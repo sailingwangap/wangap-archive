@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Wang'ap — Guide de test pré-départ (V1.9.2)</title>
+<style>
+  :root {
+    --navy: #0B1026;
+    --gold: #E8B059;
+    --gold-deep: #C9943E;
+    --teal: #2EC4B6;
+    --teal-deep: #14807A;
+    --cream: #FBF7EF;
+    --sand: #F5F0E8;
+    --slate: #2C3E50;
+    --gray: #8D99AE;
+    --coral: #E63946;
+  }
+  @page { size: A4; margin: 14mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--slate);
+    background: var(--cream);
+    line-height: 1.45;
+    font-size: 10pt;
+    padding: 18mm 16mm;
+    max-width: 210mm;
+    margin: 0 auto;
+  }
+  h1 {
+    font-family: Georgia, serif;
+    font-size: 22pt;
+    color: var(--navy);
+    margin: 0 0 2pt 0;
+    letter-spacing: 0.5pt;
+  }
+  h1 .v { color: var(--gold-deep); font-size: 14pt; font-weight: normal; margin-left: 8pt; }
+  .tagline { color: var(--gray); font-size: 10pt; margin: 0 0 8pt 0; }
+  .date-line { color: var(--teal-deep); font-size: 9pt; font-weight: 600; margin: 0 0 14pt 0; }
+
+  h2 {
+    font-size: 11pt;
+    color: var(--navy);
+    background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
+    padding: 3pt 6pt 3pt 8pt;
+    margin: 12pt 0 4pt 0;
+    border-left: 3pt solid var(--gold-deep);
+    border-radius: 1pt;
+  }
+  h3 {
+    font-size: 10pt;
+    color: var(--teal-deep);
+    margin: 6pt 0 2pt 0;
+  }
+  p { margin: 2pt 0 4pt 0; }
+  ul, ol { margin: 2pt 0 4pt 18pt; padding: 0; }
+  li { margin: 1pt 0; }
+  code {
+    background: rgba(232,176,89,0.15);
+    color: var(--gold-deep);
+    padding: 1pt 4pt;
+    border-radius: 2pt;
+    font-size: 9pt;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+  }
+  strong { color: var(--navy); }
+
+  .summary {
+    background: #fff;
+    border: 1pt solid var(--sand);
+    border-radius: 4pt;
+    padding: 8pt 10pt;
+    margin: 6pt 0 10pt 0;
+    box-shadow: 0 1pt 3pt rgba(0,0,0,0.04);
+  }
+  .summary strong { color: var(--teal-deep); }
+
+  .roadmap-grid {
+    display: grid;
+    grid-template-columns: 18mm 1fr;
+    gap: 2pt 6pt;
+    margin: 4pt 0;
+  }
+  .roadmap-grid .v { font-weight: bold; color: var(--navy); }
+  .roadmap-grid .v.done { color: var(--teal-deep); }
+  .roadmap-grid .v.future { color: var(--gray); }
+  .roadmap-grid .desc { color: var(--slate); font-size: 9.5pt; }
+
+  table.checklist {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 4pt 0;
+    font-size: 9pt;
+  }
+  table.checklist td {
+    padding: 3pt 4pt;
+    border-bottom: 0.5pt solid var(--sand);
+    vertical-align: top;
+  }
+  table.checklist td:first-child {
+    width: 38mm;
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .severity {
+    display: inline-block;
+    padding: 0.5pt 4pt;
+    border-radius: 2pt;
+    font-size: 8pt;
+    font-weight: 600;
+    margin-right: 2pt;
+  }
+  .sev-crit { background: rgba(230,57,70,0.18); color: #B22F3A; }
+  .sev-high { background: rgba(232,176,89,0.22); color: var(--gold-deep); }
+  .sev-med { background: rgba(46,196,182,0.18); color: var(--teal-deep); }
+  .sev-low { background: rgba(141,153,174,0.20); color: var(--gray); }
+
+  .report-template {
+    background: var(--sand);
+    border: 1pt dashed var(--gray);
+    border-radius: 3pt;
+    padding: 6pt 8pt;
+    margin: 4pt 0;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 8.5pt;
+    white-space: pre-line;
+    color: var(--slate);
+  }
+
+  footer {
+    margin-top: 14pt;
+    padding-top: 6pt;
+    border-top: 0.5pt solid var(--sand);
+    font-size: 8pt;
+    color: var(--gray);
+    text-align: center;
+  }
+
+  .twocol {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8pt;
+  }
+
+  @media print {
+    body { padding: 0; background: #fff; }
+    .summary { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>⛵ Wang'ap <span class="v">V1.9.2 — pré-départ</span></h1>
+<p class="tagline">Journal de bord · Catherine &amp; Bertrand · Tour du Monde à la Voile · 2026–2029</p>
+<p class="date-line">Guide de test pour la famille &amp; les amis · 9 mai 2026</p>
+
+<div class="summary">
+  <strong>👋 Bienvenue !</strong> Wang'ap est notre journal de bord numérique. Vous y suivrez le bateau en direct via AIS,
+  les posts de Catherine et Bertrand, les photos, et — si vous êtes invités à bord — votre propre passage dans le Livre d'Or.
+  L'application est <strong>prête pour le départ</strong>. On vous demande un petit coup d'œil avant la première sortie en mer
+  pour repérer ce qui pourrait être perfectionné.
+</div>
+
+<h2>🌍 Ce que fait l'application</h2>
+<div class="twocol">
+  <div>
+    <h3>Côté public — accessible à tous</h3>
+    <ul>
+      <li><strong>Page d'accueil</strong> — où est le bateau, dernières actualités, programme du tour</li>
+      <li><strong>Carte interactive</strong> — trace GPS en direct, étapes, points d'intérêt</li>
+      <li><strong>Posts publics</strong> — récits, photos, vidéos partagées en accès libre</li>
+      <li><strong>Livre d'Or</strong> 📖 — votre message après votre passage à bord (V2)</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Côté famille &amp; amis (sur invitation)</h3>
+    <ul>
+      <li><strong>Posts privés</strong> — récits réservés au cercle proche</li>
+      <li><strong>Messages</strong> — écrivez directement aux skippers, ils reçoivent une notification</li>
+      <li><strong>Carte avec position précise</strong> — sans le délai public</li>
+      <li><strong>Notifications push</strong> — à chaque nouveau post si vous le souhaitez</li>
+    </ul>
+  </div>
+</div>
+
+<h2>🗺️ Feuille de route</h2>
+<div class="roadmap-grid">
+  <div class="v done">V1 ✅</div>
+  <div class="desc"><strong>Stabilisation pré-départ</strong> — l'application complète. V1.6 → V1.9.2 (mai 2026). Tout marche : auth, posts, carte, AIS direct, mode offline, multi-langues FR/EN, PWA installable. <strong>Vous testez cette version.</strong></div>
+
+  <div class="v done">V1.9 ⭐</div>
+  <div class="desc"><strong>Audit complet pré-départ</strong> (terminé 9 mai 2026) — 28 corrections sur 3 sprints (v1.9 / v1.9.1 / v1.9.2). Lighthouse public : Perf <strong>24 → 78</strong>, A11Y <strong>80 → 93</strong>. Worker AIS Fly.io v9 déployé.</div>
+
+  <div class="v">V2 📋</div>
+  <div class="desc"><strong>Pendant le voyage</strong> — Sauvegarde Google Drive, <strong>Livre d'Or</strong>, newsletter, traduction multilingue, vue calendrier, refonte des Stats, animation 3D du voyage type PolarSteps, génération de livre PDF, import historique GPX/AIS, "Le Renard" entraîné sur les manuels du bateau.</div>
+
+  <div class="v future">V3 🌍</div>
+  <div class="desc">Améliorations avancées (passages au moteur, météo, app native, multi-bateaux AIS) — uniquement si un besoin réel apparaît pendant le voyage.</div>
+</div>
+
+<h2>🧪 Comment tester (UAT)</h2>
+
+<h3>1. Sur quoi tester ?</h3>
+<ul>
+  <li><strong>iPhone Safari</strong> (en navigateur web)</li>
+  <li><strong>iPhone PWA</strong> — ouvrir <code>www.wangap.fr</code> sur Safari, puis <em>Partager → Sur l'écran d'accueil</em></li>
+  <li><strong>Android Chrome</strong> + Android PWA installable de la même façon</li>
+  <li><strong>Ordinateur</strong> — Chrome, Safari, Firefox, Edge si disponible</li>
+  <li><strong>iPad</strong> en portrait et en paysage</li>
+</ul>
+
+<h3>2. Que faire ?</h3>
+<table class="checklist">
+  <tr><td>Page publique <code>/</code></td><td>Le bateau apparaît-il sur la mini-carte ? Les derniers posts s'affichent-ils ? Le menu burger fonctionne-t-il ? Cliquer sur "Voir sur la carte" depuis un post — est-ce que la carte reste bien centrée sur le post ?</td></tr>
+  <tr><td>Connexion famille</td><td>Si vous avez reçu un compte, connectez-vous. Le clavier disparaît-il après "Se connecter" ? La page Famille s'affiche-t-elle correctement ?</td></tr>
+  <tr><td>Posts &amp; commentaires</td><td>Lire les posts, ouvrir les photos en plein écran (lightbox), revenir, faire défiler. Tout est-il fluide ?</td></tr>
+  <tr><td>Carte interactive</td><td>Zoom / dézoom / déplacement. Bouton 🧭 (basemap nautique) — la trace reste colorée ? Tap sur un point waypoint — la popup s'affiche correctement ?</td></tr>
+  <tr><td>Composer un message</td><td>Cliquer "Écrire aux skippers" sur la page publique ou famille. Le formulaire s'ouvre ? Le bouton de fermeture est accessible ?</td></tr>
+  <tr><td>Mode offline (avancé)</td><td>Mettre l'iPhone en mode avion sur la page Carte — la trace reste-t-elle visible ? Recharger — l'app fonctionne-t-elle toujours ?</td></tr>
+</table>
+
+<h3>3. Quoi regarder ?</h3>
+<ul>
+  <li><strong>Affichage</strong> — texte coupé, boutons hors écran, superpositions, espaces blancs anormaux, photos qui ne se chargent pas</li>
+  <li><strong>Performance</strong> — chargement &gt; 3 s, animations qui saccadent, scroll qui rame</li>
+  <li><strong>Comportement</strong> — clics qui ne font rien, formulaires qui ne se soumettent pas, navigation cassée</li>
+  <li><strong>Lisibilité</strong> — contrastes faibles, polices trop petites, couleurs difficiles à lire (notamment au soleil)</li>
+  <li><strong>Pinch-zoom</strong> — vous pouvez zoomer sur une page avec deux doigts ? (depuis V1.9.2 c'est le cas, c'est voulu pour l'accessibilité)</li>
+</ul>
+
+<h2>✏️ Comment reporter</h2>
+
+<h3>Format suggéré (1 bug = 1 message)</h3>
+<div class="report-template">📱 Appareil : iPhone 14 Pro · iOS 18 · Safari (ou PWA installée)
+📍 Page : /map (Carte) — ou : /timeline · /family · / (public)
+👀 Ce que je vois : la trace devient orange au lieu de rester en couleurs après tap sur 🧭
+✅ Ce que j'attendais : trace reste en couleurs (chapitres / étapes)
+🖼️ Capture : (joindre si possible — ⏹+🔘 sur iPhone)
+🔁 Reproductible : oui / non / parfois</div>
+
+<h3>Niveaux de gravité</h3>
+<p>
+  <span class="severity sev-crit">CRITIQUE</span> ne peut pas utiliser une fonction (ex : impossible de publier un post)<br/>
+  <span class="severity sev-high">HAUTE</span> bug visible mais contournement possible (ex : bouton hors écran sauf si on scrolle)<br/>
+  <span class="severity sev-med">MOYENNE</span> gêne l'expérience (ex : texte coupé, animation lente)<br/>
+  <span class="severity sev-low">FAIBLE</span> détail visuel ou polish (ex : couleur, marge, alignement)
+</p>
+
+<h3>Catégories</h3>
+<ul>
+  <li><strong>🐛 Bug</strong> — quelque chose ne marche pas / crashe / s'affiche mal</li>
+  <li><strong>💡 Amélioration</strong> — ça marche mais ça pourrait être plus simple / plus clair</li>
+  <li><strong>🎨 Design</strong> — esthétique, lisibilité, ergonomie, ton de la copie</li>
+  <li><strong>❓ Question</strong> — comportement pas clair, manque d'explication</li>
+</ul>
+
+<h3>Où envoyer ?</h3>
+<p>
+  <strong>Catherine ou Bertrand</strong> par message WhatsApp / SMS / email. Pour les retours détaillés (avec capture), envoyez à
+  <code>flavien.maire@gmail.com</code> avec <code>[Wang'ap UAT]</code> en sujet.
+</p>
+
+<h3>🔧 Si l'app semble bloquée sur une ancienne version</h3>
+<p>
+  Après une mise à jour, votre navigateur ou la PWA peut garder l'ancienne version en cache. Si quelque chose semble cassé (boutons manquants,
+  mise en page étrange), ouvrez ce lien magique dans Safari ou la PWA :
+</p>
+<div class="report-template">https://www.wangap.fr/?reset=1</div>
+<p>
+  La page va vider son propre cache et recharger une version fraîche, automatiquement. C'est la même action que le bouton
+  <em>« 🔄 Forcer la mise à jour »</em> côté skipper dans <strong>Réglages → 🔧 Maintenance technique</strong>.
+</p>
+
+<h2>📅 Contexte du test</h2>
+<p>
+  Catherine et Bertrand <strong>réceptionnent le bateau (Outremer 52) la semaine prochaine</strong> à La Grande-Motte. Le programme :
+  d'abord une <strong>préparation au port</strong> (équipements, panneaux solaires, formation), puis des <strong>petites sorties</strong>
+  (Aigues-Mortes, golfe du Lion) avant la grande boucle Méditerranée → Atlantique → Antilles → Pacifique.
+</p>
+<p>
+  L'app sera utilisée tous les jours à bord, donc vos retours sur la fiabilité, la lisibilité au soleil, et la consommation de batterie
+  sont précieux. Pas besoin de tout tester d'un coup — un retour court vaut mieux qu'un grand silence.
+</p>
+
+<footer>
+  Wang'ap V1.9.2 · 9 mai 2026 · <code>https://www.wangap.fr/</code> · Code source <code>github.com/sailingwangap/jdb_wangap</code><br/>
+  Catherine &amp; Bertrand · Outremer 52 · Tour du Monde 2026–2029 — pour la feuille de route détaillée voir <code>docs/roadmap/wangap_roadmap.html</code>
+</footer>
+
+</body>
+</html>

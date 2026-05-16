@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wang'ap — Guide utilisateur</title>
+  <style>
+    :root {
+      --night: #0B1026;
+      --navy: #162447;
+      --blue: #1F4068;
+      --teal: #1B9AAA;
+      --gold: #E8B059;
+      --coral: #E07A5F;
+      --sand: #F4F1DE;
+      --cream: #FFFCF2;
+      --slate: #3D405B;
+      --gray: #8D99AE;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--slate);
+      background: var(--cream);
+      line-height: 1.6;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--night) 0%, var(--navy) 100%);
+      color: #fff;
+      padding: 60px 24px 50px;
+      text-align: center;
+    }
+    .hero img { width: 80px; margin-bottom: 16px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
+    .hero h1 { font-family: Georgia, serif; font-size: 2.8rem; letter-spacing: -1px; margin-bottom: 4px; }
+    .hero .subtitle { color: var(--gold); font-size: 1.1rem; font-weight: 500; }
+    .hero .tagline { color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-top: 4px; }
+    .hero .badge {
+      display: inline-block; margin-top: 20px; padding: 6px 18px;
+      border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+      background: rgba(27,154,170,0.2); border: 1px solid rgba(27,154,170,0.4); color: var(--teal);
+    }
+
+    /* Container */
+    .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+    /* Section */
+    section { padding: 50px 0; }
+    section:nth-child(even) { background: var(--sand); }
+    h2 {
+      font-family: Georgia, serif; font-size: 1.6rem; margin-bottom: 24px;
+      color: var(--slate); text-align: center;
+    }
+    h3 { font-size: 1rem; color: var(--teal); margin-bottom: 8px; }
+    p { font-size: 0.9rem; color: var(--slate); margin-bottom: 12px; }
+
+    /* Screenshot gallery */
+    .screenshots {
+      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+      margin: 30px 0;
+    }
+    .screenshot-item { text-align: center; }
+    .screenshot {
+      width: 180px; border-radius: 20px; overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      border: 3px solid rgba(0,0,0,0.08);
+    }
+    .screenshot img { width: 100%; display: block; }
+    .screenshot-label {
+      font-size: 0.72rem; font-weight: 600;
+      color: var(--gray); margin-top: 8px;
+    }
+
+    /* Feature showcase — screenshot + description side by side */
+    .showcase {
+      display: flex; align-items: center; gap: 32px;
+      margin: 40px 0; padding: 0 10px;
+    }
+    .showcase.reverse { flex-direction: row-reverse; }
+    .showcase .screenshot { width: 220px; flex-shrink: 0; }
+    .showcase .desc { flex: 1; }
+    .showcase .desc h3 { font-size: 1.15rem; margin-bottom: 10px; }
+    .showcase .desc p { font-size: 0.88rem; color: var(--gray); margin-bottom: 8px; }
+    .showcase .desc .tag {
+      display: inline-block; padding: 3px 10px; border-radius: 12px;
+      font-size: 0.7rem; font-weight: 600; margin-right: 4px; margin-bottom: 4px;
+      background: rgba(27,154,170,0.1); color: var(--teal);
+    }
+    @media (max-width: 640px) {
+      .showcase, .showcase.reverse { flex-direction: column; align-items: center; text-align: center; }
+      .showcase .screenshot { width: 200px; }
+    }
+
+    /* Feature grid */
+    .features {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px; margin-top: 20px;
+    }
+    .feature {
+      background: #fff; border-radius: 16px; padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+    .feature .icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .feature h3 { margin-bottom: 6px; }
+    .feature p { font-size: 0.82rem; color: var(--gray); margin: 0; }
+
+    /* Access levels */
+    .levels {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-top: 20px;
+    }
+    .level {
+      border-radius: 16px; padding: 20px; text-align: center;
+    }
+    .level.public { background: linear-gradient(135deg, var(--navy), var(--blue)); color: #fff; }
+    .level.family { background: linear-gradient(135deg, var(--teal), #2ec4b6); color: #fff; }
+    .level.admin { background: linear-gradient(135deg, var(--gold), var(--coral)); color: #fff; }
+    .level .icon { font-size: 2rem; margin-bottom: 8px; }
+    .level h3 { color: #fff; font-size: 1rem; }
+    .level p { color: rgba(255,255,255,0.85); font-size: 0.8rem; margin: 0; }
+    .level ul { text-align: left; font-size: 0.8rem; margin-top: 10px; padding-left: 18px; color: rgba(255,255,255,0.9); }
+    .level li { margin-bottom: 4px; }
+
+    /* Tab bar mockup */
+    .tabbar {
+      display: flex; justify-content: center; gap: 24px;
+      background: var(--night); border-radius: 16px; padding: 14px 20px;
+      margin: 24px auto; max-width: 400px;
+    }
+    .tabbar .tab { text-align: center; }
+    .tabbar .tab .emoji { font-size: 1.4rem; }
+    .tabbar .tab .label { font-size: 0.6rem; color: var(--gray); margin-top: 2px; }
+    .tabbar .tab.active .label { color: var(--teal); }
+
+    /* Tech stack */
+    .stack {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px;
+    }
+    .stack .chip {
+      padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+      background: var(--navy); color: var(--teal);
+    }
+
+    /* Flow diagram */
+    .flow {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; flex-wrap: wrap; margin: 20px 0;
+    }
+    .flow .step {
+      background: #fff; border-radius: 12px; padding: 10px 16px;
+      font-size: 0.8rem; font-weight: 600; color: var(--slate);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .flow .arrow { color: var(--teal); font-size: 1.2rem; }
+
+    /* Separator */
+    .sep { height: 1px; background: rgba(0,0,0,0.06); margin: 40px 0; }
+
+    /* Footer */
+    footer {
+      background: var(--night); color: var(--gray); text-align: center;
+      padding: 30px 20px; font-size: 0.75rem;
+    }
+    footer img { width: 30px; opacity: 0.3; margin-bottom: 8px; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 2rem; }
+      .screenshot { width: 150px !important; }
+      .features { grid-template-columns: 1fr; }
+      .levels { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <div class="hero">
+    <img src="images/logo.png" alt="Wang'ap" />
+    <h1>wang'ap</h1>
+    <div class="subtitle">Guide utilisateur</div>
+    <div class="tagline">Journal de Bord — Catherine & Bertrand</div>
+    <div class="badge">PWA Offline-First &middot; React 19 &middot; Supabase &middot; V1.0</div>
+
+    <div style="display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap;">
+      <a href="#feedback" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 25px; font-size: 0.85rem; font-weight: 600; text-decoration: none; color: #fff; background: var(--coral); box-shadow: 0 4px 15px rgba(224,122,95,0.4); transition: transform 0.2s;"
+         onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+        💬 Feedback V1
+      </a>
+      <a href="#v2" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 25px; font-size: 0.85rem; font-weight: 600; text-decoration: none; color: #fff; background: var(--teal); box-shadow: 0 4px 15px rgba(27,154,170,0.4); transition: transform 0.2s;"
+         onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+        🗺️ Fonctionnalites V2
+      </a>
+    </div>
+  </div>
+
+  <!-- CONCEPT -->
+  <section>
+    <div class="container">
+      <h2>Le concept</h2>
+      <p>
+        <strong>Wang'ap</strong> est le journal de bord numerique de Catherine et Bertrand,
+        qui partent pour un tour du monde a la voile de 3 ans (2026-2029) a bord de leur
+        catamaran <strong>Outremer 52</strong>.
+      </p>
+      <p>
+        L'application permet de partager le voyage en temps reel avec la famille et les amis,
+        tout en servant d'outil de gestion technique pour les skippers :
+        suivi GPS, carnet de maintenance, gestion des taches, et un assistant IA
+        pour les questions techniques sur le bateau.
+      </p>
+      <p>
+        Concue pour fonctionner <strong>hors ligne</strong> (en pleine mer, sans connexion),
+        l'application synchronise automatiquement les donnees des qu'une connexion est disponible
+        (WiFi marina, Starlink, reseau mobile).
+      </p>
+    </div>
+  </section>
+
+  <!-- ECRANS PUBLICS -->
+  <section>
+    <div class="container">
+      <h2>Ecrans publics</h2>
+      <div class="screenshots">
+        <div class="screenshot-item">
+          <div class="screenshot"><img src="screenshots/landing.png" alt="Page d'accueil" /></div>
+          <div class="screenshot-label">Accueil</div>
+        </div>
+        <div class="screenshot-item">
+          <div class="screenshot"><img src="screenshots/about.png" alt="A propos" /></div>
+          <div class="screenshot-label">Le projet</div>
+        </div>
+        <div class="screenshot-item">
+          <div class="screenshot"><img src="screenshots/login.png" alt="Connexion" /></div>
+          <div class="screenshot-label">Connexion</div>
+        </div>
+      </div>
+      <p style="text-align:center; font-size: 0.82rem; color: var(--gray);">
+        Page d'accueil avec photo aerienne du lagon, carte du parcours mondial (32 etapes),
+        derniers articles publics, newsletter et formulaire de message aux skippers.
+      </p>
+    </div>
+  </section>
+
+  <!-- 3 NIVEAUX D'ACCES -->
+  <section>
+    <div class="container">
+      <h2>3 niveaux d'acces</h2>
+      <div class="levels">
+        <div class="level public">
+          <div class="icon">🌍</div>
+          <h3>Public</h3>
+          <p>Visiteurs, amis, curieux</p>
+          <ul>
+            <li>Page d'accueil avec photo aerienne</li>
+            <li>Carte du parcours (32 waypoints)</li>
+            <li>Articles publics du journal</li>
+            <li>Newsletter &amp; message aux skippers</li>
+            <li>Page "A propos" du projet</li>
+          </ul>
+        </div>
+        <div class="level family">
+          <div class="icon">👨‍👩‍👧‍👦</div>
+          <h3>Famille</h3>
+          <p>Connexion par lien magique</p>
+          <ul>
+            <li>Tableau de bord famille</li>
+            <li>Articles famille + publics</li>
+            <li>Commentaires sur les posts</li>
+            <li>Position en temps reel</li>
+            <li>Carte interactive</li>
+          </ul>
+        </div>
+        <div class="level admin">
+          <div class="icon">⚓</div>
+          <h3>Skipper</h3>
+          <p>Catherine &amp; Bertrand</p>
+          <ul>
+            <li>Journal complet (prive/famille/public)</li>
+            <li>Carnet de maintenance</li>
+            <li>Liste de taches prioritaires</li>
+            <li>Boite de reception</li>
+            <li>Le Renard (assistant IA)</li>
+            <li>Statistiques &amp; reglages</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ECRANS SKIPPER — Showcase avec screenshots -->
+  <section>
+    <div class="container">
+      <h2>Les ecrans du skipper</h2>
+
+      <!-- Journal -->
+      <div class="showcase">
+        <div class="screenshot"><img src="screenshots/timeline.png" alt="Journal" /></div>
+        <div class="desc">
+          <h3>📖 Journal de bord</h3>
+          <p>
+            Le fil chronologique du voyage. Chaque entree a un titre, une categorie,
+            un niveau de visibilite (public, famille, prive), et des photos compressees
+            automatiquement.
+          </p>
+          <p>
+            Barre de recherche par pull-down, filtres de visibilite,
+            compteurs de milles parcourus et d'escales.
+          </p>
+          <span class="tag">7 categories</span>
+          <span class="tag">3 visibilites</span>
+          <span class="tag">Photos &lt;500 Ko</span>
+          <span class="tag">Commentaires</span>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <!-- Carte -->
+      <div class="showcase reverse">
+        <div class="screenshot"><img src="screenshots/map.png" alt="Carte" /></div>
+        <div class="desc">
+          <h3>🗺️ Carte interactive</h3>
+          <p>
+            Carte plein ecran avec tuiles CARTO Voyager. Bascule vers les cartes nautiques
+            (OpenSeaMap). Articles geolocalisees affichees sous forme de pins avec photos.
+          </p>
+          <p>
+            Filtres de POIs : mouillages, marinas, fuel, restaurants, sites de plongee.
+            Position actuelle avec indicateur pulse.
+          </p>
+          <span class="tag">MapLibre GL</span>
+          <span class="tag">Cartes nautiques</span>
+          <span class="tag">POIs filtres</span>
+          <span class="tag">Position GPS</span>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <!-- Stats -->
+      <div class="showcase">
+        <div class="screenshot"><img src="screenshots/insights.png" alt="Statistiques" /></div>
+        <div class="desc">
+          <h3>📊 Statistiques</h3>
+          <p>
+            Tableau de bord avec KPIs : distance, vitesse moyenne et max, nuits en mer,
+            etape max, carburant. Graphiques interactifs Recharts.
+          </p>
+          <p>
+            Vitesse par jour (barres), distance cumulee (courbe avec aire),
+            repartition par categorie (camembert). Filtres Total/Semaine/Mois.
+          </p>
+          <span class="tag">6 KPIs</span>
+          <span class="tag">Recharts</span>
+          <span class="tag">3 graphiques</span>
+          <span class="tag">Filtres temporels</span>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <!-- Maintenance -->
+      <div class="showcase reverse">
+        <div class="screenshot"><img src="screenshots/maintenance.png" alt="Maintenance" /></div>
+        <div class="desc">
+          <h3>🔧 Carnet de maintenance</h3>
+          <p>
+            Suivi technique complet du bateau. 12 categories : moteur, voiles, electricite,
+            plomberie, grement, coque, mouillage, securite...
+          </p>
+          <p>
+            Heures moteur, pieces utilisees avec couts, alertes de prochaine echeance.
+            Sous-onglet "A faire" pour la liste de taches prioritaires avec 4 niveaux d'urgence.
+          </p>
+          <span class="tag">12 categories</span>
+          <span class="tag">Heures moteur</span>
+          <span class="tag">Pieces + couts</span>
+          <span class="tag">Alertes echeance</span>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <!-- Le Renard -->
+      <div class="showcase">
+        <div class="screenshot"><img src="screenshots/renard.png" alt="Le Renard" /></div>
+        <div class="desc">
+          <h3>🦊 Le Renard — Assistant IA</h3>
+          <p>
+            Assistant technique propulse par Claude (Anthropic). Pose des questions
+            sur le bateau et obtiens des reponses avec citations des manuels techniques.
+          </p>
+          <p>
+            Choix du modele : Haiku (~0.001&euro;/requete, rapide) ou
+            Sonnet (~0.006&euro;, plus precis). Mode hors ligne avec recherche par mots-cles.
+            Base de connaissances alimentee par upload de PDFs.
+          </p>
+          <span class="tag">Claude API</span>
+          <span class="tag">RAG</span>
+          <span class="tag">Sources citees</span>
+          <span class="tag">Mode offline</span>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <!-- Reglages -->
+      <div class="showcase reverse">
+        <div class="screenshot"><img src="screenshots/settings.png" alt="Reglages" /></div>
+        <div class="desc">
+          <h3>⚙️ Reglages</h3>
+          <p>
+            Configuration complete de l'application : langue (FR/EN),
+            mode de synchronisation (Auto/Manuel/Off), source de tracking
+            (GPS/AIS/Manuel) avec intervalle configurable.
+          </p>
+          <p>
+            Notifications push par categorie (nouveaux posts, commentaires, messages,
+            alertes maintenance). Bouton "Forcer la sync" pour upload immediat.
+          </p>
+          <span class="tag">Sync Auto/Manuel/Off</span>
+          <span class="tag">GPS 5-60 min</span>
+          <span class="tag">Push par categorie</span>
+          <span class="tag">FR/EN</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NAVIGATION -->
+  <section>
+    <div class="container">
+      <h2>Navigation</h2>
+      <p style="text-align:center; margin-bottom: 20px;">
+        Barre de navigation mobile avec 6 onglets (5 pour la famille) :
+      </p>
+      <div class="tabbar">
+        <div class="tab"><div class="emoji">📖</div><div class="label">Journal</div></div>
+        <div class="tab"><div class="emoji">🗺️</div><div class="label">Carte</div></div>
+        <div class="tab"><div class="emoji">📊</div><div class="label">Stats</div></div>
+        <div class="tab"><div class="emoji">🔧</div><div class="label">Tech</div></div>
+        <div class="tab active"><div class="emoji">🦊</div><div class="label">Renard</div></div>
+        <div class="tab"><div class="emoji">⚙️</div><div class="label">Reglages</div></div>
+      </div>
+      <p style="text-align:center; font-size: 0.8rem; color: var(--gray);">
+        Sur desktop : barre laterale avec les memes elements.
+      </p>
+    </div>
+  </section>
+
+  <!-- LOGIQUE OFFLINE -->
+  <section>
+    <div class="container">
+      <h2>Logique hors ligne</h2>
+      <p>
+        En pleine mer, la connexion est rare. Wang'ap est concu pour fonctionner
+        entierement hors ligne et synchroniser des qu'une connexion est disponible.
+      </p>
+      <div class="flow">
+        <div class="step">📝 Creation locale</div>
+        <div class="arrow">&rarr;</div>
+        <div class="step">💾 IndexedDB</div>
+        <div class="arrow">&rarr;</div>
+        <div class="step">📶 Connexion detectee</div>
+        <div class="arrow">&rarr;</div>
+        <div class="step">☁️ Sync Supabase</div>
+      </div>
+      <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+        <div class="feature">
+          <h3>Mode Auto</h3>
+          <p>Synchronise des que le reseau est disponible. Ideal en marina avec WiFi.</p>
+        </div>
+        <div class="feature">
+          <h3>Mode Manuel</h3>
+          <p>Synchronise uniquement quand le skipper appuie sur le bouton. Economise les donnees Starlink.</p>
+        </div>
+        <div class="feature">
+          <h3>Mode Off</h3>
+          <p>Aucune synchronisation. Tout reste en local. Utile en navigation hauturiere.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PIPELINE LE RENARD -->
+  <section>
+    <div class="container">
+      <h2>🦊 Pipeline Le Renard</h2>
+      <div class="flow">
+        <div class="step">📄 Upload PDF</div>
+        <div class="arrow">&rarr;</div>
+        <div class="step">✂️ Decoupage ~500 tokens</div>
+        <div class="arrow">&rarr;</div>
+        <div class="step">🗄️ Indexation tsvector</div>
+        <div class="arrow">&rarr;</div>
+        <div class="step">🔍 Recherche RAG</div>
+        <div class="arrow">&rarr;</div>
+        <div class="step">🦊 Claude API</div>
+      </div>
+      <div class="features" style="grid-template-columns: 1fr 1fr; margin-top: 24px;">
+        <div class="feature">
+          <h3>Mode en ligne</h3>
+          <p>
+            Recherche dans la base de connaissances (RAG) puis envoie le contexte a
+            l'API Claude. Reponse en streaming avec citations des sources (document + page).
+          </p>
+        </div>
+        <div class="feature">
+          <h3>Mode hors ligne</h3>
+          <p>
+            Recherche par mots-cles dans la base locale (PostgreSQL full-text search).
+            Pas de LLM — retourne les extraits pertinents des manuels.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK TECHNIQUE -->
+  <section>
+    <div class="container">
+      <h2>Stack technique</h2>
+      <div class="stack">
+        <span class="chip">React 19</span>
+        <span class="chip">Vite 8</span>
+        <span class="chip">Tailwind v4</span>
+        <span class="chip">React Router v7</span>
+        <span class="chip">Supabase</span>
+        <span class="chip">PostgreSQL + RLS</span>
+        <span class="chip">MapLibre GL</span>
+        <span class="chip">Dexie (IndexedDB)</span>
+        <span class="chip">Recharts</span>
+        <span class="chip">Claude API</span>
+        <span class="chip">i18next</span>
+        <span class="chip">Vercel</span>
+        <span class="chip">Web Push API</span>
+        <span class="chip">Service Worker</span>
+      </div>
+      <div class="features" style="margin-top: 30px; grid-template-columns: 1fr 1fr;">
+        <div class="feature">
+          <h3>Frontend</h3>
+          <p>
+            React 19 + Vite 8 + Tailwind v4. Design system Le Petit Prince
+            (nuit etoilee, palette nautique). Mobile-first, responsive.
+            12 pages, 40+ composants, 10 hooks custom.
+          </p>
+        </div>
+        <div class="feature">
+          <h3>Backend</h3>
+          <p>
+            Supabase : PostgreSQL avec Row Level Security, Auth (magic link + mot de passe),
+            Storage (photos), Realtime (commentaires, messages).
+            11 tables, 20+ politiques RLS. Fonctions serverless Vercel.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEPLOIEMENT -->
+  <section>
+    <div class="container">
+      <h2>Deploiement</h2>
+      <div class="flow">
+        <div class="step">git push main</div>
+        <div class="arrow">&rarr;</div>
+        <div class="step">Vercel auto-deploy</div>
+        <div class="arrow">&rarr;</div>
+        <div class="step">jdb-wangap-bay.vercel.app</div>
+      </div>
+      <p style="text-align: center; margin-top: 16px;">
+        Deploiement automatique sur chaque push.
+        Build Vite (~0.5s), fonctions serverless pour l'API Le Renard et l'ingestion de documents.
+      </p>
+    </div>
+  </section>
+
+  <!-- AIS -->
+  <section>
+    <div class="container">
+      <h2>📡 Integration AIS</h2>
+      <p>
+        L'AIS (Automatic Identification System) permet de suivre la position du Wang'ap
+        et des navires a proximite. Deux sources complementaires :
+      </p>
+
+      <div class="features" style="grid-template-columns: 1fr 1fr; margin-top: 20px;">
+        <div class="feature">
+          <div class="icon">🖥️</div>
+          <h3>Signal K (a bord)</h3>
+          <p>
+            Serveur open source (Node.js) sur un Raspberry Pi connecte au transpondeur AIS
+            du bord via NMEA. Expose toutes les donnees en temps reel via WebSocket :
+            position, COG, SOG, vent, profondeur, navires proches.
+          </p>
+          <p style="margin-top: 8px;">
+            La PWA se connecte en <code>ws://signalk.local:3000</code> sur le WiFi du bord.
+            Rafraichissement : 1-2 secondes. Fonctionne sans internet.
+          </p>
+          <span class="tag">Temps reel</span>
+          <span class="tag">Offline</span>
+          <span class="tag">~250&euro; hardware</span>
+        </div>
+        <div class="feature">
+          <div class="icon">🌐</div>
+          <h3>MarineTraffic API (a distance)</h3>
+          <p>
+            Suivi par MMSI quand le bateau est hors du reseau local.
+            Ideal pour la famille qui veut suivre la position depuis la France.
+            Couverture satellite en haute mer (delai 5-60 min).
+          </p>
+          <p style="margin-top: 8px;">
+            Appel REST toutes les 5 min quand connecte.
+            Derniere position cachee dans IndexedDB pour consultation offline.
+          </p>
+          <span class="tag">Suivi famille</span>
+          <span class="tag">~15&euro;/mois</span>
+          <span class="tag">Satellite</span>
+        </div>
+      </div>
+
+      <div class="flow" style="margin-top: 24px;">
+        <div class="step">🔌 AIS Transponder</div>
+        <div class="arrow">&rarr;</div>
+        <div class="step">🖥️ Signal K (RPi)</div>
+        <div class="arrow">&rarr;</div>
+        <div class="step">📶 WiFi bord</div>
+        <div class="arrow">&rarr;</div>
+        <div class="step">📱 PWA WebSocket</div>
+      </div>
+      <p style="text-align: center; font-size: 0.8rem; color: var(--gray); margin-top: 12px;">
+        Fallback : si Signal K indisponible &rarr; MarineTraffic API par MMSI &rarr; cache IndexedDB
+      </p>
+    </div>
+  </section>
+
+  <!-- V2 ROADMAP — Interactive voting -->
+  <section id="v2">
+    <div class="container">
+      <h2>🗺️ V2 — Votez pour les fonctionnalites !</h2>
+      <p style="text-align: center; margin-bottom: 8px;">
+        Notez de 1 a 5 et choisissez l'urgence. <strong>Cliquez sur une ligne pour voter.</strong>
+      </p>
+      <div style="text-align: center; margin-bottom: 20px;">
+        <input id="voter-name" type="text" placeholder="Votre prenom" style="padding: 6px 14px; border-radius: 10px; border: 1px solid var(--sand); font-size: 0.82rem; outline: none; color: var(--slate); width: 200px; text-align: center;" />
+      </div>
+
+      <div id="v2-features"></div>
+      <div id="v2-status" style="text-align: center; margin-top: 12px; font-size: 0.82rem;"></div>
+    </div>
+  </section>
+
+  <style>
+    .cat-header { font-size: 0.85rem; font-weight: 700; color: var(--slate); margin: 20px 0 8px; padding: 6px 12px; background: var(--sand); border-radius: 8px; }
+    .cat-header:first-child { margin-top: 0; }
+    .feat-row { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 10px; margin-bottom: 4px; background: #fff; transition: background 0.15s; cursor: pointer; flex-wrap: wrap; }
+    .feat-row:hover { background: rgba(27,154,170,0.04); }
+    .feat-row.done-row { background: rgba(46,196,182,0.06); }
+    .feat-id { font-size: 0.65rem; font-weight: 700; color: var(--gray); width: 24px; flex-shrink: 0; }
+    .feat-name { font-size: 0.8rem; font-weight: 600; color: var(--slate); flex: 1; min-width: 120px; }
+    .feat-done { font-size: 0.6rem; color: var(--green); font-weight: 600; }
+    .feat-pri { font-size: 0.6rem; padding: 1px 6px; border-radius: 6px; font-weight: 600; flex-shrink: 0; }
+    .pri-P1 { background: rgba(27,154,170,0.12); color: var(--teal); }
+    .pri-P2 { background: rgba(232,176,89,0.12); color: var(--gold); }
+    .pri-P3 { background: rgba(141,153,174,0.12); color: var(--gray); }
+    .feat-stars { display: flex; gap: 2px; flex-shrink: 0; }
+    .feat-stars button { width: 22px; height: 22px; border: none; border-radius: 4px; background: var(--sand); color: var(--gray); font-size: 0.7rem; cursor: pointer; transition: all 0.1s; padding: 0; }
+    .feat-stars button.on { background: var(--teal); color: #fff; }
+    .feat-urg { display: flex; gap: 2px; flex-shrink: 0; }
+    .feat-urg button { border: none; border-radius: 4px; padding: 2px 6px; font-size: 0.6rem; cursor: pointer; background: var(--sand); color: var(--gray); transition: all 0.1s; }
+    .feat-urg button.on-low { background: rgba(46,196,182,0.15); color: var(--teal); font-weight: 600; }
+    .feat-urg button.on-med { background: rgba(232,176,89,0.15); color: var(--gold); font-weight: 600; }
+    .feat-urg button.on-high { background: rgba(230,57,70,0.15); color: #E63946; font-weight: 600; }
+    .feat-send { border: none; border-radius: 6px; padding: 4px 10px; font-size: 0.65rem; font-weight: 600; cursor: pointer; background: var(--sand); color: var(--gray); flex-shrink: 0; transition: all 0.15s; }
+    .feat-send:hover { background: var(--teal); color: #fff; }
+    .feat-send.sent { background: rgba(46,196,182,0.15); color: var(--teal); cursor: default; }
+    @media (max-width: 500px) {
+      .feat-row { padding: 6px 8px; }
+      .feat-name { font-size: 0.75rem; }
+      .feat-stars button { width: 20px; height: 20px; font-size: 0.65rem; }
+    }
+  </style>
+
+  <!-- FEEDBACK V1 — Interactive form -->
+  <section id="feedback">
+    <div class="container">
+      <h2>💬 Feedback V1</h2>
+      <p style="text-align: center; margin-bottom: 20px;">
+        Signalez un bug ou proposez une amelioration. Chaque envoi est enregistre et traite.
+      </p>
+
+      <form id="feedback-form" style="background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 0.75rem; font-weight: 600; color: var(--gray); display: block; margin-bottom: 4px;">Votre prenom</label>
+          <input id="fb-name" type="text" placeholder="Catherine, Bertrand, Kevin..."
+            style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--sand); font-size: 0.85rem; outline: none; color: var(--slate); box-sizing: border-box;" />
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 0.75rem; font-weight: 600; color: var(--gray); display: block; margin-bottom: 4px;">Section concernee</label>
+          <select id="fb-section" style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--sand); font-size: 0.85rem; color: var(--slate); background: #fff; box-sizing: border-box;">
+            <option value="">-- Choisir --</option>
+            <option value="journal">📖 Journal</option>
+            <option value="carte">🗺️ Carte</option>
+            <option value="stats">📊 Statistiques</option>
+            <option value="maintenance">🔧 Maintenance</option>
+            <option value="renard">🦊 Le Renard</option>
+            <option value="inbox">✉️ Messagerie</option>
+            <option value="settings">⚙️ Reglages</option>
+            <option value="landing">🏠 Page d'accueil</option>
+            <option value="general">🌐 General</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 0.75rem; font-weight: 600; color: var(--gray); display: block; margin-bottom: 4px;">Type</label>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" onclick="setFbType('bug')" id="fb-type-bug"
+              style="flex: 1; padding: 8px; border-radius: 10px; border: 2px solid var(--coral); background: rgba(224,122,95,0.08); color: var(--coral); font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+              🐛 Bug
+            </button>
+            <button type="button" onclick="setFbType('improvement')" id="fb-type-improvement"
+              style="flex: 1; padding: 8px; border-radius: 10px; border: 1px solid var(--sand); background: #fff; color: var(--gray); font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+              💡 Amelioration
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 0.75rem; font-weight: 600; color: var(--gray); display: block; margin-bottom: 4px;">Urgence</label>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" onclick="setFbUrgency('low')" id="fb-urg-low" class="urg-btn" style="flex:1; padding:6px; border-radius:8px; border:1px solid var(--sand); background:#fff; color:var(--gray); font-size:0.75rem; cursor:pointer;">🟢 Basse</button>
+            <button type="button" onclick="setFbUrgency('medium')" id="fb-urg-medium" class="urg-btn" style="flex:1; padding:6px; border-radius:8px; border:2px solid var(--gold); background:rgba(232,176,89,0.08); color:var(--gold); font-size:0.75rem; font-weight:600; cursor:pointer;">🟡 Moyenne</button>
+            <button type="button" onclick="setFbUrgency('high')" id="fb-urg-high" class="urg-btn" style="flex:1; padding:6px; border-radius:8px; border:1px solid var(--sand); background:#fff; color:var(--gray); font-size:0.75rem; cursor:pointer;">🟠 Haute</button>
+            <button type="button" onclick="setFbUrgency('critical')" id="fb-urg-critical" class="urg-btn" style="flex:1; padding:6px; border-radius:8px; border:1px solid var(--sand); background:#fff; color:var(--gray); font-size:0.75rem; cursor:pointer;">🔴 Critique</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label style="font-size: 0.75rem; font-weight: 600; color: var(--gray); display: block; margin-bottom: 4px;">Description</label>
+          <textarea id="fb-body" rows="3" placeholder="Decrivez le bug ou l'amelioration souhaitee..."
+            style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--sand); font-size: 0.85rem; outline: none; color: var(--slate); resize: vertical; font-family: inherit; box-sizing: border-box;" required></textarea>
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 12px; border-radius: 12px; border: none; background: var(--teal); color: #fff; font-size: 0.9rem; font-weight: 600; cursor: pointer;">
+          Envoyer le feedback
+        </button>
+      </form>
+
+      <div id="fb-status" style="text-align: center; margin-top: 12px; font-size: 0.85rem;"></div>
+
+      <!-- Recent feedback list -->
+      <div id="fb-list" style="margin-top: 24px;"></div>
+    </div>
+  </section>
+
+  <script>
+    // ═══ Supabase config ═══
+    const SB_URL = 'https://ccgtnpwzdgxcewadlvmd.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjZ3RucHd6ZGd4Y2V3YWRsdm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTk5MTYsImV4cCI6MjA5MTkzNTkxNn0.mfbtAOUD-bllHO_9bw_CCVpSFqSLNIowlaZ8Ebf7B3g';
+    const headers = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+
+    // ═══ V2 Features — full list ═══
+    const V2_CATS = [
+      { cat: 'A', label: 'A. Visualisation de la trace', features: [
+        { id: 'A1', name: 'Trace GPS continue', pri: 'FAIT' },
+        { id: 'A2', name: 'Couleur par vitesse (bleu→vert→rouge)', pri: 'P1' },
+        { id: 'A3', name: 'Couleur par allure (pres/largue/VA)', pri: 'P1' },
+        { id: 'A4', name: 'Couleur moteur vs voile', pri: 'P1' },
+        { id: 'A5', name: 'Couleur jour/nuit', pri: 'P2' },
+        { id: 'A6', name: 'Segmentation en passages (port→port)', pri: 'P1' },
+        { id: 'A7', name: 'Animation replay + slider temporel', pri: 'P2' },
+        { id: 'A8', name: 'Heatmap personnelle', pri: 'P3' },
+      ]},
+      { cat: 'B', label: 'B. Evenements sur la trace', features: [
+        { id: 'B1', name: 'Marqueur virement/empannage', pri: 'P1' },
+        { id: 'B2', name: 'Changement de voile (GV, genois, spi, code0)', pri: 'P1' },
+        { id: 'B3', name: 'Prise/largage de ris (1er, 2e, 3e)', pri: 'P1' },
+        { id: 'B4', name: 'Moteur on/off', pri: 'P1' },
+        { id: 'B5', name: 'Mouillage (ancre + cercle evitage)', pri: 'P2' },
+        { id: 'B6', name: 'Homme a la mer (MOB)', pri: 'P2' },
+        { id: 'B7', name: 'Meteo (grain, rafale, changement vent)', pri: 'P2' },
+        { id: 'B8', name: 'Saisie rapide via boutons flottants', pri: 'P1' },
+      ]},
+      { cat: 'C', label: 'C. Configuration voilure & allures', features: [
+        { id: 'C1', name: 'Log voilure active (GV/genois/spi/code0)', pri: 'P1' },
+        { id: 'C2', name: 'Allure (pres, travers, largue, VA...)', pri: 'P1' },
+        { id: 'C3', name: 'Segments colores par allure', pri: 'P1' },
+        { id: 'C4', name: 'Camembert allures par passage', pri: 'P2' },
+        { id: 'C5', name: 'Rose des vents naviguees', pri: 'P3' },
+        { id: 'C6', name: 'Vitesse reelle vs polaire theorique', pri: 'P3' },
+      ]},
+      { cat: 'D', label: 'D. Posts & photos geolocalisees', features: [
+        { id: 'D1', name: 'Markers photo PolarSteps-style', pri: 'FAIT' },
+        { id: 'D2', name: 'Galerie photo par zone geographique', pri: 'P2' },
+        { id: 'D3', name: 'Clustering automatique au dezoom', pri: 'P1' },
+        { id: 'D4', name: 'Filtrage posts par categorie sur carte', pri: 'P1' },
+        { id: 'D5', name: 'Story mode (lecture animee)', pri: 'P2' },
+        { id: 'D6', name: 'Lien de partage vue carte', pri: 'P2' },
+      ]},
+      { cat: 'E', label: 'E. POIs', features: [
+        { id: 'E1', name: 'Types existants (mouillage, marina...)', pri: 'FAIT' },
+        { id: 'E2', name: 'Note/commentaire par POI (rating)', pri: 'P2' },
+        { id: 'E3', name: 'Import/export GPX/KML', pri: 'P2' },
+        { id: 'E4', name: 'Profondeur + qualite de fond', pri: 'P3' },
+        { id: 'E5', name: 'Detection auto arret → suggestion POI', pri: 'P3' },
+        { id: 'E6', name: 'Cercle evitage anime sur mouillage', pri: 'P3' },
+      ]},
+      { cat: 'F', label: 'F. Passages & statistiques', features: [
+        { id: 'F1', name: 'Passage = port depart → arrivee', pri: 'P1' },
+        { id: 'F2', name: 'Stats : distance, duree, vitesse, VMG', pri: 'P1' },
+        { id: 'F3', name: 'Repartition moteur vs voile', pri: 'P1' },
+        { id: 'F4', name: 'Repartition allures par passage', pri: 'P2' },
+        { id: 'F5', name: 'Segmentation jour/jour (passage long)', pri: 'P2' },
+        { id: 'F6', name: 'Quarts de nuit (2h par equipier)', pri: 'P3' },
+      ]},
+      { cat: 'G', label: 'G. Meteo & overlays', features: [
+        { id: 'G1', name: 'Carte nautique OpenSeaMap', pri: 'FAIT' },
+        { id: 'G2', name: 'Overlay vent anime (style Windy)', pri: 'P2' },
+        { id: 'G3', name: 'Overlay houle', pri: 'P3' },
+        { id: 'G4', name: 'Marees par point', pri: 'P3' },
+        { id: 'G5', name: 'Historique meteo par waypoint', pri: 'P2' },
+      ]},
+      { cat: 'H', label: 'H. AIS & trafic', features: [
+        { id: 'H1', name: 'Overlay AIS temps reel', pri: 'P2' },
+        { id: 'H2', name: 'Historique trace AIS', pri: 'P2' },
+      ]},
+      { cat: 'I', label: 'I. Interface carte', features: [
+        { id: 'I1', name: 'Slider temporel (filtrer par dates)', pri: 'P1' },
+        { id: 'I2', name: 'Mode nuit (palette rouge)', pri: 'P2' },
+        { id: 'I3', name: 'Recherche de lieu / go-to', pri: 'P2' },
+        { id: 'I4', name: 'Mesure de distance (regle clic-clic)', pri: 'P3' },
+      ]},
+      { cat: 'J', label: 'J. Couches carte (layers)', features: [
+        { id: 'J1', name: 'Toggle couches: Social / Navigation / Trafic / Meteo', pri: 'P1' },
+        { id: 'J2', name: 'Couche Social: posts, photos, commentaires', pri: 'P1' },
+        { id: 'J3', name: 'Couche Navigation: trace, passages, evenements voile', pri: 'P1' },
+        { id: 'J4', name: 'Couche Trafic: AIS, navires proches', pri: 'P2' },
+        { id: 'J5', name: 'Couche Meteo: vent, houle, pression', pri: 'P2' },
+        { id: 'J6', name: 'Couche POIs: mouillages, marinas, fuel...', pri: 'FAIT' },
+      ]},
+      { cat: 'K', label: 'K. Posts geolocalisees (enrichi)', features: [
+        { id: 'K1', name: 'Miniature photo sur le pin (vignette ronde)', pri: 'FAIT' },
+        { id: 'K2', name: 'Clic pin → zoom flyTo + carte post detaillee', pri: 'P1' },
+        { id: 'K3', name: 'Galerie photo plein ecran (swipe entre photos)', pri: 'P1' },
+        { id: 'K4', name: 'Multi-photos par post sur la carte', pri: 'P1' },
+        { id: 'K5', name: 'Filtre par visibilite (public/famille/prive) sur carte', pri: 'P1' },
+        { id: 'K6', name: 'Popup enrichi: photo, titre, extrait, likes, commentaires', pri: 'P1' },
+        { id: 'K7', name: 'Trace reliant les posts chronologiquement', pri: 'P2' },
+        { id: 'K8', name: 'Mode diaporama carte (parcourir posts un par un)', pri: 'P2' },
+      ]},
+      { cat: 'L', label: 'L. Backup, Newsletter & Galerie', features: [
+        { id: 'L1', name: 'Export complet (JSON + schema SQL + photos ZIP)', pri: 'P2' },
+        { id: 'L2', name: 'Sync cloud (Google Drive / Dropbox auto)', pri: 'P2' },
+        { id: 'L3', name: 'Restore depuis backup ZIP', pri: 'P3' },
+        { id: 'L4', name: 'Newsletter hebdomadaire (Resend API)', pri: 'P2' },
+        { id: 'L5', name: 'Galerie photo plein ecran (swipe, zoom)', pri: 'P1' },
+      ]},
+    ];
+
+    const voteState = {};
+
+    function renderV2Features() {
+      const container = document.getElementById('v2-features');
+      container.innerHTML = V2_CATS.map(cat => {
+        const rows = cat.features.map(f => {
+          const isDone = f.pri === 'FAIT';
+          return `<div class="feat-row ${isDone ? 'done-row' : ''}" id="fr-${f.id}">
+            <span class="feat-id">${f.id}</span>
+            <span class="feat-name">${f.name}</span>
+            ${isDone
+              ? '<span class="feat-done">✓ FAIT</span>'
+              : `<span class="feat-pri pri-${f.pri}">${f.pri}</span>
+                 <div class="feat-stars">${[1,2,3,4,5].map(n =>
+                   `<button id="s-${f.id}-${n}" onclick="event.stopPropagation();setV('${f.id}',${n})">${n}</button>`
+                 ).join('')}</div>
+                 <div class="feat-urg">
+                   <button id="u-${f.id}-low" onclick="event.stopPropagation();setU('${f.id}','low')">🟢</button>
+                   <button id="u-${f.id}-medium" onclick="event.stopPropagation();setU('${f.id}','medium')">🟡</button>
+                   <button id="u-${f.id}-high" onclick="event.stopPropagation();setU('${f.id}','high')">🔴</button>
+                 </div>
+                 <button class="feat-send" id="send-${f.id}" onclick="event.stopPropagation();sendV('${f.id}')">OK</button>`
+            }
+          </div>`;
+        }).join('');
+        return `<div class="cat-header">${cat.label}</div>${rows}`;
+      }).join('');
+    }
+
+    function setV(fid, n) {
+      if (!voteState[fid]) voteState[fid] = {};
+      voteState[fid].vote = n;
+      for (let i = 1; i <= 5; i++) {
+        const b = document.getElementById('s-' + fid + '-' + i);
+        if (b) { b.className = i <= n ? 'on' : ''; }
+      }
+    }
+
+    function setU(fid, u) {
+      if (!voteState[fid]) voteState[fid] = {};
+      voteState[fid].urgency = u;
+      ['low','medium','high'].forEach(v => {
+        const b = document.getElementById('u-' + fid + '-' + v);
+        if (b) { b.className = v === u ? 'on-' + (v === 'high' ? 'high' : v === 'medium' ? 'med' : 'low') : ''; }
+      });
+    }
+
+    async function sendV(fid) {
+      const v = voteState[fid];
+      if (!v || !v.vote) { alert('Choisissez une note (1-5)'); return; }
+      const name = document.getElementById('voter-name')?.value || '';
+
+      const res = await fetch(SB_URL + '/rest/v1/feature_votes', {
+        method: 'POST', headers: { ...headers, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ feature_id: fid, vote: v.vote, urgency: v.urgency || 'medium', author_name: name || null }),
+      });
+
+      const btn = document.getElementById('send-' + fid);
+      if (res.ok) {
+        btn.textContent = '✓';
+        btn.classList.add('sent');
+      } else {
+        btn.textContent = '✗';
+        btn.style.color = 'var(--coral)';
+      }
+    }
+
+    // ═══ Feedback form ═══
+    let fbType = 'bug';
+    let fbUrgency = 'medium';
+
+    function setFbType(t) {
+      fbType = t;
+      const bugBtn = document.getElementById('fb-type-bug');
+      const impBtn = document.getElementById('fb-type-improvement');
+      if (t === 'bug') {
+        bugBtn.style.border = '2px solid var(--coral)';
+        bugBtn.style.background = 'rgba(224,122,95,0.08)';
+        bugBtn.style.color = 'var(--coral)';
+        impBtn.style.border = '1px solid var(--sand)';
+        impBtn.style.background = '#fff';
+        impBtn.style.color = 'var(--gray)';
+      } else {
+        impBtn.style.border = '2px solid var(--teal)';
+        impBtn.style.background = 'rgba(27,154,170,0.08)';
+        impBtn.style.color = 'var(--teal)';
+        bugBtn.style.border = '1px solid var(--sand)';
+        bugBtn.style.background = '#fff';
+        bugBtn.style.color = 'var(--gray)';
+      }
+    }
+
+    function setFbUrgency(u) {
+      fbUrgency = u;
+      const colors = { low: 'var(--teal)', medium: 'var(--gold)', high: '#E8A030', critical: 'var(--coral)' };
+      ['low','medium','high','critical'].forEach(v => {
+        const btn = document.getElementById('fb-urg-' + v);
+        if (v === u) {
+          btn.style.border = '2px solid ' + colors[v];
+          btn.style.fontWeight = '600';
+          btn.style.color = colors[v];
+        } else {
+          btn.style.border = '1px solid var(--sand)';
+          btn.style.fontWeight = 'normal';
+          btn.style.color = 'var(--gray)';
+        }
+      });
+    }
+
+    document.getElementById('feedback-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const body = document.getElementById('fb-body').value.trim();
+      if (!body) return;
+
+      const data = {
+        section: document.getElementById('fb-section').value || null,
+        body,
+        type: fbType,
+        urgency: fbUrgency,
+        author_name: document.getElementById('fb-name').value || null,
+      };
+
+      const status = document.getElementById('fb-status');
+      const res = await fetch(SB_URL + '/rest/v1/feedback', { method: 'POST', headers, body: JSON.stringify(data) });
+
+      if (res.ok) {
+        status.innerHTML = '<span style="color: var(--teal);">✓ Feedback envoye ! Merci 🙏</span>';
+        document.getElementById('fb-body').value = '';
+        document.getElementById('fb-section').value = '';
+        setFbType('bug');
+        setFbUrgency('medium');
+      } else {
+        status.innerHTML = '<span style="color: var(--coral);">❌ Erreur — reessayez</span>';
+      }
+    });
+
+    // Init
+    renderV2Features();
+  </script>
+
+  <!-- FOOTER -->
+  <footer>
+    <img src="images/logo.png" alt="Wang'ap" />
+    <p>Wang'ap — Journal de Bord &middot; Catherine & Bertrand</p>
+    <p style="margin-top: 4px; font-size: 0.65rem; opacity: 0.5;">
+      Outremer 52 &middot; 2026-2029 &middot; Saint-Cyr-sur-Mer &rarr; Tour du Monde
+    </p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>Wang'ap — Feuille de route</title>
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 16mm 14mm 16mm;
+    @bottom-center {
+      content: "Wang'ap — Feuille de route · page " counter(page) " / " counter(pages);
+      font-family: Georgia, serif;
+      font-size: 8pt;
+      color: #8D99AE;
+    }
+  }
+
+  :root {
+    --navy: #0B1026;
+    --slate: #162447;
+    --teal: #1B9AAA;
+    --gold: #E8B059;
+    --gold-deep: #B07820;
+    --coral: #E07A5F;
+    --green: #2EC4B6;
+    --gray: #8D99AE;
+    --sand: #F4F1DE;
+    --cream: #FFFCF2;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 10.5pt;
+    line-height: 1.45;
+    color: #162447;
+    margin: 0;
+    background: #fff;
+  }
+
+  .cover {
+    page-break-after: always;
+    text-align: center;
+    padding-top: 35mm;
+  }
+  .cover h1 {
+    font-size: 32pt;
+    margin: 0 0 8pt;
+    color: var(--slate);
+    letter-spacing: 0.5pt;
+  }
+  .cover .tagline {
+    font-style: italic;
+    color: var(--gold-deep);
+    font-size: 13pt;
+    margin-bottom: 30pt;
+  }
+  .cover .subtitle {
+    font-size: 11pt;
+    color: var(--gray);
+    margin-bottom: 28pt;
+  }
+  .cover .compass {
+    font-size: 80pt;
+    color: var(--gold);
+    margin: 18pt 0;
+  }
+  .cover .summary-box {
+    margin: 24pt auto 0;
+    max-width: 130mm;
+    padding: 14pt 18pt;
+    background: var(--sand);
+    border-left: 3pt solid var(--gold);
+    text-align: left;
+    font-size: 10.5pt;
+  }
+  .cover .summary-box strong { color: var(--slate); }
+
+  h1, h2, h3, h4 { font-family: Georgia, serif; }
+
+  h2 {
+    color: var(--slate);
+    font-size: 18pt;
+    margin: 0 0 4pt;
+    padding-bottom: 6pt;
+    border-bottom: 1.5pt solid var(--gold);
+    page-break-after: avoid;
+  }
+  h2 .ver-badge {
+    font-size: 10pt;
+    color: var(--cream);
+    background: var(--teal);
+    padding: 2pt 8pt;
+    border-radius: 10pt;
+    vertical-align: middle;
+    margin-left: 10pt;
+    font-weight: normal;
+  }
+  h2 .ver-badge.future { background: var(--gray); }
+  h2 .ver-badge.next { background: var(--coral); }
+
+  h3 {
+    color: var(--slate);
+    font-size: 13pt;
+    margin: 18pt 0 6pt;
+    page-break-after: avoid;
+  }
+  h3 .status {
+    font-size: 9pt;
+    font-weight: normal;
+    margin-left: 6pt;
+    padding: 1pt 6pt;
+    border-radius: 8pt;
+    vertical-align: middle;
+  }
+  .status.done { background: rgba(46,196,182,0.15); color: #14807A; }
+  .status.shipped { background: rgba(46,196,182,0.15); color: #14807A; }
+  .status.progress { background: rgba(232,176,89,0.18); color: var(--gold-deep); }
+  .status.planned { background: rgba(141,153,174,0.2); color: var(--gray); }
+  .status.future { background: rgba(141,153,174,0.15); color: var(--gray); }
+
+  .legend {
+    background: var(--cream);
+    border: 1pt solid var(--sand);
+    border-radius: 4pt;
+    padding: 8pt 12pt;
+    margin: 0 0 14pt;
+    font-size: 9.5pt;
+  }
+  .legend strong { color: var(--slate); }
+  .legend ul { margin: 4pt 0 0 16pt; padding: 0; }
+  .legend li { margin: 1pt 0; }
+
+  .phase-intro {
+    font-style: italic;
+    color: var(--gray);
+    margin: 4pt 0 12pt;
+    font-size: 10pt;
+  }
+
+  ul.feature-list {
+    margin: 4pt 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  ul.feature-list li {
+    padding: 3pt 0 3pt 18pt;
+    position: relative;
+    page-break-inside: avoid;
+  }
+  ul.feature-list li::before {
+    content: attr(data-mark);
+    position: absolute;
+    left: 0;
+    top: 3pt;
+    font-size: 10pt;
+  }
+  ul.feature-list li.done   { color: #14807A; }
+  ul.feature-list li.next   { color: var(--coral); }
+  ul.feature-list li.future { color: var(--gray); }
+  ul.feature-list li .label { color: var(--slate); font-weight: normal; }
+  ul.feature-list li.done .label   { color: #14807A; font-weight: 500; }
+
+  .timeline-strip {
+    margin: 0 0 24pt;
+    border: 1pt solid var(--sand);
+    background: var(--cream);
+    border-radius: 6pt;
+    padding: 12pt 14pt;
+  }
+  .timeline-strip h4 { margin: 0 0 8pt; font-size: 10.5pt; color: var(--slate); }
+  .timeline-strip table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  .timeline-strip td { padding: 3pt 4pt; border-bottom: 0.5pt solid #E0DCC4; vertical-align: top; }
+  .timeline-strip td.tag { font-weight: bold; width: 22mm; color: var(--slate); }
+  .timeline-strip td.status-cell { width: 28mm; }
+  .timeline-strip tr:last-child td { border-bottom: 0; }
+  .pill {
+    display: inline-block;
+    padding: 1pt 6pt;
+    border-radius: 8pt;
+    font-size: 8.5pt;
+    font-weight: bold;
+  }
+  .pill.shipped { background: rgba(46,196,182,0.18); color: #14807A; }
+  .pill.next { background: rgba(224,122,95,0.18); color: var(--coral); }
+  .pill.planned { background: rgba(141,153,174,0.2); color: var(--gray); }
+
+  .v1-e-note {
+    background: rgba(27,154,170,0.06);
+    border-left: 3pt solid var(--teal);
+    padding: 10pt 14pt;
+    margin: 12pt 0 18pt;
+    font-size: 10pt;
+    color: var(--slate);
+  }
+  .v1-e-note strong { color: var(--teal); }
+
+  .footer-note {
+    margin-top: 28pt;
+    border-top: 1pt solid var(--sand);
+    padding-top: 8pt;
+    font-size: 9pt;
+    color: var(--gray);
+    font-style: italic;
+  }
+
+  section { page-break-inside: avoid; }
+  section.v1-section { page-break-after: always; }
+  section.v2-section { page-break-after: always; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ COVER ═══════════════════════════════ -->
+<div class="cover">
+  <div class="compass">⚓</div>
+  <h1>Wang'ap</h1>
+  <div class="tagline">Tour du Monde à la Voile · Catherine &amp; Bertrand</div>
+  <div class="subtitle">Feuille de route de l'application — V1.6 → V3<br/>16 mai 2026 · v2.51 — <strong>V2.1.2 archive.wangap.fr livrée</strong> (5 batches en 1 j : pipeline + LFS + visuel + parité avec wangap.fr — featured, couleurs d'étape, marqueurs photo, lightbox, tags, programme animé, Genèse) · servie à <code>sailingwangap.github.io/wangap-archive/</code> en attendant le DNS Godaddy chez Bertrand · prochain <strong>V2.4.1</strong> ingestion vidéos hand-over · V1.9.4 (tracker satellite) avant départ</div>
+
+  <div class="summary-box">
+    <strong>Où en est-on ?</strong>
+    <ul style="margin: 6pt 0 0 16pt; padding: 0;">
+      <li><strong>V1.6</strong> &nbsp;✅ Stabilisation pré-départ — terminée</li>
+      <li><strong>V1.7</strong> &nbsp;✅ Étapes (sous-chapitres) — terminée</li>
+      <li><strong>V1.8</strong> &nbsp;✅ Trace GPS &amp; AIS — terminée, taggée <code>v1.8-final</code> au commit <code>628f2a9</code></li>
+      <li><strong>V1.9</strong> &nbsp;✅ <strong>Audit complet pré-départ</strong> — terminée le 9 mai 2026 (<code>v1.9-final</code> + <code>v1.9.1</code> polish + <code>v1.9.2</code> Tier-1 quick wins + <code>v1.9.3</code> 4 batches PWA iOS). Lighthouse public mobile passé de Perf <strong>24 → 78</strong>, A11Y <strong>80 → 93</strong> ; desktop <strong>90 / 93 / 100 / 100</strong> tous verts. Worker AIS Fly.io v10 déployé (bbox Atlantique+Med). <em>L'application est prête pour le départ.</em></li>
+      <li><strong>V1.9.4</strong> &nbsp;📅 <strong>Intégration tracker satellite (Garmin InReach Mini 2 / YB3i)</strong> — couverture 100 % Iridium globale en remplacement de la couverture AISStream qui a des trous au-dessus de l'Ibérie / Méditerranée Ouest / océans. Le tracker est l'appareil de sécurité que B&amp;C achètent de toute façon ; Wang'ap consomme son flux MapShare KML (poll 30 min). Coût Wang'ap : 0 €/mois. <strong>Bloqué</strong> sur le choix du tracker par B&amp;C + partage de l'URL MapShare. Estimé 1-2 jours dev. <em>Requis avant le départ (~juillet 2026)</em>.</li>
+      <li><strong>V2</strong> &nbsp;&nbsp;&nbsp;📋 Sauvegarde, Livre d'Or, Newsletter, Le Renard, traduction multilingue, <strong>vue calendrier</strong>, <strong>refonte des stats</strong>, polish UX cumulé — démarre après le départ</li>
+      <li><strong>V3</strong> &nbsp;&nbsp;&nbsp;🌍 Améliorations avancées (passages, météo, app native, <strong>multi-bateaux AIS</strong>) — pendant le voyage si besoin</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ LEGEND ═══════════════════════════════ -->
+<div class="legend">
+  <strong>Légende :</strong>
+  <ul>
+    <li>✅ <strong>Livré</strong> — déployé en production</li>
+    <li>🚧 <strong>En cours</strong> — code écrit, tests / déploiement en cours</li>
+    <li>🔜 <strong>Prochaine étape</strong> — planifiée, démarrage imminent</li>
+    <li>⏳ <strong>Plus tard</strong> — V2 ou V3, après le départ</li>
+    <li>💤 <strong>Optionnel</strong> — uniquement si un besoin réel apparaît</li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════ V1 ═══════════════════════════════ -->
+<section class="v1-section">
+
+<h2>V1 — Stabilisation avant le départ <span class="ver-badge">priorité actuelle</span></h2>
+<p class="phase-intro">Tout ce qui rend l'application fiable, lisible et utilisable au jour-le-jour à bord.<br/>Pas de nouvelle fonctionnalité hors périmètre — uniquement corrections, polish, et UX.</p>
+
+<!-- ── V1.6 ── -->
+<h3>V1.6 — Stabilisation initiale <span class="status done">✅ Terminée (avril 2026)</span></h3>
+<ul class="feature-list">
+  <li class="done" data-mark="✅"><span class="label">Affichage cross-device</span> : iPhone Safari + PWA, iPad, desktop Chrome / Safari</li>
+  <li class="done" data-mark="✅"><span class="label">Page d'accueil refondue</span> : design "ALT", menu burger latéral, photo encadrée, formulaire de contact, abonnement newsletter</li>
+  <li class="done" data-mark="✅"><span class="label">Notifications push</span> testées sur iPhone PWA en conditions réelles</li>
+  <li class="done" data-mark="✅"><span class="label">Emails transactionnels</span> via Resend (envois automatiques au skipper)</li>
+  <li class="done" data-mark="✅"><span class="label">Mode hors-ligne</span> : tous les écrans lisent l'IndexedDB locale en cas de coupure réseau</li>
+  <li class="done" data-mark="✅"><span class="label">File d'attente offline</span> pour messages, maintenance, todos (toute action est rejouée à la reconnexion)</li>
+  <li class="done" data-mark="✅"><span class="label">Synchronisation respecte le mode choisi</span> : Auto / Manuel / Off — plus de push silencieux non voulu</li>
+  <li class="done" data-mark="✅"><span class="label">Photos</span> : protection contre les pertes lors d'upload partiels, anti-collision sur mises-à-jour concurrentes</li>
+  <li class="done" data-mark="✅"><span class="label">Animation Programme</span> : trajet revérifié (6 traversées de terre corrigées), pictogramme catamaran personnalisé</li>
+  <li class="done" data-mark="✅"><span class="label">Inbox / Messages</span> : indicateur visuel des messages avec réponses</li>
+  <li class="done" data-mark="✅"><span class="label">Bug-bash</span> : 19 tickets ISSUE_TRACKER fermés</li>
+</ul>
+
+<!-- ── V1.7 ── -->
+<h3>V1.7 — Étapes &amp; sous-chapitres <span class="status done">✅ Livré &amp; déployé</span></h3>
+<p class="phase-intro">Chaque chapitre du voyage peut être découpé en étapes (legs) — par exemple "LGM → Malte avec Valérie", "Le Maset semaine famille". Posts, traces et photos s'organisent automatiquement.</p>
+<ul class="feature-list">
+  <li class="done" data-mark="✅"><span class="label">Modèle Chapitre → Étape → Post</span> : un chapitre contient des étapes ; chaque étape couvre une période avec ports, distance, équipage</li>
+  <li class="done" data-mark="✅"><span class="label">CRUD complet</span> dans Réglages → Étapes : création, modification, suppression avec dates obligatoires</li>
+  <li class="done" data-mark="✅"><span class="label">Filtres partout</span> : Timeline, Tableau de bord famille, Carnet de bord public, Carte — chaque écran filtre par chapitre / étape</li>
+  <li class="done" data-mark="✅"><span class="label">Carte interactive</span> : la trace GPS change de teinte plus claire à chaque étape pour visualiser le parcours</li>
+  <li class="done" data-mark="✅"><span class="label">Compositeur de post</span> : étape auto-détectée selon la date du post ; chapitre se synchronise automatiquement</li>
+  <li class="done" data-mark="✅"><span class="label">Validation des dates</span> : alertes intelligentes si une étape déborde de son chapitre, ou un post de son étape (proposer d'étendre, recadrer, déplacer)</li>
+  <li class="done" data-mark="✅"><span class="label">Suppression sécurisée</span> : un chapitre supprimé déplace ses étapes et posts vers "Non classés" sans perte</li>
+  <li class="done" data-mark="✅"><span class="label">Indicateur 💬</span> : pastille dorée sur les posts qui ont reçu des commentaires</li>
+  <li class="done" data-mark="✅"><span class="label">Données réelles</span> : 5 chapitres et 10 étapes pré-remplis pour le programme 2025-2026</li>
+</ul>
+
+<!-- ── V1.8 ── -->
+<h3>V1.8 — Trace GPS, AIS &amp; édition <span class="status progress">⏳ En cours</span></h3>
+<p class="phase-intro">L'objectif : avoir une trace propre en mer sans avoir à laisser le téléphone allumé pendant des jours. Plusieurs sources se complètent et s'auto-nettoient.</p>
+
+<div class="v1-e-note">
+  <strong>Principe directeur</strong> — Pour une longue traversée, garder un iPhone écran-allumé est irréaliste. La V1.8 introduit donc plusieurs sources GPS qui se relaient :<br/>
+  → <strong>AIS</strong> (transpondeur du bateau, capté par satellite) pour le suivi continu en mer<br/>
+  → <strong>Import GPX</strong> du calculateur de bord (B&amp;G / Raymarine / Garmin) pour la haute fidélité<br/>
+  → <strong>iPhone GPS</strong> avec verrouillage écran pour les sorties courtes (annexe, marina, à terre)<br/>
+  → <strong>Marqueurs manuels</strong> 1 tap pour les évènements ("on empanne", "dauphins")<br/><br/>
+  <strong>Vie privée &amp; sécurité</strong> — la sync AIS peut être mise en pause à volonté (zones à risque, transits sensibles, contraintes d'assurance), et la diffusion sur la page publique est différée par défaut de 48 h, ou contrôlée manuellement par le skipper. La famille connectée voit toujours en temps réel.
+</div>
+
+<div class="timeline-strip">
+  <h4>Découpage en 8 phases successives (chacune indépendante)</h4>
+  <table>
+    <tr><td class="tag">v1.8.0</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Pastille de suivi GPS intelligente</strong> dans la barre de navigation : ⚫ éteint / 🔴 actif / 🟡 défaillant. Tap pour ouvrir un panneau de statut. Verrouillage écran auto pendant l'enregistrement.</td></tr>
+    <tr><td class="tag">v1.8.1</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Filtre anti-jitter</strong> : ignore les positions GPS quasi-immobiles (&lt; 30 m, &lt; 1 nœud) pour ne plus polluer la trace au mouillage.</td></tr>
+    <tr><td class="tag">v1.8.2</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>AIS en direct</strong> via AISStream.io (gratuit) — un petit serveur tourne en permanence sur Fly.io (1 conteneur 256 Mo, région CDG), écoute le MMSI du bateau et alimente la base de données 24/7. Le téléphone peut être éteint ou hors-ligne, la trace continue à se construire.<br/><br/>
+    <strong>Garde-fous de sécurité &amp; vie privée</strong> (livrés) :<br/>
+    &nbsp;&nbsp;• <em>Toggle "Pause sync"</em> — interrompt l'enregistrement de la position en base sans débrancher l'AIS du bateau (zones à risque de piraterie, exigences d'assurance, transits sensibles). Réactivation instantanée.<br/>
+    &nbsp;&nbsp;• <em>Délai de publication publique</em> — 3 modes : Direct / Différé (défaut 48 h, modifiable) / Manuel. Famille &amp; amis (connectés) voient toujours en temps réel ; seule la page publique anonyme est filtrée.<br/>
+    &nbsp;&nbsp;• <em>Réglages dans la vue skipper</em> uniquement.<br/><br/>
+    <strong>Couplage trace ↔ chapitre/étape</strong> (livré) :<br/>
+    &nbsp;&nbsp;• Le filtre Chapitre / Étape s'applique enfin à la trace GPS sur la carte.<br/>
+    &nbsp;&nbsp;• Toute nouvelle position (AIS / iPhone / marqueur manuel) se voit attribuer son étape automatiquement selon sa date.<br/>
+    &nbsp;&nbsp;• Bouton admin "Réassigner les waypoints orphelins" pour rattraper les positions historiques sans étape.<br/><br/>
+    <strong>Vaisseau réel suivi</strong> : <em>VB LLEVANT</em> (MMSI 225437000, ES) — frames PositionReport reçues et écrites en base. Toutes les 30 s à 2 min selon couverture côtière.</td></tr>
+    <tr><td class="tag">v1.8.2.x</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Série de patches itératifs</strong> (V1.8.2.1 → V1.8.2.9, fin avril – début mai 2026) après les premiers tests réels :<br/>
+    &nbsp;&nbsp;• <em>UX iPhone</em> — toggles natifs (style iOS), sections de Réglages collapsibles avec mémoire d'état<br/>
+    &nbsp;&nbsp;• <em>Sécurité</em> — validation JWT côté API, profils admin/skipper protégés contre suppression accidentelle<br/>
+    &nbsp;&nbsp;• <em>Robustesse worker</em> — heartbeat toutes les minutes, watchdog 5 min sur WebSocket silencieuse, cooldown 15 min en cas de rate-limit AISStream (HTTP 429), filtre MMSI côté client (le filtre serveur d'AISStream est cassé sur le tier gratuit)<br/>
+    &nbsp;&nbsp;• <em>Carte AIS clean</em> — affichage en lecture seule par défaut, bouton "Modifier" explicite pour éviter les éditions accidentelles<br/>
+    &nbsp;&nbsp;• <em>Gestion d'erreur honnête</em> — états distincts "En attente / Actif / Inactif (N min) / Erreur" liés à des signaux réels, pas un point vert décoratif</td></tr>
+    <tr><td class="tag">v1.8.3.x</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Fix critique + UI</strong> (3 mai 2026) :<br/>
+    &nbsp;&nbsp;• <em>Fix timestamp Go → ISO 8601</em> — AISStream envoie le champ <code>time_utc</code> au format Go ("2026-05-02 21:19:44.457469232 +0000 UTC"). Postgres rejetait toutes les insertions à cause des nanosecondes et du suffixe "UTC". Worker patché pour parser proprement vers ISO 8601 millisecondes. Premier <code>PositionReport</code> "VB LLEVANT" reçu et inséré sans erreur immédiatement après le déploiement.<br/>
+    &nbsp;&nbsp;• <em>Chevron rotatif</em> sur les sections de Réglages — affordance iOS plus visible que les caractères ▾/▸ unicode précédents.</td></tr>
+    <tr><td class="tag">v1.8.3</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Marqueur manuel 📍</strong> (livré 5 mai 2026) — bouton flottant 📍 en bas-à-droite de la carte (admin uniquement, masqué pendant les modes édition / création). 1 tap capture la position GPS courante et sauvegarde un waypoint <code>source='manual'</code>. Une feuille de 4 s s'ouvre avec étiquettes rapides : <em>⛵ Voile · ⚙️ Moteur · 🐬 Faune · ⚓ Mouillage · ➕ Autre</em>. Si rien n'est tapé en 4 s, le marqueur reste sans étiquette. L'étiquette apparaît dans la popup au tap du point (titre teal en haut). Persistance offline-first : le waypoint et l'étiquette passent par IndexedDB puis sync Supabase via la file d'attente standard.</td></tr>
+    <tr><td class="tag">v1.8.4</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Éditeur de trace — refonte complète</strong> (livré 4 mai 2026, 7 phases sur la branche v1.8) :<br/><br/>
+    <strong>Performance</strong> — un Marker DOM par waypoint remplacé par une couche GeoJSON <code>circle</code> unique (couche invisible 14 px pour les taps + couche visible avec style data-driven). 5–10 k points qui bloquaient l'UI 1–3 s sur iPhone Safari sont maintenant fluides (~10× plus rapide).<br/><br/>
+    <strong>Provenance</strong> (migration 025 sur Supabase) — colonne <code>edited_at</code> sur <code>waypoints</code>, stamped <code>NOW()</code> à chaque déplacement / insertion. Pastille "✎ modifié" dorée dans le popup d'un point modifié. Filtre "Originaux uniquement" dans la barre d'outils pour ne voir que les enregistrements pristine.<br/><br/>
+    <strong>Opérations</strong> :<br/>
+    &nbsp;&nbsp;• <em>Drag-to-move</em> — un point sélectionné devient draggable via un Marker 32 px (au lieu de 24), halo translucide pendant le drag.<br/>
+    &nbsp;&nbsp;• <em>Long-press sur la trace</em> — insère un point <code>source='manual'</code> avec <code>recorded_at</code> interpolé entre les deux voisins ; auto-sélectionné pour drag immédiat.<br/>
+    &nbsp;&nbsp;• <em>Suppression</em> — désormais annulable (re-INSERT avec les ids d'origine).<br/>
+    &nbsp;&nbsp;• <em>🚢 Forcer une étape</em> — bulk-update <code>etape_id</code> sur la sélection, avec <strong>aperçu avant commit</strong> ("X waypoints, de étape A → B").<br/>
+    &nbsp;&nbsp;• <em>📅 Décaler les dates</em> — Mode 1 : ±N heures/jours ; Mode 2 : caler le 1er point sur une date. Aperçu en direct du 1er et dernier point. Re-attribution automatique de l'étape après le décalage (lookup par plage de dates).<br/><br/>
+    <strong>Sélection</strong> — tap simple = bascule (1 point), long-press sur un point = mode plage visible (ancre dorée), 2e tap complète la plage. Sur desktop : Cmd+Z (annuler), Cmd+A (sélectionner toute l'étape courante), Esc (effacer).<br/><br/>
+    <strong>Undo</strong> — bouton ↩ toujours visible dans la barre d'outils (grisé quand la pile est vide), max 20 ops, pile de session.<br/><br/>
+    Closes V1-F-4 ; conflit popup déjà corrigé en v1.8.11.2.</td></tr>
+    <tr><td class="tag">v1.8.5</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Mode <em>Création de trace</em> ✏️</strong> (livré 5 mai 2026) — pour rattraper une journée où le GPS était éteint, le skipper dessine la route à la main et les points apparaissent dans la trace comme tout le reste (flag <code>source='manual'</code>, plage de dates répartie linéairement entre 2 dates choisies).<br/><br/>
+    <strong>Deux sous-modes</strong> :<br/>
+    &nbsp;&nbsp;• <em>🖐 Tracé libre</em> (mobile) — 1 doigt dessine, 2 doigts bougent / zooment la carte.<br/>
+    &nbsp;&nbsp;• <em>👆 Points reliés</em> (mobile + PC) — chaque tap ajoute un point ; lignes droites entre points consécutifs.<br/><br/>
+    <strong>Flux d'enregistrement</strong> : bouton <em>✓ Terminer</em> dans la barre du bas ouvre une fenêtre Date début / Date fin / Étape (auto-suggérée selon la date). À la sauvegarde, les N points sont insérés en lot avec <code>recorded_at</code> espacés régulièrement et apparaissent immédiatement dans la trace. Toast "✅ Trace enregistrée · ↩ Annuler" pendant 12 s permet d'annuler en un clic.<br/><br/>
+    <strong>Itération UX (v1.8.5.x)</strong> — 11 patches sur 4–5 mai pour aligner le comportement iPhone Safari / PC :<br/>
+    &nbsp;&nbsp;• Sélection : <em>1 doigt ne fait jamais bouger la carte</em> en mode édition/création (seuls 2 doigts bougent + 2 doigts pinch zoom). Pas d'inclinaison 3D possible (touchPitch désactivé).<br/>
+    &nbsp;&nbsp;• <em>✋ Déplacer</em> : touch direct sur un point + drag = il bouge. Multi-déplacements en lot (Map &lt;id, …&gt;) avec banner inline dans la barre du bas : <em>"✋ N modifs · ✕ Annuler · ✓ Valider"</em>. Ligne d'aperçu teal pendant le drag.<br/>
+    &nbsp;&nbsp;• Sélection plage : double-tap pour ancrer (en or), tap suivant complète la plage instantanément (plus d'attente debounce de 280 ms quand l'ancre est déjà posée).<br/>
+    &nbsp;&nbsp;• Long-press abandonné au profit du double-tap (instable sur iPhone Safari).<br/>
+    &nbsp;&nbsp;• Sur PC en mode création, mouse drag bouge la carte ; le tracé libre est tactile uniquement (PC utilise <em>Points reliés</em>).<br/>
+    &nbsp;&nbsp;• Plus de pop-up surprise au lift-finger : boutons explicites <em>Annuler</em> / <em>Terminer</em> dans la barre.</td></tr>
+    <tr><td class="tag">v1.8.5b</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Simplification visuelle</strong> (Douglas-Peucker, livré 5 mai 2026) — bouton ✂️ dans la barre d'édition ouvre un panneau avec curseur de tolérance (échelle log). Les points qui disparaîtraient s'affichent en <strong style="color:#E63946">rouge</strong> en direct sur la carte au fur et à mesure que vous bougez le curseur. Deux garde-fous activés par défaut : <em>"Originaux uniquement"</em> (n'attaque que le GPS téléphone, protège AIS / GPX / marques manuelles) et <em>"Garder les points modifiés"</em> (ignore tout waypoint déjà déplacé / inséré dans l'éditeur). Le bouton <strong>🗑 Supprimer N</strong> applique la suppression — annulable par le bouton ↩ de l'éditeur (re-INSERT). Désactivé si des déplacements ✋ sont en attente. <em>(Renumérotée v1.8.5 → v1.8.5b car v1.8.5 a été utilisée pour la création de trace E3c.)</em></td></tr>
+    <tr><td class="tag">v1.8.6</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Affichage adaptatif selon le zoom</strong> (livré 5 mai 2026) — la carte reste fluide même avec des dizaines de milliers de points. Sous zoom 9, la trace est simplifiée (Ramer-Douglas-Peucker en degrés) avec un seuil par tranche : <em>zoom &lt; 5</em> → 0.05° (vue mondiale), <em>5–7</em> → 0.01°, <em>7–9</em> → 0.001°. Au-dessus de zoom 9, plus de simplification — toute la trace s'affiche. Une petite étiquette ✂️ <strong>Trace simplifiée</strong> apparaît en haut-à-droite quand active.<br/><br/>
+    Réglages → 🛠 <strong>Maintenance du trace</strong> ouvre une carte avec 3 curseurs (un par tranche de zoom) pour ajuster le compromis fluidité / fidélité visuelle ; valeurs persistées en local au navigateur. Bouton "Réinitialiser" si les valeurs ne sont plus celles par défaut.</td></tr>
+    <tr><td class="tag">v1.8.6.3</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>EXIF Photo picker + correctif curseur de simplification</strong> (livré 5 mai 2026) — sixième puce <em>📷 Photo</em> dans le sélecteur de localisation du compositeur de post : lit les coordonnées GPS dans les métadonnées EXIF des photos jointes (via <code>exifr</code> chargé en différé). Si plusieurs photos ont du GPS, on affiche une grille de vignettes pour choisir laquelle utiliser ; la position n'est jamais auto-remplie. Si aucune photo n'a de GPS (cas iPhone par défaut), on affiche un avertissement et le chemin Réglages iOS pour activer "Toujours inclure les coordonnées".<br/><br/>
+    <strong>Bug corrigé</strong> : sur la carte 🛠 Maintenance du trace, glisser un curseur tout à gauche (tolérance = 0) ne désactivait pas réellement la simplification — la couche corail unicolore prenait quand même le dessus sur les couleurs par chapitre. Désormais tol=0 redonne complètement la main aux couches colorées par chapitre.</td></tr>
+    <tr><td class="tag">v1.8.6.4</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>user_marks séparés + Douglas-Peucker par chapitre + barre d'édition pilotée par la sélection</strong> (livré 5 mai 2026) — trois changements de fond :<br/><br/>
+    <strong>1. user_marks séparés des waypoints</strong> — les marqueurs 📍 (FAB sur la carte : ⛵ Voile, ⚙️ Moteur, 🐬 Faune, ⚓ Mouillage, ou texte libre) vivent désormais dans une nouvelle table <code>user_marks</code> et ne polluent plus la ligne du trajet, les statistiques de distance ou le simplificateur. La table <code>pois</code> existante reste réservée aux points d'intérêt externes (mouillages, ports, carburant…). Migration 026 + 027 : copie uniquement des marqueurs FAB d'origine (les points <em>manuels</em> insérés via l'éditeur ou via "Création de trace" restent dans <code>waypoints</code> car ce sont des nœuds de trajet, pas des marqueurs).<br/><br/>
+    <strong>2. Simplification par chapitre / par étape</strong> — l'ancienne couche corail unicolore qui masquait toutes les couleurs sous zoom 9 est supprimée. Désormais chaque chapitre — et chaque étape à l'intérieur — est simplifié indépendamment. Couleurs préservées ET fluidité au zoom mondial. Le calcul est indexé sur la <em>tranche</em> de zoom (5/7/9) et non le zoom continu, pour éviter le scintillement pendant un pinch-zoom. En mode Édition et Création, plus aucune simplification : tous les points restent visibles et sélectionnables.<br/><br/>
+    <strong>3. Barre d'action en mode Édition pilotée par la sélection</strong> — sans sélection : ↩ Annuler dernière action, ✋ Mode déplacer, et ↧ <em>Sélectionner tout</em> (visible uniquement quand un filtre chapitre/étape est actif — sélectionne d'un coup tous les points visibles du filtre). Avec sélection : 🪄 Douglas-Peucker (s'applique uniquement à la sélection, plus à la trace entière), 🚢 Forcer une étape, 📅 Décaler les dates, 🗑 Supprimer, ✕ Annuler la sélection. Compteur "X points sélectionnés" remonté dans la pastille flottante au-dessus de la barre.</td></tr>
+    <tr><td class="tag">v1.8.6.5</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Suivi v1.8.6.4 + ergonomie carte</strong> (livré 6 mai 2026) — corrections et améliorations issues du test sur PC + iPhone :<br/><br/>
+    • ✅ <strong>Détection des coupures (livré)</strong> — la trace est désormais coupée quand le bateau reste silencieux longtemps (mouillage prolongé, AIS éteint, données archivées) ou en cas de "téléport" (pic de vitesse implicite irréaliste). Plus de ligne fantôme entre deux clusters de points distants. Deux curseurs ajoutables dans Réglages → 🛠 Trace : visualisation et maintenance — <em>Coupure si silence supérieur à</em> (défaut 24 h, 0 = désactivé) et <em>Coupure si vitesse implicite ></em> (défaut désactivé). Implémenté via une géométrie GeoJSON <code>MultiLineString</code> par couche (chapitre / étape / filtré), conservation des couleurs.<br/>
+    • ✅ <strong>Menu contextuel sur 📍 user mark (livré)</strong> — clic-droit (PC) ou long-press 500 ms (mobile) sur un marqueur → <em>Renommer</em> (saisie inline) ou <em>Supprimer</em> (avec confirmation). Les deux passent par la file d'actions offline pour rester fiable hors ligne. Plus une nouvelle pastille <em>📍 Marks</em> dans le bandeau de filtres en haut (à côté de Posts / Tracé / Plan) pour montrer/masquer tous les marqueurs sur la carte.<br/>
+    • ✅ <strong>Mode "création libre" repensé (livré)</strong> — un seul bouton ✏️ dans la barre du bas bascule entre <em>crayon armé</em> (orange, glissez pour dessiner) et <em>navigation</em> (neutre avec barre, glissez pour bouger la carte). Symétrique mobile + PC. Plus la prise en charge de la souris sur PC. Le bouton ↩ <em>Annuler</em> annule désormais le dernier <em>trait</em> entier (pas seulement le dernier point). Barre du bas : ↩ Annuler · ✏️ Crayon · ✓ Terminer · ✕ Quitter.<br/>
+    • ✅ <strong>Bandeau du haut en mode Création (livré)</strong> — le bandeau de filtres est remplacé par "✏️ Création tracé · ✕ Quitter" tant que le mode est actif (mirroir du mode Édition).<br/>
+    • ✅ <strong>Régression sélection multi-points (corrigé)</strong> — confirmé après vidage du cache : la correction du hoist de la lecture d'ancre faite dans v1.8.6.4 (MapView.jsx:1476-1483, sécurisée vis-à-vis de StrictMode) règle bien le problème. Tap sur le 1<sup>er</sup> puis tap sur le 2<sup>e</sup> sélectionnent désormais correctement.<br/>
+    • ✅ <strong>Auto-zoom sur position courante (livré)</strong> — à l'ouverture de la carte (premier chargement, rechargement complet), la carte se centre/zoome automatiquement sur la dernière position du voilier au lieu de rester sur la vue mondiale.<br/>
+    • ✅ <strong>Persistance du zoom entre les écrans (livré)</strong> — quand on quitte Carte pour Journal/Stats/etc. puis qu'on revient, le zoom et le centre sont conservés (via sessionStorage). Un vrai rechargement du navigateur efface la persistance et redéclenche l'auto-zoom sur le voilier.</td></tr>
+    <tr><td class="tag">v1.8.8</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Consolidation multi-sources</strong> : quand AIS + GPX + iPhone se chevauchent, on garde la meilleure source par minute (priorité GPX &gt; AIS &gt; GPS, surchargeable par étape).<br/><br/>
+    <strong>Algorithme</strong> : par étape, regroupement des points en buckets de 1 minute, sélection de la source la plus prioritaire présente dans le bucket, choix du point le plus central (médiane lat/lon) parmi les candidats. Les autres reçoivent <code>superseded_by</code> pointant vers le gagnant — non destructif, réversible, idempotent.<br/><br/>
+    <strong>Marques 📍 toujours préservées</strong> (jamais déduplifiées).<br/><br/>
+    <strong>Réglages → 🧬 Cohérence du trace</strong> : affichage de la priorité, <strong>toggle "Mode" (v1.8.8.1)</strong> entre <em>Toujours (1 pt/min)</em> — défaut, garde la trace très propre — et <em>Multi-sources uniquement</em> — n'agit que sur les minutes où plusieurs sources se chevauchent (AIS et GPS gardent leur fidélité maximale), statistiques (waypoints affichés vs supersédés), bouton "↻ Recalculer la consolidation", surcharges par étape (Auto / Forcer GPX / Forcer AIS / Forcer GPS).<br/><br/>
+    <strong>Éditeur de carte</strong> : nouveau toggle 👁 "Toutes les sources / Source consolidée" — quand activé, les points supersédés apparaissent en gris fantôme (35 % d'opacité) pour inspection / surcharge.<br/><br/>
+    <em>Migration 030 prête ; rollback fourni. Auto-trigger AIS reporté à V2.11 (pas d'écriture en lot aujourd'hui).</em></td></tr>
+    <tr><td class="tag">v1.8.9</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Auto-allocation universelle par date</strong> ⭐ — moteur unifié qui rattache automatiquement chaque point GPS (AIS, GPX, iPhone, marqueur manuel) à la bonne étape selon sa date <em>recorded_at</em>, et qui re-classe les points existants quand on modifie les dates d'une étape.<br/><br/>
+    <strong>Trois déclencheurs</strong> :<br/>
+    &nbsp;&nbsp;• <em>À l'insertion</em> — toute nouvelle position (n'importe quelle source) reçoit son <code>etape_id</code> via un trigger Postgres (BEFORE INSERT).<br/>
+    &nbsp;&nbsp;• <em>Au changement des dates d'une étape</em> — si Catherine étend "Le Maset semaine famille" de 2 jours, les points couverts par la nouvelle plage basculent automatiquement (trigger AFTER UPDATE).<br/>
+    &nbsp;&nbsp;• <em>Manuel</em> — bouton "↻ Tout réassigner" dans Réglages → Suivi GPS → Maintenance du trace, idempotent.<br/><br/>
+    <strong>Audit complet</strong> : chaque réassignation enregistrée dans <code>waypoint_allocations</code> (waypoint_id, before/after etape_id, raison ∈ insert/recorded_at_changed/etape_window_changed/manual_reassign, acteur, date). Drawer "Voir l'historique des réassignations" dans le card Maintenance.<br/><br/>
+    <strong>Brique sous-jacente du calendrier V2.7</strong> : le drag d'une bordure d'étape sur le calendrier appellera directement le RPC <code>realloc_waypoints_for_window()</code>.<br/><br/>
+    <em>Migrations 028 (audit) + 029 (triggers + RPC) prêtes ; rollback fournis. Tag stable <code>v1.8.6.5.1</code> posé avant le sprint comme point de gel.</em></td></tr>
+    <tr><td class="tag">v1.8.10</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Affichage de la dernière position</strong> (livré v1.8.10.x, 26 avril 2026) — répondre en 2 secondes à "où est le bateau et est-ce que ça remonte ?" en 3 endroits :<br/>
+    &nbsp;&nbsp;• <em>Réglages → AIS</em> — ligne "Dernière position : 43.123° N · 5.789° E · il y a 2 min" (vert &lt; 5 min, doré 5–15 min, corail &gt; 15 min).<br/>
+    &nbsp;&nbsp;• <em>Carte (admin + famille + public)</em> — encart flottant <code>LiveNavCard</code> bas-à-gauche affichant en permanence : nom du bateau, date/heure, position, vitesse, cap, source ; auto-rafraîchi 30 s.<br/>
+    &nbsp;&nbsp;• <em>Tap sur n'importe quel point</em> de la trace → popup compacte (4 lignes) :<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;<code>ven. 3 mai · 04:46<br/>43.123° N · 5.789° E<br/>SOG 6.4 kn · COG 087°<br/>Source AIS</code><br/><br/>
+    <strong>Vie privée</strong> : sur la page publique, l'encart et la popup respectent le réglage Visibilité publique (Direct / Différé / Manuel). En mode Manuel, l'historique est figé jusqu'au prochain 📢 Publier.</td></tr>
+    <tr><td class="tag">v1.8.11</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Sélecteur de localisation dans le compositeur</strong> (livré v1.8.11.x, 3 mai 2026) — quand on écrit un post ou une entrée de journal, choisir parmi 4 sources de position :<br/>
+    &nbsp;&nbsp;• <em>GPS du téléphone</em> — instantané, avec rayon de précision.<br/>
+    &nbsp;&nbsp;• <em>Déposer une épingle sur la carte</em> — vue mini-carte, pan + tap pour placer.<br/>
+    &nbsp;&nbsp;• <em>Choisir un point sur la trace</em> — utile pour les posts rétrospectifs ("on était là à ce moment-là"). La trace de l'étape s'affiche, on tape le point le plus proche.<br/>
+    &nbsp;&nbsp;• <em>Dernière position AIS</em> — un bouton, pré-remplit avec le dernier <code>PositionReport</code> (grisé si trop ancien).<br/><br/>
+    Aucune migration nécessaire : la colonne <code>posts.location</code> existe déjà.<br/><br/>
+    <strong>Marqueurs sur la carte pour les posts/log entries sans photo</strong> (livré v1.8.11.1, 3 mai 2026) : disque teal 16 px, sans image, fin contour blanc.</td></tr>
+    <tr><td class="tag">v1.8.10b</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Mode "Manuel" : conserver l'historique visible</strong> (livré v1.8.11.2, 3 mai 2026) — Basculer en Manuel <strong>gèle</strong> la vue publique à l'instant T : l'historique reste visible, seules les nouvelles positions nécessitent un appui sur 📢 Publier. Petit toast de confirmation dans la carte Visibilité publique. Aucune migration.</td></tr>
+    <tr><td class="tag">v1.8.12</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Barre de statut à 5 signaux</strong> (livré v1.8.12.x, 3 mai 2026) — sous le logo Wang'ap (mobile + PC), 5 icônes indépendantes pour lire toute la pile télémétrique d'un coup d'œil :<br/>
+    &nbsp;&nbsp;1. 📶 <em>Connexion</em> — 4G/5G / WiFi / Ethernet / 2G-3G / hors-ligne<br/>
+    &nbsp;&nbsp;2. 📱 <em>GPS iPhone</em> — vert clignotant (enregistre), doré (fix périmé), gris (off)<br/>
+    &nbsp;&nbsp;3. 📡 <em>AIS vers base</em> — vert clignotant (actif &lt; 5 min), doré (pause / 429), rouge (erreur), gris (off / inactif &gt; 60 min)<br/>
+    &nbsp;&nbsp;4. 👁 <em>Visibilité publique</em> — vert (Direct), doré (Différé Nh), corail (Manuel)<br/>
+    &nbsp;&nbsp;5. 🔄 <em>Sync backend</em> — vert (file vide), doré (≤ 10 en attente), rouge (&gt; 10 ou hors-ligne)<br/><br/>
+    <strong>Tap</strong> (PC : clic) sur n'importe quelle icône → ouvre la section Réglages correspondante. Sur mobile (touch), un premier tap montre le texte de statut ("AIS actif (2 min) → Réglages") puis un second tap ouvre Réglages. Sur PC, hover natif + clic direct.</td></tr>
+    <tr><td class="tag">v1.8.13</td><td class="status-cell"><span class="pill shipped">✅ Livré</span></td><td><strong>Vue PC — Option A</strong> (livré v1.8.13.x, 3 mai 2026) — La vue PC pour les skippers et la famille connectée passe de "appli téléphone à 600 px sur un écran 1920 px" à un layout natif PC :<br/>
+    &nbsp;&nbsp;• <em>Barre latérale</em> 80 px → 220 px avec étiquettes texte à côté des icônes.<br/>
+    &nbsp;&nbsp;• <em>Logo Le Petit Prince</em> 40 px → 56 px, titre <em>wang'ap</em> 18 → 24 px pour lire à la distance d'écran.<br/>
+    &nbsp;&nbsp;• <em>Navigation primaire</em> : Journal · Carte · Stats · Tech (skipper) · Renard (skipper). Famille : 🏡 Accueil → /family · Journal · Carte · Stats.<br/>
+    &nbsp;&nbsp;• <em>Navigation secondaire</em> : Messages (avec badge non-lu) · Réglages.<br/>
+    &nbsp;&nbsp;• <em>Carte utilisateur</em> en bas : avatar + nom + rôle + 🚪 déconnexion.<br/>
+    &nbsp;&nbsp;• <em>Contenu principal</em> max 1152 px (était 896 px).<br/>
+    &nbsp;&nbsp;• <em>Mobile et page publique inchangés</em>.<br/><br/>
+    Option B (vrai layout 2 colonnes liste/détail) et Option C (tableau de bord avec widgets) reportées en V3.10.</td></tr>
+    <tr><td class="tag">v1.9</td><td class="status-cell"><span class="pill shipped">✅ Livré + déployé</span></td><td><strong>Audit complet avant départ</strong> ⭐ — passe systématique sur la qualité d'affichage, la couverture multi-plateforme, la stabilité technique et la performance perçue. <em>Branche `v1.9` ouverte le 7 mai 2026 ; clôturée le 9 mai 2026 avec les patchs <code>v1.9.1</code> (polish) et <code>v1.9.2</code> (quick wins).</em> <strong>L'application est prête pour le départ.</strong> <strong>Bilan Lighthouse</strong> sur <code>https://www.wangap.fr/</code> : mobile Perf <strong>24 → 78</strong>, TBT <strong>5050 → 40 ms</strong>, LCP <strong>10.9 → 3.7 s</strong>, A11Y <strong>80 → 93</strong> ; desktop <strong>90 / 93 / 100 / 100</strong> tous ≥ 90.<br/><br/>
+    <strong>v1.9.1 (8 fixes polish, même jour que v1.9-final)</strong> :<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-K1 + V1.9-PERF-3 démasqués par V1.9-DEV-1</strong> ✅ — tous les retests depuis v3 tournaient contre du code stale servi par le SW (cache <code>stale-while-revalidate</code> sur <code>/@vite/client</code>) ; une fois le SW gated off sur <code>localhost</code>, le bug couleurs de chapitre + le 12 s cold-load disparaissent sans changement de code.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-DEV-1</strong> ✅ — gate du service worker PWA off sur <code>localhost</code> + RFC 1918 LAN dans <code>index.html</code>.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-BUG-1</strong> ✅ — <code>Carnet "+"</code> crash <code>Can't find variable: t</code> sur toutes les plateformes (PWA + iPhone Safari + Mac Chrome) — destructuring manquant à <code>MaintenancePage.jsx:33</code> (un seul caractère).<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-PWA-1c + parité famille</strong> ✅ — composer post sur iPhone PWA inaccessible (X / Brouillon / Publier sous le Dynamic Island) ; corrigé sur PostComposer + MessageForm + 2× PublicHomeAlt detail modal + MapPage detail modal via <code>maxHeight: 'min(85vh, calc(100dvh - env(safe-area-inset-top) - 80px))'</code>.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-PERF-5</strong> ✅ — sortir <code>MapPage</code> du modulepreload public (~245 KB gzipped économisés sur le cold-load anonyme) en lazy() dans les Layouts.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-PERF-6 (1+2)</strong> ✅ — <code>MapView</code> lazy + <code>IntersectionObserver</code> dans PublicHomeAlt → maplibre-gl ne fetch que sur scroll-into-view ; perf mobile 24 → 78.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-A11Y-1 (a/b/e)</strong> ✅ — drop <code>user-scalable=no</code> du viewport meta + <code>&lt;main&gt;</code> landmark + <code>aria-label</code> sur les boutons icon-only ; A11Y 80 → 93.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-PWA-1a</strong> ✅ — menu burger : sliding panel avec <code>paddingTop: env(safe-area-inset-top)</code> pour que le X de fermeture reste sous le Dynamic Island.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-PWA-1b</strong> ✅ — barre de navigation basse : le crème s'étend désormais jusque dans la zone du home-indicator iOS, plus de bande "sand" inutile.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-UI-1</strong> ✅ — "Voir sur la carte" depuis un post n'auto-zoome plus à la position du bateau ; le <code>flyTarget</code> du post est respecté.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-UI-2</strong> ✅ — clavier iOS PWA dismiss après login (<code>document.activeElement?.blur()</code>).<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-UI-3</strong> ✅ — bouton Annuler toujours présent dans les formulaires Carnet et Todo (et plus seulement en mode édition).<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-AUDIT-1</strong> ✅ — popup Chrome "Save password?" sur la clé API AIS éliminé via masquage CSS (<code>WebkitTextSecurity: disc</code>) au lieu de <code>type="password"</code>.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-BUG-2</strong> ✅ — détecteur défensif HEIC dans <code>handleMedia()</code> : alerte bilingue sur upload d'un HEIC dans Chrome desktop (échec silencieux auparavant) ; conversion <code>heic2any</code> transparente reportée à V2.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-AIS-1</strong> ✅ — drop du bras MMSI du predicate <code>identityChanged</code> du worker AIS : changer de bateau ne provoque plus une reconnexion WebSocket → plus de blocage 15 min "Limité (réessai dans ~15 min)" sur AISStream. Worker Fly.io <strong>v9</strong> déployé.<br/><br/>
+    <strong>v1.9.2 (3 Tier-1 quick wins)</strong> :<br/>
+    &nbsp;&nbsp;☑ <strong>§3 headers de sécurité</strong> ✅ — <code>vercel.json</code> : <code>X-Content-Type-Options=nosniff</code> + <code>X-Frame-Options=DENY</code> + <code>Referrer-Policy=strict-origin-when-cross-origin</code> + <code>Permissions-Policy</code> avec scoping explicite. HSTS déjà actif. CSP reportée à V2 (script inline du SW gate dans <code>index.html</code>).<br/>
+    &nbsp;&nbsp;☑ <strong>V2-RENARD-1 client hardening</strong> ✅ — <code>RenardAdminPage.jsx:115-126</code> : lecture du body en text + try-parse JSON, l'utilisateur voit le vrai message serveur au lieu de "Unexpected token A is not valid JSON" (root cause serveur encore en V2.4).<br/>
+    &nbsp;&nbsp;☑ <strong>V2-PERF-3 image-lazy sweep</strong> ✅ — 19 <code>loading="lazy"</code> ajoutés sur 8 fichiers active-route ; logos above-fold + LCP heroes gardés eager ; popup-template MapView (click-gated) skippés.<br/><br/>
+    <strong>Items reportés en V2.0</strong> (architectural, hors scope v1.9.x) : V1.9-PERF-2 follow-up (<code>compute_voyage_kpis</code> RPC + lazy recharts), V1.9-PERF-4 (Journal pagination + virtualization), V1.9-PERF-6 V2.0 (mobile 78 → 90 via static map placeholders), V1.9-A11Y-1 V2.0 (color-contrast pass), V2-PERF-4 (N+1 photo upload + multi-move waypoint), V2-MSG-1 (messages bulk actions), V2-COMPOSER-1/2, V2-RENARD-1 server-side, CSP via SW-gate-extraction.<br/><br/>
+
+    <strong>Détails sprint v1.9 originaux (7-9 mai 2026)</strong> :<br/><br/>
+    <strong>0. Smoke tests + risques carry-forward de v1.8 (à faire EN PREMIER)</strong> :<br/>
+    &nbsp;&nbsp;☑ <strong>Smoke test trigger AIS (v1.8.9)</strong> ✅ — vérifié 7 mai 2026 : <code>insert</code>=209, <code>etape_window_changed</code>=13 982, <code>manual_reassign</code>=428. BEFORE INSERT trigger se déclenche bien à chaque AIS PositionReport frais ; pipeline worker → trigger → audit confirmé bout-en-bout.<br/>
+    &nbsp;&nbsp;☑ <strong>Risque trigger storm sur édition de date d'étape (V1.9-RISK-1)</strong> ✅ — migration 032 livre le filet de sécurité async pg_cron : <code>trg_realloc_on_etape_change()</code> compte d'abord les lignes dans la fenêtre d'union ; ≤ 5 000 → inline (comportement v1.8.9 inchangé) ; > 5 000 → ajout d'une ligne dans <code>etape_realloc_jobs</code>, l'UPDATE étape commit en O(ms). <code>pg_cron</code> draine la queue chaque minute via <code>process_etape_realloc_jobs(5)</code> avec <code>FOR UPDATE SKIP LOCKED</code> + sous-transaction par job. Stress-test à 250 k waypoints synthétiques skip — à 6 k waypoints aujourd'hui le seuil ne déclenche jamais ; safety net défensif pour le volume tour du monde.<br/>
+    &nbsp;&nbsp;☑ <strong>Purge TTL <code>waypoint_allocations</code> (V1.9-RISK-4)</strong> ✅ — migration 034 : nouvelle fonction <code>prune_waypoint_allocations(p_older_than INTERVAL DEFAULT '6 months')</code> + schedule pg_cron <code>waypoint_allocations_prune</code> à 03:00 UTC quotidien. Index existant <code>idx_wp_alloc_at</code> garde le DELETE millisecond-fast. Choix nightly DELETE plutôt que partitionnement : ~260 k lignes en steady-state à volume tour du monde, partitionnement aurait nécessité de refaire FKs + RLS par partition pour aucun bénéfice.<br/>
+    &nbsp;&nbsp;☑ <strong>Auto re-consolidation après réallocation d'étape (V1.9-DEFER-2)</strong> ✅ — migration 033 : les deux chemins de réallocation (trigger inline + drainer async) capturent l'union DISTINCT des étape IDs avant/après dans une CTE puis fanout-call <code>consolidate_waypoints_for_etape()</code> par étape concernée (NULL orphans filtrés). Tourne dans la même (sous-)transaction que le réalloc — un échec de consolidation rollback le mouvement aussi. Le bouton "↻ Recalculer la consolidation" devient un re-run explicite plutôt qu'une étape obligatoire après chaque édition.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-PERF-2 — page Stats lente + bug de troncature silencieuse à 1 000 lignes</strong> ✅ — <code>useInsights.js</code> faisait <code>select('*')</code> sans pagination ; le cap Supabase à 1 000 lignes par requête signifiait que les KPI étaient silencieusement calculés sur 16 % des données (à 6 249 waypoints prod, distance totale / vitesse max / nuits en mer tous faux). Patch rapide : pattern parallel-fetch de V1.9-PERF-1 via nouveau <code>fetchWaypointsForPeriod(period)</code> (count probe + <code>Promise.all</code> de N pages, filtre période appliqué aux deux). <code>SELECT *</code> rétréci aux 6 colonnes utilisées (~30-40 % de payload en moins). <code>localStorage.getItem('lang')</code> hoisté hors des boucles. Flag <code>cancelled</code> dans le cleanup pour éviter les races sur changement de période rapide. <strong>Reporté à V2.8</strong> : RPC Postgres <code>compute_voyage_kpis(p_period TEXT)</code> côté serveur (remplace l'agrégation client entière — à l'échelle tour du monde, ~50 k waypoints/leg, expédier toutes les lignes vers JS pour un SUM est le mauvais shape) ; lazy-load des composants recharts (chunk 378 KB / 110 KB gzip domine le 1ʳᵉ visit) ; cache de résultats par période.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-PERF-1 + V1.9-POLISH-1 — re-render trace lent au retour Réglages → Carte + popup waypoint resserré</strong> ✅ — option (b) : <code>MapPage</code> persisté au-dessus de <code>&lt;Routes&gt;</code> via Mobile/DesktopLayout, toggle CSS <code>display:isMapPage</code>. <code>&lt;Route path="/map" element={&lt;&gt;&lt;/&gt;}&gt;</code> préserve l'URL matching sans rien rendre. ResizeObserver dans MapView appelle <code>map.resize()</code> sur changement de taille (gère show/hide + rotation). 1ʳᵉ visite /map inchangée ; navigations suivantes instantanées (pas de remount, pas de re-fetch, pas de ré-init MapLibre). Side-quest : <code>fetchAllWaypoints()</code> rewrite séquentiel → <code>count: 'exact'</code> + <code>Promise.all</code> de N pages parallèles → coût 1ʳᵉ visite passe de ~1-2 s à ~250-400 ms. Popup waypoint : ligne 1 = <code>&lt;date&gt; (A)</code> (ou G/X/M) + ✎ inline ; ligne 4 = <code>chapitre · étape</code> ; ligne "Source XXX" supprimée.<br/>
+    &nbsp;&nbsp;☑ <strong>Régression couleurs trace (V1.9-K1, ex v1.8.6.5-E-K1)</strong> ✅ — fix en 3 étapes. <strong>v1</strong> : bump synchrone <code>setBucketsVersion</code> dans <code>style.load</code> → marche pour standard→nautical mais pas l'inverse (les tiles Carto arrivent plus tard que les tiles Esri ; le chapter-trace ajoute des layers avant que le renderer soit prêt). <strong>v2</strong> : défère le bump à <code>map.once('idle', …)</code> → l'effet chapter-trace re-tourne mais les layers ne se peignent toujours pas avant le prochain zoom. <strong>v3 (final)</strong> : <code>map.triggerRepaint()</code> à la fin de l'effet chapter-trace — quand l'effet tourne depuis un callback <code>idle</code>, le scheduler de rendu MapLibre est en état "tout posé" et addLayer seul ne queue pas un repaint ; <code>triggerRepaint</code> force le schedule. Matrice de régression dans <code>docs/AUDIT_v1.9.md</code> §K1.<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-MAP-1 — basemap marin hybride</strong> ✅ — <code>STYLES.nautical</code> était Esri <code>World_Ocean_Base</code> seul ; les tiles s'arrêtent à z≈10, donc le zoom port-level affichait "Map data not yet available" partout. Hybride : Esri Ocean reste la base low-zoom (z 0-11), Carto Voyager (mêmes tiles que <code>STYLES.standard</code>) prend le relais à z ≥ 11 avec <code>raster-saturation: -0.35</code> + <code>raster-brightness-min: 0.08</code> pour un feeling marin tout en restant lisible ; OpenSeaMap seamarks overlay sur le tout (z 5-18). Pas de clé API. Suivi V2 : <strong>V1.9-MAP-2</strong> = MapTiler Outdoor pour de la vraie bathymétrie (BLUEPRINT §V2.9 ; tier gratuit 100 k req/mois, clé publique domain-restricted, fallback payant ~$25/mois si trafic public sature).<br/>
+    &nbsp;&nbsp;☑ <strong>V1.9-LINT-1 — dette lint accumulée dans MapView.jsx</strong> ✅ — fix partiel : 24 errors ESLint → 12. (a) <strong>PROGRAMME_STAGES no-undef confirmé dead code, pas un bug latent</strong> : le bouton ▶️ appelle <code>setShowPlaySoonModal(true)</code> ; le scaffolding playback (start/stop/togglePlayback + useEffect cleanup + bloc JSX + state <code>playing</code>/<code>playStage</code>/<code>playTimerRef</code>) n'était jamais branché, et le bloc JSX était gardé par <code>playing</code> toujours <code>false</code> donc <code>PROGRAMME_STAGES.length</code> n'était jamais évalué. Supprimé entièrement ; V2.9 livrera son propre pipeline typé. (b) Vars mortes supprimées : <code>icons</code>, <code>togglePlayback</code>, plus 3 surfacées par les hints TS de l'IDE (<code>pendingMove</code> — état legacy v1.8.5.4 remplacé par <code>pendingMoves</code> Map ; <code>haversineMeters</code> + <code>TRACE_BUCKET_DEFAULTS</code> — imports non utilisés). (c) <code>set-state-in-effect</code> sur le cleanup d'exit edit mode : block-disabled avec commentaire de justification — la règle préfère un event handler mais la forme correcte ici est "réagir quand un prop externe passe à false" ; React batche déjà les 11 setStates en un seul re-render. <strong>Reporté en V2 (migration React Compiler)</strong> : les ~12 erreurs restantes sont toutes de la famille lint React-Compiler-aware (preserve-manual-memoization, "Cannot access refs during render", "Cannot access variable before it is declared", "This value cannot be modified" + 3 exhaustive-deps warnings) — cosmétique tant que React Compiler n'est pas activé dans ce repo.<br/><br/>
+    <strong>1. Bugs d'affichage et UX</strong> :<br/>
+    &nbsp;&nbsp;• Walk-through complet skipper / famille / public sur les 4 pages clés (Journal, Carte, Stats, Réglages) — capture d'écran de chaque page sur 6 résolutions (iPhone SE, iPhone 14, iPhone 14 Pro Max, iPad portrait, MacBook 13", écran externe 1920×1080).<br/>
+    &nbsp;&nbsp;• Inventaire des truncations / overflows / textes coupés / boutons hors-écran / chevauchements / z-index incorrects.<br/>
+    &nbsp;&nbsp;• Test du flux de saisie complet (post + log + maintenance + todo + livre d'or) avec 3 longueurs de contenu (court / moyen / 5 photos + 800 mots).<br/>
+    &nbsp;&nbsp;• Vérif que les 12+ états du <em>StatusBar</em> rendent correctement (offline, sync queue, AIS error, GPS stale, etc.).<br/><br/>
+    <strong>2. Multi-plateforme &amp; supports</strong> :<br/>
+    &nbsp;&nbsp;• <em>iOS</em> : iPhone Safari + Chrome iOS (utilise WebKit), PWA installée vs onglet, mode standalone vs avec barre d'URL, iPadOS portrait + paysage.<br/>
+    &nbsp;&nbsp;• <em>Android</em> : Chrome + Firefox + Samsung Internet, PWA installée.<br/>
+    &nbsp;&nbsp;• <em>Desktop</em> : Chrome / Safari / Firefox / Edge, macOS + Windows + Linux.<br/>
+    &nbsp;&nbsp;• <em>Connexion dégradée</em> : 2G / 3G / WiFi instable / hors-ligne complet (offline-first vérifié bout-en-bout via service worker).<br/>
+    &nbsp;&nbsp;• <em>Mode landscape</em> sur iPhone vs blocage CSS — confirmer que le bandeau de rotation s'affiche correctement.<br/><br/>
+    <strong>3. Audit technique</strong> :<br/>
+    &nbsp;&nbsp;• <em>Sécurité</em> : revue des RLS Supabase (policies par table × par rôle × par visibilité), CORS sur les fonctions API, secrets côté client, validation des entrées utilisateur, headers HTTP (CSP, HSTS, X-Frame-Options).<br/>
+    &nbsp;&nbsp;• <em>Performance</em> : bundle size par route, chunks lazy-loadés, image lazy-loading, cache stratégie sw.js, requêtes N+1, queries Supabase non-indexées. <strong>Régression connue (loggée 6 mai 2026)</strong> : le rendu de la trace est lent quand on revient sur Carte depuis Réglages — la carte est démontée puis remontée et l'effet chapitre/étape recalcule tout de zéro. Cible : &lt; 200 ms de "trace apparaît" après changement de page avec 5 k waypoints. Pistes : cache de géométrie au niveau application, garder MapView monté en arrière-plan, ou découper l'effet en construction (mémoïsée) et commit MapLibre (toujours exécuté).<br/>
+    &nbsp;&nbsp;• <em>Fiabilité</em> : tests de récupération sur perte de connexion (queue offline, retry exponential backoff), résilience aux migrations Supabase, comportement quand le worker AIS Fly.io est down.<br/>
+    &nbsp;&nbsp;• <em>Accessibilité</em> : contraste WCAG AA, attributs aria-label / role, navigation clavier complète, lecteur d'écran (VoiceOver / TalkBack).<br/>
+    &nbsp;&nbsp;• <em>Code health</em> : warnings ESLint, deps obsolètes, hooks deps incorrects, refs non nettoyés, fuites mémoire (mesurer avec Chrome DevTools heap snapshot après 30 min d'usage).<br/><br/>
+    <strong>4. Score Google Lighthouse</strong> ⭐ — viser ≥ 90 sur les 5 axes (Performance, Accessibility, Best Practices, SEO, PWA) sur :<br/>
+    &nbsp;&nbsp;• Page d'accueil publique<br/>
+    &nbsp;&nbsp;• Page <code>/timeline</code> admin (post composer + 50 derniers posts)<br/>
+    &nbsp;&nbsp;• Page <code>/map</code> admin (carte avec 10 k waypoints)<br/>
+    &nbsp;&nbsp;• Page <code>/family</code> connectée<br/>
+    Plus PageSpeed Insights mobile + desktop. Documents le score atteint pour chaque page dans <code>docs/AUDIT_v1.9.md</code>.<br/><br/>
+    <strong>Livrable</strong> : un fichier <code>docs/AUDIT_v1.9.md</code> avec checkboxes par item, captures avant/après pour les bugs corrigés, scores Lighthouse, et la liste des bugs ouverts à reporter en V2 ou plus tard.</td></tr>
+
+    <tr><td class="tag">v2.0.1</td><td class="status-cell"><span class="pill shipped">✅ Livré + déployé (UAT)</span></td><td><strong>Sprint V2 #1 — performance Journal · variantes photo client-side · filtres synchronisés Journal ↔ Carte · base de connaissances Renard refondue</strong> (mergée sur main le 11 mai 2026 au commit <code>2d2aa07</code>, tag <code>v2.0.1-uat</code> = nouvelle base UAT, ancien <code>v1.9-uat</code> figé à <code>038b71c</code>). Sprint suivant ouvert sur la branche <code>v2.0.2</code>. Migration 035 (<code>source_class</code> sur <code>rag_documents</code>) appliquée sur Supabase production avant le merge. :<br/><br/>
+    &nbsp;&nbsp;☑ <strong>Performance Journal</strong> ✅ — <code>usePosts</code> paginé via <code>count: 'exact', head: true</code> précount + <code>Promise.all</code> sur pages <code>range()</code> de 500 (corrige la troncature silencieuse à 1 000 lignes Supabase qui aurait frappé le jour où le nombre de posts traverse ce seuil). Timeline persisté dans <code>Mobile/DesktopLayout</code> via <code>display:none</code> sur <code>pathname === '/timeline'</code> (zéro refetch sur Réglages ↔ Journal, état des filtres + position de scroll + état du composer conservés).<br/>
+    &nbsp;&nbsp;☑ <strong>Variantes photo client-side au upload</strong> ✅ — chaque nouvelle photo génère trois tailles en parallèle : <code>&lt;base&gt;.jpg</code> (1200 px), <code>&lt;base&gt;-md.jpg</code> (600 px), <code>&lt;base&gt;-sm.jpg</code> (200 px). Helper <code>thumbUrl(url, size)</code> dans <code>src/lib/imageVariants.js</code> + <code>onError={fallbackToOriginal(url)}</code> sur chaque <code>&lt;img&gt;</code> pour rétro-compatibilité posts legacy. Économie ~16× sur les marqueurs carte (50 × 500 KB lg → 50 × ~30 KB sm). Cache <code>noVariantUrls</code> de session pour éliminer le flicker MapLibre sur posts legacy. <strong>Outil admin de backfill</strong> dans <code>/renard/admin</code> exécuté avec succès (~41 posts × ~3 photos × ~2-3 s).<br/>
+    &nbsp;&nbsp;☑ <strong>Filtres synchronisés Journal ↔ Carte</strong> ✅ — chapitre + étape partagés entre Timeline.jsx et MapView.jsx (vues skipper + famille) via nouveau hook <code>useSharedFilters</code> (localStorage + <code>CustomEvent</code> + bonus <code>storage</code> event pour la sync cross-tab). PublicHomeAlt garde son état local (visiteurs ont une intention différente).<br/>
+    &nbsp;&nbsp;☑ <strong>Étape dropdown unifié</strong> ✅ — quand un chapitre est sélectionné, les étapes s'affichent à plat (le wrapper <code>&lt;optgroup&gt;</code> redondant disparaît, comme MapView le faisait déjà — propagé à Timeline + PublicHomeAlt). Sélectionner une étape avec chapitre=all auto-définit le chapitre parent.<br/>
+    &nbsp;&nbsp;☑ <strong>Modale de discard stylée</strong> ✅ — remplace <code>window.confirm()</code> à la fermeture du composer (X) par un modal in-app (carte cream, bouton coral, indication "Brouillon" pour sauvegarder).<br/>
+    &nbsp;&nbsp;☑ <strong>HEIC transparent via <code>heic2any</code></strong> partiel (chunk lazy 344 KB) — fonctionne sur les vieux iPhones et la plupart des HEIC, échoue sur iOS 17+ HEIC avec "Could not parse HEIF file". Reste sur la branche v2 jusqu'à évaluation d'une alternative serveur-side ou d'une lib plus récente.<br/>
+    &nbsp;&nbsp;☑ <strong>PublicHomeAlt CSS <code>background-url</code> → <code>&lt;img&gt;</code></strong> ✅ — 6 sites d'image convertis pour permettre <code>onError</code> fallback (hero featured, grille, modaux selectedPost + fullMapDetail, grille secondaire, vignette compacte).<br/><br/>
+    Détails sprint complets dans <code>BLUEPRINT.md</code> §2.40 et table <code>docs/ISSUE_TRACKER.md</code> section V2.0.1. Tag <code>v2.0.1</code> = <code>bf07b37</code>. Vercel preview URL <code>jdb-wangap-git-v2-*.vercel.app</code> = surface de test iPhone.</td></tr>
+
+    <tr><td class="tag">v1.9.6</td><td class="status-cell"><span class="pill shipped">✅ Livré + déployé</span></td><td><strong>Hotfix UAT — régression Lucide-Image + modale de confirmation stylée</strong> (livré 11 mai 2026, 2 commits sur main, tag <code>v1.9-uat</code> remonté de <code>c21ab6a</code> à <code>52f537d</code>) :<br/><br/>
+    &nbsp;&nbsp;☑ <strong>V1.9.6-HOTFIX-1 — bug latent corrigé</strong> ✅ — l'import <code>Image</code> de <code>lucide-react</code> dans <code>PostComposer</code> masquait depuis v1.9.5 le constructeur global <code>window.Image</code>, cassant silencieusement la sonde de décodage HEIC (V1.9-BUG-2) sur Chrome / Firefox / Edge desktop pendant toute la fenêtre UAT. <code>new Image()</code> construisait le composant React Lucide au lieu du global navigateur → <code>TypeError: C is not a constructor</code> dans l'exécuteur de Promise → rejet silencieux de <code>handleMedia</code>. Fix : alias <code>Image as ImageIcon</code> + try/catch défensif sur <code>handleMedia</code> (futures régressions du même type surfacent maintenant comme alerte visible). Sortie minifiée vérifiée : <code>new Image</code> (global), pas <code>new C</code>.<br/>
+    &nbsp;&nbsp;☑ <strong>Modale de confirmation à la fermeture</strong> ✅ — la confirmation X-avec-contenu passe de <code>window.confirm()</code> (boîte OS, jarring) à un modal in-app stylé (carte cream, bouton coral, sand "Continuer"). Reprend exactement le pattern de la confirmation de suppression de PostCard.<br/><br/>
+    <strong>Conversion HEIC transparente via <code>heic2any</code> délibérément exclue</strong> de ce hotfix — preview testing révèle que <code>libheif-js</code> (lib WASM sous-jacente à heic2any) échoue sur les formats HEIC iOS 17+ avec une erreur "Could not parse HEIF file" trompeuse pour l'utilisateur ("Fichier HEIC corrompu ?" sur une photo parfaitement valide). Main revient au design V1.9-BUG-2 d'origine : alerte explicite <em>"HEIC non supporté par ce navigateur — convertissez en JPEG ou utilisez Safari"</em>, jamais d'échec silencieux. <strong>Flux photo iPhone non affecté</strong> : iPhone PWA utilise iOS auto-convert JPEG (jamais sur le chemin HEIC), AirDrop→Mac→Safari décode HEIC nativement, seul AirDrop→Mac→Chrome/Firefox/Edge voit l'alerte. <strong>Branche v2 resynchronisée</strong> via <code>git merge -s ours main</code> (commit `4b797e9`) — les fixes v1.9.6 sont déjà présents sur v2 via Batches 5b+5c, l'option <code>-s ours</code> enregistre la convergence sans toucher au contenu v2.</td></tr>
+
+    <tr><td class="tag">v1.9.5</td><td class="status-cell"><span class="pill shipped">✅ Livré + déployé</span></td><td><strong>Polish UX — système d'icônes Lucide + Réglages drill-down / split-view</strong> (livré 11 mai 2026) — trois changements de présentation sur la base UAT v1.9, conçus pour atterrir sur prod sans aucun changement de comportement :<br/><br/>
+    &nbsp;&nbsp;☑ <strong>Icônes Lucide unifiées</strong> ✅ — TabBar (mobile) + NavBar (desktop) : <code>BookOpen</code> (Journal), <code>Map</code> (Carte), <code>BarChart3</code> (Stats), <code>Wrench</code> (Tech), <code>Settings</code> (Réglages), <code>Home</code> (Accueil famille), <code>Mail</code> (Messages), <code>LogOut</code> (Déconnexion). <strong>🦊 Renard reste en emoji coloré</strong> exprès — l'outil IA admin se distingue visuellement du reste de la barre monochrome.<br/>
+    &nbsp;&nbsp;☑ <strong>Réglages drill-down sur mobile + iPad (toutes orientations)</strong> ✅ — liste de sections avec chevron, tap → slide depuis la droite (animation 280 ms cubic-bezier iOS-style), retour via chevron en haut à gauche. Détection : <code>matchMedia('(min-width: 1024px) and (pointer: fine)')</code> — iPad landscape à ≥ 1024 px reporte <code>pointer: coarse</code> donc reste en drill-down comme attendu, alors qu'un MacBook 13" à la même largeur bascule sur split-view.<br/>
+    &nbsp;&nbsp;☑ <strong>Réglages split-view sur laptop/PC</strong> ✅ — sidebar 260 px à gauche listant toutes les sections (teinte or pour la sélection active), panneau de droite affichant le contenu de la section sélectionnée. Symétrique avec le mobile (même JSX rendu sous deux contextes différents).<br/>
+    &nbsp;&nbsp;☑ <strong>"Tout déplier / Tout replier" retirés</strong> ✅ — ne font plus sens avec un seul section affichée à la fois dans chacun des deux nouveaux modes.<br/><br/>
+    Pas de changement de comportement, pas de migration DB, pas de touche au worker. Pur refactor de présentation. Tag <code>v1.9-uat</code> remonté sur cette base.</td></tr>
+
+    <tr><td class="tag">v1.9.3</td><td class="status-cell"><span class="pill shipped">✅ Livré + déployé</span></td><td><strong>4 batches PWA iOS — pinch-zoom · containing-block · pull-to-refresh · espace TabBar</strong> (livré 9-10 mai 2026, 4 commits sur <code>main</code>) — quatre problèmes utilisateur post-v1.9.2 corrigés en suivant la doctrine STOP / THINK / PLAN / SEEK APPROVAL :<br/><br/>
+    &nbsp;&nbsp;☑ <strong>#4 Pinch-zoom Safari</strong> ✅ — <code>touch-action: pan-x pan-y</code> sur <code>html, body</code> dans <code>globals.css</code>. iOS Safari ignore <code>user-scalable=no</code> du viewport meta depuis iOS 10 (raison d'accessibilité), donc le meta seul ne bloque le pinch qu'en mode PWA standalone. CSS refuse explicitement le geste. MapLibre garde ses propres listeners canvas → non impacté.<br/>
+    &nbsp;&nbsp;☑ <strong>#1 Espace vertical TabBar</strong> ✅ — <code>py-2</code> → <code>py-1.5</code> sur l'inner div de TabBar pour récupérer ~8 px. Outer wrapper garde <code>paddingBottom: env(safe-area-inset-bottom, 0px)</code> pour étendre le crème dans la zone home-indicator iOS (V1.9-PWA-1b).<br/>
+    &nbsp;&nbsp;☑ <strong>#2 PostComposer modal containing-block trap</strong> ✅ — <code>createPortal(..., document.body)</code> sur le PostComposer. Avec <code>fixed inset-0 z-50</code> le modal était clippé par un ancestor : selon la spec CSS, tout élément avec <code>transform</code> / <code>filter</code> / <code>contain</code> / <code>backdrop-filter</code> crée un nouveau bloc englobant pour ses descendants <code>position: fixed</code> — le canvas MapLibre du <code>MapPage</code> persistant (V1.9-PERF-1) tombait dans cette catégorie et faisait passer la TabBar par-dessus l'overlay sombre du modal. Le portail élève le sous-arbre hors du piège.<br/>
+    &nbsp;&nbsp;☑ <strong>Batch 4 — pull-to-refresh iOS efface le brouillon</strong> ✅ — <code>overscroll-behavior: contain</code> sur <code>html, body</code> + sur le formulaire PostComposer. Après le createPortal de #2, le scroll du modal chaîne sur body → tirage vers le bas en haut du modal → iOS Safari déclenche pull-to-refresh → reload → brouillon perdu. <code>contain</code> casse la chaîne aux deux niveaux (défensif).<br/><br/>
+    <strong>#3 Couverture AIS — pas de fix code</strong> : diagnostic confirme que <code>matched=0</code> sur 5 000 frames/min n'est pas un bug — le réseau de stations terrestres bénévoles d'AISStream a une densité quasi-nulle au-dessus de l'Ibérie / Méditerranée Ouest / Afrique du Nord. Solution = <strong>v1.9.4</strong> (intégration tracker satellite, voir ligne suivante). AISHub free rejeté (exige une station de réception personnelle). APIs payantes évaluées et rejetées sur coût (Datalastic 199 €/mois, VesselFinder 330 €/mois en termes de crédits).<br/><br/>
+    <strong>Bbox AIS étendu</strong> en batch 2 : <code>[[30,-10],[46,36]]</code> Méditerranée → <code>[[20,-75],[60,36]]</code> Atlantique+Med pour couvrir toute la zone du voyage 2026. Worker AIS Fly.io <strong>v10</strong> déployé.</td></tr>
+
+    <tr><td class="tag">v1.9.4</td><td class="status-cell"><span class="pill planned">📅 Planifiée</span></td><td><strong>Intégration tracker satellite (Garmin InReach Mini 2 / YB3i) — couverture globale Iridium pour la position propre du bateau</strong> ⭐ <em>Requis avant le départ (~juillet 2026)</em>.<br/><br/>
+    <strong>Pourquoi</strong> : AISStream gratuit a des trous au-dessus de l'Ibérie / Méditerranée Ouest / Afrique du Nord / Pacifique / océan Indien. APIs AIS payantes : 199-2 800 €/mois selon couverture satellite. Trackers satellite Iridium : <strong>0 €/mois supplémentaire</strong> pour Wang'ap (B&amp;C achètent un tracker de toute façon comme appareil de sécurité — Wang'ap consomme le même flux).<br/><br/>
+    <strong>Recommandation hardware</strong> : <strong>Garmin InReach Mini 2</strong> ~$400 + 14,95 $/mois plan Safety (suivi 30 min inclus, SMS bidirectionnel, bouton SOS, MapShare KML clean pour API perso). Alternative : YB3i ~700 $ + ~8 $/mois (plus cher en hardware mais REST API plus propre). ZOLEO et SPOT rejetés (pas d'API publique propre / trous Globalstar dans le Pacifique).<br/><br/>
+    <strong>Architecture</strong> : le worker Fly.io gagne un deuxième type de provider à côté d'AISStream WS — branche <code>provider='garmin'</code> qui poll <code>https://share.garmin.com/&lt;handle&gt;</code> en KML toutes les 30 min, parse les <code>&lt;Placemark&gt;</code>, INSERT dans <code>waypoints</code> avec <code>source='garmin'</code>, met à jour <code>boats.last_known_position</code>. Schéma DB inchangé (juste une nouvelle valeur pour <code>source</code>). UI : Réglages → 📡 AIS card gagne une sous-section "Garmin MapShare" (URL chiffrée + test de connexion) ; icône bateau sur la carte affiche "📡 via Garmin" quand le fix Garmin est plus frais que le fix AIS, "📡 via AIS" sinon.<br/><br/>
+    <strong>État</strong> : 🟠 <strong>bloqué sur B&amp;C</strong> — choix du modèle de tracker + partage de l'URL MapShare. Voir <code>docs/OUTREMER_AND_BC_QUESTIONS.md</code> pour la liste des questions à poser au chantier Outremer et aux propriétaires. Estimé 1-2 jours dev une fois débloqué. V2-AIS-1 (paid AISStream / dynamic bbox) est superseded par cette ligne — au budget 0 €/mois Wang'ap, le tracker domine toutes les autres options de couverture globale.</td></tr>
+  </table>
+</div>
+
+</section>
+
+<!-- ═══════════════════════════════ V2 ═══════════════════════════════ -->
+<section class="v2-section">
+
+<h2>V2 — Nouvelles fonctionnalités <span class="ver-badge future">après V1</span></h2>
+<p class="phase-intro">Une fois le voyage commencé et l'application stabilisée, ajout de capacités majeures.</p>
+
+<h3>V2.1 — Sauvegarde, archive &amp; pérennité long-terme <span class="status done">✅ V2.1.1 + V2.1.2 livrées</span></h3>
+<p class="phase-intro"><em>Objectif</em> : découpler la <strong>mémoire</strong> du voyage de l'<strong>infrastructure live</strong>. Aujourd'hui tout dépend de Supabase + Vercel ; dans 10-20 ans l'un ou l'autre peut disparaître. Deux sprints couplés rendent la mémoire indépendante.</p>
+
+<h4 style="margin-top:14pt;color:var(--slate);">V2.1.1 — Sauvegarde &amp; export (souveraineté des données, AI-consumable) <span class="status done">✅ Livré (13–14 mai 2026)</span></h4>
+<p style="font-size:9.5pt;color:var(--gray);margin:4pt 0 6pt 0;"><em>But</em> : B&amp;C possèdent leurs données <strong>hors de Supabase</strong>, dans des formats qu'ils peuvent réellement <em>utiliser</em> — et que n'importe quel outil futur (humain ou IA) peut consommer dans 30 ans. Architecture <strong>server-side via GitHub Actions</strong> : pas besoin d'avoir l'app ouverte le dimanche soir. <strong>Push Google Drive automatique opérationnel depuis le 14 mai 2026</strong> (3 secrets GitHub configurés sur <code>sailingwangap/jdb_wangap</code> ; procédure dans <code>docs/BATCH3_DRIVE_SETUP.md</code>).</p>
+<ul class="feature-list">
+  <li class="done" data-mark="✅"><span class="label">Bouton "Tout exporter"</span> dans Settings → Sauvegarde → déclenche un GitHub Action via <code>workflow_dispatch</code> → runner génère le zip + push Google Drive + écrit dans <code>backup_log</code> → l'admin UI (page <code>/backups</code>) affiche le bouton de téléchargement quand c'est prêt</li>
+  <li class="done" data-mark="✅"><span class="label">(A) JSON brut</span> de toutes les tables (posts, comments, chapters, étapes, waypoints, marks, <strong>maintenance, todos</strong>, rag_documents, boat_config) — <strong>toutes visibilités</strong> (public + famille + privé), le backup est pour B&amp;C uniquement</li>
+  <li class="done" data-mark="✅"><span class="label">(B) Photos toutes tailles</span> (lg + md + sm) sous <code>photos/&lt;id&gt;-{sm,md,lg}.jpg</code></li>
+  <li class="done" data-mark="✅"><span class="label">(C) Cahier-de-bord Excel</span> <code>wangap-logbook.xlsx</code> multi-onglets — <em>Maintenance</em> · <em>Todos</em> · <em>Posts</em> (tous les champs aplatis incluant <code>navigation_data</code> → <code>nav_distance_nm</code>/<code>nav_speed_avg</code>/<code>nav_wind_dir</code>…, <code>conditions_data</code> → <code>cond_sea_state</code>/<code>cond_weather</code>…, <code>technical_data</code> → <code>tech_engine_hours</code>/<code>tech_fuel_used_l</code>… — filtrable "speed_avg &gt; 8 AND wind_dir = 'NW'") · <em>Étapes</em> · <em>Waypoints</em> · <em>Index</em> (dictionnaire des colonnes)</li>
+  <li class="done" data-mark="✅"><span class="label">(D) Traces GPX par étape</span> sous <code>gpx/&lt;étape&gt;.gpx</code> — importables dans OpenCPN, iSailor, Garmin</li>
+  <li class="done" data-mark="✅"><span class="label">(E) JSON pré-joint par étape</span> sous <code>etapes/&lt;étape&gt;.json</code> — pour chaque étape, posts + photos + waypoints joints dans un seul fichier, avec le <code>chapter</code> parent dénormalisé inline (V2.1.1-ENH-1). Droppable directement dans Claude/ChatGPT avec un prompt simple ("génère un chapitre de livre depuis ce fichier").</li>
+  <li class="done" data-mark="✅"><span class="label">(F) Méta AI-consumable</span> : <code>README.md</code> ("bienvenue dans l'archive") + <code>SCHEMA.md</code> (chaque table + chaque colonne documentée, type, exemple — l'IA lit ça en premier pour comprendre la structure) + <code>AI_PROMPTS.md</code> (5-10 prompts d'exemple : régénérer un chapitre, créer une page web, lister les pannes mécaniques, écrire une newsletter)</li>
+  <li class="done" data-mark="✅"><span class="label">(G) RESTORE.md</span> générique — instructions pas-à-pas pour reconstituer la base de zéro. Une future IA peut lire ce doc + les JSON et recréer la base sans intervention humaine.</li>
+  <li class="done" data-mark="✅"><span class="label">Push automatique Google Drive</span> (compte <code>sailing.wangap@gmail.com</code>, OAuth scope <code>drive.file</code>, refresh token stocké sur GitHub Secrets) — dossier <code>/Wang'ap Backups/</code> créé automatiquement au premier run</li>
+  <li class="done" data-mark="✅"><span class="label">Cron hebdomadaire</span> (dimanche 03:00 UTC, GitHub Action) — server-side uniquement, pas besoin d'avoir l'app ouverte</li>
+  <li class="done" data-mark="✅"><span class="label">Path browser-side conservé</span> en fallback (petit-scale, dev / tests / début de voyage)</li>
+  <li class="future" data-mark="•"><span class="label">Domaine email vérifié</span> wangap.fr — emails depuis contact@wangap.fr (à traiter dans un sprint email dédié)</li>
+  <li class="done" data-mark="✅"><span class="label">Indépendant de V2.6 (bilingue)</span> : V2.1.1 dumpe les colonnes qui existent ; quand V2.6 ajoutera <code>body_fr</code>/<code>body_en</code>, les exports suivants incluront automatiquement les traductions, sans code à changer</li>
+</ul>
+
+<h4 style="margin-top:14pt;color:var(--slate);">V2.1.2 — archive.wangap.fr (mémoire statique long-terme) <span class="status done">✅ Livré (16 mai 2026, 3 batches)</span></h4>
+<p style="font-size:9.5pt;color:var(--gray);margin:4pt 0 6pt 0;"><em>But</em> : un site web statique permanent qui ne dépend plus d'aucun serveur. Un cron hebdomadaire prend un instantané complet du site public et le commit dans un repo dédié, servi à <code>archive.wangap.fr</code>. Comme un journal papier numérisé : se lit dans 30 ans même si Supabase et Vercel n'existent plus.</p>
+<ul class="feature-list">
+  <li class="done" data-mark="✅"><span class="label">Snapshot hebdomadaire automatique</span> (GitHub Action, lundi 03:00 UTC) — chaque commit = un point dans le temps</li>
+  <li class="done" data-mark="✅"><span class="label">Bouton "Snapshot maintenant"</span> dans Réglages → Sauvegarde &amp; archive pour déclencher manuellement</li>
+  <li class="done" data-mark="✅"><span class="label">Contenu inclus</span> : posts publics (texte + photos), étapes, chapitres, stats agrégées, carte interactive</li>
+  <li class="done" data-mark="✅"><span class="label">Exclu</span> : posts famille/privés, commentaires, position bateau live (opérationnel, pas historique)</li>
+  <li class="done" data-mark="✅"><span class="label">Photos sm + md commités normalement, lg via Git LFS</span> — quota LFS gratuit (1 GB/mo) couvre le trafic attendu ; lightbox uniquement consomme la bande LFS</li>
+  <li class="done" data-mark="✅"><span class="label">Carte route</span> : <code>route.geojson</code> bundlé + renderer Leaflet 1.9.4 vendoré (interactif, MIT license, fonctionne dans 20 ans, pas de tile externe)</li>
+  <li class="done" data-mark="✅"><span class="label">Repo séparé</span> <code>sailingwangap/wangap-archive</code> — public read-only, commit history = machine à remonter le temps</li>
+  <li class="done" data-mark="✅"><span class="label">Hébergement GitHub Pages</span> : actif. Custom domain <code>archive.wangap.fr</code> via DNS Godaddy CNAME — <strong>en attente de Bertrand</strong> (seul accès Godaddy). En attendant : <code>sailingwangap.github.io/wangap-archive/</code></li>
+  <li class="done" data-mark="✅"><span class="label">Privacy gotcha</span> : snapshots <strong>immuables par timestamp</strong> — un post public à l'instant T reste dans le snapshot T même s'il est édité ou privatisé plus tard (honnêteté de l'histoire ; reportée à V2.12 si on veut une politique différente)</li>
+  <li class="done" data-mark="✅"><span class="label">Permanence escalade</span> : laptop/Google Drive (V2.1.1) → repo GitHub (V2.1.2) → GitHub Pages live (V2.1.2) → soumission annuelle Internet Archive Wayback Machine (différée à V2.12 après PDF)</li>
+  <li class="done" data-mark="✅"><span class="label">Forward-compatible avec V2.6 (bilingue)</span> : le renderer lit toutes les colonnes-langue qui existent — pas de migration nécessaire quand V2.6 ship</li>
+</ul>
+
+<h3>V2.2 — Livre d'Or <span class="status planned">📋 Planifié</span></h3>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Gestion équipage</span> : créer une fiche équipier (prénom, dates, étape associée)</li>
+  <li class="future" data-mark="•"><span class="label">Lien d'invitation</span> partageable par WhatsApp ou email</li>
+  <li class="future" data-mark="•"><span class="label">Formulaire équipage</span> : message + photos depuis le navigateur, sans compte</li>
+  <li class="future" data-mark="•"><span class="label">Validation par B&amp;C</span> : approbation manuelle, choix entre Livre d'Or privé (skippers) ou public (page d'accueil)</li>
+  <li class="future" data-mark="•"><span class="label">Page Livre d'Or publique</span> accessible depuis l'accueil — cards avec nom, photo, message</li>
+</ul>
+
+<h3>V2.3 — Newsletter <span class="status planned">📋 Planifié</span></h3>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Création assistée</span> par IA : choisir une période, sélectionner les posts/photos/trace à inclure, donner un fil thématique</li>
+  <li class="future" data-mark="•"><span class="label">Brouillon généré</span> automatiquement par Claude — éditable avant envoi</li>
+  <li class="future" data-mark="•"><span class="label">Envoi en masse</span> via la liste d'abonnés (table subscribers, déjà alimentée)</li>
+  <li class="future" data-mark="•"><span class="label">Archive Google Drive</span> : chaque newsletter sauvegardée en .docx</li>
+</ul>
+
+<h3>V2.4 — Le Renard, formation complète <span class="status planned">📋 Planifié</span></h3>
+
+<h4 style="margin-top:14pt;color:var(--slate);">V2.4.1 — Ingestion vidéos hand-over <span class="status planned">⭐ Prochain sprint (~1,5 j)</span></h4>
+<p style="font-size:9.5pt;color:var(--gray);margin:4pt 0 6pt 0;"><em>But</em> : B&amp;C tournent une série de vidéos commentées pendant la prise en main du bateau (cette semaine et les semaines suivantes — moteur, dessal, B&amp;G, Starlink, voiles, sécurité…). Ces vidéos en prise unique sont du savoir authoritatif à ne pas perdre dans un dossier Drive. V2.4.1 les transforme en source de connaissance Renard, transcrites par Whisper avec timestamps citables.</p>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Stockage : Google Drive uniquement</span> dans <code>sailing.wangap@gmail.com</code> (dossier <code>/Wang'ap Knowledge Base/Handover Videos/</code>, nommage <code>YYYY-MM-DD_&lt;système&gt;_&lt;sujet&gt;.mp4</code>). Supabase Storage non utilisé pour les vidéos — seuls les transcripts (texte) y atterrissent.</li>
+  <li class="future" data-mark="•"><span class="label">Bouton "Ingérer une vidéo"</span> dans <code>/renard/admin</code> : l'admin colle l'URL Drive d'une vidéo (après l'avoir partagée une fois avec l'OAuth app via clic droit Drive), clique, le pipeline server-side se déclenche.</li>
+  <li class="future" data-mark="•"><span class="label">Pipeline server-side via GitHub Action</span> (réutilise <code>workflow_dispatch</code> de V2.1.1) : téléchargement Drive (avec le refresh token existant) → extraction audio ffmpeg → OpenAI Whisper API → chunks au niveau phrase avec <code>meta: { drive_file_id, t_start_sec, t_end_sec }</code> → insert dans <code>rag_documents</code> avec <code>source_class='videos-handover'</code>.</li>
+  <li class="future" data-mark="•"><span class="label">Citations horodatées</span> : quand Le Renard cite une réponse depuis une vidéo, le lien deep-link vers <em>vidéo X à 4:32</em> (mm:ss).</li>
+  <li class="future" data-mark="•"><span class="label">Nouvelle catégorie taxonomique</span> <code>videos-handover</code> (6<sup>e</sup> source_class, à côté de outremer-officiel · vendor-manuel · communauté-leçons · littérature · wangap-app).</li>
+  <li class="future" data-mark="•"><span class="label">Whisper API OpenAI</span> ($0,006/min ≈ $11 pour ~30 h de hand-over). Pas de diarisation (Whisper seul, pas AssemblyAI).</li>
+  <li class="future" data-mark="•"><span class="label">Recording guidelines pour B&amp;C</span> : 1 sujet par vidéo ≤ 10 min · ré-énoncer le contexte à l'oral toutes les 30 s (Whisper ne transcrit que ce qui est dit) · format constant (vertical ou horizontal) · lavalier ou bateau silencieux pour audio clair.</li>
+  <li class="future" data-mark="•"><span class="label">Forward-compatible V2.4 vectors</span> : quand V2.4 livrera pgvector + embeddings, les chunks vidéo seront automatiquement vectorisés — aucune migration spécifique.</li>
+</ul>
+
+<h4 style="margin-top:14pt;color:var(--slate);">V2.4 — Renard full training (vectors + ingest complet)</h4>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Ingestion de toute la doc technique</span> du bateau : moteur Yanmar, électricité, plomberie, gréement, voiles, électronique (Starlink, B&amp;G, pilote auto), sécurité, dessalinisateur, solaire, frigo</li>
+  <li class="future" data-mark="•"><span class="label">Recherche améliorée</span> via embeddings vectoriels pour répondre à des questions très spécifiques</li>
+  <li class="future" data-mark="•"><span class="label">Test terrain</span> avec questions réelles du quotidien à bord</li>
+</ul>
+
+<h3>V2.5 — Guide développeur pour Bertrand <span class="status planned">📋 Planifié</span></h3>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Manuel "Comment utiliser Cursor + Claude"</span> : démarrer une session, prompts efficaces, commit / push / déploiement</li>
+  <li class="future" data-mark="•"><span class="label">Vérifier qu'un déploiement a bien marché</span></li>
+  <li class="future" data-mark="•"><span class="label">Lecture du Blueprint et de la Stratégie de codage</span></li>
+  <li class="future" data-mark="•"><span class="label">Dépannage</span> : commandes courantes en cas de problème</li>
+</ul>
+
+<h3>V2.7 — Vue calendrier ⭐ <span class="status planned">📋 Planifié</span></h3>
+<p class="phase-intro">Une seule surface visuelle où tout le voyage se lit dans le temps. Le skipper voit en un coup d'œil quels posts couvrent quelle étape, peut faire glisser les bords d'une étape pour caler les dates (les points GPS suivent automatiquement via le moteur v1.8.9), et saute directement à n'importe quel élément sur la carte.</p>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Axe horizontal du temps</span> avec zoom (année / mois / semaine / jour). Marqueur "aujourd'hui" en doré.</li>
+  <li class="future" data-mark="•"><span class="label">Chapitres en bandeaux larges</span> en haut, couleur du chapitre. <strong>Étapes en barres plus fines</strong> en dessous, étiquetées (port départ → port arrivée + distance).</li>
+  <li class="future" data-mark="•"><span class="label">Miniatures des posts</span> 32 × 32 sous les étapes, positionnées par date. Survol = aperçu (titre + 2 lignes + auteur). Clic = ouverture du post.</li>
+  <li class="future" data-mark="•"><span class="label">Glisser-déposer pour éditer les dates</span> : tirer le bord d'une étape pour étendre/réduire ; tirer la barre entière pour décaler. À chaque relâchement, les points GPS sont réassignés automatiquement et un toast confirme : "12 waypoints réassignés à 'LGM → Malte'."</li>
+  <li class="future" data-mark="•"><span class="label">Glisser un bandeau de chapitre</span> décale tous ses étapes ; alerte si une étape sort du nouveau cadre.</li>
+  <li class="future" data-mark="•"><span class="label">Sauter à la carte</span> : clic sur un chapitre, une étape ou un post → bouton "Voir sur la carte" qui zoome sur la zone concernée (ou pose une épingle sur le post si géolocalisé).</li>
+  <li class="future" data-mark="•"><span class="label">Création rapide</span> : clic-droit (ou appui long) sur l'axe = "Créer une étape ici" avec date pré-remplie.</li>
+  <li class="future" data-mark="•"><span class="label">Disponible aux skippers (édition)</span> et à la famille (lecture seule).</li>
+</ul>
+
+<h3>V2.8 — Refonte de la page Stats ⭐ <span class="status planned">📋 Planifié</span></h3>
+<p class="phase-intro">La page Insights actuelle compte surtout les posts et les photos. V2.8 la réoriente vers deux questions : "où en est-on dans le voyage ?" (vue narrative pour la famille et le public) et "comment va le bateau ?" (vue opérationnelle pour le skipper).</p>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Vue d'ensemble du voyage</span> (en haut) : milles totaux, jours en mer, pays, ports, photos, posts, log entries — auto-calculé depuis les waypoints + étapes + posts.</li>
+  <li class="future" data-mark="•"><span class="label">Carte "passage actif"</span> visible uniquement quand le bateau est en mouvement : distance parcourue, ETA, SOG actuel, cap, durée. Live, mise à jour toutes les 30 s.</li>
+  <li class="future" data-mark="•"><span class="label">Détail par étape</span> : carte par étape avec distance, durée, SOG max/moy, photos, posts ; tri/filtre ; "voir sur la carte" en un clic.</li>
+  <li class="future" data-mark="•"><span class="label">Tendances</span> : milles par semaine, cadence des posts/photos, "étape la plus photographiée", "passage le plus long" — petits headlines de storytelling.</li>
+  <li class="future" data-mark="•"><span class="label">Carte "santé d'ingestion" admin</span> en haut quand connecté en skipper : msg AIS du jour, dernière position AIS, dernière position GPS, dernier import GPX, alertes "trou de N heures" sur une étape, et 2 boutons d'entretien (Recalculer la consolidation / Tout réassigner).</li>
+  <li class="future" data-mark="•"><span class="label">Visibilité respectée</span> : les chiffres dérivés de la position (distance, SOG, ETA, panel passage actif) suivent le délai de publication public (Direct / Différé / Manuel) — sur le site public en mode Différé 48 h, "milles totaux" est en retard de 48 h, cohérent avec la carte.</li>
+</ul>
+
+<h3>V2.9 — Animation 3D du voyage (mode "story") ⭐ <span class="status planned">📋 Planifié</span></h3>
+<p class="phase-intro">Promu de V3.7 (4 mai 2026) sur retour de Flavien. Le bouton ▶️ existant sur la carte est mis en attente derrière un message "bientôt disponible (V2.9)" jusqu'à ce que cette phase aboutisse.</p>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Caméra 3D qui suit le bateau</span> à travers le chapitre ou l'étape sélectionnés (filtres ⛵ Tous chapitres / 🚢 Toutes étapes déjà présents au-dessus de la carte).</li>
+  <li class="future" data-mark="•"><span class="label">Pictogramme catamaran 3D</span> qui glisse le long de la trace en respectant la vitesse et le cap réels (réutilise le pictogramme V1.6 ProgrammeAnimation).</li>
+  <li class="future" data-mark="•"><span class="label">Photos flottantes</span> qui apparaissent au-dessus de la trace au moment et à l'endroit où le post a été pris ; tap pour ouvrir la fiche complète.</li>
+  <li class="future" data-mark="•"><span class="label">Extraits de récit</span> (premier paragraphe, ~80 caractères) en bulles narratives le long du trajet pour les entrées de journal.</li>
+  <li class="future" data-mark="•"><span class="label">Vue PolarSteps-like</span> avec inclinaison 3D du terrain (`map.setPitch(60)`) et basemap satellite optionnelle.</li>
+  <li class="future" data-mark="•"><span class="label">Contrôles</span> : ▶️ play / ⏸ pause / ⏹ stop, slider de timeline, vitesse 1× / 2× / 5×, partage URL avec timestamp.</li>
+  <li class="future" data-mark="•"><span class="label">Réutilise</span> les briques existantes : MapLibre 3D pitch/bearing, sources de waypoints + posts par étape déjà filtrées en V1.8, ProgrammeAnimation pour le boat marker.</li>
+</ul>
+
+<h3>V2.10 — Génération de livre PDF haute qualité ⭐ <span class="status planned">📋 Planifié</span></h3>
+<p class="phase-intro">Promu de V3.7 (4 mai 2026). Permet d'imprimer un livre du voyage à partir d'une section choisie (chapitre, étape, période). Fait sauter la limite de compression photo qui sert pour le web mais pas pour l'impression.</p>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Stockage parallèle de la photo originale</span> (non compressée) sur Supabase Storage bucket `photos-hq`. Côté UX rien ne change : la version compressée continue de servir les pages, la haute qualité dort jusqu'à export.</li>
+  <li class="future" data-mark="•"><span class="label">Modale "Générer un livre"</span> dans Réglages : choix de la portée (un chapitre / une étape / plage de dates / tout le voyage), format (A4 portrait, A4 paysage, format livre 21×28 cm), résolution (web / impression 300 dpi).</li>
+  <li class="future" data-mark="•"><span class="label">Mise en page automatique</span> : couverture (titre + photo de héros), table des matières par étape, pages "carte + métriques" (mille parcourus, jours en mer, ports), pages "récit + photos pleine page", livre d'or, crédits.</li>
+  <li class="future" data-mark="•"><span class="label">Génération côté serveur</span> via une fonction Vercel + Puppeteer (HTML → PDF) ou Cloudflare Worker, pour ne pas alourdir le client. Téléchargement du PDF terminé via lien e-mail Resend.</li>
+  <li class="future" data-mark="•"><span class="label">Ready-for-print</span> : marges 10 mm, fond perdu 3 mm, profil de couleur sRGB (ou CMJN si demandé pour Blurb / Pixum), polices embarquées.</li>
+  <li class="future" data-mark="•"><span class="label">Aperçu dans l'app</span> avant export : feuilleter les pages comme un PDF, valider, lancer le rendu HQ.</li>
+</ul>
+
+<h3>V2.11 — Import historique unifié (GPX + AIS Datalastic) ⭐ <span class="status future">💤 Si besoin</span></h3>
+<p class="phase-intro">Sprint regroupant deux specs précédemment séparées (<strong>v1.8.7</strong> import/export GPX et <strong>v1.8.2b</strong> récupération AIS historique Datalastic). Les deux partagent la même tuyauterie — déduplication, auto-allocation à l'étape, consolidation post-import — donc on les construit en une seule fois plutôt que deux fois. <strong>Quand l'activer ?</strong> Post-départ, à la demande : la couverture AIS pendant le shake-down méditerranéen s'est révélée suffisante, ces imports deviennent un confort plutôt qu'un blocant.</p>
+<h4 style="margin:0.6em 0 0.4em 0; color:var(--brand)">Partie 1 — Import / Export GPX (ex-v1.8.7)</h4>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Import du calculateur de bord</span> : zone de dépôt + sélecteur de fichier dans Réglages → Suivi GPS → "Importer / Exporter un GPX". Sélecteur d'étape (par défaut : étape couvrant la première date du fichier). Source par défaut <code>'gpx'</code> ; aperçu avant import ("412 pts · 287 nouveaux · 125 doublons").</li>
+  <li class="future" data-mark="•"><span class="label">Déduplication intelligente</span> : ±2 min ET haversine ≤ 50 m sur les points existants → flaggés en doublon. L'utilisateur confirme avant insert.</li>
+  <li class="future" data-mark="•"><span class="label">Export</span> : choix d'une étape (ou tout), sortie <code>.gpx</code>. Filtre par défaut "points consolidés uniquement" (couche d'affichage), bascule "Inclure les supersédés".</li>
+  <li class="future" data-mark="•"><span class="label">Time zones</span> : <code>&lt;time&gt;</code> est UTC par spec mais certains calculateurs écrivent l'heure locale. Détection + warning si les dates semblent décalées de plusieurs heures.</li>
+</ul>
+<h4 style="margin:0.8em 0 0.4em 0; color:var(--brand)">Partie 2 — Récupération AIS historique Datalastic (ex-v1.8.2b)</h4>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">API Datalastic</span> (payant, à la demande) — endpoint historique par MMSI + plage de dates. Estimé ~5 €/requête pour quelques jours selon les tarifs mi-2026.</li>
+  <li class="future" data-mark="•"><span class="label">UI</span> : section pliable "Combler une période" dans Réglages → AIS. Plage de dates, sélecteur d'étape, bouton "Estimer le coût" (quote Datalastic) avant le bouton "Importer".</li>
+  <li class="future" data-mark="•"><span class="label">Provenance traçable</span> : <code>source='ais'</code> + <code>metadata.ais_provider='datalastic'</code> en JSONB pour ne pas confondre avec les enregistrements en direct.</li>
+  <li class="future" data-mark="•"><span class="label">Confirmation explicite</span> : action <em>payante</em>, le coût estimé est affiché à côté du bouton de confirmation. Aucun appel automatique.</li>
+</ul>
+<h4 style="margin:0.8em 0 0.4em 0; color:var(--brand)">Partie 3 — Bibliothèque partagée</h4>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Lib unifiée</span> : <code>src/lib/historic-import.js</code> centralise <em>déduplication</em>, <em>auto-allocation par étape</em> (déléguée à la sortie de v1.8.9) et <em>insert avec provenance</em>. Réutilisée par le worker AIS en direct, l'importeur GPX et l'importeur Datalastic.</li>
+  <li class="future" data-mark="•"><span class="label">Hook consolidation (v1.8.8)</span> : après chaque insert massif, déclencher <code>consolidate_waypoints_for_etape(etape_id)</code> pour que la source la plus fidèle prenne la priorité (GPX &gt; AIS &gt; iPhone).</li>
+  <li class="future" data-mark="•"><span class="label">Schéma</span> : <code>waypoints.metadata JSONB NULL</code> (si aucun consommateur antérieur ne l'a déjà introduit).</li>
+</ul>
+
+<h3>V2.6 — Bilingue FR / EN &amp; traduction à la demande <span class="status planned">📋 Planifié</span></h3>
+<p class="phase-intro">La famille est mixte francophone / anglophone. L'interface est déjà en deux langues, mais le contenu (posts, journal, Livre d'Or, newsletter) est aujourd'hui mono-langue. V2.6 rend le contenu lui-même bilingue — à la demande, traduit par Le Renard (Claude API), jamais bloquant pour l'auteur.</p>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Bouton 🌐 sur chaque post / entrée de journal</span> : affiche la traduction en un tap. Premier appel = traduction par Claude, mise en cache en base ; ensuite instantané pour tous les lecteurs.</li>
+  <li class="future" data-mark="•"><span class="label">Mode automatique par utilisateur</span> : Catherine et Bertrand choisissent dans Réglages "Tout en français / Tout en anglais / Original avec traduction si étranger". Petit badge "🌐 traduit" sur les posts auto-traduits.</li>
+  <li class="future" data-mark="•"><span class="label">Vocabulaire de marin préservé</span> : prompt système spécialisé ("ris" → "reef", "amure" → "tack", "estime" → "dead reckoning", etc.).</li>
+  <li class="future" data-mark="•"><span class="label">Livre d'Or bilingue</span> : l'équipier soumet en FR ou EN ; à la validation, B&amp;C peuvent générer la version dans l'autre langue en un clic.</li>
+  <li class="future" data-mark="•"><span class="label">Newsletter bilingue</span> : choix FR / EN / les deux dans le modale d'init. Si "les deux", Claude génère deux brouillons cohérents (pas une simple back-translation), éditables côte-à-côte. Chaque abonné reçoit la version dans sa langue préférée.</li>
+  <li class="future" data-mark="•"><span class="label">Coût</span> : traductions à la demande, mises en cache, &lt; 0,50 €/mois estimé pour le voyage.</li>
+  <li class="future" data-mark="•"><span class="label">Extensible</span> : espagnol / italien / grec en V3 selon le parcours.</li>
+</ul>
+
+</section>
+
+<!-- ═══════════════════════════════ V3 ═══════════════════════════════ -->
+<section class="v3-section">
+
+<h2>V3 — Améliorations avancées <span class="ver-badge future">pendant le voyage si besoin</span></h2>
+<p class="phase-intro">Fonctionnalités à construire en cours de route, selon les besoins réels.</p>
+
+<h3>V3.1 — Passages &amp; évènements de navigation <span class="status future">💤 Si besoin</span></h3>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Passages</span> : port de départ, port d'arrivée, distance, vitesse moyenne/max, heures moteur/voile</li>
+  <li class="future" data-mark="•"><span class="label">Évènements de navigation</span> : empannage, virement, prise de ris, changement de voile, mise sous moteur, mouillage, météo, MOB, note libre</li>
+  <li class="future" data-mark="•"><span class="label">Boutons rapides</span> sur la carte pour ajouter un évènement en cours de nav</li>
+  <li class="future" data-mark="•"><span class="label">Cartes récapitulatives</span> de passage</li>
+</ul>
+
+<h3>V3.2 — Configuration des voiles &amp; allures <span class="status future">💤 Si besoin</span></h3>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Sélecteur visuel de voiles</span> : GV, génois, spi, solent, code 0, tourmentin</li>
+  <li class="future" data-mark="•"><span class="label">Sélecteur d'allure</span> : près, travers, largue, vent arrière</li>
+  <li class="future" data-mark="•"><span class="label">Trace colorée</span> par allure ou par mode (voile / moteur)</li>
+</ul>
+
+<h3>V3.3 — Carte enrichie <span class="status future">💤 Si besoin</span></h3>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Marqueurs d'évènements</span> sur la trace, frise temporelle</li>
+  <li class="future" data-mark="•"><span class="label">Gradient de vitesse</span>, segments de passage</li>
+  <li class="future" data-mark="•"><span class="label">Couches</span> (Social / Navigation / Trafic / Météo / POIs) avec barre de bascule</li>
+  <li class="future" data-mark="•"><span class="label">Mode diaporama</span>, URL partageables</li>
+</ul>
+
+<h3>V3.4 — Statistiques de passages <span class="status future">💤 Si besoin</span></h3>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Diagrammes</span> : répartition par allure, ratio moteur/voile, segmentation jour par jour</li>
+  <li class="future" data-mark="•"><span class="label">Comparaison</span> entre passages</li>
+</ul>
+
+<h3>V3.5 — Météo &amp; AIS avancé <span class="status future">💤 Si besoin</span></h3>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Surcouche vent</span> (Open-Meteo)</li>
+  <li class="future" data-mark="•"><span class="label">AIS étendu</span> : autres bateaux à proximité (MarineTraffic / Signal K)</li>
+  <li class="future" data-mark="•"><span class="label">POIs notés</span> avec commentaires d'autres équipages</li>
+</ul>
+
+<h3>V3.6 — Le Renard avec vidéo <span class="status done">↗️ Promu en V2.4.1 (14 mai 2026)</span></h3>
+<ul class="feature-list">
+  <li class="future" data-mark="•" style="opacity:0.6"><em>Cette section est superseded par <strong>V2.4.1 — Ingestion vidéos hand-over</strong> (voir plus haut). Promotion déclenchée par les vidéos de prise en main filmées par B&amp;C à partir du 14 mai 2026 — le besoin est devenu immédiat et urgent plutôt que "si besoin".</em></li>
+</ul>
+
+<h3>V3.7 — Fonctionnalités avancées (à évaluer en cours de route) <span class="status future">💤 Si besoin</span></h3>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Publication automatique</span> sur Instagram / Facebook</li>
+  <li class="future" data-mark="•"><span class="label">Connectivité bateau</span> (NMEA 2000 / Signal K) pour récupérer en temps réel les données du calculateur</li>
+  <li class="future" data-mark="•"><span class="label">Communauté</span> type NoForeignLand</li>
+  <li class="future" data-mark="•" style="opacity:0.6"><em>Animation 3D type PolarSteps → promu en V2.9 (4 mai 2026).</em></li>
+  <li class="future" data-mark="•" style="opacity:0.6"><em>Stockage photos haute qualité pour livre du voyage → promu en V2.10 (4 mai 2026).</em></li>
+</ul>
+
+<h3>V3.9 — Suivi AIS multi-bateaux ⭐ <span class="status future">💤 Si besoin</span></h3>
+<p class="phase-intro">Étendre le pipeline AIS à plusieurs bateaux simultanément — bateaux copains sur le même parcours, flotille famille-amis lors d'étapes communes, rallye ARC / OCC. Chaque bateau a sa trace colorée sur la carte et sa propre ligne dans les Réglages AIS.</p>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Table <code>boats</code></span> en base : chaque bateau a son MMSI, sa clé AIS, sa couleur, son indicatif. Le bateau actuel (Wang'ap) devient le "primaire".</li>
+  <li class="future" data-mark="•"><span class="label">Worker Fly.io modifié</span> : un seul WebSocket par clé AIS (capable de filtrer plusieurs MMSI), routage des frames vers le bon bateau côté serveur.</li>
+  <li class="future" data-mark="•"><span class="label">UI Réglages → 📡 AIS</span> devient une liste avec bouton "+ Ajouter un bateau". Chaque ligne : nom + MMSI + couleur + statut + Modifier / Supprimer.</li>
+  <li class="future" data-mark="•"><span class="label">Carte</span> : légende en bas-à-droite avec une case à cocher par bateau. Traces côte-à-côte avec opacité réduite pour les passages parallèles.</li>
+  <li class="future" data-mark="•"><span class="label">Cas d'usage</span> : suivi d'un bateau copain pendant la traversée du Pacifique, flottille familiale aux Antilles, opérateur de charter avec plusieurs bateaux loués.</li>
+  <li class="future" data-mark="•"><span class="label">Coût</span> : la même VM Fly.io supporte une vingtaine de bateaux sans surcoût ; les limites de l'AISStream gratuit s'appliquent par clé API, pas par MMSI.</li>
+</ul>
+
+<h3>V3.8 — Application native iOS/Android <span class="status future">💤 Optionnel</span></h3>
+<p class="phase-intro">Wrapping de la PWA dans une coquille native (Capacitor) pour débloquer l'enregistrement GPS en arrière-plan total. À déclencher uniquement si V1.8 (AIS + GPX + Wake Lock) ne suffit pas.</p>
+<ul class="feature-list">
+  <li class="future" data-mark="•"><span class="label">Enregistrement GPS</span> même téléphone verrouillé / appli fermée</li>
+  <li class="future" data-mark="•"><span class="label">Notifications natives</span> (APNs) — beaucoup plus fiables que les notifications web sur iOS</li>
+  <li class="future" data-mark="•"><span class="label">Live Activities</span> sur écran verrouillé</li>
+  <li class="future" data-mark="•"><span class="label">Distribution</span> : iOS via TestFlight (compte Apple Developer 99 €/an, ~10 iPhones famille), Android via APK direct (gratuit)</li>
+  <li class="future" data-mark="•"><span class="label">Mises à jour à chaud</span> : la couche web continue de se mettre à jour sans repasser par l'App Store</li>
+  <li class="future" data-mark="•"><span class="label">Coût</span> : 99 €/an Apple — rien pour Android</li>
+</ul>
+
+</section>
+
+<div class="footer-note">
+  Document généré depuis le BLUEPRINT — version 2.51 du 16 mai 2026 · dernier sprint livré <strong>V2.1.2 archive.wangap.fr</strong> (5 batches en 1 j ; DNS Godaddy en attente de Bertrand) · prochain <strong>V2.4.1</strong> ingestion vidéos hand-over · sprint en cours sur la branche <code>v2.0.2</code>.<br/>
+  Livré ces deux derniers jours en production :<br/>
+  &nbsp;&nbsp;• <strong>v1.8.4</strong> (4 mai) — refonte complète de l'éditeur de trace en 7 phases : couche GeoJSON pour 10 k+ points, drag-to-move, double-tap pour insérer un point manuel, suppression annulable, opérations en lot (Forcer une étape, Décaler les dates), provenance via migration 025, raccourcis clavier desktop.<br/>
+  &nbsp;&nbsp;• <strong>v1.8.4.x</strong> (4 mai) — fix de la barre de statut sur iPhone (📶 connectivité au lieu de 📡 qui dupliquait visuellement l'AIS) ; long-press → double-tap partout (instable sur iPhone Safari) ; bouton ✋ <em>Déplacer</em> explicite ; modale Valider/Annuler avant écriture en base.<br/>
+  &nbsp;&nbsp;• <strong>v1.8.5</strong> (4 mai) — mode <em>Création de trace</em> ✏️ pour rattraper une journée où le GPS était éteint : tracé libre (1 doigt dessine, 2 doigts bougent la carte) ou points reliés (tap par tap), avec dates réparties linéairement entre un début et une fin que vous choisissez et étape auto-suggérée d'après la date du milieu.<br/>
+  &nbsp;&nbsp;• <strong>v1.8.5.x</strong> (4–5 mai) — itération UX (11 patches) : 1 doigt ne fait JAMAIS bouger la carte en édition/création (seuls 2 doigts bougent + 2 doigts pinch zoom, pas d'inclinaison 3D) ; ✋ multi-déplacements en lot avec banner inline et ligne d'aperçu teal ; range completion instantané quand l'ancre est posée ; sur PC, le mouse drag bouge la carte (le tracé libre devient tactile uniquement, PC utilise les points reliés) ; plus de pop-up surprise — boutons explicites <em>Annuler</em> / <em>Terminer</em> dans la barre du bas.<br/>
+  &nbsp;&nbsp;• <strong>v1.8.5.3</strong> — bouton ▶️ <em>Animation 3D</em> mis en attente avec popup explicite (renvoie vers V2.9).<br/><br/>
+  ✅ <strong>V1 entièrement livrée</strong> (v1.6 → v1.9.2). À venir en V2 (post-départ) : <strong>V2.0</strong> carry-forward backlog (V1.9-PERF-2 follow-up, V1.9-PERF-4 pagination + virtualization, V1.9-PERF-6 placeholders carte statiques pour passer mobile 78 → 90, V1.9-A11Y-1 color-contrast pass, V2-PERF-4 N+1 photo upload, V2-MSG-1 actions multiples Messages, V2-COMPOSER-1 filtre LocationPicker, V2-COMPOSER-2 conversion HEIC <code>heic2any</code>), <strong>V2.4</strong> Le Renard full training (V2-RENARD-1 fix serveur), <strong>V2.7</strong> calendrier, <strong>V2.8</strong> refonte des stats, <strong>V2.9</strong> animation 3D du voyage (promu de V3.7), <strong>V2.10</strong> génération de livre PDF haute qualité (promu de V3.7), <strong>V2.11</strong> import historique unifié (AIS Datalastic + GPX, regroupé depuis v1.8.2b et v1.8.7).
+</div>
+
+</body>
+</html>
