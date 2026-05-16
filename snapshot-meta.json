@@ -1,5 +1,5 @@
 {
-  "snapshot_date": "2026-05-16T12:19:08.642Z",
+  "snapshot_date": "2026-05-16T14:52:30.273Z",
   "generator": "wangap-archive V2.1.2",
   "stats": {
     "posts": 40,
@@ -8,6 +8,6 @@
     "photos": 22,
     "waypoints": 998
   },
-  "workflow_run_url": "https://github.com/sailingwangap/jdb_wangap/actions/runs/25961740525",
+  "workflow_run_url": "https://github.com/sailingwangap/jdb_wangap/actions/runs/25964930067",
   "trigger": "manual"
 }

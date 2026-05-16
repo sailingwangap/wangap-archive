@@ -6,7 +6,7 @@
   <title>Sardaigne Nord — Maddalena &amp; ses îles — Wang'ap Archive</title>
   <link rel="stylesheet" href="../style.css">
   <meta name="generator" content="Wang'ap archive snapshot V2.1.2">
-  <meta name="snapshot-date" content="2026-05-16T12:19:08.642Z">
+  <meta name="snapshot-date" content="2026-05-16T14:52:30.273Z">
   
 </head>
 <body class="page-post">
@@ -17,14 +17,16 @@
     </a>
     <div class="nav-links">
       <a href="../carte.html">Carte</a>
+      <a href="../programme.html">Programme</a>
       <a href="../stats.html">Stats</a>
+      <a href="../genese.html">Genèse</a>
       <a class="ext" href="https://www.wangap.fr/">Site principal ↗</a>
     </div>
   </nav>
 
   <aside class="archive-badge" title="Cet instantané du site est figé : il ne se met pas à jour seul. Le site principal est sur wangap.fr.">
     <span class="archive-badge-label">Archive</span>
-    <span class="archive-badge-num">#3</span>
+    <span class="archive-badge-num">#4</span>
     <span class="archive-badge-date">16/05/2026</span>
   </aside>
 
@@ -42,11 +44,11 @@
 
         
           <section class="photo-grid">
-            <a class="photo-cell" href="../photos-lg/photo-1544551763-46a013bb70d5-lg.jpg" onerror="this.href='../photos/photo-1544551763-46a013bb70d5-md.jpg'">
+            <a class="photo-cell" data-lightbox="photos-lg/photo-1544551763-46a013bb70d5-lg.jpg" href="../photos-lg/photo-1544551763-46a013bb70d5-lg.jpg">
               <img src="../photos/photo-1544551763-46a013bb70d5-md.jpg" loading="lazy" alt="" onerror="this.onerror=null; this.src='../photos/photo-1544551763-46a013bb70d5-sm.jpg'">
-            </a><a class="photo-cell" href="../photos-lg/photo-1500375592092-40eb2168fd21-lg.jpg" onerror="this.href='../photos/photo-1500375592092-40eb2168fd21-md.jpg'">
+            </a><a class="photo-cell" data-lightbox="photos-lg/photo-1500375592092-40eb2168fd21-lg.jpg" href="../photos-lg/photo-1500375592092-40eb2168fd21-lg.jpg">
               <img src="../photos/photo-1500375592092-40eb2168fd21-md.jpg" loading="lazy" alt="" onerror="this.onerror=null; this.src='../photos/photo-1500375592092-40eb2168fd21-sm.jpg'">
-            </a><a class="photo-cell" href="../photos-lg/photo-1530053969600-caed2596d242-lg.jpg" onerror="this.href='../photos/photo-1530053969600-caed2596d242-md.jpg'">
+            </a><a class="photo-cell" data-lightbox="photos-lg/photo-1530053969600-caed2596d242-lg.jpg" href="../photos-lg/photo-1530053969600-caed2596d242-lg.jpg">
               <img src="../photos/photo-1530053969600-caed2596d242-md.jpg" loading="lazy" alt="" onerror="this.onerror=null; this.src='../photos/photo-1530053969600-caed2596d242-sm.jpg'">
             </a>
           </section>
@@ -57,8 +59,33 @@
 <p>Un petit grain en fin d&#39;après-midi nous a forcés à lever l&#39;ancre de la Cala Corsara pour rejoindre le port de La Maddalena. Rien de grave, 30 nœuds pendant 20 minutes puis retour au calme.</p>
 <p>Le port est plein de voiliers italiens. Ambiance très sympa, on a partagé un apéro avec un couple de Milan sur un Dufour 390.</p></section>
 
-        <p class="tags"><span class="tag">port</span> <span class="tag">mouillage</span> <span class="tag">snorkeling</span></p>
+        <p class="tags"><a class="tag" href="../tags/port.html">port</a> <a class="tag" href="../tags/mouillage.html">mouillage</a> <a class="tag" href="../tags/snorkeling.html">snorkeling</a></p>
       </article>
+
+      <!-- #7 — minimal lightbox: clicks on .photo-cell open a fullscreen overlay
+           with the lg image. ~700 B of JS, no dep. If JS fails, the <a href>
+           navigation falls through to the lg URL directly (graceful degradation). -->
+      <div id="lightbox" class="lightbox" hidden onclick="this.hidden=true">
+        <img alt="">
+        <button class="lightbox-close" aria-label="Fermer" type="button">✕</button>
+      </div>
+      <script>
+        (function(){
+          var lb = document.getElementById('lightbox');
+          if (!lb) return;
+          var img = lb.querySelector('img');
+          document.querySelectorAll('.photo-cell[data-lightbox]').forEach(function(a){
+            a.addEventListener('click', function(e){
+              e.preventDefault();
+              img.src = '../' + a.dataset.lightbox;
+              lb.hidden = false;
+            });
+          });
+          document.addEventListener('keydown', function(e){
+            if (e.key === 'Escape') lb.hidden = true;
+          });
+        })();
+      </script>
     
   </main>
 

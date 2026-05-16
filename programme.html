@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Programme — Wang'ap Archive</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="generator" content="Wang'ap archive snapshot V2.1.2">
+  <meta name="snapshot-date" content="2026-05-16T14:52:30.273Z">
+  <link rel="stylesheet" href="leaflet/leaflet.css">
+</head>
+<body class="page-programme">
+  <nav class="navbar">
+    <a class="brand" href="./">
+      <img class="brand-logo" src="images/logo.webp" alt="">
+      <span class="brand-name">wang'ap</span>
+    </a>
+    <div class="nav-links">
+      <a href="carte.html">Carte</a>
+      <a href="programme.html">Programme</a>
+      <a href="stats.html">Stats</a>
+      <a href="genese.html">Genèse</a>
+      <a class="ext" href="https://www.wangap.fr/">Site principal ↗</a>
+    </div>
+  </nav>
+
+  <aside class="archive-badge" title="Cet instantané du site est figé : il ne se met pas à jour seul. Le site principal est sur wangap.fr.">
+    <span class="archive-badge-label">Archive</span>
+    <span class="archive-badge-num">#4</span>
+    <span class="archive-badge-date">16/05/2026</span>
+  </aside>
+
+  <main>
+    
+      <article class="programme-page">
+        <h1>Le programme</h1>
+        <p class="lede">Le tour du monde planifié — 4 ans, 3 océans, plus de 50 escales. La trace ci-dessous est l'itinéraire prévu au départ.</p>
+        <div class="programme-controls">
+          <button id="play" type="button" class="btn-primary">▶ Animer le voyage</button>
+          <button id="reset" type="button" class="btn-secondary">↺ Reset</button>
+          <span id="stage-label" class="stage-label">—</span>
+        </div>
+        <div id="map" class="leaflet-map"></div>
+        <p class="dl-note"><a href="planned-route.geojson"><code>planned-route.geojson</code></a> — données brutes de l'itinéraire prévu.</p>
+      </article>
+      <script src="leaflet/leaflet.js"></script>
+      <script>
+        const ROUTE = [[3.98,43.56],[5.5,43.1],[7,43.1],[8,42.8],[8.74,41.93],[8.6,41.5],[8.8,41.2],[9.1,41.1],[9.5,40.9],[10.2,40.5],[10.3,40],[10,39.5],[9.5,39.22],[9.8,38.8],[10.5,38],[12,36.8],[13.5,36.2],[14.51,35.9],[15.5,35.8],[17,35.5],[19,35.5],[21,35.5],[22.8,35.6],[24.5,36.8],[24,37.8],[23.73,37.97],[24.2,37],[23.5,35.8],[21,35.5],[17.5,35.5],[14.5,36],[12.5,36.7],[11,37.3],[9,38],[7,39.5],[7,41.5],[6.5,42.8],[5.69,43.17],[4.5,42.5],[3,41],[1.5,39.5],[0,38],[-1.5,37],[-3,36.5],[-5.35,36.13],[-6.5,35.5],[-9.5,34],[-12,32.5],[-14.5,30.5],[-16.5,29],[-15.4,28.1],[-17.5,25],[-20,21],[-22.5,18],[-23.5,16],[-27,15.5],[-32,15],[-37,14.8],[-42,14.7],[-47,14.6],[-52,14.55],[-56,14.55],[-61,14.6],[-61.3,15.2],[-61.8,16],[-61.55,16.24],[-61.8,15.5],[-61.8,14.5],[-61.5,13.5],[-61.2,13.16],[-62.5,12.5],[-64,12],[-66.9,11.8],[-67.8,12],[-68.97,12.18],[-70.5,12.5],[-72.5,11.8],[-74,11],[-75.5,10.4],[-76.5,10],[-77.8,9.8],[-78.95,9.56],[-79.5,9],[-79.8,7.5],[-80,5],[-81.5,2.5],[-84,0.5],[-87,-0.3],[-90.3,-0.9],[-95,-3],[-100,-4.5],[-105,-5.5],[-110,-6.5],[-115,-7.2],[-120,-7.8],[-125,-8.2],[-130,-8.5],[-135,-8.7],[-139.5,-8.9],[-141,-10.5],[-143,-12.5],[-145.5,-15],[-147,-16],[-149.4,-17.5],[-150.5,-17],[-151.75,-16.5],[-153.5,-17.5],[-157,-18.5],[-163,-19.5],[-166.5,-19.2],[-169.92,-19.05],[-172,-19.5],[-175.2,-21.17],[179.5,-18.5],[177.95,-17.77],[177,-20],[176.5,-25],[175.5,-30],[174.1,-35.2],[174.5,-34],[173,-29],[170,-26],[168,-23],[166.45,-22.27],[167,-20],[168.32,-17.73],[164,-17],[159,-17.5],[154,-18],[150,-18.5],[147.5,-19],[146.8,-19.25],[148,-18],[149,-16],[148,-13.5],[145,-11.5],[143,-10.8],[142.18,-10.59],[140,-10.5],[137.5,-9.5],[135,-8.5],[133,-5.5],[131.5,-3],[130.5,-1],[129.5,-2.5],[128,-3],[125.5,-3.7],[125,-5.5],[124,-7],[122,-8],[121,-8.5],[119,-9],[117,-8.8],[115.8,-8.8],[115.3,-8.7],[113.5,-9.5],[111,-10],[108,-10.3],[105.63,-10.48],[103,-11],[100,-11.5],[96.83,-12.18],[90,-13.5],[83,-15],[76,-17],[70,-18.5],[63.42,-19.67],[60.5,-19.9],[57.5,-20.16],[56.5,-20.5],[55.45,-21.11],[50,-24],[46,-26.5],[43,-28],[39,-29],[36,-29],[34,-29],[32.04,-28.8],[31.8,-29.5],[31.02,-29.86],[30.8,-30.8],[29.8,-31.8],[28.8,-32.5],[27.9,-33.01],[26.8,-34],[25.9,-34.2],[24,-34.8],[21.5,-35],[19.5,-34.8],[18.42,-33.92],[16,-32],[14.5,-28],[13.5,-25],[14,-23],[14.5,-22.94],[11,-21],[7,-19.5],[2,-18],[-3,-16.5],[-5.72,-15.96],[-12,-15],[-20,-14],[-28,-13.5],[-34,-13],[-38.51,-12.97],[-37.5,-11.5],[-36,-9.5],[-34.5,-6.5],[-32.42,-3.85],[-35,-1],[-40,2],[-45,5],[-50,7.5],[-55,9],[-59,10],[-61.52,10.45],[-61.7,11.5],[-61.5,13],[-61,14.6],[-60,17],[-57,22],[-50,28],[-43,32],[-36,35.5],[-28.63,38.53],[-25,38],[-20,37.5],[-15,37],[-10,36.5],[-5.35,36.13],[-4,36.4],[-2,36.5],[0,37],[1.5,38.5],[3,40.5],[4.5,42],[5.69,43.17]];
+        const STAGES = [{"coord":[3.98,43.56],"label":"La Grande-Motte","period":"Mai 2026","flag":"🇫🇷","tier":1},{"coord":[8.74,41.93],"label":"Corse","period":"Juin 2026","flag":"🇫🇷","tier":3},{"coord":[9.5,39.22],"label":"Sardaigne","period":"Juin 2026","flag":"🇮🇹","tier":3},{"coord":[14.51,35.9],"label":"Malte","period":"Jul 2026","flag":"🇲🇹","tier":3},{"coord":[23.73,37.97],"label":"Grèce","period":"Jul–Août 2026","flag":"🇬🇷","tier":2},{"coord":[5.69,43.17],"label":"Saint-Cyr","period":"Sep 2026","flag":"🇫🇷","tier":1},{"coord":[-5.35,36.13],"label":"Gibraltar","period":"Oct 2026","flag":"🇪🇸","tier":1},{"coord":[-15.4,28.1],"label":"Canaries","period":"Nov 2026","flag":"🇪🇸","tier":2},{"coord":[-23.5,16],"label":"Cap-Vert","period":"Nov 2026","flag":"🇨🇻","tier":2},{"coord":[-61,14.6],"label":"Martinique","period":"Déc 2026","flag":"🇲🇶","tier":1},{"coord":[-61.55,16.24],"label":"Guadeloupe","period":"Déc 2026","flag":"🇬🇵","tier":3},{"coord":[-61.2,13.16],"label":"Grenadines","period":"Jan 2027","flag":"🇻🇨","tier":3},{"coord":[-66.9,11.8],"label":"Los Roques","period":"Jan 2027","flag":"🇻🇪","tier":3},{"coord":[-68.97,12.18],"label":"Curaçao","period":"Fév 2027","flag":"🇨🇼","tier":3},{"coord":[-75.5,10.4],"label":"Cartagena","period":"Fév 2027","flag":"🇨🇴","tier":2},{"coord":[-79.5,9],"label":"Panama","period":"Mar 2027","flag":"🇵🇦","tier":1},{"coord":[-90.3,-0.9],"label":"Galápagos","period":"Mar 2027","flag":"🇪🇨","tier":1},{"coord":[-139.5,-8.9],"label":"Marquises","period":"Avr 2027","flag":"🇵🇫","tier":2},{"coord":[-145.5,-15],"label":"Tuamotu","period":"Mai 2027","flag":"🇵🇫","tier":3},{"coord":[-149.4,-17.5],"label":"Tahiti","period":"Jun 2027","flag":"🇵🇫","tier":1},{"coord":[-151.75,-16.5],"label":"Bora Bora","period":"Jul–Sep 2027","flag":"🇵🇫","tier":2},{"coord":[-169.92,-19.05],"label":"Niue","period":"Oct 2027","flag":"🇳🇺","tier":3},{"coord":[-175.2,-21.17],"label":"Tonga","period":"Oct 2027","flag":"🇹🇴","tier":3},{"coord":[177.95,-17.77],"label":"Fidji","period":"Nov 2027","flag":"🇫🇯","tier":2},{"coord":[174.1,-35.2],"label":"Bay of Islands","period":"Nov 2027–Mar 2028","flag":"🇳🇿","tier":1},{"coord":[166.45,-22.27],"label":"Nlle-Calédonie","period":"Avr 2028","flag":"🇳🇨","tier":2},{"coord":[168.32,-17.73],"label":"Vanuatu","period":"Mai 2028","flag":"🇻🇺","tier":3},{"coord":[146.8,-19.25],"label":"Grande Barrière","period":"Jun 2028","flag":"🇦🇺","tier":2},{"coord":[115.3,-8.7],"label":"Bali","period":"Août 2028","flag":"🇮🇩","tier":1},{"coord":[57.5,-20.16],"label":"Maurice","period":"Oct 2028","flag":"🇲🇺","tier":2},{"coord":[18.42,-33.92],"label":"Le Cap","period":"Déc 2028","flag":"🇿🇦","tier":1},{"coord":[-38.51,-12.97],"label":"Brésil","period":"Fév 2029","flag":"🇧🇷","tier":1},{"coord":[-28.63,38.53],"label":"Açores","period":"Mai 2029","flag":"🇵🇹","tier":2},{"coord":[5.69,43.17],"label":"Saint-Cyr ⚓","period":"Été 2029","flag":"🇫🇷","tier":1}];
+        const map = L.map('map', { zoomControl: true, attributionControl: false });
+        const latlngs = ROUTE.map(([lng, lat]) => [lat, lng]);
+        L.polyline(latlngs, { color: '#E8B059', weight: 2, opacity: 0.55, dashArray: '4,5' }).addTo(map);
+        // Named stages with circle markers.
+        STAGES.forEach(s => {
+          L.circleMarker([s.coord[1], s.coord[0]], {
+            radius: s.tier === 1 ? 6 : (s.tier === 2 ? 5 : 4),
+            fillColor: '#1B9AAA', color: '#fff', weight: 1.5, fillOpacity: 0.9,
+          }).addTo(map).bindPopup('<strong>' + (s.flag || '') + ' ' + s.label + '</strong><br><small>' + (s.period || '') + '</small>');
+        });
+        if (latlngs.length >= 2) map.fitBounds(L.latLngBounds(latlngs), { padding: [30, 30] });
+        // Boat marker that walks the polyline.
+        const boat = L.divIcon({ className: 'boat-marker', html: '⛵', iconSize: [28, 28], iconAnchor: [14, 14] });
+        const boatM = L.marker(latlngs[0], { icon: boat }).addTo(map);
+        const label = document.getElementById('stage-label');
+        let i = 0, timer = null;
+        function setLabel(idx) {
+          // Find nearest stage with smallest index >= idx in route coords.
+          let best = null, bestD = Infinity;
+          STAGES.forEach(s => {
+            for (let j = 0; j < ROUTE.length; j++) {
+              const d = Math.abs(ROUTE[j][0] - s.coord[0]) + Math.abs(ROUTE[j][1] - s.coord[1]);
+              if (d < 0.3 && Math.abs(j - idx) < 12 && d < bestD) { bestD = d; best = s; }
+            }
+          });
+          label.textContent = best ? (best.flag || '') + ' ' + best.label + (best.period ? ' · ' + best.period : '') : '—';
+        }
+        function tick() {
+          i++;
+          if (i >= ROUTE.length) { clearInterval(timer); timer = null; document.getElementById('play').textContent = '▶ Animer le voyage'; return; }
+          boatM.setLatLng([ROUTE[i][1], ROUTE[i][0]]);
+          setLabel(i);
+        }
+        document.getElementById('play').addEventListener('click', () => {
+          if (timer) { clearInterval(timer); timer = null; document.getElementById('play').textContent = '▶ Reprendre'; return; }
+          document.getElementById('play').textContent = '⏸ Pause';
+          timer = setInterval(tick, 70);
+        });
+        document.getElementById('reset').addEventListener('click', () => {
+          if (timer) { clearInterval(timer); timer = null; }
+          i = 0; boatM.setLatLng(latlngs[0]); label.textContent = '—';
+          document.getElementById('play').textContent = '▶ Animer le voyage';
+        });
+      </script>
+    
+  </main>
+
+  <footer class="site-footer">
+    <p>Instantané immuable du 16 mai 2026. Chaque lundi 03:00 UTC, une GitHub Action prend un nouveau snapshot dans <a href="https://github.com/sailingwangap/wangap-archive">sailingwangap/wangap-archive</a> ; les snapshots passés vivent dans l'historique git.</p>
+    <p>Le site vivant est sur <a href="https://www.wangap.fr/">wangap.fr</a>. © Catherine et Bertrand 2026–</p>
+  </footer>
+  
+</body>
+</html>

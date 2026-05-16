@@ -6,7 +6,7 @@
   <title>Jour J — Livraison du Wang&#39;ap — Wang'ap Archive</title>
   <link rel="stylesheet" href="../style.css">
   <meta name="generator" content="Wang'ap archive snapshot V2.1.2">
-  <meta name="snapshot-date" content="2026-05-16T12:19:08.642Z">
+  <meta name="snapshot-date" content="2026-05-16T14:52:30.273Z">
   
 </head>
 <body class="page-post">
@@ -17,14 +17,16 @@
     </a>
     <div class="nav-links">
       <a href="../carte.html">Carte</a>
+      <a href="../programme.html">Programme</a>
       <a href="../stats.html">Stats</a>
+      <a href="../genese.html">Genèse</a>
       <a class="ext" href="https://www.wangap.fr/">Site principal ↗</a>
     </div>
   </nav>
 
   <aside class="archive-badge" title="Cet instantané du site est figé : il ne se met pas à jour seul. Le site principal est sur wangap.fr.">
     <span class="archive-badge-label">Archive</span>
-    <span class="archive-badge-num">#3</span>
+    <span class="archive-badge-num">#4</span>
     <span class="archive-badge-date">16/05/2026</span>
   </aside>
 
@@ -42,7 +44,7 @@
 
         
           <section class="photo-grid">
-            <a class="photo-cell" href="../photos-lg/photo-1569263979104-865ab7cd8d13-lg.jpg" onerror="this.href='../photos/photo-1569263979104-865ab7cd8d13-md.jpg'">
+            <a class="photo-cell" data-lightbox="photos-lg/photo-1569263979104-865ab7cd8d13-lg.jpg" href="../photos-lg/photo-1569263979104-865ab7cd8d13-lg.jpg">
               <img src="../photos/photo-1569263979104-865ab7cd8d13-md.jpg" loading="lazy" alt="" onerror="this.onerror=null; this.src='../photos/photo-1569263979104-865ab7cd8d13-sm.jpg'">
             </a>
           </section>
@@ -51,8 +53,33 @@
         <section class="post-body"><p>Ca y est, les cles sont entre nos mains ! L&#39;Outremer 52 est magnifique. Premiere nuit a bord a La Grande-Motte. Le reve commence.</p>
 <p>Le chantier a fait un travail impeccable. Tout est range, les voiles sont neuves, les moteurs tournent comme des horloges. On a passe 3h avec le technicien pour le briefing complet.</p></section>
 
-        <p class="tags"><span class="tag">personal</span></p>
+        <p class="tags"><a class="tag" href="../tags/personal.html">personal</a></p>
       </article>
+
+      <!-- #7 — minimal lightbox: clicks on .photo-cell open a fullscreen overlay
+           with the lg image. ~700 B of JS, no dep. If JS fails, the <a href>
+           navigation falls through to the lg URL directly (graceful degradation). -->
+      <div id="lightbox" class="lightbox" hidden onclick="this.hidden=true">
+        <img alt="">
+        <button class="lightbox-close" aria-label="Fermer" type="button">✕</button>
+      </div>
+      <script>
+        (function(){
+          var lb = document.getElementById('lightbox');
+          if (!lb) return;
+          var img = lb.querySelector('img');
+          document.querySelectorAll('.photo-cell[data-lightbox]').forEach(function(a){
+            a.addEventListener('click', function(e){
+              e.preventDefault();
+              img.src = '../' + a.dataset.lightbox;
+              lb.hidden = false;
+            });
+          });
+          document.addEventListener('keydown', function(e){
+            if (e.key === 'Escape') lb.hidden = true;
+          });
+        })();
+      </script>
     
   </main>
 

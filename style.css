@@ -233,11 +233,121 @@ h3 { font-size: 1.15rem; margin: 0 0 0.3rem; font-weight: 700; color: var(--slat
 .site-footer a { color: var(--gray); text-decoration: underline; }
 .site-footer a:hover { color: var(--slate); }
 
+/* ─── #2 Featured post (large hero card) ──────────────────────────── */
+.featured-section { margin: 0 0 2.5rem; }
+.featured-card {
+  display: grid; grid-template-columns: 1.4fr 1fr; gap: 0;
+  background: white; border-radius: 18px; overflow: hidden;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.08); border: 1px solid var(--sand);
+  color: var(--slate); transition: transform 0.18s, box-shadow 0.18s;
+}
+.featured-card:hover { text-decoration: none; transform: translateY(-3px); box-shadow: 0 10px 32px rgba(0,0,0,0.12); }
+.featured-photo { width: 100%; height: 100%; aspect-ratio: 16/10; object-fit: cover; min-height: 260px; }
+.featured-photo-empty { background: linear-gradient(135deg, var(--sand) 0%, var(--sea) 100%); }
+.featured-body { padding: 1.8rem 2rem; display: flex; flex-direction: column; justify-content: center; }
+.featured-eyebrow { text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.7rem; color: var(--gold-d); font-weight: 700; margin-bottom: 0.6rem; }
+.featured-body h3 { font-size: 1.7rem; margin: 0; line-height: 1.2; color: var(--slate); }
+.featured-body .post-date { margin: 0.5rem 0 0; }
+
+/* ─── #5 Chapter-filter pills ─────────────────────────────────────── */
+.chapter-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin: 0 0 1.2rem; }
+.chapter-filter-label { font-size: 0.85rem; color: var(--gray); margin-right: 0.3rem; }
+.chapter-filter-pill {
+  display: inline-block; padding: 0.3rem 0.8rem; border-radius: 999px;
+  background: white; border: 1px solid var(--sand);
+  font-size: 0.82rem; font-weight: 600; color: var(--slate);
+  border-left: 4px solid var(--pill-color, var(--gold));
+}
+.chapter-filter-pill:hover { text-decoration: none; background: var(--cream); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+
+/* ─── #7 Lightbox modal ───────────────────────────────────────────── */
+.lightbox {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.92);
+  display: flex; align-items: center; justify-content: center;
+  padding: 2rem; cursor: zoom-out;
+}
+.lightbox img { max-width: 96vw; max-height: 92vh; width: auto; height: auto; border-radius: 4px; box-shadow: 0 6px 26px rgba(0,0,0,0.5); }
+.lightbox-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,0.18); border: none; color: white;
+  font-size: 1rem; cursor: pointer;
+}
+.lightbox-close:hover { background: rgba(255,255,255,0.3); }
+.photo-cell { cursor: zoom-in; }
+
+/* ─── Étape markers + photo markers on the map ────────────────────── */
+.etape-marker { background: transparent; border: none; }
+.etape-marker span { display: block; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+.photo-marker { background: transparent; border: none; }
+.photo-marker img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.35); }
+.photo-marker-fallback { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: var(--gold); color: white; font-size: 1.2rem; }
+.boat-marker { background: transparent; border: none; font-size: 1.8rem; line-height: 1; text-align: center; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
+.legend { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+.legend-pill {
+  display: inline-block; padding: 0.25rem 0.7rem; border-radius: 999px;
+  background: white; border: 1px solid var(--sand);
+  font-size: 0.78rem; font-weight: 600;
+  border-left: 4px solid var(--c, var(--gold));
+}
+.legend-pill a { color: var(--slate); }
+.legend-pill a:hover { text-decoration: none; }
+
+/* ─── Programme page ──────────────────────────────────────────────── */
+.programme-page h1 { font-size: 2.2rem; color: var(--slate); margin: 0.4rem 0 0.8rem; }
+.programme-controls { display: flex; align-items: center; gap: 0.7rem; margin: 1rem 0; flex-wrap: wrap; }
+.btn-primary { background: var(--gold); color: white; border: none; padding: 0.5rem 1rem; border-radius: 999px; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+.btn-primary:hover { background: var(--gold-d); }
+.btn-secondary { background: var(--sand); color: var(--slate); border: none; padding: 0.5rem 1rem; border-radius: 999px; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+.btn-secondary:hover { background: var(--cream); }
+.stage-label { color: var(--teal); font-weight: 600; font-style: italic; margin-left: 0.5rem; }
+
+/* ─── Genèse page ─────────────────────────────────────────────────── */
+.page-genese main { max-width: 56rem; }
+.genese-hero { margin-bottom: 3rem; }
+.eyebrow { text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.72rem; color: var(--gold-d); font-weight: 700; margin-bottom: 0.6rem; }
+.genese-hero h1 { font-size: 3rem; font-weight: 300; line-height: 1.05; color: var(--slate); margin: 0 0 0.6rem; }
+.genese-hero h1 em { font-style: italic; color: var(--gold); }
+.genese-hero .lede { font-size: 1.1rem; font-style: italic; color: var(--gray); margin: 0 0 1.5rem; max-width: 36rem; }
+.genese-timeline-strip { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.genese-timeline-strip > div { padding-left: 0.8rem; border-left: 2px solid var(--gold); }
+.g-date { display: block; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.7rem; font-weight: 700; color: var(--gold-d); }
+.g-event { display: block; font-size: 0.9rem; margin-top: 0.2rem; color: var(--slate); }
+.genese-section { padding: 2rem 0; border-top: 1px solid var(--sand); }
+.genese-section h2 { font-size: 2rem; font-weight: 300; margin: 0.3rem 0 1rem; color: var(--slate); }
+.genese-section h2 em { font-style: italic; color: var(--gold); }
+.genese-section.dark-section { background: var(--navy); color: var(--cream); padding: 3rem 1.5rem; margin: 2rem -1.5rem; border-radius: 18px; border-top: none; }
+.genese-section.dark-section h2 { color: white; }
+.genese-section.dark-section h2 em { color: var(--gold); }
+.genese-section.dark-section .eyebrow { color: var(--gold); }
+.genese-body p { margin: 1rem 0; }
+.genese-quote { border-left: 3px solid var(--gold); padding: 0.5rem 0 0.5rem 1.2rem; margin: 1.5rem 0; }
+.genese-quote p { font-style: italic; font-family: Georgia, serif; font-size: 1.05rem; margin: 0; }
+.genese-quote cite { display: block; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.7rem; color: var(--gray); margin-top: 0.5rem; font-style: normal; }
+.genese-numlist { list-style: none; counter-reset: g; padding: 0; margin: 1.5rem 0; }
+.genese-numlist li { counter-increment: g; padding: 0.6rem 0 0.6rem 2.5rem; position: relative; }
+.genese-numlist li::before {
+  content: counter(g); position: absolute; left: 0; top: 0.55rem;
+  width: 1.7rem; height: 1.7rem; border: 1px solid currentColor; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; opacity: 0.85;
+}
+.boat-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--sand); border: 1px solid var(--sand); margin-top: 1.5rem; border-radius: 6px; overflow: hidden; }
+.boat-stats > div { background: white; padding: 1.1rem; }
+.bs-val { display: block; font-family: Georgia, serif; font-size: 1.8rem; color: var(--gold); }
+.bs-lbl { display: block; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.7rem; color: var(--gray); margin-top: 0.3rem; }
+.genese-footer { padding: 2rem 0; border-top: 1px solid var(--sand); color: var(--gray); font-size: 0.9rem; text-align: center; }
+
+/* ─── Tag page ────────────────────────────────────────────────────── */
+.tag-page h1 { font-size: 2rem; color: var(--slate); margin: 0.3rem 0 0.5rem; }
+.tag-page .lede { color: var(--gray); margin: 0 0 1.5rem; }
+
 /* ─── Responsive ──────────────────────────────────────────────────── */
 @media (max-width: 720px) {
   main { padding: 1.8rem 1.1rem; }
   .navbar { padding: 0.7rem 1.1rem; }
-  .nav-links { gap: 0.9rem; }
+  .nav-links { gap: 0.7rem; font-size: 0.85rem; }
   .nav-links a.ext { display: none; }
   .archive-badge { top: 60px; right: 10px; padding: 0.3rem 0.6rem; font-size: 0.7rem; }
   .archive-badge::before { font-size: 0.85rem; }
@@ -249,6 +359,13 @@ h3 { font-size: 1.15rem; margin: 0 0 0.3rem; font-weight: 700; color: var(--slat
   .leaflet-map { height: 55vh; min-height: 320px; }
   .post-hero h1 { font-size: 1.7rem; }
   h2 { font-size: 1.3rem; margin-top: 2rem; }
+  .featured-card { grid-template-columns: 1fr; }
+  .featured-body { padding: 1.2rem 1.3rem 1.5rem; }
+  .featured-body h3 { font-size: 1.3rem; }
+  .featured-photo { aspect-ratio: 16/9; min-height: 180px; }
+  .genese-hero h1 { font-size: 2.1rem; }
+  .genese-section h2 { font-size: 1.5rem; }
+  .boat-stats { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 480px) {
   .brand-name { display: none; }

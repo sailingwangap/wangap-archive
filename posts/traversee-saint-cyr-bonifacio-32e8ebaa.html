@@ -6,7 +6,7 @@
   <title>Traversée Saint-Cyr → Bonifacio — Wang'ap Archive</title>
   <link rel="stylesheet" href="../style.css">
   <meta name="generator" content="Wang'ap archive snapshot V2.1.2">
-  <meta name="snapshot-date" content="2026-05-16T12:19:08.642Z">
+  <meta name="snapshot-date" content="2026-05-16T14:52:30.273Z">
   
 </head>
 <body class="page-post">
@@ -17,14 +17,16 @@
     </a>
     <div class="nav-links">
       <a href="../carte.html">Carte</a>
+      <a href="../programme.html">Programme</a>
       <a href="../stats.html">Stats</a>
+      <a href="../genese.html">Genèse</a>
       <a class="ext" href="https://www.wangap.fr/">Site principal ↗</a>
     </div>
   </nav>
 
   <aside class="archive-badge" title="Cet instantané du site est figé : il ne se met pas à jour seul. Le site principal est sur wangap.fr.">
     <span class="archive-badge-label">Archive</span>
-    <span class="archive-badge-num">#3</span>
+    <span class="archive-badge-num">#4</span>
     <span class="archive-badge-date">16/05/2026</span>
   </aside>
 
@@ -42,9 +44,9 @@
 
         
           <section class="photo-grid">
-            <a class="photo-cell" href="../photos-lg/photo-1534224039826-c7a0eda0e6b3-lg.jpg" onerror="this.href='../photos/photo-1534224039826-c7a0eda0e6b3-md.jpg'">
+            <a class="photo-cell" data-lightbox="photos-lg/photo-1534224039826-c7a0eda0e6b3-lg.jpg" href="../photos-lg/photo-1534224039826-c7a0eda0e6b3-lg.jpg">
               <img src="../photos/photo-1534224039826-c7a0eda0e6b3-md.jpg" loading="lazy" alt="" onerror="this.onerror=null; this.src='../photos/photo-1534224039826-c7a0eda0e6b3-sm.jpg'">
-            </a><a class="photo-cell" href="../photos-lg/photo-1507400492013-162706c8c05e-lg.jpg" onerror="this.href='../photos/photo-1507400492013-162706c8c05e-md.jpg'">
+            </a><a class="photo-cell" data-lightbox="photos-lg/photo-1507400492013-162706c8c05e-lg.jpg" href="../photos-lg/photo-1507400492013-162706c8c05e-lg.jpg">
               <img src="../photos/photo-1507400492013-162706c8c05e-md.jpg" loading="lazy" alt="" onerror="this.onerror=null; this.src='../photos/photo-1507400492013-162706c8c05e-sm.jpg'">
             </a>
           </section>
@@ -54,8 +56,33 @@
 <p>La nuit a été magique. Pas de lune, ciel dégagé, la Voie Lactée d&#39;une clarté incroyable. On a croisé deux cargos au large du Cap Corse, l&#39;AIS fonctionne parfaitement.</p>
 <p>Arrivée dans les Bouches de Bonifacio au lever du soleil. Le courant nous a un peu secoués à l&#39;entrée mais rien de méchant. Mouillage au fond du fjord, protégé de tout. On est épuisés mais heureux.</p></section>
 
-        <p class="tags"><span class="tag">navigation</span> <span class="tag">nuit</span></p>
+        <p class="tags"><a class="tag" href="../tags/navigation.html">navigation</a> <a class="tag" href="../tags/nuit.html">nuit</a></p>
       </article>
+
+      <!-- #7 — minimal lightbox: clicks on .photo-cell open a fullscreen overlay
+           with the lg image. ~700 B of JS, no dep. If JS fails, the <a href>
+           navigation falls through to the lg URL directly (graceful degradation). -->
+      <div id="lightbox" class="lightbox" hidden onclick="this.hidden=true">
+        <img alt="">
+        <button class="lightbox-close" aria-label="Fermer" type="button">✕</button>
+      </div>
+      <script>
+        (function(){
+          var lb = document.getElementById('lightbox');
+          if (!lb) return;
+          var img = lb.querySelector('img');
+          document.querySelectorAll('.photo-cell[data-lightbox]').forEach(function(a){
+            a.addEventListener('click', function(e){
+              e.preventDefault();
+              img.src = '../' + a.dataset.lightbox;
+              lb.hidden = false;
+            });
+          });
+          document.addEventListener('keydown', function(e){
+            if (e.key === 'Escape') lb.hidden = true;
+          });
+        })();
+      </script>
     
   </main>
 
