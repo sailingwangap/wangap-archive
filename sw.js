@@ -30,9 +30,9 @@ const PRECACHE_URLS = [
   '/',
   '/manifest.json',
   '/favicon.svg',
-  '/images/logo.webp',
-  '/images/boat.webp',
-  '/images/logo.png',
+  '/wangap-archive/images/logo.webp',
+  '/wangap-archive/images/boat.webp',
+  '/wangap-archive/images/logo.png',
 ];
 
 // Install — precache app shell
@@ -210,7 +210,7 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body,
-    icon: '/images/logo.webp',
+    icon: '/wangap-archive/images/logo.webp',
     badge: '/favicon.svg',
     tag: data.tag || 'wangap-notification',
     data: { url: data.url || '/' },
