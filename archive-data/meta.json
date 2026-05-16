@@ -1,12 +1,12 @@
 {
-  "snapshot_date": "2026-05-16T20:02:36.716Z",
-  "snapshot_number": 8,
+  "snapshot_date": "2026-05-16T20:12:55.330Z",
+  "snapshot_number": 9,
   "stats": {
     "posts": 40,
     "etapes": 14,
     "chapters": 7,
     "photos": 22,
-    "waypoints": 8573
+    "waypoints": 8584
   },
   "generator": "wangap-archive V2.1.2 Batch 6 (frozen SPA)",
   "archive_repo": "sailingwangap/wangap-archive"
