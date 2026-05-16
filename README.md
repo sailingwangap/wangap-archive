@@ -1,30 +1,30 @@
 # wangap-archive
 
 Long-term static archive of [Wang'ap](https://www.wangap.fr/) — the
-sailing logbook of Catherine & Bertrand's Outremer 52 voyage
-(2026–2029).
+sailing logbook of Catherine & Bertrand's Outremer 52 voyage.
 
-A GitHub Action in the main app repo
-([sailingwangap/jdb_wangap](https://github.com/sailingwangap/jdb_wangap))
-takes a weekly snapshot of the public site (posts, étapes, chapters,
-photos, route, aggregate stats) and commits it here. Each commit is
-an immutable point-in-time copy. The latest snapshot is served at
-**[archive.wangap.fr](https://archive.wangap.fr/)** via GitHub Pages.
+**Latest snapshot**: 2026-05-16T11:50:31.673Z
+**Contents**: 40 posts · 22 photos · 14 étapes · 7 chapters
 
-Past snapshots remain readable through git history.
+A GitHub Action in [sailingwangap/jdb_wangap](https://github.com/sailingwangap/jdb_wangap)
+generates this archive every Monday at 03:00 UTC. Each commit is an immutable
+point-in-time copy. The latest snapshot is served at:
 
-## Why?
+- [sailingwangap.github.io/wangap-archive/](https://sailingwangap.github.io/wangap-archive/) — always works (GitHub Pages default)
+- [archive.wangap.fr](https://archive.wangap.fr/) — intended canonical URL, pending Godaddy DNS CNAME. Once set, GitHub auto-redirects the github.io URL to the custom domain.
 
-Today's Wang'ap depends on Supabase + Vercel. In 10–20 years either
-could disappear. This archive decouples the *memory* of the voyage
-from the *operational stack*: a public, static, immutable mirror
-that can be read in 30 years even if nothing else exists. See
-[ADR-0002](https://github.com/sailingwangap/jdb_wangap/blob/main/docs/decisions/0002-archive-wangap-fr.md)
-for the architectural decisions.
+Past snapshots remain accessible through git history. Each snapshot includes
+a machine-readable [`snapshot-meta.json`](./snapshot-meta.json) with the
+exact timestamp, record counts, and workflow run URL.
 
-## Don't edit this repo by hand
+## Don't edit by hand
 
-Every snapshot regenerates from current Supabase state. Manual
-commits to `main` will be overwritten on the next Monday cron run.
+Every snapshot regenerates from current Supabase state. Manual commits to `main`
+will be overwritten on the next cron run. To change content, edit
+[wangap.fr](https://www.wangap.fr/) — the next snapshot will pick it up.
 
-— Last bootstrap: 14 May 2026.
+## Architecture
+
+See [ADR-0002](https://github.com/sailingwangap/jdb_wangap/blob/main/docs/decisions/0002-archive-wangap-fr.md)
+in the main app repo for design decisions (renderer, hosting, photo strategy,
+privacy model).

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carte — Wang'ap Archive</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="generator" content="Wang'ap archive snapshot V2.1.2">
+  <meta name="snapshot-date" content="2026-05-16T11:50:31.673Z">
+</head>
+<body class="page-carte">
+  <header class="site-header">
+    <a href="/" class="site-title">Wang'ap — Archive</a>
+    <nav class="site-nav">
+      <a href="carte.html">Carte</a>
+      <a href="stats.html">Stats</a>
+      <a href="https://www.wangap.fr/" class="ext">Site principal ↗</a>
+    </nav>
+  </header>
+  <main>
+    
+      <article class="carte-page">
+        <h1>Carte du voyage</h1>
+        <p class="map-note">Trace GPS consolidée (waypoints publics, sources GPS + AIS + manuelles fusionnées). Cliquez sur un marqueur d'étape pour en savoir plus.</p>
+        <div id="map" class="leaflet-map"></div>
+        <p class="dl-note">Format brut : <a href="route.geojson"><code>route.geojson</code></a> — importable dans QGIS, OpenCPN, iSailor.</p>
+      </article>
+      <link rel="stylesheet" href="leaflet/leaflet.css">
+      <script src="leaflet/leaflet.js"></script>
+      <script>
+        // Self-hosted Leaflet, no tile layer — CSS-painted ocean background.
+        // Polyline + étape markers from /route.geojson + inlined étapes.
+        const etapesData = [{"name":"premier leg","slug":"premier-leg-2bcd6fc0","start":null,"end":null,"date_start":"2026-04-24","date_end":"2026-05-01"},{"name":"deuxieme leg","slug":"deuxieme-leg-b7c2ce3a","start":null,"end":null,"date_start":"2026-05-02","date_end":"2026-05-05"},{"name":"troisieme leg","slug":"troisieme-leg-7e995830","start":null,"end":null,"date_start":"2026-05-06","date_end":"2026-05-31"},{"name":"Phase 1 — Préparation Abu Dhabi","slug":"phase-1-preparation-abu-dhabi-798a5c49","start":"Abu Dhabi","end":"Abu Dhabi","date_start":"2024-04-01","date_end":"2025-04-30"},{"name":"LGM → Malte avec Valérie","slug":"lgm-malte-avec-valerie-e4b06823","start":"La Grande Motte","end":"Malte","date_start":"2025-05-30","date_end":"2025-06-11"},{"name":"Malte → Grèce → Malte (Paul & Linda)","slug":"malte-grece-malte-paul-linda-62aac410","start":"Malte","end":"Malte","date_start":"2025-06-12","date_end":"2025-07-05"},{"name":"Malte → Sicile → Sardaigne → Corse → Saint-Cyr","slug":"malte-sicile-sardaigne-corse-saint-cyr-e2a5479f","start":"Malte","end":"Saint-Cyr","date_start":"2025-07-05","date_end":"2025-07-22"},{"name":"Carénage Outremer","slug":"carenage-outremer-542ee169","start":"La Grande Motte","end":"La Grande Motte","date_start":"2025-09-06","date_end":"2025-09-18"},{"name":"Phase 2 — Transition Montréal & Maset","slug":"phase-2-transition-montreal-maset-7172514c","start":"Abu Dhabi","end":"La Grande Motte","date_start":"2025-05-01","date_end":"2025-05-10"},{"name":"Le Maset — semaine famille","slug":"le-maset-semaine-famille-b25905e1","start":"Saint-Cyr","end":"Saint-Cyr","date_start":"2025-07-23","date_end":"2025-08-07"},{"name":"Méditerranée — automne/hiver 2025","slug":"mediterranee-automne-hiver-2025-56945798","start":"La Grande Motte","end":"Côte d'Azur","date_start":"2025-09-19","date_end":"2026-02-01"},{"name":"Phase 3 — Réception La Grande-Motte","slug":"phase-3-reception-la-grande-motte-56158649","start":"La Grande Motte","end":"La Grande Motte","date_start":"2025-05-11","date_end":"2025-05-29"},{"name":"Corse, Sardaigne & Baléares","slug":"corse-sardaigne-baleares-f070a15b","start":"Saint-Cyr","end":"La Grande Motte","date_start":"2025-08-08","date_end":"2025-09-05"},{"name":"Côte d'Azur — printemps 2026","slug":"cote-d-azur-printemps-2026-8a0b83a0","start":"Côte d'Azur","end":"Côte d'Azur","date_start":"2026-03-01","date_end":"2026-04-01"}];
+        fetch('route.geojson').then(r => r.json()).then(geo => {
+          const coords = geo.features[0].geometry.coordinates;
+          if (!coords.length) {
+            document.getElementById('map').innerHTML = '<p class="empty">Aucune position publiée pour l\'instant.</p>';
+            return;
+          }
+          const latlngs = coords.map(([lng, lat]) => [lat, lng]);
+          const map = L.map('map', { zoomControl: true, attributionControl: false });
+          L.polyline(latlngs, { color: '#d97706', weight: 3, opacity: 0.9 }).addTo(map);
+          // Fit
+          const bounds = L.latLngBounds(latlngs);
+          map.fitBounds(bounds, { padding: [20, 20] });
+          // Étape markers anchored at the closest waypoint by date.
+          // Cheap heuristic: place each étape marker at the start/end of its date range
+          // by picking the first/last waypoint inside the étape window.
+          // We don't have waypoint timestamps in the geojson — use evenly spaced
+          // markers proportional to the étape index for visual cues.
+          if (etapesData.length && coords.length > 1) {
+            etapesData.forEach((e, i) => {
+              const idx = Math.round((i / Math.max(1, etapesData.length - 1)) * (latlngs.length - 1));
+              const ll = latlngs[idx];
+              const popup = '<strong>' + e.name + '</strong><br>' +
+                (e.start || '') + ' → ' + (e.end || '') + '<br>' +
+                '<a href="etapes/' + e.slug + '.html">Voir l\'étape →</a>';
+              L.marker(ll).addTo(map).bindPopup(popup);
+            });
+          }
+        }).catch(err => {
+          document.getElementById('map').innerHTML = '<p class="empty">Erreur de chargement de la trace : ' + err.message + '</p>';
+        });
+      </script>
+    
+  </main>
+  <footer class="site-footer">
+    <p>Snapshot du 16 mai 2026. Cette archive est immuable : chaque lundi à 03:00 UTC, une GitHub Action prend un nouvel instantané dans ce repo. Les snapshots passés vivent dans l'historique git.</p>
+    <p><a href="https://github.com/sailingwangap/wangap-archive">Source GitHub</a> — © Catherine et Bertrand 2026–</p>
+  </footer>
+</body>
+</html>
