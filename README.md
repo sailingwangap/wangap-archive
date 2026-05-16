@@ -3,7 +3,7 @@
 Long-term static archive of [Wang'ap](https://www.wangap.fr/) — the
 sailing logbook of Catherine & Bertrand's Outremer 52 voyage.
 
-**Latest snapshot**: 2026-05-16T11:58:32.030Z
+**Latest snapshot**: 2026-05-16T12:19:08.642Z
 **Contents**: 40 posts · 22 photos · 14 étapes · 7 chapters
 
 A GitHub Action in [sailingwangap/jdb_wangap](https://github.com/sailingwangap/jdb_wangap)

@@ -6,121 +6,203 @@
   <title>Accueil — Wang'ap Archive</title>
   <link rel="stylesheet" href="style.css">
   <meta name="generator" content="Wang'ap archive snapshot V2.1.2">
-  <meta name="snapshot-date" content="2026-05-16T11:58:32.030Z">
+  <meta name="snapshot-date" content="2026-05-16T12:19:08.642Z">
+  <link rel="stylesheet" href="leaflet/leaflet.css">
 </head>
 <body class="page-home">
-  <header class="site-header">
-    <a href="/" class="site-title">Wang'ap — Archive</a>
-    <nav class="site-nav">
+  <nav class="navbar">
+    <a class="brand" href="./">
+      <img class="brand-logo" src="images/logo.webp" alt="">
+      <span class="brand-name">wang'ap</span>
+    </a>
+    <div class="nav-links">
       <a href="carte.html">Carte</a>
       <a href="stats.html">Stats</a>
-      <a href="https://www.wangap.fr/" class="ext">Site principal ↗</a>
-    </nav>
-  </header>
+      <a class="ext" href="https://www.wangap.fr/">Site principal ↗</a>
+    </div>
+  </nav>
+
+  <aside class="archive-badge" title="Cet instantané du site est figé : il ne se met pas à jour seul. Le site principal est sur wangap.fr.">
+    <span class="archive-badge-label">Archive</span>
+    <span class="archive-badge-num">#3</span>
+    <span class="archive-badge-date">16/05/2026</span>
+  </aside>
+
   <main>
     
       <section class="hero">
-        <h1>Wang'ap</h1>
-        <p class="lede">Le journal de bord du tour du monde à la voile de Catherine et Bertrand sur leur Outremer 52.</p>
-        <p class="stats-strip">
-          <strong>40</strong> articles · <strong>22</strong> photos · <strong>14</strong> étapes · <strong>7</strong> chapitres
-        </p>
+        <div class="hero-text">
+          <h1 class="brand-wordmark"><img class="brand-wordmark-logo" src="images/logo.webp" alt=""> wang'ap</h1>
+          <p class="lede">Le journal de bord du tour du monde à la voile de Catherine &amp; Bertrand sur leur Outremer 52.</p>
+          <p class="stats-strip">
+            <strong>40</strong> articles &nbsp;·&nbsp; <strong>22</strong> photos &nbsp;·&nbsp; <strong>14</strong> étapes &nbsp;·&nbsp; <strong>7</strong> chapitres
+          </p>
+        </div>
+        <div class="hero-photo-wrap">
+          <img class="hero-photo" src="photos/1778520594311-q6x28e1kss-md.jpg" alt="Catherine et Bertrand">
+        </div>
       </section>
 
-      <section class="chapters">
+      <section class="home-map-section">
+        <h2>La route</h2>
+        <a class="home-map-link" href="carte.html">
+          <div id="home-map" class="home-map"></div>
+          <span class="home-map-cta">Voir la carte interactive →</span>
+        </a>
+      </section>
+
+      <section class="chapter-bands">
         <h2>Chapitres</h2>
-        <ul class="chapter-list">
+        <div class="chapter-grid">
           
-            <li><a href="chapitres/preparation-dbf080d7.html">
-              <span class="chapter-title">Préparation</span>
-              <span class="chapter-dates">01/04/2025 → 29/05/2025</span>
-            </a></li>
-            <li><a href="chapitres/sicile-malte-68ff2e65.html">
-              <span class="chapter-title">Sicile &amp; Malte</span>
-              <span class="chapter-dates">30/05/2025 → 11/06/2025</span>
-            </a></li>
-            <li><a href="chapitres/grece-61d84212.html">
-              <span class="chapter-title">Grèce</span>
-              <span class="chapter-dates">12/06/2025 → 04/07/2025</span>
-            </a></li>
-            <li><a href="chapitres/corse-sardaigne-1020a13b.html">
-              <span class="chapter-title">Corse &amp; Sardaigne</span>
-              <span class="chapter-dates">05/07/2025 → 22/07/2025</span>
-            </a></li>
-            <li><a href="chapitres/cote-d-azur-d59ac251.html">
-              <span class="chapter-title">Côte d&#39;Azur</span>
-              <span class="chapter-dates">23/07/2025 → 01/04/2026</span>
-            </a></li>
-            <li><a href="chapitres/mai-2026-cde63d79.html">
-              <span class="chapter-title">MAI 2026</span>
-              <span class="chapter-dates">17/04/2026 → 31/05/2026</span>
-            </a></li>
-            <li><a href="chapitres/non-classes-00000000.html">
-              <span class="chapter-title">Non classés</span>
-              <span class="chapter-dates">01/01/1970 → 31/12/2099</span>
-            </a></li>
-        </ul>
+            <a class="chapter-card" href="chapitres/preparation-dbf080d7.html">
+              <div class="chapter-card-cover chapter-card-cover-empty"></div>
+              <div class="chapter-card-body">
+                <h3>Préparation</h3>
+                <p class="dates">01/04/2025 → 29/05/2025</p>
+              </div>
+            </a>
+            <a class="chapter-card" href="chapitres/sicile-malte-68ff2e65.html">
+              <div class="chapter-card-cover chapter-card-cover-empty"></div>
+              <div class="chapter-card-body">
+                <h3>Sicile &amp; Malte</h3>
+                <p class="dates">30/05/2025 → 11/06/2025</p>
+              </div>
+            </a>
+            <a class="chapter-card" href="chapitres/grece-61d84212.html">
+              <div class="chapter-card-cover chapter-card-cover-empty"></div>
+              <div class="chapter-card-body">
+                <h3>Grèce</h3>
+                <p class="dates">12/06/2025 → 04/07/2025</p>
+              </div>
+            </a>
+            <a class="chapter-card" href="chapitres/corse-sardaigne-1020a13b.html">
+              <div class="chapter-card-cover chapter-card-cover-empty"></div>
+              <div class="chapter-card-body">
+                <h3>Corse &amp; Sardaigne</h3>
+                <p class="dates">05/07/2025 → 22/07/2025</p>
+              </div>
+            </a>
+            <a class="chapter-card" href="chapitres/cote-d-azur-d59ac251.html">
+              <div class="chapter-card-cover chapter-card-cover-empty"></div>
+              <div class="chapter-card-body">
+                <h3>Côte d&#39;Azur</h3>
+                <p class="dates">23/07/2025 → 01/04/2026</p>
+              </div>
+            </a>
+            <a class="chapter-card" href="chapitres/mai-2026-cde63d79.html">
+              <div class="chapter-card-cover chapter-card-cover-empty"></div>
+              <div class="chapter-card-body">
+                <h3>MAI 2026</h3>
+                <p class="dates">17/04/2026 → 31/05/2026</p>
+              </div>
+            </a>
+            <a class="chapter-card" href="chapitres/non-classes-00000000.html">
+              <div class="chapter-card-cover chapter-card-cover-empty"></div>
+              <div class="chapter-card-body">
+                <h3>Non classés</h3>
+                <p class="dates">01/01/1970 → 31/12/2099</p>
+              </div>
+            </a>
+        </div>
       </section>
 
-      <section class="recent">
+      <section class="recent-posts">
         <h2>Derniers articles</h2>
-        <ul class="post-list">
-          
-            <li><a href="posts/sdfsaf-67764d49.html">
-              <span class="post-title">sdfsaf</span>
-              <span class="post-date">11/05/2026</span>
-            </a></li>
-            <li><a href="posts/wemby-66974c86.html">
-              <span class="post-title">Wemby</span>
-              <span class="post-date">11/05/2026</span>
-            </a></li>
-            <li><a href="posts/hshsh-b234f5df.html">
-              <span class="post-title">Hshsh</span>
-              <span class="post-date">09/05/2026</span>
-            </a></li>
-            <li><a href="posts/beijing-yallah-7a237752.html">
-              <span class="post-title">beijing yallah</span>
-              <span class="post-date">06/05/2026</span>
-            </a></li>
-            <li><a href="posts/bangkok-express-3453835a.html">
-              <span class="post-title">Bangkok express</span>
-              <span class="post-date">03/05/2026</span>
-            </a></li>
-            <li><a href="posts/carenage-termine-remise-a-l-eau-5ef6d1ce.html">
-              <span class="post-title">Carénage terminé — remise à l&#39;eau</span>
-              <span class="post-date">18/09/2025</span>
-            </a></li>
-            <li><a href="posts/revision-moteurs-volvo-3f25d665.html">
-              <span class="post-title">Révision moteurs Volvo</span>
-              <span class="post-date">14/09/2025</span>
-            </a></li>
-            <li><a href="posts/inspection-coque-saildrives-595d5367.html">
-              <span class="post-title">Inspection coque + saildrives</span>
-              <span class="post-date">10/09/2025</span>
-            </a></li>
-            <li><a href="posts/sortie-d-eau-au-chantier-outremer-2cc6ebc4.html">
-              <span class="post-title">Sortie d&#39;eau au chantier Outremer</span>
-              <span class="post-date">06/09/2025</span>
-            </a></li>
-            <li><a href="posts/derniere-sortie-fin-de-semaine-famille-cef2b404.html">
-              <span class="post-title">Dernière sortie — fin de semaine famille</span>
-              <span class="post-date">06/08/2025</span>
-            </a></li>
-            <li><a href="posts/bouillabaisse-a-bord-4608b94a.html">
-              <span class="post-title">Bouillabaisse à bord</span>
-              <span class="post-date">04/08/2025</span>
-            </a></li>
-            <li><a href="posts/porquerolles-la-plus-longue-sortie-de-la-semaine-8fb9256e.html">
-              <span class="post-title">Porquerolles — la plus longue sortie de la semaine</span>
-              <span class="post-date">01/08/2025</span>
-            </a></li>
-        </ul>
+        <div class="post-grid">
+          <a class="post-card" href="posts/sdfsaf-67764d49.html">
+              <img class="post-card-photo" src="photos/1778520594311-q6x28e1kss-md.jpg" alt="" loading="lazy">
+              <div class="post-card-body">
+                <h3>sdfsaf</h3>
+                <p class="post-date">11/05/2026</p>
+              </div>
+            </a><a class="post-card" href="posts/wemby-66974c86.html">
+              <img class="post-card-photo" src="photos/1778513535361-bvvh7w1d0ef-md.jpg" alt="" loading="lazy">
+              <div class="post-card-body">
+                <h3>Wemby</h3>
+                <p class="post-date">11/05/2026</p>
+              </div>
+            </a><a class="post-card" href="posts/hshsh-b234f5df.html">
+              <div class="post-card-photo post-card-photo-empty"></div>
+              <div class="post-card-body">
+                <h3>Hshsh</h3>
+                <p class="post-date">09/05/2026</p>
+              </div>
+            </a><a class="post-card" href="posts/beijing-yallah-7a237752.html">
+              <img class="post-card-photo" src="photos/1778076587106-jbogdxfuj3o-md.jpg" alt="" loading="lazy">
+              <div class="post-card-body">
+                <h3>beijing yallah</h3>
+                <p class="post-date">06/05/2026</p>
+              </div>
+            </a><a class="post-card" href="posts/bangkok-express-3453835a.html">
+              <img class="post-card-photo" src="photos/1777785124408-eszrwvu1no-md.jpg" alt="" loading="lazy">
+              <div class="post-card-body">
+                <h3>Bangkok express</h3>
+                <p class="post-date">03/05/2026</p>
+              </div>
+            </a><a class="post-card" href="posts/carenage-termine-remise-a-l-eau-5ef6d1ce.html">
+              <div class="post-card-photo post-card-photo-empty"></div>
+              <div class="post-card-body">
+                <h3>Carénage terminé — remise à l&#39;eau</h3>
+                <p class="post-date">18/09/2025</p>
+              </div>
+            </a><a class="post-card" href="posts/revision-moteurs-volvo-3f25d665.html">
+              <div class="post-card-photo post-card-photo-empty"></div>
+              <div class="post-card-body">
+                <h3>Révision moteurs Volvo</h3>
+                <p class="post-date">14/09/2025</p>
+              </div>
+            </a><a class="post-card" href="posts/inspection-coque-saildrives-595d5367.html">
+              <div class="post-card-photo post-card-photo-empty"></div>
+              <div class="post-card-body">
+                <h3>Inspection coque + saildrives</h3>
+                <p class="post-date">10/09/2025</p>
+              </div>
+            </a><a class="post-card" href="posts/sortie-d-eau-au-chantier-outremer-2cc6ebc4.html">
+              <div class="post-card-photo post-card-photo-empty"></div>
+              <div class="post-card-body">
+                <h3>Sortie d&#39;eau au chantier Outremer</h3>
+                <p class="post-date">06/09/2025</p>
+              </div>
+            </a><a class="post-card" href="posts/derniere-sortie-fin-de-semaine-famille-cef2b404.html">
+              <div class="post-card-photo post-card-photo-empty"></div>
+              <div class="post-card-body">
+                <h3>Dernière sortie — fin de semaine famille</h3>
+                <p class="post-date">06/08/2025</p>
+              </div>
+            </a><a class="post-card" href="posts/bouillabaisse-a-bord-4608b94a.html">
+              <div class="post-card-photo post-card-photo-empty"></div>
+              <div class="post-card-body">
+                <h3>Bouillabaisse à bord</h3>
+                <p class="post-date">04/08/2025</p>
+              </div>
+            </a><a class="post-card" href="posts/porquerolles-la-plus-longue-sortie-de-la-semaine-8fb9256e.html">
+              <div class="post-card-photo post-card-photo-empty"></div>
+              <div class="post-card-body">
+                <h3>Porquerolles — la plus longue sortie de la semaine</h3>
+                <p class="post-date">01/08/2025</p>
+              </div>
+            </a>
+        </div>
       </section>
     
   </main>
+
   <footer class="site-footer">
-    <p>Snapshot du 16 mai 2026. Cette archive est immuable : chaque lundi à 03:00 UTC, une GitHub Action prend un nouvel instantané dans ce repo. Les snapshots passés vivent dans l'historique git.</p>
-    <p><a href="https://github.com/sailingwangap/wangap-archive">Source GitHub</a> — © Catherine et Bertrand 2026–</p>
+    <p>Instantané immuable du 16 mai 2026. Chaque lundi 03:00 UTC, une GitHub Action prend un nouveau snapshot dans <a href="https://github.com/sailingwangap/wangap-archive">sailingwangap/wangap-archive</a> ; les snapshots passés vivent dans l'historique git.</p>
+    <p>Le site vivant est sur <a href="https://www.wangap.fr/">wangap.fr</a>. © Catherine et Bertrand 2026–</p>
   </footer>
+  
+      <script src="leaflet/leaflet.js"></script>
+      <script>
+        fetch('route.geojson').then(r => r.json()).then(geo => {
+          const coords = geo.features[0].geometry.coordinates;
+          if (!coords.length) { document.getElementById('home-map').style.display = 'none'; return; }
+          const latlngs = coords.map(([lng, lat]) => [lat, lng]);
+          const map = L.map('home-map', { zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, touchZoom: false });
+          L.polyline(latlngs, { color: '#E8B059', weight: 3, opacity: 0.95 }).addTo(map);
+          map.fitBounds(L.latLngBounds(latlngs), { padding: [10, 10] });
+        }).catch(() => { document.getElementById('home-map').style.display = 'none'; });
+      </script>
 </body>
 </html>
