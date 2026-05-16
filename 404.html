@@ -35,7 +35,7 @@
     <link rel="apple-touch-icon" href="/wangap-archive/icons/apple-touch-icon.png" />
     <link rel="manifest" href="/wangap-archive/manifest.json" />
     <title>Wang'ap — Journal de Bord</title>
-    <script type="module" crossorigin src="/wangap-archive/assets/index-PyPhKhlB.js"></script>
+    <script type="module" crossorigin src="/wangap-archive/assets/index-B6yEQW-I.js"></script>
     <link rel="modulepreload" crossorigin href="/wangap-archive/assets/chunk-DseTPa7n.js">
     <link rel="modulepreload" crossorigin href="/wangap-archive/assets/preload-helper-Dgw69CSF.js">
     <link rel="modulepreload" crossorigin href="/wangap-archive/assets/offline-8aU1tWBO.js">
@@ -124,11 +124,26 @@
           }
           return;
         }
-        // V2.1.2 Batch 6 — skip SW registration in archive-mode builds.
-        // The frozen-SPA archive is fully static; a worker would pin a fetch
-        // interceptor on archive.wangap.fr that's harder to retract than the
-        // archive itself, and is unnecessary since GitHub Pages caches well.
-        if ('true' === 'true') return;
+        // V2.1.2 Batch 11 — archive-mode builds actively UNREGISTER any
+        // pre-existing service worker (from a Batch 6-8 visit that DID
+        // register one) AND purge the wangap-* caches. Without this, Chrome
+        // serves stale assets from the old SW indefinitely, redirecting
+        // /wangap-archive/genese back through the broken old worker and
+        // landing on /genese (404 on the github.io root). Safari is less
+        // aggressive so it tends to work without this hard reset.
+        if ('true' === 'true') {
+          navigator.serviceWorker.getRegistrations()
+            .then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); })
+            .catch(function () {});
+          if ('caches' in window) {
+            caches.keys()
+              .then(function (ks) { return Promise.all(ks
+                .filter(function (k) { return k.indexOf('wangap-') === 0; })
+                .map(function (k) { return caches.delete(k); })); })
+              .catch(function () {});
+          }
+          return;
+        }
         window.addEventListener('load', function () {
           navigator.serviceWorker.register('/sw.js').catch(function () {});
         });
