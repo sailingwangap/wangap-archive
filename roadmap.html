@@ -217,7 +217,7 @@
   <div class="compass">⚓</div>
   <h1>Wang'ap</h1>
   <div class="tagline">Tour du Monde à la Voile · Catherine &amp; Bertrand</div>
-  <div class="subtitle">Feuille de route de l'application — V1.6 → V3<br/>16 mai 2026 · v2.51 — <strong>V2.1.2 archive.wangap.fr livrée</strong> (5 batches en 1 j : pipeline + LFS + visuel + parité avec wangap.fr — featured, couleurs d'étape, marqueurs photo, lightbox, tags, programme animé, Genèse) · servie à <code>sailingwangap.github.io/wangap-archive/</code> en attendant le DNS Godaddy chez Bertrand · prochain <strong>V2.4.1</strong> ingestion vidéos hand-over · V1.9.4 (tracker satellite) avant départ</div>
+  <div class="subtitle">Feuille de route de l'application — V1.6 → V3<br/>17 mai 2026 · v2.53 — <strong>V2.1.2 archive livrée</strong> (SPA-figé, ADR-0003) · <strong>V2.3 newsletter scopée</strong> (BLUEPRINT §2.53 + ADR-0004 + setup doc — composer IA + Resend mass-send + archive 3-way ; ~4 j code, bloqué sur session V2.5 Bertrand pour DNS) · <strong>V2.5 session Bertrand scopée</strong> (DNS archive + DNS Resend + Cursor + Google Drive virtuel) · prochains sprints code <strong>V2.4.1</strong> ingestion vidéos puis V2.3 batches · V1.9.4 tracker avant départ</div>
 
   <div class="summary-box">
     <strong>Où en est-on ?</strong>
@@ -556,12 +556,18 @@
   <li class="future" data-mark="•"><span class="label">Page Livre d'Or publique</span> accessible depuis l'accueil — cards avec nom, photo, message</li>
 </ul>
 
-<h3>V2.3 — Newsletter <span class="status planned">📋 Planifié</span></h3>
+<h3>V2.3 — Newsletter <span class="status planned">📋 Scopée 17 mai 2026 (~4 j, ADR-0004, bloquée sur DNS de la session V2.5)</span></h3>
+<p style="font-size:9.5pt;color:var(--gray);margin:4pt 0 6pt 0;"><em>But</em> : envoyer aux abonnés une newsletter rédigée à 4 mains (Claude pour le brouillon, B&amp;C pour l'édition) en ~30 min, à la demande uniquement. Liste <code>subscribers</code> déjà alimentée depuis le formulaire d'accueil v1.6. Archive 3 endroits : Supabase + Drive .docx + page publique dans archive.wangap.fr.</p>
 <ul class="feature-list">
-  <li class="future" data-mark="•"><span class="label">Création assistée</span> par IA : choisir une période, sélectionner les posts/photos/trace à inclure, donner un fil thématique</li>
-  <li class="future" data-mark="•"><span class="label">Brouillon généré</span> automatiquement par Claude — éditable avant envoi</li>
-  <li class="future" data-mark="•"><span class="label">Envoi en masse</span> via la liste d'abonnés (table subscribers, déjà alimentée)</li>
-  <li class="future" data-mark="•"><span class="label">Archive Google Drive</span> : chaque newsletter sauvegardée en .docx</li>
+  <li class="future" data-mark="•"><span class="label">Compositeur dans /maintenance</span> : sélecteur de période + multi-pick de posts + champ "angle/thème" + dropdown du modèle IA (Sonnet par défaut, Opus optionnel) + éditeur TipTap WYSIWYG sur le brouillon IA</li>
+  <li class="future" data-mark="•"><span class="label">Brouillon IA via Claude API</span> — endpoint Vercel /api/newsletter-draft, prompt avec titres + corps des posts sélectionnés + thème. Régénérable. ~$0,01 par essai (Sonnet).</li>
+  <li class="future" data-mark="•"><span class="label">Bouton "Envoyer un test à moi"</span> avant envoi de masse (rendu réel en boîte de réception, pas en preview navigateur)</li>
+  <li class="future" data-mark="•"><span class="label">Envoi de masse via Resend</span> par batches de 50/min (workflow_dispatch GitHub Action, respecte la limite 100 req/min). Compte Resend déjà connecté (api/notify.js).</li>
+  <li class="future" data-mark="•"><span class="label">Désinscription 1-clic</span> via token public dans chaque email (CAN-SPAM + RGPD). Bounces durs → désactive automatiquement l'abonné (webhook Resend).</li>
+  <li class="future" data-mark="•"><span class="label">Archive 3-way</span> : (a) table <code>newsletters</code> (HTML canonique), (b) Drive .docx dans <code>/Wang'ap Newsletters/</code>, (c) page publique <code>archive.wangap.fr/newsletters/&lt;slug&gt;.html</code> (extension de build-spa.mjs).</li>
+  <li class="future" data-mark="•"><span class="label">Rappel automatisé à B&amp;C</span> (PAS d'envoi auto) : cron vérifie "≥ 30 j depuis la dernière + ≥ 5 nouveaux posts publics" → bannière dans /maintenance + email à sailing.wangap@gmail.com. B&amp;C décident quand envoyer.</li>
+  <li class="future" data-mark="•"><span class="label">Forward-compatible V2.6 bilingue</span> : schéma DB inclut <code>subject_en</code> / <code>body_html_en</code> dès le départ (nullable) + <code>subscribers.preferred_lang</code>. Onglet EN du compositeur désactivé jusqu'à V2.6, activé automatiquement quand les colonnes EN sont remplies.</li>
+  <li class="future" data-mark="•"><span class="label">Bloquée sur session V2.5 Bertrand</span> pour vérification DNS du domaine sur Resend (SPF + DKIM sur wangap.fr via Godaddy). Test-send via <code>onboarding@resend.dev</code> fonctionne sans DNS.</li>
 </ul>
 
 <h3>V2.4 — Le Renard, formation complète <span class="status planned">📋 Planifié</span></h3>
@@ -586,12 +592,15 @@
   <li class="future" data-mark="•"><span class="label">Test terrain</span> avec questions réelles du quotidien à bord</li>
 </ul>
 
-<h3>V2.5 — Guide développeur pour Bertrand <span class="status planned">📋 Planifié</span></h3>
+<h3>V2.5 — Session de handover avec Bertrand <span class="status planned">📋 Scopée 17 mai 2026 (~1-2 h en screen-share)</span></h3>
+<p style="font-size:9.5pt;color:var(--gray);margin:4pt 0 6pt 0;"><em>But</em> : regrouper en UNE session de 1-2 h en screen-share avec Bertrand toutes les tâches opérateur en attente qui débloquent les sprints en cours.</p>
 <ul class="feature-list">
-  <li class="future" data-mark="•"><span class="label">Manuel "Comment utiliser Cursor + Claude"</span> : démarrer une session, prompts efficaces, commit / push / déploiement</li>
-  <li class="future" data-mark="•"><span class="label">Vérifier qu'un déploiement a bien marché</span></li>
-  <li class="future" data-mark="•"><span class="label">Lecture du Blueprint et de la Stratégie de codage</span></li>
-  <li class="future" data-mark="•"><span class="label">Dépannage</span> : commandes courantes en cas de problème</li>
+  <li class="future" data-mark="•"><span class="label">(a) DNS Godaddy CNAME <code>archive.wangap.fr</code> → <code>sailingwangap.github.io</code></span> (débloque V2.1.2 archive sur le domaine final ; pour l'instant servie à sailingwangap.github.io/wangap-archive/)</li>
+  <li class="future" data-mark="•"><span class="label">(b) DNS Godaddy SPF + DKIM pour Resend</span> (vérification du domaine <code>wangap.fr</code> ; débloque l'envoi de masse V2.3 newsletter ; valeurs exactes copiées depuis le dashboard Resend avant la session)</li>
+  <li class="future" data-mark="•"><span class="label">(c) Install Cursor IDE sur le laptop de Bertrand</span> : signin, clone <code>sailingwangap/jdb_wangap</code>, config Claude Code, walk-through d'un aller-retour (lire BLUEPRINT, poser une question, voir la réponse)</li>
+  <li class="future" data-mark="•"><span class="label">(d) Install Google Drive virtuel (Drive for Desktop)</span> sur le laptop de Bertrand — monte <code>/Wang'ap Backups/</code>, <code>/Wang'ap Newsletters/</code>, <code>/Wang'ap Knowledge Base/Handover Videos/</code> comme un dossier filesystem (B&amp;C peuvent y glisser des vidéos directement sans passer par l'interface web Drive)</li>
+  <li class="future" data-mark="•"><span class="label">Pré-session : préparer un doc imprimable</span> avec toutes les valeurs DNS à coller + checklist Drive setup + lien d'onboarding Cursor — pour éviter d'improviser pendant la session</li>
+  <li class="future" data-mark="•"><span class="label">Suite : guide écrit Cursor + Claude pour Bertrand</span> (manuel "Comment utiliser Cursor + Claude", démarrer une session, prompts efficaces, commit/push, dépannage) reste ouvert comme livrable de la session</li>
 </ul>
 
 <h3>V2.7 — Vue calendrier ⭐ <span class="status planned">📋 Planifié</span></h3>
@@ -759,7 +768,7 @@
 </section>
 
 <div class="footer-note">
-  Document généré depuis le BLUEPRINT — version 2.51 du 16 mai 2026 · dernier sprint livré <strong>V2.1.2 archive.wangap.fr</strong> (5 batches en 1 j ; DNS Godaddy en attente de Bertrand) · prochain <strong>V2.4.1</strong> ingestion vidéos hand-over · sprint en cours sur la branche <code>v2.0.2</code>.<br/>
+  Document généré depuis le BLUEPRINT — version 2.53 du 17 mai 2026 · dernier sprint livré <strong>V2.1.2 archive</strong> · sprints scopés <strong>V2.3 newsletter</strong> (~4 j, ADR-0004) + <strong>V2.5 session Bertrand</strong> (DNS + Cursor + Drive virtuel) · prochain sprint code <strong>V2.4.1</strong> ingestion vidéos hand-over · branche <code>v2.0.2</code>.<br/>
   Livré ces deux derniers jours en production :<br/>
   &nbsp;&nbsp;• <strong>v1.8.4</strong> (4 mai) — refonte complète de l'éditeur de trace en 7 phases : couche GeoJSON pour 10 k+ points, drag-to-move, double-tap pour insérer un point manuel, suppression annulable, opérations en lot (Forcer une étape, Décaler les dates), provenance via migration 025, raccourcis clavier desktop.<br/>
   &nbsp;&nbsp;• <strong>v1.8.4.x</strong> (4 mai) — fix de la barre de statut sur iPhone (📶 connectivité au lieu de 📡 qui dupliquait visuellement l'AIS) ; long-press → double-tap partout (instable sur iPhone Safari) ; bouton ✋ <em>Déplacer</em> explicite ; modale Valider/Annuler avant écriture en base.<br/>
