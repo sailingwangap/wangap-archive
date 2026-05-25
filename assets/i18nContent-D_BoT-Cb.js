@@ -1,0 +1,1 @@
+function e(e,t,n){if(!e)return``;if(n===`en`){let n=e[`${t}_en`];if(typeof n==`string`&&n.trim())return n}return e[t]||``}export{e as t};

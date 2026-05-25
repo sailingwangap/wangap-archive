@@ -1,1 +1,0 @@
-import{t as e}from"./jsx-runtime-C6D02mtk.js";import{c as t}from"./chunk-OE4NN4TA-BEC731WK.js";import{t as n}from"./ProgrammeAnimation-ErqGlLyU.js";var r=e();function i(){let e=t();return(0,r.jsx)(n,{onClose:()=>e(`/`)})}export{i as default};

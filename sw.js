@@ -1,4 +1,10 @@
-const CACHE_NAME = 'wangap-v8';
+// V2.2 22 May 2026: bump from v8 → v9 to force a full cache purge on next
+// SW activation. Users reported wangap.fr/roadmap.html still showing the
+// pre-renumber V2.8/V2.9/V2.10/V2.11 layout despite f104dfd shipping the
+// new V3.1-V3.4 + V4.1-V4.7 structure. The activation handler below
+// already does `caches.delete()` for every cache name that doesn't match
+// CACHE_NAME — bumping the suffix is the canonical SW reset signal.
+const CACHE_NAME = 'wangap-v9';
 
 // Guaranteed-Response wrapper. Wraps any handler so a thrown exception or a
 // resolved-non-Response value never bubbles up to the platform (which would
@@ -107,7 +113,13 @@ self.addEventListener('fetch', (event) => {
   // user's request resolves immediately from cache; the network refresh is
   // fired-and-forgotten in the background and its failures are swallowed.
   if (url.origin === self.location.origin && event.request.mode === 'navigate') {
-    const offlinePage = new Response('<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Wang\'ap — Offline</title></head><body style="background:#0B1026;color:#FBF7EF;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0"><div style="text-align:center"><h1>⛵ Wang\'ap</h1><p>Offline — reconnectez-vous</p></div></body></html>', {
+    // V2.2 polish — fallback page now shows TWO possible messages
+    // (truly offline vs server momentarily unavailable) so users mid-
+    // deploy aren't misled into thinking their connection broke.
+    // The body auto-detects via navigator.onLine + retries the
+    // navigation once after 2 s so a Vercel cold-start usually
+    // self-recovers without the user noticing.
+    const offlinePage = new Response('<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Wang\'ap — Offline</title></head><body style="background:#0B1026;color:#FBF7EF;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0"><div style="text-align:center;max-width:320px;padding:0 20px"><h1>⛵ Wang\'ap</h1><p id="msg">Chargement…</p><script>(function(){var on=navigator.onLine;var t=document.getElementById("msg");if(!on){t.textContent="Hors-ligne — reconnectez-vous";return;}var k="wangap:swReloadCount",n=parseInt(sessionStorage.getItem(k)||"0",10);if(n>=3){t.textContent="Service indisponible — réessayez dans quelques minutes";sessionStorage.removeItem(k);return;}sessionStorage.setItem(k,String(n+1));t.textContent="Service momentanément indisponible — nouvelle tentative…";setTimeout(function(){location.reload();},2000);})();</script></div></body></html>', {
       // V1.9.3-fix: explicit charset=utf-8 in the Content-Type header AND a
       // <meta charset="utf-8"> in the HTML so the ⛵ + em-dash UTF-8 bytes
       // don't render as Latin-1 mojibake (â›µ / â€" — what users were seeing
