@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wang'ap — Stack technique / Tech stack</title>
+  <meta name="robots" content="noindex" />
+  <meta name="description" content="Architecture détaillée, modèle de données, pipeline du Renard et décisions techniques de Wang'ap (vue skipper)." />
+  <style>
+    :root { --night:#0B1026; --navy:#162447; --teal:#1B9AAA; --gold:#E8B059; --gold-deep:#B07820; --coral:#E07A5F; --sand:#F4F1DE; --cream:#FFFCF2; --slate:#3D405B; --gray:#8D99AE; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:var(--slate); background:var(--cream); line-height:1.62; -webkit-font-smoothing:antialiased; }
+    a { color:var(--teal); }
+    code { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.85em; background:var(--sand); padding:1px 5px; border-radius:5px; }
+    header.top { position:sticky; top:0; z-index:50; background:linear-gradient(180deg,var(--night) 0%,var(--navy) 100%); color:var(--sand); padding:14px 18px; box-shadow:0 2px 14px rgba(0,0,0,.25); }
+    .top-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; max-width:960px; margin:0 auto; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:800; font-size:18px; }
+    .brand .logo { width:34px; height:34px; border-radius:9px; background:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .brand small { display:block; font-weight:500; font-size:11px; color:var(--gold); }
+    .spacer { flex:1; }
+    .lang-toggle { display:flex; background:rgba(255,255,255,.12); border-radius:9px; overflow:hidden; }
+    .lang-toggle button { border:none; background:transparent; color:var(--sand); padding:7px 12px; cursor:pointer; font-weight:700; font-size:12px; }
+    .lang-toggle button.active { background:var(--gold); color:var(--night); }
+    .back-app { color:var(--sand); text-decoration:none; font-size:12px; opacity:.85; border:1px solid rgba(255,255,255,.25); padding:6px 11px; border-radius:9px; white-space:nowrap; }
+    main { max-width:960px; margin:0 auto; padding:18px 18px 70px; }
+    .skipper-note { background:rgba(232,176,89,.16); color:var(--gold-deep); border-radius:10px; padding:10px 14px; font-size:13px; margin-bottom:16px; font-weight:600; }
+    .toc { background:#fff; border-radius:12px; padding:12px 16px; margin-bottom:18px; box-shadow:0 1px 8px rgba(0,0,0,.05); }
+    .toc b { font-size:12px; text-transform:uppercase; letter-spacing:.5px; color:var(--gray); }
+    .toc a { display:inline-block; font-size:13px; margin:4px 12px 2px 0; }
+    .card { background:#fff; border-radius:14px; padding:16px 20px; margin-bottom:14px; box-shadow:0 1px 8px rgba(0,0,0,.05); border:1px solid rgba(0,0,0,.04); scroll-margin-top:70px; }
+    .card h2 { font-size:18px; color:var(--navy); margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+    .card p { font-size:14px; margin:6px 0; }
+    .card ul { margin:8px 0 0 2px; padding-left:18px; }
+    .card li { font-size:13.5px; margin-bottom:6px; }
+    .card li b { color:var(--navy); }
+    .tree { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; white-space:pre; overflow-x:auto; background:var(--night); color:#cfe3e7; border-radius:10px; padding:14px 16px; line-height:1.7; }
+    .tree .c { color:#7f93a8; }
+    .doclinks { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:4px; }
+    .doclink { display:block; background:var(--sand); border-radius:12px; padding:13px 16px; text-decoration:none; color:var(--slate); }
+    .doclink b { color:var(--navy); display:block; font-size:14.5px; margin-bottom:2px; }
+    .doclink span { font-size:12px; color:var(--gray); }
+    footer { max-width:960px; margin:0 auto; padding:22px 18px 60px; border-top:1px solid rgba(0,0,0,.08); color:var(--gray); font-size:12.5px; }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-row">
+      <div class="brand"><span class="logo">🐘</span><span>wang'ap<small data-i18n="subtitle">Stack technique</small></span></div>
+      <div class="spacer"></div>
+      <div class="lang-toggle">
+        <button id="lang-fr" onclick="setLang('fr')">FR</button>
+        <button id="lang-en" onclick="setLang('en')">EN</button>
+      </div>
+      <a class="back-app" href="/" data-i18n="backApp">← l'app</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="skipper-note" id="skipperNote"></div>
+    <div class="toc" id="toc"></div>
+    <div id="sections"></div>
+  </main>
+  <footer><p id="footerNote"></p></footer>
+
+  <script>
+  const REPO = 'https://github.com/sailingwangap/jdb_wangap/blob/main';
+
+  const UI = {
+    fr: {
+      subtitle:'Stack technique', backApp:"← l'app",
+      skipperNote:'🔒 Vue technique détaillée — destinée au skipper / à l’équipe technique.',
+      tocLabel:'Sommaire',
+      footerNote:'Page technique non indexée. Code complet dans le dépôt privé github.com/sailingwangap/jdb_wangap. Les documents liés sont des copies servies depuis l’app.'
+    },
+    en: {
+      subtitle:'Tech stack', backApp:'← the app',
+      skipperNote:'🔒 Detailed technical view — intended for the skipper / technical team.',
+      tocLabel:'Contents',
+      footerNote:'Non-indexed technical page. Full code in the private repo github.com/sailingwangap/jdb_wangap. Linked documents are copies served from the app.'
+    }
+  };
+
+  // Each section: id, icon, title{fr,en}, body{fr,en} (HTML, trusted static).
+  const SECTIONS = [
+    { id:'overview', icon:'🧭', title:{fr:'Vue d’ensemble',en:'Overview'},
+      body:{
+        fr:`<p>PWA <b>offline-first</b> (React 19 + Vite) — journal de bord d’un tour du monde à la voile. SPA mono-branche : <code>main</code> = production sur <code>www.wangap.fr</code>, auto-déployée par Vercel à chaque push.</p>
+        <ul>
+          <li><b>3 zones de visibilité</b> (public / famille / privé) appliquées par RLS Postgres + un résolveur unique côté hooks.</li>
+          <li><b>Offline</b> : Service Worker + IndexedDB (Dexie) + file de synchro ; lecture/écriture sans réseau.</li>
+          <li><b>Bilingue</b> FR/EN : interface (i18next) + contenu traduit automatiquement (Claude).</li>
+          <li>Modules majeurs : journal & carte, AIS temps réel, carnet de maintenance, <b>Le Renard</b> (assistant RAG), newsletter, Livre d’Or, sauvegarde & archive figée.</li>
+        </ul>`,
+        en:`<p><b>Offline-first PWA</b> (React 19 + Vite) — a round-the-world sailing logbook. Single-track SPA: <code>main</code> = production on <code>www.wangap.fr</code>, auto-deployed by Vercel on every push.</p>
+        <ul>
+          <li><b>3 visibility zones</b> (public / family / private) enforced by Postgres RLS + a single resolver at the hook layer.</li>
+          <li><b>Offline</b>: Service Worker + IndexedDB (Dexie) + sync queue; read/write with no network.</li>
+          <li><b>Bilingual</b> FR/EN: UI (i18next) + content auto-translated (Claude).</li>
+          <li>Major modules: journal & map, real-time AIS, maintenance log, <b>Le Renard</b> (RAG assistant), newsletter, Guest Book, backup & frozen archive.</li>
+        </ul>`
+      } },
+
+    { id:'stack', icon:'🧱', title:{fr:'Stack technique',en:'Tech stack'},
+      body:{
+        fr:`<ul>
+          <li><b>Frontend</b> : React 19, Vite 8 (Rolldown), Tailwind CSS 4, react-router 7, i18next, <b>MapLibre GL 4.7.1</b> (épinglé — v5 plante sous Rolldown), Recharts, Dexie, TipTap (newsletter), react-markdown.</li>
+          <li><b>Backend</b> : Supabase (Postgres + RLS + Storage + Auth + <b>pgvector</b>) ; <b>12 fonctions Vercel</b> (plafond Hobby — d’où les routeurs d’action) ; 58 migrations SQL.</li>
+          <li><b>Tâches lourdes</b> : GitHub Actions via <code>workflow_dispatch</code> (timeout 6 h, hors limite Vercel 60 s).</li>
+          <li><b>Worker</b> : Fly.io <code>wangap-ais-worker</code> (région cdg) — écoute AIS et écrit les waypoints.</li>
+          <li><b>Services</b> : Resend (emails), Google Drive (sauvegardes + .docx, OAuth), OpenAI (Whisper + embeddings), Anthropic (Claude : Renard, newsletter, traduction).</li>
+          <li>Dépendances notables : <code>@resvg/resvg-js</code> + <code>world-atlas</code> (carte newsletter PNG côté serveur), <code>heic2any</code> (HEIC→JPG à la volée), <code>browser-image-compression</code>, <code>pdfjs-dist</code>, <code>docx</code>, <code>web-push</code>.</li>
+        </ul>`,
+        en:`<ul>
+          <li><b>Frontend</b>: React 19, Vite 8 (Rolldown), Tailwind CSS 4, react-router 7, i18next, <b>MapLibre GL 4.7.1</b> (pinned — v5 crashes under Rolldown), Recharts, Dexie, TipTap (newsletter), react-markdown.</li>
+          <li><b>Backend</b>: Supabase (Postgres + RLS + Storage + Auth + <b>pgvector</b>); <b>12 Vercel functions</b> (Hobby cap — hence action routers); 58 SQL migrations.</li>
+          <li><b>Heavy work</b>: GitHub Actions via <code>workflow_dispatch</code> (6 h timeout, beyond Vercel's 60 s).</li>
+          <li><b>Worker</b>: Fly.io <code>wangap-ais-worker</code> (region cdg) — listens to AIS and writes waypoints.</li>
+          <li><b>Services</b>: Resend (email), Google Drive (backups + .docx, OAuth), OpenAI (Whisper + embeddings), Anthropic (Claude: Renard, newsletter, translation).</li>
+          <li>Notable deps: <code>@resvg/resvg-js</code> + <code>world-atlas</code> (server-side newsletter map PNG), <code>heic2any</code> (HEIC→JPG on the fly), <code>browser-image-compression</code>, <code>pdfjs-dist</code>, <code>docx</code>, <code>web-push</code>.</li>
+        </ul>`
+      } },
+
+    { id:'patterns', icon:'🏗️', title:{fr:'Architecture & motifs',en:'Architecture & patterns'},
+      body:{
+        fr:`<ul>
+          <li><b>GitHub Action plutôt que fonction Vercel</b> pour tout ce qui (a) dépasse 60 s, (b) dépasse 4,5 MB, ou (c) tourne en cron : un mince relais Vercel déclenche le workflow ; l’état est suivi via une table Supabase que l’UI sonde. Utilisé par backup, archive, ingestion vidéo, embeddings, envoi newsletter.</li>
+          <li><b>Travail CPU côté navigateur → écriture serveur fine</b> : parse PDF, compression image, poster vidéo tournent dans le navigateur (lib chargée à la volée) ; la fonction Vercel ne fait que l’insert DB. Évite le timeout Hobby.</li>
+          <li><b>Persister AVANT <code>res.end()</code></b> sur Vercel : les instances peuvent être tuées dès la fermeture du flux ; tout side-effect qui doit durer est <code>await</code> avant la fin.</li>
+          <li><b>Routeur d’action</b> (un fichier <code>api/*.js</code>, <code>?action=…</code>) pour rester sous 12 fonctions (renard-admin, newsletter, rag).</li>
+          <li><b>RLS par politiques séparées</b> (une par rôle+verbe) + résolveur de position unique côté hooks.</li>
+          <li><b>Cache module + dédup de Promise en vol</b> pour les hooks de données partagées (useChapters appelé en cascade).</li>
+          <li><b>Soft-hide</b> (booléen + filtre côté hook) : masque dans l’app mais reste lisible hors-bande (backup, archive, stats, RAG).</li>
+          <li><b>Auto-réparation des chunks périmés</b> dans l’ErrorBoundary (après déploiement, le SW sert un vieux <code>index.html</code> → rechargement qui contourne le SW).</li>
+          <li><b>fetch brut plutôt que SDK</b> pour Drive et OpenAI (économise des Mo de dépendance).</li>
+        </ul>
+        <p>Référence exhaustive : <b>CODING_STRATEGY</b> (dépôt privé) (section « patterns à réutiliser »).</p>`,
+        en:`<ul>
+          <li><b>GitHub Action over Vercel function</b> for anything that (a) exceeds 60 s, (b) exceeds 4.5 MB, or (c) runs on a cron: a thin Vercel relay triggers the workflow; state is tracked via a Supabase table the UI polls. Used by backup, archive, video ingest, embeddings, newsletter send.</li>
+          <li><b>CPU work in the browser → thin server insert</b>: PDF parse, image compression, video poster run in the browser (lazy-imported lib); the Vercel function only does the DB write. Dodges the Hobby timeout.</li>
+          <li><b>Persist BEFORE <code>res.end()</code></b> on Vercel: instances can be reaped the moment the stream closes; any side-effect that must land is <code>await</code>ed before the end.</li>
+          <li><b>Action router</b> (one <code>api/*.js</code> file, <code>?action=…</code>) to stay under 12 functions (renard-admin, newsletter, rag).</li>
+          <li><b>RLS via separate policies</b> (one per role+verb) + a single position resolver at the hook layer.</li>
+          <li><b>Module cache + in-flight Promise dedup</b> for shared-data hooks (useChapters called in cascade).</li>
+          <li><b>Soft-hide</b> (boolean + hook-layer filter): hides in the app but stays readable out-of-band (backup, archive, stats, RAG).</li>
+          <li><b>Stale-chunk self-heal</b> in the ErrorBoundary (after a deploy the SW serves an old <code>index.html</code> → reload that bypasses the SW).</li>
+          <li><b>Raw fetch over SDK</b> for Drive and OpenAI (saves MBs of dependency).</li>
+        </ul>
+        <p>Full reference: <b>CODING_STRATEGY</b> (dépôt privé) ("reusable patterns" section).</p>`
+      } },
+
+    { id:'data', icon:'🗄️', title:{fr:'Modèle de données',en:'Data model'},
+      body:{
+        fr:`<p>Postgres (Supabase), RLS sur toutes les tables, ~58 migrations. Tables principales :</p>
+        <ul>
+          <li><code>profiles</code> — utilisateurs + rôle (public/family/admin) + préférences JSONB.</li>
+          <li><code>posts</code> — récits ; <code>navigation_data</code> / <code>conditions_data</code> / <code>technical_data</code> (JSONB), visibilité, étape, tags, statut (publié/brouillon), colonnes <code>*_en</code> + <code>translation_status</code>.</li>
+          <li><code>photos</code> — variantes sm/md/lg (Storage).</li>
+          <li><code>chapters</code> / <code>etapes</code> — hiérarchie ; <code>hidden</code> (soft-hide), sentinelle « Non classés ».</li>
+          <li><code>waypoints</code> — trace GPS ; <code>source</code> (ais/gps/manual), <code>superseded_by</code>, <code>recorded_at</code>, étape.</li>
+          <li><code>marks</code> / <code>pois</code> — repères et points d’intérêt.</li>
+          <li><code>boat_config</code> — MMSI, fournisseur AIS, état worker, mode de visibilité publique ; <code>live_position</code> — position manuelle.</li>
+          <li><code>messages</code> / <code>message_replies</code> — contact + fils ; <code>comments</code> — commentaires publics.</li>
+          <li><code>maintenance_logs</code> / <code>todos</code> — carnet + tâches.</li>
+          <li><code>crew_members</code> / <code>livre_or_entries</code> — Livre d’Or (invitations + entrées modérées).</li>
+          <li><code>subscribers</code> / <code>newsletters</code> / <code>newsletter_sends</code> / <code>admin_reminders</code> — newsletter (sections JSONB, tokens de désabonnement, suivi d’envoi).</li>
+          <li><code>rag_documents</code> — base du Renard : texte + <code>tsvector</code> + <code>embedding</code> (pgvector), <code>theme</code> + <code>source_class</code> (taxonomie à 2 axes), <code>meta</code> JSONB (timecodes vidéo) ; <code>ingest_jobs</code> — suivi des ingestions.</li>
+          <li><code>backup_log</code> / <code>archive_snapshots</code> — historique des exports et archives.</li>
+        </ul>
+        <p>Schéma complet et historique des migrations : <b>BLUEPRINT</b> §3.</p>`,
+        en:`<p>Postgres (Supabase), RLS on every table, ~58 migrations. Main tables:</p>
+        <ul>
+          <li><code>profiles</code> — users + role (public/family/admin) + preferences JSONB.</li>
+          <li><code>posts</code> — stories; <code>navigation_data</code> / <code>conditions_data</code> / <code>technical_data</code> (JSONB), visibility, leg, tags, status (published/draft), <code>*_en</code> columns + <code>translation_status</code>.</li>
+          <li><code>photos</code> — sm/md/lg variants (Storage).</li>
+          <li><code>chapters</code> / <code>etapes</code> — hierarchy; <code>hidden</code> (soft-hide), "Unsorted" sentinel.</li>
+          <li><code>waypoints</code> — GPS track; <code>source</code> (ais/gps/manual), <code>superseded_by</code>, <code>recorded_at</code>, leg.</li>
+          <li><code>marks</code> / <code>pois</code> — markers and points of interest.</li>
+          <li><code>boat_config</code> — MMSI, AIS provider, worker status, public visibility mode; <code>live_position</code> — manual position.</li>
+          <li><code>messages</code> / <code>message_replies</code> — contact + threads; <code>comments</code> — public comments.</li>
+          <li><code>maintenance_logs</code> / <code>todos</code> — log + tasks.</li>
+          <li><code>crew_members</code> / <code>livre_or_entries</code> — Guest Book (invites + moderated entries).</li>
+          <li><code>subscribers</code> / <code>newsletters</code> / <code>newsletter_sends</code> / <code>admin_reminders</code> — newsletter (sections JSONB, unsubscribe tokens, send tracking).</li>
+          <li><code>rag_documents</code> — Le Renard base: text + <code>tsvector</code> + <code>embedding</code> (pgvector), <code>theme</code> + <code>source_class</code> (dual-axis taxonomy), <code>meta</code> JSONB (video timecodes); <code>ingest_jobs</code> — ingestion tracking.</li>
+          <li><code>backup_log</code> / <code>archive_snapshots</code> — export and archive history.</li>
+        </ul>
+        <p>Full schema and migration history: <b>BLUEPRINT</b> §3.</p>`
+      } },
+
+    { id:'renard', icon:'🦊', title:{fr:'Le Renard — pipeline RAG',en:'Le Renard — RAG pipeline'},
+      body:{
+        fr:`<ul>
+          <li><b>Ingestion</b> : PDF/TXT/MD/HTML parsés <i>côté navigateur</i> (pdfjs-dist) → découpage en chunks (~600 car.) → insert dans <code>rag_documents</code> via <code>api/rag.js</code> (consolidé). Axes <code>theme</code> + <code>source_class</code>.</li>
+          <li><b>Vidéos handover</b> : URL Drive → relais Vercel → GitHub Action <code>ingest-video.yml</code> → ffmpeg segmente l’audio → <b>Whisper</b> (OpenAI) → chunker avec timecodes → insert (<code>source_class='videos-handover'</code>, <code>meta</code> JSONB).</li>
+          <li><b>Embeddings</b> : OpenAI <code>text-embedding-3-small</code> sur chaque chunk (pgvector) ; backfill idempotent via <code>embeddings-backfill.yml</code>.</li>
+          <li><b>Récupération hybride</b> : FTS (tsvector français) + similarité vectorielle (cosinus), fusionnées par <b>RRF</b> (k=60) via la fonction Postgres <code>match_rag_documents()</code>. Compense la tokenisation des termes à trait d’union (ex. <code>C-Zone</code>).</li>
+          <li><b>En ligne</b> : <code>api/renard.js</code> appelle Claude en streaming (SSE), persiste la réponse + auto-titre <b>avant</b> <code>res.end()</code>, puis renvoie l’événement « done ». Rendu markdown + chips de sources (sable = docs, or 🎬 = vidéos avec deep-link <code>?t=&lt;sec&gt;</code> dans Drive).</li>
+          <li><b>Hors-ligne</b> : recherche plein-texte locale dans les chunks indexés, sans Claude.</li>
+          <li><b>Modèles</b> : bascule Haiku / Sonnet ; compteur de tokens. Mémoire de conversation par fil.</li>
+        </ul>`,
+        en:`<ul>
+          <li><b>Ingestion</b>: PDF/TXT/MD/HTML parsed <i>in the browser</i> (pdfjs-dist) → chunked (~600 chars) → inserted into <code>rag_documents</code> via <code>api/rag.js</code> (consolidated). Axes <code>theme</code> + <code>source_class</code>.</li>
+          <li><b>Handover videos</b>: Drive URL → Vercel relay → GitHub Action <code>ingest-video.yml</code> → ffmpeg segments the audio → <b>Whisper</b> (OpenAI) → timecoded chunker → insert (<code>source_class='videos-handover'</code>, <code>meta</code> JSONB).</li>
+          <li><b>Embeddings</b>: OpenAI <code>text-embedding-3-small</code> per chunk (pgvector); idempotent backfill via <code>embeddings-backfill.yml</code>.</li>
+          <li><b>Hybrid retrieval</b>: FTS (French tsvector) + vector similarity (cosine), fused by <b>RRF</b> (k=60) via the Postgres function <code>match_rag_documents()</code>. Compensates hyphenated-term tokenisation (e.g. <code>C-Zone</code>).</li>
+          <li><b>Online</b>: <code>api/renard.js</code> calls Claude streaming (SSE), persists the answer + auto-title <b>before</b> <code>res.end()</code>, then sends the "done" event. Markdown rendering + source chips (sand = docs, gold 🎬 = videos with a <code>?t=&lt;sec&gt;</code> deep-link in Drive).</li>
+          <li><b>Offline</b>: local full-text search in the indexed chunks, no Claude.</li>
+          <li><b>Models</b>: Haiku / Sonnet toggle; token counter. Per-thread conversation memory.</li>
+        </ul>`
+      } },
+
+    { id:'trace', icon:'🛰️', title:{fr:'Carte, trace & position',en:'Map, track & position'},
+      body:{
+        fr:`<ul>
+          <li><b>Acquisition AIS</b> : worker Fly.io abonné à AISStream (filtre MMSI), écrit dans <code>waypoints</code> avec la clé service-role (contourne RLS).</li>
+          <li><b>Filtre anti-jitter</b> : rejette tout waypoint trop proche du précédent (distance + Δtemps sous seuil) — sinon la base se remplirait de milliers de points superposés.</li>
+          <li><b>Position effective (décision)</b> : une fonction pure <code>effectivePosition(waypoints, boatConfig, livePosition, isPublic)</code> renvoie la plus récente entre (override manuel, dernier waypoint visible par l’audience), avec un tampon « collant » d’1 h qui protège un geste humain récent contre un point AIS entrant. <b>Public, famille et skipper voient des positions différentes par conception</b> (modes live / différé / manuel).</li>
+          <li><b>Filtre canonique des waypoints</b> : <code>superseded_by IS NULL OR source = 'manual'</code> partout (évite d’afficher des points « legacy »).</li>
+          <li><b>Simplification de la trace (décision)</b> : algorithme <b>Douglas-Peucker</b> (<code>simplify-js</code>) qui retire les points intermédiaires d’une quasi-ligne droite ; <b>aperçu avant validation + annulation</b> pendant quelques secondes.</li>
+          <li><b>Suppression en lot</b> : batchée par <b>200</b> (limite d’URL PostgREST), toast de résultat <code>{ok, deletedCount, totalRequested}</code>.</li>
+          <li><b>Trace manuelle</b> : points dessinés à la main (<code>source='manual'</code>, <code>recorded_at</code> interpolé) pour combler une panne de balise. Décalage de dates d’étape par glissement de bordure.</li>
+          <li><b>Rendu</b> : MapLibre, trace colorée par chapitre/étape, miniatures photo DOM, clustering en pixels + éclatement « spider » au zoom, fond marin OpenSeaMap/ESRI.</li>
+        </ul>`,
+        en:`<ul>
+          <li><b>AIS acquisition</b>: Fly.io worker subscribed to AISStream (MMSI filter), writes to <code>waypoints</code> with the service-role key (bypasses RLS).</li>
+          <li><b>Anti-jitter filter</b>: rejects any waypoint too close to the previous one (distance + Δtime under threshold) — otherwise the DB fills with thousands of stacked points.</li>
+          <li><b>Effective position (decision)</b>: a pure function <code>effectivePosition(waypoints, boatConfig, livePosition, isPublic)</code> returns the most recent of (manual override, latest audience-visible waypoint), with a 1 h "sticky" buffer protecting a recent human gesture from an incoming AIS point. <b>Public, family and skipper see different positions by design</b> (live / delayed / manual modes).</li>
+          <li><b>Canonical waypoint filter</b>: <code>superseded_by IS NULL OR source = 'manual'</code> everywhere (avoids showing "legacy" points).</li>
+          <li><b>Track simplification (decision)</b>: <b>Douglas-Peucker</b> (<code>simplify-js</code>) removing intermediate points of a near-straight line; <b>preview before applying + undo</b> for a few seconds.</li>
+          <li><b>Bulk delete</b>: batched in <b>200</b> (PostgREST URL cap), result toast <code>{ok, deletedCount, totalRequested}</code>.</li>
+          <li><b>Manual track</b>: hand-drawn points (<code>source='manual'</code>, interpolated <code>recorded_at</code>) to fill a tracker outage. Leg-date shifting by dragging the leg boundary.</li>
+          <li><b>Rendering</b>: MapLibre, track coloured by chapter/leg, DOM photo thumbnails, pixel clustering + "spider" fan-out on zoom, OpenSeaMap/ESRI nautical chart.</li>
+        </ul>`
+      } },
+
+    { id:'newsletter', icon:'📧', title:{fr:'Newsletter',en:'Newsletter'},
+      body:{
+        fr:`<ul>
+          <li><b>Document typé</b> : <code>sections</code> JSONB (titre, collage photo, carte, métriques, texte, équipage) — deux moteurs de rendu partagés (email avec footer/désabonnement + public sans chrome).</li>
+          <li><b>Carte auto</b> : rendue <i>côté serveur</i> en PNG via <code>@resvg/resvg-js</code> + basemap TopoJSON <code>world-atlas</code>, uploadée dans un bucket Storage.</li>
+          <li><b>Brouillon IA</b> : Claude (Sonnet/Opus) via <code>api/newsletter.js?action=draft</code>, prompt partagé (<code>src/lib/newsletterPrompt.js</code>), coût calculé depuis l’usage.</li>
+          <li><b>Envoi en masse</b> : <code>?action=send</code> pré-crée une ligne <code>newsletter_sends</code> par abonné puis déclenche <code>newsletter-send.yml</code> → Resend par lots de 50/min ; <b>refus 412</b> tant que <code>RESEND_DOMAIN_VERIFIED=false</code> (test via onboarding@resend.dev).</li>
+          <li><b>Désabonnement</b> : token 32 car. immuable + header <code>List-Unsubscribe-Post</code> (un clic Gmail/Yahoo).</li>
+          <li><b>Webhook</b> Svix : réconcilie delivered/bounced/complained, désactive sur hard-bounce. <b>Archive</b> : .docx vers Drive + pages publiques <code>/newsletters</code> (héritées dans l’archive figée).</li>
+        </ul>`,
+        en:`<ul>
+          <li><b>Typed document</b>: <code>sections</code> JSONB (title, photo collage, map, metrics, text, crew) — two shared render engines (email with footer/unsubscribe + public, no chrome).</li>
+          <li><b>Auto map</b>: rendered <i>server-side</i> to PNG via <code>@resvg/resvg-js</code> + <code>world-atlas</code> TopoJSON basemap, uploaded to a Storage bucket.</li>
+          <li><b>AI draft</b>: Claude (Sonnet/Opus) via <code>api/newsletter.js?action=draft</code>, shared prompt (<code>src/lib/newsletterPrompt.js</code>), cost computed from usage.</li>
+          <li><b>Mass send</b>: <code>?action=send</code> pre-creates one <code>newsletter_sends</code> row per subscriber then fires <code>newsletter-send.yml</code> → Resend in batches of 50/min; <b>412 refusal</b> while <code>RESEND_DOMAIN_VERIFIED=false</code> (test via onboarding@resend.dev).</li>
+          <li><b>Unsubscribe</b>: 32-char immutable token + <code>List-Unsubscribe-Post</code> header (one-click Gmail/Yahoo).</li>
+          <li><b>Svix webhook</b>: reconciles delivered/bounced/complained, deactivates on hard bounce. <b>Archive</b>: .docx to Drive + public <code>/newsletters</code> pages (inherited into the frozen archive).</li>
+        </ul>`
+      } },
+
+    { id:'offline', icon:'📶', title:{fr:'Hors-ligne & synchro',en:'Offline & sync'},
+      body:{
+        fr:`<ul>
+          <li><b>IndexedDB (Dexie)</b> : posts, waypoints, photos, chapitres, messages, maintenance, todos hydratés au fetch en ligne et lus hors-ligne.</li>
+          <li><b>File de synchro</b> : modes Auto / Manuel / Off ; écritures mises en file hors-ligne, rejouées au retour du réseau ; mutex par post pour les photos ; back-off exponentiel ; échecs exposés (retry/dismiss).</li>
+          <li><b>Service Worker</b> : précache de la coque + assets, ne cache que les GET, page hors-ligne stylée, éviction de la coque sur asset périmé.</li>
+          <li><b>Auto-réparation</b> : l’ErrorBoundary intercepte les « chunk load failed » post-déploiement et recharge via <code>/?reset=1</code> (désinscrit le SW + purge les caches).</li>
+          <li><b>TTL</b> : <code>clearStaleCache(30 j)</code> au démarrage évite la croissance illimitée d’IndexedDB.</li>
+        </ul>`,
+        en:`<ul>
+          <li><b>IndexedDB (Dexie)</b>: posts, waypoints, photos, chapters, messages, maintenance, todos hydrated on online fetch and read offline.</li>
+          <li><b>Sync queue</b>: Auto / Manual / Off modes; offline writes queued, replayed on reconnect; per-post mutex for photos; exponential back-off; failures surfaced (retry/dismiss).</li>
+          <li><b>Service Worker</b>: precache of shell + assets, caches GET only, styled offline page, shell eviction on stale asset.</li>
+          <li><b>Self-heal</b>: the ErrorBoundary catches post-deploy "chunk load failed" and reloads via <code>/?reset=1</code> (unregisters the SW + clears caches).</li>
+          <li><b>TTL</b>: <code>clearStaleCache(30 d)</code> at startup prevents unbounded IndexedDB growth.</li>
+        </ul>`
+      } },
+
+    { id:'backup', icon:'💾', title:{fr:'Sauvegarde, archive & bilingue',en:'Backup, archive & bilingual'},
+      body:{
+        fr:`<ul>
+          <li><b>Sauvegarde</b> : <code>api/backup.js</code> → <code>backup.yml</code> → zip 7 artefacts (JSON, photos, GPX, Excel, JSON par étape, méta IA, RESTORE) → Drive (OAuth fetch brut) ; cron dimanche 03:00 UTC ; <code>backup_log</code>.</li>
+          <li><b>Archive figée</b> : <code>archive.wangap.fr</code> EST l’app React, buildée une fois avec <code>VITE_ARCHIVE_MODE=true</code> + client Supabase remplacé par un shim JSON statique (<code>supabaseArchive.js</code>) ; cron lundi ; <code>archive_snapshots</code>.</li>
+          <li><b>Contenu bilingue</b> : à chaque écriture, fire-and-forget vers <code>api/translate-content.js</code> (Claude, JSON in/out) qui remplit les colonnes <code>*_en</code> + <code>translation_status</code> ∈ {pending, done, failed, manual} ; lecture via <code>localizedField()</code> ; prompt partagé + backfill Node.</li>
+        </ul>`,
+        en:`<ul>
+          <li><b>Backup</b>: <code>api/backup.js</code> → <code>backup.yml</code> → 7-artifact zip (JSON, photos, GPX, Excel, per-leg JSON, AI meta, RESTORE) → Drive (raw-fetch OAuth); Sunday 03:00 UTC cron; <code>backup_log</code>.</li>
+          <li><b>Frozen archive</b>: <code>archive.wangap.fr</code> IS the React app, built once with <code>VITE_ARCHIVE_MODE=true</code> + the Supabase client swapped for a static-JSON shim (<code>supabaseArchive.js</code>); Monday cron; <code>archive_snapshots</code>.</li>
+          <li><b>Bilingual content</b>: on every write, fire-and-forget to <code>api/translate-content.js</code> (Claude, JSON in/out) filling <code>*_en</code> columns + <code>translation_status</code> ∈ {pending, done, failed, manual}; read via <code>localizedField()</code>; shared prompt + Node backfill.</li>
+        </ul>`
+      } },
+
+    { id:'infra', icon:'☁️', title:{fr:'Infra & déploiement',en:'Infra & deployment'},
+      body:{
+        fr:`<ul>
+          <li><b>12 fonctions Vercel</b> : archive, backup, ingest-video, livre-or-submit, newsletter, notify, rag, renard, renard-admin, reply-email, translate-content, users.</li>
+          <li><b>6 GitHub Actions</b> : backup, archive-snapshot, ingest-video, embeddings-backfill, newsletter-send, newsletter-reminder.</li>
+          <li><b>Déploiement</b> : push sur <code>main</code> → build Vercel + déploiement auto. Sprints sur branche <code>vX.Y.Z-dev</code> → merge <code>--no-ff</code> → bump <code>src/version.js</code>. SPA rewrite (vercel.json) + en-têtes de sécurité.</li>
+          <li><b>Supabase</b> en Europe ; Storage sur CDN. Secrets en variables d’env Vercel / secrets GitHub / secrets Fly (jamais dans le code).</li>
+        </ul>`,
+        en:`<ul>
+          <li><b>12 Vercel functions</b>: archive, backup, ingest-video, livre-or-submit, newsletter, notify, rag, renard, renard-admin, reply-email, translate-content, users.</li>
+          <li><b>6 GitHub Actions</b>: backup, archive-snapshot, ingest-video, embeddings-backfill, newsletter-send, newsletter-reminder.</li>
+          <li><b>Deployment</b>: push to <code>main</code> → Vercel build + auto-deploy. Sprints on a <code>vX.Y.Z-dev</code> branch → <code>--no-ff</code> merge → bump <code>src/version.js</code>. SPA rewrite (vercel.json) + security headers.</li>
+          <li><b>Supabase</b> in Europe; Storage on CDN. Secrets in Vercel env vars / GitHub secrets / Fly secrets (never in code).</li>
+        </ul>`
+      } },
+  ];
+
+  const TREE = `src/
+  pages/        <span class="c">33 routes (Timeline, MapPage, RenardPage/Admin, Newsletter*, Insights, Settings, HelpPage, Livre*, Crew*…)</span>
+  hooks/        <span class="c">24 hooks (usePosts, useNewsletters, useRenard, useSync, useTracking, useChapters, useInsights, useLivePosition…)</span>
+  lib/          <span class="c">visibility · newsletterMap/Metrics/Prompt · embeddings · translateContent/Prompt · imageVariants · videoPoster · ragIngest · supabase(+Archive)…</span>
+  components/   <span class="c">admin · home · insights · layout · map · messages · newsletter · posts · settings · shared</span>
+  data/ · i18n/ <span class="c">helpContent.js · fr.json / en.json</span>
+api/            <span class="c">12 Vercel functions (action-routed: renard-admin, newsletter, rag)</span>
+supabase/migrations/   <span class="c">58 migrations (+ .rollback.sql)</span>
+scripts/        <span class="c">backup · archive · ingest · newsletter · translate · renard</span>
+.github/workflows/     <span class="c">backup · archive-snapshot · ingest-video · embeddings-backfill · newsletter-send · newsletter-reminder</span>
+worker/ais-worker/     <span class="c">Fly.io AIS listener</span>
+public/         <span class="c">guide.html · faq.html · tech.html · roadmap.html · help-shots/</span>`;
+
+  const DOCS = {
+    fr:[ {b:'🗺️ Feuille de route', s:'Versions livrées + sprints à venir (publique)', href:'/roadmap.html'} ],
+    en:[ {b:'🗺️ Roadmap', s:'Shipped versions + upcoming sprints (public)', href:'/roadmap.html'} ],
+  };
+  const DOCS_NOTE = {
+    fr:'Le blueprint, la stratégie de code et le suivi des tickets restent privés (dépôt github.com/sailingwangap/jdb_wangap) — non liés ici.',
+    en:'The blueprint, coding strategy and issue tracker stay private (repo github.com/sailingwangap/jdb_wangap) — not linked here.',
+  };
+
+  let lang='fr';
+  function setLang(l){
+    lang=(l==='en')?'en':'fr';
+    localStorage.setItem('lang', lang);
+    document.documentElement.lang=lang;
+    document.getElementById('lang-fr').classList.toggle('active', lang==='fr');
+    document.getElementById('lang-en').classList.toggle('active', lang==='en');
+    render();
+  }
+  function render(){
+    const u=UI[lang];
+    document.querySelector('[data-i18n="subtitle"]').textContent=u.subtitle;
+    document.querySelector('[data-i18n="backApp"]').textContent=u.backApp;
+    document.getElementById('skipperNote').textContent=u.skipperNote;
+    document.getElementById('footerNote').textContent=u.footerNote;
+    // TOC
+    document.getElementById('toc').innerHTML = `<b>${u.tocLabel}</b><br>`
+      + SECTIONS.map(s=>`<a href="#${s.id}">${s.icon} ${s.title[lang]}</a>`).join('')
+      + `<a href="#docs">📚 ${lang==='fr'?'Documentation':'Documentation'}</a>`;
+    // Sections
+    let html = SECTIONS.map(s=>(
+      `<div class="card" id="${s.id}"><h2>${s.icon} ${s.title[lang]}</h2>${s.body[lang]}</div>`
+    )).join('');
+    // Code structure
+    html += `<div class="card" id="tree"><h2>🗂️ ${lang==='fr'?'Structure du code':'Code structure'}</h2><div class="tree">${TREE}</div></div>`;
+    // Docs
+    html += `<div class="card" id="docs"><h2>📚 ${lang==='fr'?'Documentation':'Documentation'}</h2>`
+      + `<div class="doclinks">`
+      + DOCS[lang].map(d=>{ const ext=d.href.startsWith('http')?' target="_blank" rel="noopener"':''; return `<a class="doclink" href="${d.href}"${ext}><b>${d.b}</b><span>${d.s}</span></a>`; }).join('')
+      + `</div><p style="font-size:12.5px;color:var(--gray);margin-top:10px">${DOCS_NOTE[lang]}</p></div>`;
+    document.getElementById('sections').innerHTML = html;
+  }
+  (function init(){
+    const p=new URLSearchParams(location.search).get('lang');
+    setLang(p||localStorage.getItem('lang')||'fr');
+  })();
+  </script>
+</body>
+</html>

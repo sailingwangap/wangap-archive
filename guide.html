@@ -3,1011 +3,725 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wang'ap — Guide utilisateur</title>
+  <title>Wang'ap — Guide / Guide utilisateur</title>
+  <meta name="description" content="Guide complet de l'application Wang'ap — par niveau (public, famille, skipper) et par fonctionnalité." />
   <style>
     :root {
-      --night: #0B1026;
-      --navy: #162447;
-      --blue: #1F4068;
-      --teal: #1B9AAA;
-      --gold: #E8B059;
-      --coral: #E07A5F;
-      --sand: #F4F1DE;
-      --cream: #FFFCF2;
-      --slate: #3D405B;
-      --gray: #8D99AE;
+      --night:#0B1026; --navy:#162447; --blue:#1F4068; --teal:#1B9AAA;
+      --gold:#E8B059; --gold-deep:#B07820; --coral:#E07A5F; --sand:#F4F1DE;
+      --cream:#FFFCF2; --slate:#3D405B; --gray:#8D99AE;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      color: var(--slate);
-      background: var(--cream);
-      line-height: 1.6;
-    }
-
-    /* Hero */
-    .hero {
-      background: linear-gradient(135deg, var(--night) 0%, var(--navy) 100%);
-      color: #fff;
-      padding: 60px 24px 50px;
-      text-align: center;
-    }
-    .hero img { width: 80px; margin-bottom: 16px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
-    .hero h1 { font-family: Georgia, serif; font-size: 2.8rem; letter-spacing: -1px; margin-bottom: 4px; }
-    .hero .subtitle { color: var(--gold); font-size: 1.1rem; font-weight: 500; }
-    .hero .tagline { color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-top: 4px; }
-    .hero .badge {
-      display: inline-block; margin-top: 20px; padding: 6px 18px;
-      border-radius: 20px; font-size: 0.75rem; font-weight: 600;
-      background: rgba(27,154,170,0.2); border: 1px solid rgba(27,154,170,0.4); color: var(--teal);
-    }
-
-    /* Container */
-    .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
-
-    /* Section */
-    section { padding: 50px 0; }
-    section:nth-child(even) { background: var(--sand); }
-    h2 {
-      font-family: Georgia, serif; font-size: 1.6rem; margin-bottom: 24px;
-      color: var(--slate); text-align: center;
-    }
-    h3 { font-size: 1rem; color: var(--teal); margin-bottom: 8px; }
-    p { font-size: 0.9rem; color: var(--slate); margin-bottom: 12px; }
-
-    /* Screenshot gallery */
-    .screenshots {
-      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
-      margin: 30px 0;
-    }
-    .screenshot-item { text-align: center; }
-    .screenshot {
-      width: 180px; border-radius: 20px; overflow: hidden;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-      border: 3px solid rgba(0,0,0,0.08);
-    }
-    .screenshot img { width: 100%; display: block; }
-    .screenshot-label {
-      font-size: 0.72rem; font-weight: 600;
-      color: var(--gray); margin-top: 8px;
-    }
-
-    /* Feature showcase — screenshot + description side by side */
-    .showcase {
-      display: flex; align-items: center; gap: 32px;
-      margin: 40px 0; padding: 0 10px;
-    }
-    .showcase.reverse { flex-direction: row-reverse; }
-    .showcase .screenshot { width: 220px; flex-shrink: 0; }
-    .showcase .desc { flex: 1; }
-    .showcase .desc h3 { font-size: 1.15rem; margin-bottom: 10px; }
-    .showcase .desc p { font-size: 0.88rem; color: var(--gray); margin-bottom: 8px; }
-    .showcase .desc .tag {
-      display: inline-block; padding: 3px 10px; border-radius: 12px;
-      font-size: 0.7rem; font-weight: 600; margin-right: 4px; margin-bottom: 4px;
-      background: rgba(27,154,170,0.1); color: var(--teal);
-    }
-    @media (max-width: 640px) {
-      .showcase, .showcase.reverse { flex-direction: column; align-items: center; text-align: center; }
-      .showcase .screenshot { width: 200px; }
-    }
-
-    /* Feature grid */
-    .features {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px; margin-top: 20px;
-    }
-    .feature {
-      background: #fff; border-radius: 16px; padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-    }
-    .feature .icon { font-size: 1.8rem; margin-bottom: 8px; }
-    .feature h3 { margin-bottom: 6px; }
-    .feature p { font-size: 0.82rem; color: var(--gray); margin: 0; }
-
-    /* Access levels */
-    .levels {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px; margin-top: 20px;
-    }
-    .level {
-      border-radius: 16px; padding: 20px; text-align: center;
-    }
-    .level.public { background: linear-gradient(135deg, var(--navy), var(--blue)); color: #fff; }
-    .level.family { background: linear-gradient(135deg, var(--teal), #2ec4b6); color: #fff; }
-    .level.admin { background: linear-gradient(135deg, var(--gold), var(--coral)); color: #fff; }
-    .level .icon { font-size: 2rem; margin-bottom: 8px; }
-    .level h3 { color: #fff; font-size: 1rem; }
-    .level p { color: rgba(255,255,255,0.85); font-size: 0.8rem; margin: 0; }
-    .level ul { text-align: left; font-size: 0.8rem; margin-top: 10px; padding-left: 18px; color: rgba(255,255,255,0.9); }
-    .level li { margin-bottom: 4px; }
-
-    /* Tab bar mockup */
-    .tabbar {
-      display: flex; justify-content: center; gap: 24px;
-      background: var(--night); border-radius: 16px; padding: 14px 20px;
-      margin: 24px auto; max-width: 400px;
-    }
-    .tabbar .tab { text-align: center; }
-    .tabbar .tab .emoji { font-size: 1.4rem; }
-    .tabbar .tab .label { font-size: 0.6rem; color: var(--gray); margin-top: 2px; }
-    .tabbar .tab.active .label { color: var(--teal); }
-
-    /* Tech stack */
-    .stack {
-      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px;
-    }
-    .stack .chip {
-      padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
-      background: var(--navy); color: var(--teal);
-    }
-
-    /* Flow diagram */
-    .flow {
-      display: flex; align-items: center; justify-content: center;
-      gap: 8px; flex-wrap: wrap; margin: 20px 0;
-    }
-    .flow .step {
-      background: #fff; border-radius: 12px; padding: 10px 16px;
-      font-size: 0.8rem; font-weight: 600; color: var(--slate);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .flow .arrow { color: var(--teal); font-size: 1.2rem; }
-
-    /* Separator */
-    .sep { height: 1px; background: rgba(0,0,0,0.06); margin: 40px 0; }
-
-    /* Footer */
-    footer {
-      background: var(--night); color: var(--gray); text-align: center;
-      padding: 30px 20px; font-size: 0.75rem;
-    }
-    footer img { width: 30px; opacity: 0.3; margin-bottom: 8px; }
-
-    /* Responsive */
-    @media (max-width: 600px) {
-      .hero h1 { font-size: 2rem; }
-      .screenshot { width: 150px !important; }
-      .features { grid-template-columns: 1fr; }
-      .levels { grid-template-columns: 1fr; }
-    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:var(--slate); background:var(--cream); line-height:1.6; -webkit-font-smoothing:antialiased; }
+    a { color:var(--teal); }
+    header.top { position:sticky; top:0; z-index:50; background:linear-gradient(180deg,var(--night) 0%,var(--navy) 100%); color:var(--sand); padding:14px 18px; box-shadow:0 2px 14px rgba(0,0,0,.25); }
+    .top-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; max-width:1080px; margin:0 auto; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:800; font-size:18px; letter-spacing:.5px; }
+    .brand .logo { width:34px; height:34px; border-radius:9px; background:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .brand small { display:block; font-weight:500; font-size:11px; color:var(--gold); letter-spacing:0; }
+    .spacer { flex:1; }
+    .search { flex:1 1 240px; min-width:180px; max-width:420px; position:relative; }
+    .search input { width:100%; padding:9px 12px 9px 32px; border-radius:10px; border:none; background:rgba(255,255,255,.95); color:var(--slate); font-size:14px; }
+    .search::before { content:'🔍'; position:absolute; left:10px; top:8px; font-size:13px; opacity:.6; }
+    .lang-toggle { display:flex; background:rgba(255,255,255,.12); border-radius:9px; overflow:hidden; }
+    .lang-toggle button { border:none; background:transparent; color:var(--sand); padding:7px 12px; cursor:pointer; font-weight:700; font-size:12px; }
+    .lang-toggle button.active { background:var(--gold); color:var(--night); }
+    .back-app { color:var(--sand); text-decoration:none; font-size:12px; opacity:.85; border:1px solid rgba(255,255,255,.25); padding:6px 11px; border-radius:9px; white-space:nowrap; }
+    .back-app:hover { opacity:1; }
+    .tabs { max-width:1080px; margin:0 auto; padding:14px 18px 0; display:flex; gap:8px; flex-wrap:wrap; }
+    .tab { border:1px solid rgba(0,0,0,.08); background:#fff; color:var(--slate); padding:8px 16px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; }
+    .tab.active { background:var(--navy); color:var(--sand); border-color:var(--navy); }
+    main { max-width:1080px; margin:0 auto; padding:16px 18px 60px; }
+    .lead { font-size:14px; color:var(--gray); margin:6px 2px 18px; }
+    .count { font-size:12px; color:var(--gray); margin:2px 2px 14px; }
+    .card { background:#fff; border-radius:16px; padding:18px 20px; margin-bottom:16px; box-shadow:0 1px 8px rgba(0,0,0,.05); border:1px solid rgba(0,0,0,.04); }
+    .card h3 { font-size:17px; color:var(--navy); display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+    .card h3 .icon { font-size:20px; }
+    .badge { font-size:10px; font-weight:700; padding:3px 9px; border-radius:999px; text-transform:uppercase; letter-spacing:.4px; }
+    .badge.public { background:#e4f3f5; color:#0d7a8a; }
+    .badge.family { background:#fde8ec; color:#b23a52; }
+    .badge.skipper { background:rgba(232,176,89,.2); color:var(--gold-deep); }
+    .card .desc { margin:10px 0 0; font-size:14.5px; }
+    .card ul { margin:9px 0 0 2px; padding-left:18px; }
+    .card ul li { margin-bottom:5px; font-size:13.5px; }
+    .card ul li b { color:var(--navy); }
+    .card .note { margin-top:10px; font-size:12.5px; color:var(--gray); background:var(--sand); border-radius:9px; padding:8px 11px; }
+    /* Screenshots — small clickable thumbnails (click to open full size) */
+    figure.shot { margin:12px 0 2px; }
+    figure.shot a.shotlink { display:inline-block; line-height:0; }
+    figure.shot img { max-width:300px; max-height:440px; width:auto; height:auto; border-radius:10px; border:1px solid rgba(0,0,0,.12); display:block; cursor:zoom-in; }
+    .shot-ph { display:flex; align-items:center; justify-content:center; flex-direction:column; gap:5px; width:300px; max-width:100%; min-height:120px; border:2px dashed var(--gold); border-radius:10px; background:repeating-linear-gradient(45deg,#fff,#fff 12px,#fdf6e8 12px,#fdf6e8 24px); color:var(--gold-deep); text-align:center; padding:14px; }
+    .shot-ph .num { font-size:20px; font-weight:800; }
+    .shot-ph .cap { font-size:11.5px; color:var(--slate); }
+    .shot-ph .path { font-size:10px; color:var(--gray); font-family:ui-monospace,Menlo,monospace; }
+    figcaption { font-size:11px; color:var(--gray); margin-top:4px; }
+    .no-results { text-align:center; padding:50px 20px; color:var(--gray); }
+    footer { max-width:1080px; margin:0 auto; padding:24px 18px 60px; border-top:1px solid rgba(0,0,0,.08); color:var(--gray); font-size:13px; }
+    footer a { margin-right:14px; }
+    .hidden { display:none !important; }
   </style>
 </head>
 <body>
-
-  <!-- HERO -->
-  <div class="hero">
-    <img src="images/logo.png" alt="Wang'ap" />
-    <h1>wang'ap</h1>
-    <div class="subtitle">Guide utilisateur</div>
-    <div class="tagline">Journal de Bord — Catherine & Bertrand</div>
-    <div class="badge">PWA Offline-First &middot; React 19 &middot; Supabase &middot; V1.0</div>
-
-    <div style="display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap;">
-      <a href="#feedback" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 25px; font-size: 0.85rem; font-weight: 600; text-decoration: none; color: #fff; background: var(--coral); box-shadow: 0 4px 15px rgba(224,122,95,0.4); transition: transform 0.2s;"
-         onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-        💬 Feedback V1
-      </a>
-      <a href="#v2" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; border-radius: 25px; font-size: 0.85rem; font-weight: 600; text-decoration: none; color: #fff; background: var(--teal); box-shadow: 0 4px 15px rgba(27,154,170,0.4); transition: transform 0.2s;"
-         onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-        🗺️ Fonctionnalites V2
-      </a>
+  <header class="top">
+    <div class="top-row">
+      <div class="brand"><span class="logo">⛵</span><span>wang'ap<small data-i18n="subtitle">Guide utilisateur</small></span></div>
+      <div class="spacer"></div>
+      <div class="search"><input id="q" type="search" autocomplete="off" /></div>
+      <div class="lang-toggle">
+        <button id="lang-fr" onclick="setLang('fr')">FR</button>
+        <button id="lang-en" onclick="setLang('en')">EN</button>
+      </div>
+      <a class="back-app" href="/" data-i18n="backApp">← l'app</a>
     </div>
-  </div>
+  </header>
 
-  <!-- CONCEPT -->
-  <section>
-    <div class="container">
-      <h2>Le concept</h2>
-      <p>
-        <strong>Wang'ap</strong> est le journal de bord numerique de Catherine et Bertrand,
-        qui partent pour un tour du monde a la voile de 3 ans (2026-2029) a bord de leur
-        catamaran <strong>Outremer 52</strong>.
-      </p>
-      <p>
-        L'application permet de partager le voyage en temps reel avec la famille et les amis,
-        tout en servant d'outil de gestion technique pour les skippers :
-        suivi GPS, carnet de maintenance, gestion des taches, et un assistant IA
-        pour les questions techniques sur le bateau.
-      </p>
-      <p>
-        Concue pour fonctionner <strong>hors ligne</strong> (en pleine mer, sans connexion),
-        l'application synchronise automatiquement les donnees des qu'une connexion est disponible
-        (WiFi marina, Starlink, reseau mobile).
-      </p>
-    </div>
-  </section>
-
-  <!-- ECRANS PUBLICS -->
-  <section>
-    <div class="container">
-      <h2>Ecrans publics</h2>
-      <div class="screenshots">
-        <div class="screenshot-item">
-          <div class="screenshot"><img src="screenshots/landing.png" alt="Page d'accueil" /></div>
-          <div class="screenshot-label">Accueil</div>
-        </div>
-        <div class="screenshot-item">
-          <div class="screenshot"><img src="screenshots/about.png" alt="A propos" /></div>
-          <div class="screenshot-label">Le projet</div>
-        </div>
-        <div class="screenshot-item">
-          <div class="screenshot"><img src="screenshots/login.png" alt="Connexion" /></div>
-          <div class="screenshot-label">Connexion</div>
-        </div>
-      </div>
-      <p style="text-align:center; font-size: 0.82rem; color: var(--gray);">
-        Page d'accueil avec photo aerienne du lagon, carte du parcours mondial (32 etapes),
-        derniers articles publics, newsletter et formulaire de message aux skippers.
-      </p>
-    </div>
-  </section>
-
-  <!-- 3 NIVEAUX D'ACCES -->
-  <section>
-    <div class="container">
-      <h2>3 niveaux d'acces</h2>
-      <div class="levels">
-        <div class="level public">
-          <div class="icon">🌍</div>
-          <h3>Public</h3>
-          <p>Visiteurs, amis, curieux</p>
-          <ul>
-            <li>Page d'accueil avec photo aerienne</li>
-            <li>Carte du parcours (32 waypoints)</li>
-            <li>Articles publics du journal</li>
-            <li>Newsletter &amp; message aux skippers</li>
-            <li>Page "A propos" du projet</li>
-          </ul>
-        </div>
-        <div class="level family">
-          <div class="icon">👨‍👩‍👧‍👦</div>
-          <h3>Famille</h3>
-          <p>Connexion par lien magique</p>
-          <ul>
-            <li>Tableau de bord famille</li>
-            <li>Articles famille + publics</li>
-            <li>Commentaires sur les posts</li>
-            <li>Position en temps reel</li>
-            <li>Carte interactive</li>
-          </ul>
-        </div>
-        <div class="level admin">
-          <div class="icon">⚓</div>
-          <h3>Skipper</h3>
-          <p>Catherine &amp; Bertrand</p>
-          <ul>
-            <li>Journal complet (prive/famille/public)</li>
-            <li>Carnet de maintenance</li>
-            <li>Liste de taches prioritaires</li>
-            <li>Boite de reception</li>
-            <li>Le Renard (assistant IA)</li>
-            <li>Statistiques &amp; reglages</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ECRANS SKIPPER — Showcase avec screenshots -->
-  <section>
-    <div class="container">
-      <h2>Les ecrans du skipper</h2>
-
-      <!-- Journal -->
-      <div class="showcase">
-        <div class="screenshot"><img src="screenshots/timeline.png" alt="Journal" /></div>
-        <div class="desc">
-          <h3>📖 Journal de bord</h3>
-          <p>
-            Le fil chronologique du voyage. Chaque entree a un titre, une categorie,
-            un niveau de visibilite (public, famille, prive), et des photos compressees
-            automatiquement.
-          </p>
-          <p>
-            Barre de recherche par pull-down, filtres de visibilite,
-            compteurs de milles parcourus et d'escales.
-          </p>
-          <span class="tag">7 categories</span>
-          <span class="tag">3 visibilites</span>
-          <span class="tag">Photos &lt;500 Ko</span>
-          <span class="tag">Commentaires</span>
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <!-- Carte -->
-      <div class="showcase reverse">
-        <div class="screenshot"><img src="screenshots/map.png" alt="Carte" /></div>
-        <div class="desc">
-          <h3>🗺️ Carte interactive</h3>
-          <p>
-            Carte plein ecran avec tuiles CARTO Voyager. Bascule vers les cartes nautiques
-            (OpenSeaMap). Articles geolocalisees affichees sous forme de pins avec photos.
-          </p>
-          <p>
-            Filtres de POIs : mouillages, marinas, fuel, restaurants, sites de plongee.
-            Position actuelle avec indicateur pulse.
-          </p>
-          <span class="tag">MapLibre GL</span>
-          <span class="tag">Cartes nautiques</span>
-          <span class="tag">POIs filtres</span>
-          <span class="tag">Position GPS</span>
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <!-- Stats -->
-      <div class="showcase">
-        <div class="screenshot"><img src="screenshots/insights.png" alt="Statistiques" /></div>
-        <div class="desc">
-          <h3>📊 Statistiques</h3>
-          <p>
-            Tableau de bord avec KPIs : distance, vitesse moyenne et max, nuits en mer,
-            etape max, carburant. Graphiques interactifs Recharts.
-          </p>
-          <p>
-            Vitesse par jour (barres), distance cumulee (courbe avec aire),
-            repartition par categorie (camembert). Filtres Total/Semaine/Mois.
-          </p>
-          <span class="tag">6 KPIs</span>
-          <span class="tag">Recharts</span>
-          <span class="tag">3 graphiques</span>
-          <span class="tag">Filtres temporels</span>
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <!-- Maintenance -->
-      <div class="showcase reverse">
-        <div class="screenshot"><img src="screenshots/maintenance.png" alt="Maintenance" /></div>
-        <div class="desc">
-          <h3>🔧 Carnet de maintenance</h3>
-          <p>
-            Suivi technique complet du bateau. 12 categories : moteur, voiles, electricite,
-            plomberie, grement, coque, mouillage, securite...
-          </p>
-          <p>
-            Heures moteur, pieces utilisees avec couts, alertes de prochaine echeance.
-            Sous-onglet "A faire" pour la liste de taches prioritaires avec 4 niveaux d'urgence.
-          </p>
-          <span class="tag">12 categories</span>
-          <span class="tag">Heures moteur</span>
-          <span class="tag">Pieces + couts</span>
-          <span class="tag">Alertes echeance</span>
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <!-- Le Renard -->
-      <div class="showcase">
-        <div class="screenshot"><img src="screenshots/renard.png" alt="Le Renard" /></div>
-        <div class="desc">
-          <h3>🦊 Le Renard — Assistant IA</h3>
-          <p>
-            Assistant technique propulse par Claude (Anthropic). Pose des questions
-            sur le bateau et obtiens des reponses avec citations des manuels techniques.
-          </p>
-          <p>
-            Choix du modele : Haiku (~0.001&euro;/requete, rapide) ou
-            Sonnet (~0.006&euro;, plus precis). Mode hors ligne avec recherche par mots-cles.
-            Base de connaissances alimentee par upload de PDFs.
-          </p>
-          <span class="tag">Claude API</span>
-          <span class="tag">RAG</span>
-          <span class="tag">Sources citees</span>
-          <span class="tag">Mode offline</span>
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <!-- Reglages -->
-      <div class="showcase reverse">
-        <div class="screenshot"><img src="screenshots/settings.png" alt="Reglages" /></div>
-        <div class="desc">
-          <h3>⚙️ Reglages</h3>
-          <p>
-            Configuration complete de l'application : langue (FR/EN),
-            mode de synchronisation (Auto/Manuel/Off), source de tracking
-            (GPS/AIS/Manuel) avec intervalle configurable.
-          </p>
-          <p>
-            Notifications push par categorie (nouveaux posts, commentaires, messages,
-            alertes maintenance). Bouton "Forcer la sync" pour upload immediat.
-          </p>
-          <span class="tag">Sync Auto/Manuel/Off</span>
-          <span class="tag">GPS 5-60 min</span>
-          <span class="tag">Push par categorie</span>
-          <span class="tag">FR/EN</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- NAVIGATION -->
-  <section>
-    <div class="container">
-      <h2>Navigation</h2>
-      <p style="text-align:center; margin-bottom: 20px;">
-        Barre de navigation mobile avec 6 onglets (5 pour la famille) :
-      </p>
-      <div class="tabbar">
-        <div class="tab"><div class="emoji">📖</div><div class="label">Journal</div></div>
-        <div class="tab"><div class="emoji">🗺️</div><div class="label">Carte</div></div>
-        <div class="tab"><div class="emoji">📊</div><div class="label">Stats</div></div>
-        <div class="tab"><div class="emoji">🔧</div><div class="label">Tech</div></div>
-        <div class="tab active"><div class="emoji">🦊</div><div class="label">Renard</div></div>
-        <div class="tab"><div class="emoji">⚙️</div><div class="label">Reglages</div></div>
-      </div>
-      <p style="text-align:center; font-size: 0.8rem; color: var(--gray);">
-        Sur desktop : barre laterale avec les memes elements.
-      </p>
-    </div>
-  </section>
-
-  <!-- LOGIQUE OFFLINE -->
-  <section>
-    <div class="container">
-      <h2>Logique hors ligne</h2>
-      <p>
-        En pleine mer, la connexion est rare. Wang'ap est concu pour fonctionner
-        entierement hors ligne et synchroniser des qu'une connexion est disponible.
-      </p>
-      <div class="flow">
-        <div class="step">📝 Creation locale</div>
-        <div class="arrow">&rarr;</div>
-        <div class="step">💾 IndexedDB</div>
-        <div class="arrow">&rarr;</div>
-        <div class="step">📶 Connexion detectee</div>
-        <div class="arrow">&rarr;</div>
-        <div class="step">☁️ Sync Supabase</div>
-      </div>
-      <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-        <div class="feature">
-          <h3>Mode Auto</h3>
-          <p>Synchronise des que le reseau est disponible. Ideal en marina avec WiFi.</p>
-        </div>
-        <div class="feature">
-          <h3>Mode Manuel</h3>
-          <p>Synchronise uniquement quand le skipper appuie sur le bouton. Economise les donnees Starlink.</p>
-        </div>
-        <div class="feature">
-          <h3>Mode Off</h3>
-          <p>Aucune synchronisation. Tout reste en local. Utile en navigation hauturiere.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PIPELINE LE RENARD -->
-  <section>
-    <div class="container">
-      <h2>🦊 Pipeline Le Renard</h2>
-      <div class="flow">
-        <div class="step">📄 Upload PDF</div>
-        <div class="arrow">&rarr;</div>
-        <div class="step">✂️ Decoupage ~500 tokens</div>
-        <div class="arrow">&rarr;</div>
-        <div class="step">🗄️ Indexation tsvector</div>
-        <div class="arrow">&rarr;</div>
-        <div class="step">🔍 Recherche RAG</div>
-        <div class="arrow">&rarr;</div>
-        <div class="step">🦊 Claude API</div>
-      </div>
-      <div class="features" style="grid-template-columns: 1fr 1fr; margin-top: 24px;">
-        <div class="feature">
-          <h3>Mode en ligne</h3>
-          <p>
-            Recherche dans la base de connaissances (RAG) puis envoie le contexte a
-            l'API Claude. Reponse en streaming avec citations des sources (document + page).
-          </p>
-        </div>
-        <div class="feature">
-          <h3>Mode hors ligne</h3>
-          <p>
-            Recherche par mots-cles dans la base locale (PostgreSQL full-text search).
-            Pas de LLM — retourne les extraits pertinents des manuels.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- STACK TECHNIQUE -->
-  <section>
-    <div class="container">
-      <h2>Stack technique</h2>
-      <div class="stack">
-        <span class="chip">React 19</span>
-        <span class="chip">Vite 8</span>
-        <span class="chip">Tailwind v4</span>
-        <span class="chip">React Router v7</span>
-        <span class="chip">Supabase</span>
-        <span class="chip">PostgreSQL + RLS</span>
-        <span class="chip">MapLibre GL</span>
-        <span class="chip">Dexie (IndexedDB)</span>
-        <span class="chip">Recharts</span>
-        <span class="chip">Claude API</span>
-        <span class="chip">i18next</span>
-        <span class="chip">Vercel</span>
-        <span class="chip">Web Push API</span>
-        <span class="chip">Service Worker</span>
-      </div>
-      <div class="features" style="margin-top: 30px; grid-template-columns: 1fr 1fr;">
-        <div class="feature">
-          <h3>Frontend</h3>
-          <p>
-            React 19 + Vite 8 + Tailwind v4. Design system Le Petit Prince
-            (nuit etoilee, palette nautique). Mobile-first, responsive.
-            12 pages, 40+ composants, 10 hooks custom.
-          </p>
-        </div>
-        <div class="feature">
-          <h3>Backend</h3>
-          <p>
-            Supabase : PostgreSQL avec Row Level Security, Auth (magic link + mot de passe),
-            Storage (photos), Realtime (commentaires, messages).
-            11 tables, 20+ politiques RLS. Fonctions serverless Vercel.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- DEPLOIEMENT -->
-  <section>
-    <div class="container">
-      <h2>Deploiement</h2>
-      <div class="flow">
-        <div class="step">git push main</div>
-        <div class="arrow">&rarr;</div>
-        <div class="step">Vercel auto-deploy</div>
-        <div class="arrow">&rarr;</div>
-        <div class="step">jdb-wangap-bay.vercel.app</div>
-      </div>
-      <p style="text-align: center; margin-top: 16px;">
-        Deploiement automatique sur chaque push.
-        Build Vite (~0.5s), fonctions serverless pour l'API Le Renard et l'ingestion de documents.
-      </p>
-    </div>
-  </section>
-
-  <!-- AIS -->
-  <section>
-    <div class="container">
-      <h2>📡 Integration AIS</h2>
-      <p>
-        L'AIS (Automatic Identification System) permet de suivre la position du Wang'ap
-        et des navires a proximite. Deux sources complementaires :
-      </p>
-
-      <div class="features" style="grid-template-columns: 1fr 1fr; margin-top: 20px;">
-        <div class="feature">
-          <div class="icon">🖥️</div>
-          <h3>Signal K (a bord)</h3>
-          <p>
-            Serveur open source (Node.js) sur un Raspberry Pi connecte au transpondeur AIS
-            du bord via NMEA. Expose toutes les donnees en temps reel via WebSocket :
-            position, COG, SOG, vent, profondeur, navires proches.
-          </p>
-          <p style="margin-top: 8px;">
-            La PWA se connecte en <code>ws://signalk.local:3000</code> sur le WiFi du bord.
-            Rafraichissement : 1-2 secondes. Fonctionne sans internet.
-          </p>
-          <span class="tag">Temps reel</span>
-          <span class="tag">Offline</span>
-          <span class="tag">~250&euro; hardware</span>
-        </div>
-        <div class="feature">
-          <div class="icon">🌐</div>
-          <h3>MarineTraffic API (a distance)</h3>
-          <p>
-            Suivi par MMSI quand le bateau est hors du reseau local.
-            Ideal pour la famille qui veut suivre la position depuis la France.
-            Couverture satellite en haute mer (delai 5-60 min).
-          </p>
-          <p style="margin-top: 8px;">
-            Appel REST toutes les 5 min quand connecte.
-            Derniere position cachee dans IndexedDB pour consultation offline.
-          </p>
-          <span class="tag">Suivi famille</span>
-          <span class="tag">~15&euro;/mois</span>
-          <span class="tag">Satellite</span>
-        </div>
-      </div>
-
-      <div class="flow" style="margin-top: 24px;">
-        <div class="step">🔌 AIS Transponder</div>
-        <div class="arrow">&rarr;</div>
-        <div class="step">🖥️ Signal K (RPi)</div>
-        <div class="arrow">&rarr;</div>
-        <div class="step">📶 WiFi bord</div>
-        <div class="arrow">&rarr;</div>
-        <div class="step">📱 PWA WebSocket</div>
-      </div>
-      <p style="text-align: center; font-size: 0.8rem; color: var(--gray); margin-top: 12px;">
-        Fallback : si Signal K indisponible &rarr; MarineTraffic API par MMSI &rarr; cache IndexedDB
-      </p>
-    </div>
-  </section>
-
-  <!-- V2 ROADMAP — Interactive voting -->
-  <section id="v2">
-    <div class="container">
-      <h2>🗺️ V2 — Votez pour les fonctionnalites !</h2>
-      <p style="text-align: center; margin-bottom: 8px;">
-        Notez de 1 a 5 et choisissez l'urgence. <strong>Cliquez sur une ligne pour voter.</strong>
-      </p>
-      <div style="text-align: center; margin-bottom: 20px;">
-        <input id="voter-name" type="text" placeholder="Votre prenom" style="padding: 6px 14px; border-radius: 10px; border: 1px solid var(--sand); font-size: 0.82rem; outline: none; color: var(--slate); width: 200px; text-align: center;" />
-      </div>
-
-      <div id="v2-features"></div>
-      <div id="v2-status" style="text-align: center; margin-top: 12px; font-size: 0.82rem;"></div>
-    </div>
-  </section>
-
-  <style>
-    .cat-header { font-size: 0.85rem; font-weight: 700; color: var(--slate); margin: 20px 0 8px; padding: 6px 12px; background: var(--sand); border-radius: 8px; }
-    .cat-header:first-child { margin-top: 0; }
-    .feat-row { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 10px; margin-bottom: 4px; background: #fff; transition: background 0.15s; cursor: pointer; flex-wrap: wrap; }
-    .feat-row:hover { background: rgba(27,154,170,0.04); }
-    .feat-row.done-row { background: rgba(46,196,182,0.06); }
-    .feat-id { font-size: 0.65rem; font-weight: 700; color: var(--gray); width: 24px; flex-shrink: 0; }
-    .feat-name { font-size: 0.8rem; font-weight: 600; color: var(--slate); flex: 1; min-width: 120px; }
-    .feat-done { font-size: 0.6rem; color: var(--green); font-weight: 600; }
-    .feat-pri { font-size: 0.6rem; padding: 1px 6px; border-radius: 6px; font-weight: 600; flex-shrink: 0; }
-    .pri-P1 { background: rgba(27,154,170,0.12); color: var(--teal); }
-    .pri-P2 { background: rgba(232,176,89,0.12); color: var(--gold); }
-    .pri-P3 { background: rgba(141,153,174,0.12); color: var(--gray); }
-    .feat-stars { display: flex; gap: 2px; flex-shrink: 0; }
-    .feat-stars button { width: 22px; height: 22px; border: none; border-radius: 4px; background: var(--sand); color: var(--gray); font-size: 0.7rem; cursor: pointer; transition: all 0.1s; padding: 0; }
-    .feat-stars button.on { background: var(--teal); color: #fff; }
-    .feat-urg { display: flex; gap: 2px; flex-shrink: 0; }
-    .feat-urg button { border: none; border-radius: 4px; padding: 2px 6px; font-size: 0.6rem; cursor: pointer; background: var(--sand); color: var(--gray); transition: all 0.1s; }
-    .feat-urg button.on-low { background: rgba(46,196,182,0.15); color: var(--teal); font-weight: 600; }
-    .feat-urg button.on-med { background: rgba(232,176,89,0.15); color: var(--gold); font-weight: 600; }
-    .feat-urg button.on-high { background: rgba(230,57,70,0.15); color: #E63946; font-weight: 600; }
-    .feat-send { border: none; border-radius: 6px; padding: 4px 10px; font-size: 0.65rem; font-weight: 600; cursor: pointer; background: var(--sand); color: var(--gray); flex-shrink: 0; transition: all 0.15s; }
-    .feat-send:hover { background: var(--teal); color: #fff; }
-    .feat-send.sent { background: rgba(46,196,182,0.15); color: var(--teal); cursor: default; }
-    @media (max-width: 500px) {
-      .feat-row { padding: 6px 8px; }
-      .feat-name { font-size: 0.75rem; }
-      .feat-stars button { width: 20px; height: 20px; font-size: 0.65rem; }
-    }
-  </style>
-
-  <!-- FEEDBACK V1 — Interactive form -->
-  <section id="feedback">
-    <div class="container">
-      <h2>💬 Feedback V1</h2>
-      <p style="text-align: center; margin-bottom: 20px;">
-        Signalez un bug ou proposez une amelioration. Chaque envoi est enregistre et traite.
-      </p>
-
-      <form id="feedback-form" style="background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
-        <div style="margin-bottom: 12px;">
-          <label style="font-size: 0.75rem; font-weight: 600; color: var(--gray); display: block; margin-bottom: 4px;">Votre prenom</label>
-          <input id="fb-name" type="text" placeholder="Catherine, Bertrand, Kevin..."
-            style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--sand); font-size: 0.85rem; outline: none; color: var(--slate); box-sizing: border-box;" />
-        </div>
-
-        <div style="margin-bottom: 12px;">
-          <label style="font-size: 0.75rem; font-weight: 600; color: var(--gray); display: block; margin-bottom: 4px;">Section concernee</label>
-          <select id="fb-section" style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--sand); font-size: 0.85rem; color: var(--slate); background: #fff; box-sizing: border-box;">
-            <option value="">-- Choisir --</option>
-            <option value="journal">📖 Journal</option>
-            <option value="carte">🗺️ Carte</option>
-            <option value="stats">📊 Statistiques</option>
-            <option value="maintenance">🔧 Maintenance</option>
-            <option value="renard">🦊 Le Renard</option>
-            <option value="inbox">✉️ Messagerie</option>
-            <option value="settings">⚙️ Reglages</option>
-            <option value="landing">🏠 Page d'accueil</option>
-            <option value="general">🌐 General</option>
-          </select>
-        </div>
-
-        <div style="margin-bottom: 12px;">
-          <label style="font-size: 0.75rem; font-weight: 600; color: var(--gray); display: block; margin-bottom: 4px;">Type</label>
-          <div style="display: flex; gap: 8px;">
-            <button type="button" onclick="setFbType('bug')" id="fb-type-bug"
-              style="flex: 1; padding: 8px; border-radius: 10px; border: 2px solid var(--coral); background: rgba(224,122,95,0.08); color: var(--coral); font-size: 0.8rem; font-weight: 600; cursor: pointer;">
-              🐛 Bug
-            </button>
-            <button type="button" onclick="setFbType('improvement')" id="fb-type-improvement"
-              style="flex: 1; padding: 8px; border-radius: 10px; border: 1px solid var(--sand); background: #fff; color: var(--gray); font-size: 0.8rem; font-weight: 600; cursor: pointer;">
-              💡 Amelioration
-            </button>
-          </div>
-        </div>
-
-        <div style="margin-bottom: 12px;">
-          <label style="font-size: 0.75rem; font-weight: 600; color: var(--gray); display: block; margin-bottom: 4px;">Urgence</label>
-          <div style="display: flex; gap: 6px;">
-            <button type="button" onclick="setFbUrgency('low')" id="fb-urg-low" class="urg-btn" style="flex:1; padding:6px; border-radius:8px; border:1px solid var(--sand); background:#fff; color:var(--gray); font-size:0.75rem; cursor:pointer;">🟢 Basse</button>
-            <button type="button" onclick="setFbUrgency('medium')" id="fb-urg-medium" class="urg-btn" style="flex:1; padding:6px; border-radius:8px; border:2px solid var(--gold); background:rgba(232,176,89,0.08); color:var(--gold); font-size:0.75rem; font-weight:600; cursor:pointer;">🟡 Moyenne</button>
-            <button type="button" onclick="setFbUrgency('high')" id="fb-urg-high" class="urg-btn" style="flex:1; padding:6px; border-radius:8px; border:1px solid var(--sand); background:#fff; color:var(--gray); font-size:0.75rem; cursor:pointer;">🟠 Haute</button>
-            <button type="button" onclick="setFbUrgency('critical')" id="fb-urg-critical" class="urg-btn" style="flex:1; padding:6px; border-radius:8px; border:1px solid var(--sand); background:#fff; color:var(--gray); font-size:0.75rem; cursor:pointer;">🔴 Critique</button>
-          </div>
-        </div>
-
-        <div style="margin-bottom: 16px;">
-          <label style="font-size: 0.75rem; font-weight: 600; color: var(--gray); display: block; margin-bottom: 4px;">Description</label>
-          <textarea id="fb-body" rows="3" placeholder="Decrivez le bug ou l'amelioration souhaitee..."
-            style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--sand); font-size: 0.85rem; outline: none; color: var(--slate); resize: vertical; font-family: inherit; box-sizing: border-box;" required></textarea>
-        </div>
-
-        <button type="submit" style="width: 100%; padding: 12px; border-radius: 12px; border: none; background: var(--teal); color: #fff; font-size: 0.9rem; font-weight: 600; cursor: pointer;">
-          Envoyer le feedback
-        </button>
-      </form>
-
-      <div id="fb-status" style="text-align: center; margin-top: 12px; font-size: 0.85rem;"></div>
-
-      <!-- Recent feedback list -->
-      <div id="fb-list" style="margin-top: 24px;"></div>
-    </div>
-  </section>
+  <div class="tabs" id="tabs"></div>
+  <main>
+    <p class="lead" id="lead"></p>
+    <p class="count" id="count"></p>
+    <div id="cards"></div>
+    <div class="no-results hidden" id="noResults"></div>
+  </main>
+  <footer><p id="footerLinks" style="margin-bottom:10px;"></p><p id="footerNote"></p></footer>
 
   <script>
-    // ═══ Supabase config ═══
-    const SB_URL = 'https://ccgtnpwzdgxcewadlvmd.supabase.co';
-    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjZ3RucHd6ZGd4Y2V3YWRsdm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTk5MTYsImV4cCI6MjA5MTkzNTkxNn0.mfbtAOUD-bllHO_9bw_CCVpSFqSLNIowlaZ8Ebf7B3g';
-    const headers = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
-
-    // ═══ V2 Features — full list ═══
-    const V2_CATS = [
-      { cat: 'A', label: 'A. Visualisation de la trace', features: [
-        { id: 'A1', name: 'Trace GPS continue', pri: 'FAIT' },
-        { id: 'A2', name: 'Couleur par vitesse (bleu→vert→rouge)', pri: 'P1' },
-        { id: 'A3', name: 'Couleur par allure (pres/largue/VA)', pri: 'P1' },
-        { id: 'A4', name: 'Couleur moteur vs voile', pri: 'P1' },
-        { id: 'A5', name: 'Couleur jour/nuit', pri: 'P2' },
-        { id: 'A6', name: 'Segmentation en passages (port→port)', pri: 'P1' },
-        { id: 'A7', name: 'Animation replay + slider temporel', pri: 'P2' },
-        { id: 'A8', name: 'Heatmap personnelle', pri: 'P3' },
-      ]},
-      { cat: 'B', label: 'B. Evenements sur la trace', features: [
-        { id: 'B1', name: 'Marqueur virement/empannage', pri: 'P1' },
-        { id: 'B2', name: 'Changement de voile (GV, genois, spi, code0)', pri: 'P1' },
-        { id: 'B3', name: 'Prise/largage de ris (1er, 2e, 3e)', pri: 'P1' },
-        { id: 'B4', name: 'Moteur on/off', pri: 'P1' },
-        { id: 'B5', name: 'Mouillage (ancre + cercle evitage)', pri: 'P2' },
-        { id: 'B6', name: 'Homme a la mer (MOB)', pri: 'P2' },
-        { id: 'B7', name: 'Meteo (grain, rafale, changement vent)', pri: 'P2' },
-        { id: 'B8', name: 'Saisie rapide via boutons flottants', pri: 'P1' },
-      ]},
-      { cat: 'C', label: 'C. Configuration voilure & allures', features: [
-        { id: 'C1', name: 'Log voilure active (GV/genois/spi/code0)', pri: 'P1' },
-        { id: 'C2', name: 'Allure (pres, travers, largue, VA...)', pri: 'P1' },
-        { id: 'C3', name: 'Segments colores par allure', pri: 'P1' },
-        { id: 'C4', name: 'Camembert allures par passage', pri: 'P2' },
-        { id: 'C5', name: 'Rose des vents naviguees', pri: 'P3' },
-        { id: 'C6', name: 'Vitesse reelle vs polaire theorique', pri: 'P3' },
-      ]},
-      { cat: 'D', label: 'D. Posts & photos geolocalisees', features: [
-        { id: 'D1', name: 'Markers photo PolarSteps-style', pri: 'FAIT' },
-        { id: 'D2', name: 'Galerie photo par zone geographique', pri: 'P2' },
-        { id: 'D3', name: 'Clustering automatique au dezoom', pri: 'P1' },
-        { id: 'D4', name: 'Filtrage posts par categorie sur carte', pri: 'P1' },
-        { id: 'D5', name: 'Story mode (lecture animee)', pri: 'P2' },
-        { id: 'D6', name: 'Lien de partage vue carte', pri: 'P2' },
-      ]},
-      { cat: 'E', label: 'E. POIs', features: [
-        { id: 'E1', name: 'Types existants (mouillage, marina...)', pri: 'FAIT' },
-        { id: 'E2', name: 'Note/commentaire par POI (rating)', pri: 'P2' },
-        { id: 'E3', name: 'Import/export GPX/KML', pri: 'P2' },
-        { id: 'E4', name: 'Profondeur + qualite de fond', pri: 'P3' },
-        { id: 'E5', name: 'Detection auto arret → suggestion POI', pri: 'P3' },
-        { id: 'E6', name: 'Cercle evitage anime sur mouillage', pri: 'P3' },
-      ]},
-      { cat: 'F', label: 'F. Passages & statistiques', features: [
-        { id: 'F1', name: 'Passage = port depart → arrivee', pri: 'P1' },
-        { id: 'F2', name: 'Stats : distance, duree, vitesse, VMG', pri: 'P1' },
-        { id: 'F3', name: 'Repartition moteur vs voile', pri: 'P1' },
-        { id: 'F4', name: 'Repartition allures par passage', pri: 'P2' },
-        { id: 'F5', name: 'Segmentation jour/jour (passage long)', pri: 'P2' },
-        { id: 'F6', name: 'Quarts de nuit (2h par equipier)', pri: 'P3' },
-      ]},
-      { cat: 'G', label: 'G. Meteo & overlays', features: [
-        { id: 'G1', name: 'Carte nautique OpenSeaMap', pri: 'FAIT' },
-        { id: 'G2', name: 'Overlay vent anime (style Windy)', pri: 'P2' },
-        { id: 'G3', name: 'Overlay houle', pri: 'P3' },
-        { id: 'G4', name: 'Marees par point', pri: 'P3' },
-        { id: 'G5', name: 'Historique meteo par waypoint', pri: 'P2' },
-      ]},
-      { cat: 'H', label: 'H. AIS & trafic', features: [
-        { id: 'H1', name: 'Overlay AIS temps reel', pri: 'P2' },
-        { id: 'H2', name: 'Historique trace AIS', pri: 'P2' },
-      ]},
-      { cat: 'I', label: 'I. Interface carte', features: [
-        { id: 'I1', name: 'Slider temporel (filtrer par dates)', pri: 'P1' },
-        { id: 'I2', name: 'Mode nuit (palette rouge)', pri: 'P2' },
-        { id: 'I3', name: 'Recherche de lieu / go-to', pri: 'P2' },
-        { id: 'I4', name: 'Mesure de distance (regle clic-clic)', pri: 'P3' },
-      ]},
-      { cat: 'J', label: 'J. Couches carte (layers)', features: [
-        { id: 'J1', name: 'Toggle couches: Social / Navigation / Trafic / Meteo', pri: 'P1' },
-        { id: 'J2', name: 'Couche Social: posts, photos, commentaires', pri: 'P1' },
-        { id: 'J3', name: 'Couche Navigation: trace, passages, evenements voile', pri: 'P1' },
-        { id: 'J4', name: 'Couche Trafic: AIS, navires proches', pri: 'P2' },
-        { id: 'J5', name: 'Couche Meteo: vent, houle, pression', pri: 'P2' },
-        { id: 'J6', name: 'Couche POIs: mouillages, marinas, fuel...', pri: 'FAIT' },
-      ]},
-      { cat: 'K', label: 'K. Posts geolocalisees (enrichi)', features: [
-        { id: 'K1', name: 'Miniature photo sur le pin (vignette ronde)', pri: 'FAIT' },
-        { id: 'K2', name: 'Clic pin → zoom flyTo + carte post detaillee', pri: 'P1' },
-        { id: 'K3', name: 'Galerie photo plein ecran (swipe entre photos)', pri: 'P1' },
-        { id: 'K4', name: 'Multi-photos par post sur la carte', pri: 'P1' },
-        { id: 'K5', name: 'Filtre par visibilite (public/famille/prive) sur carte', pri: 'P1' },
-        { id: 'K6', name: 'Popup enrichi: photo, titre, extrait, likes, commentaires', pri: 'P1' },
-        { id: 'K7', name: 'Trace reliant les posts chronologiquement', pri: 'P2' },
-        { id: 'K8', name: 'Mode diaporama carte (parcourir posts un par un)', pri: 'P2' },
-      ]},
-      { cat: 'L', label: 'L. Backup, Newsletter & Galerie', features: [
-        { id: 'L1', name: 'Export complet (JSON + schema SQL + photos ZIP)', pri: 'P2' },
-        { id: 'L2', name: 'Sync cloud (Google Drive / Dropbox auto)', pri: 'P2' },
-        { id: 'L3', name: 'Restore depuis backup ZIP', pri: 'P3' },
-        { id: 'L4', name: 'Newsletter hebdomadaire (Resend API)', pri: 'P2' },
-        { id: 'L5', name: 'Galerie photo plein ecran (swipe, zoom)', pri: 'P1' },
-      ]},
-    ];
-
-    const voteState = {};
-
-    function renderV2Features() {
-      const container = document.getElementById('v2-features');
-      container.innerHTML = V2_CATS.map(cat => {
-        const rows = cat.features.map(f => {
-          const isDone = f.pri === 'FAIT';
-          return `<div class="feat-row ${isDone ? 'done-row' : ''}" id="fr-${f.id}">
-            <span class="feat-id">${f.id}</span>
-            <span class="feat-name">${f.name}</span>
-            ${isDone
-              ? '<span class="feat-done">✓ FAIT</span>'
-              : `<span class="feat-pri pri-${f.pri}">${f.pri}</span>
-                 <div class="feat-stars">${[1,2,3,4,5].map(n =>
-                   `<button id="s-${f.id}-${n}" onclick="event.stopPropagation();setV('${f.id}',${n})">${n}</button>`
-                 ).join('')}</div>
-                 <div class="feat-urg">
-                   <button id="u-${f.id}-low" onclick="event.stopPropagation();setU('${f.id}','low')">🟢</button>
-                   <button id="u-${f.id}-medium" onclick="event.stopPropagation();setU('${f.id}','medium')">🟡</button>
-                   <button id="u-${f.id}-high" onclick="event.stopPropagation();setU('${f.id}','high')">🔴</button>
-                 </div>
-                 <button class="feat-send" id="send-${f.id}" onclick="event.stopPropagation();sendV('${f.id}')">OK</button>`
-            }
-          </div>`;
-        }).join('');
-        return `<div class="cat-header">${cat.label}</div>${rows}`;
-      }).join('');
+  const UI = {
+    fr: {
+      subtitle:'Guide utilisateur', backApp:"← l'app",
+      searchPlaceholder:'Rechercher dans le guide…',
+      lead:"Chaque écran de Wang'ap, en détail — organisé par niveau d'accès. Choisis un niveau, ou cherche un mot-clé. Clique une capture pour l'agrandir.",
+      tabs:{ all:'Tout', public:'🌍 Public', family:'❤️ Famille', skipper:'⛵ Skipper' },
+      count:(n)=>`${n} écran${n>1?'s':''}`,
+      noResults:'Aucune rubrique ne correspond à ta recherche.',
+      shotPath:(n)=>`à venir : /help-shots/${String(n).padStart(2,'0')}.webp`,
+      zoom:'cliquer pour agrandir',
+      footerLinks:'<a href="/faq.html">FAQ</a><a href="/roadmap.html">Feuille de route</a><a href="/">Ouvrir l’app</a>',
+      footerNote:"Une question non couverte ? Demande au Renard 🦊 dans l'app, ou écris à sailing.wangap@gmail.com."
+    },
+    en: {
+      subtitle:'User guide', backApp:'← the app',
+      searchPlaceholder:'Search the guide…',
+      lead:"Every Wang'ap screen, in detail — organised by access level. Pick a level, or search a keyword. Click a screenshot to enlarge.",
+      tabs:{ all:'All', public:'🌍 Public', family:'❤️ Family', skipper:'⛵ Skipper' },
+      count:(n)=>`${n} screen${n>1?'s':''}`,
+      noResults:'No topic matches your search.',
+      shotPath:(n)=>`coming: /help-shots/${String(n).padStart(2,'0')}.webp`,
+      zoom:'click to enlarge',
+      footerLinks:'<a href="/faq.html">FAQ</a><a href="/roadmap.html">Roadmap</a><a href="/">Open the app</a>',
+      footerNote:"A question not covered here? Ask Le Renard 🦊 in the app, or email sailing.wangap@gmail.com."
     }
+  };
 
-    function setV(fid, n) {
-      if (!voteState[fid]) voteState[fid] = {};
-      voteState[fid].vote = n;
-      for (let i = 1; i <= 5; i++) {
-        const b = document.getElementById('s-' + fid + '-' + i);
-        if (b) { b.className = i <= n ? 'on' : ''; }
-      }
-    }
+  // ── Guide content — exhaustive, one card per panel. shot = existing capture # ──
+  const G = [
+    // ════════════ PUBLIC ════════════
+    { id:'pub-home', level:'public', icon:'🏠', shot:1,
+      t:{fr:"Page d'accueil publique",en:'Public home page'},
+      d:{fr:"La vitrine du voyage sur wangap.fr, sans connexion.",en:'The voyage shop-window on wangap.fr, no login needed.'},
+      bullets:{fr:[
+        '<b>Hero</b> : photo plein écran, ciel étoilé animé, citation du Petit Prince, titre du voyage (Outremer 52 · ~36 000 milles · 2026–2029).',
+        '<b>Boutons</b> : « Où sommes-nous ? » (carte) et « Lire le carnet ».',
+        '<b>Barre de stats</b> : milles, jours, escales, étapes — calculés en direct.',
+        '<b>Post mis en avant</b> + grille des posts récents (publics uniquement).',
+        '<b>Récit d’intro</b> + galerie photo publique.',
+        "<b>Mini-carte</b> « où sommes-nous » (clic → carte plein écran).",
+        '<b>Abonnement newsletter</b> + bouton « Écrire aux skippers ».',
+        'Bascule de langue FR/EN, bouton Connexion, retour-en-haut.'],
+        en:[
+        '<b>Hero</b>: full-screen photo, animated starry sky, Little Prince quote, voyage title (Outremer 52 · ~36,000 nm · 2026–2029).',
+        '<b>Buttons</b>: "Where are we?" (map) and "Read the log".',
+        '<b>Stats bar</b>: miles, days, stops, legs — computed live.',
+        '<b>Featured post</b> + recent posts grid (public only).',
+        '<b>Intro narrative</b> + public photo gallery.',
+        '<b>Mini-map</b> "where are we" (click → full-screen map).',
+        '<b>Newsletter signup</b> + "Message the skippers" button.',
+        'FR/EN language toggle, Login button, scroll-to-top.']},
+      cap:{fr:"Accueil : hero, stats, posts, aperçu carte.",en:'Home: hero, stats, posts, map preview.'} },
 
-    function setU(fid, u) {
-      if (!voteState[fid]) voteState[fid] = {};
-      voteState[fid].urgency = u;
-      ['low','medium','high'].forEach(v => {
-        const b = document.getElementById('u-' + fid + '-' + v);
-        if (b) { b.className = v === u ? 'on-' + (v === 'high' ? 'high' : v === 'medium' ? 'med' : 'low') : ''; }
-      });
-    }
+    { id:'pub-about', level:'public', icon:'📜', shot:2,
+      t:{fr:'Le projet & la Genèse',en:'The project & the Genesis'},
+      d:{fr:"L'histoire du voyage, du bateau et l'origine du rêve.",en:'The story of the voyage, the boat and where the dream began.'},
+      bullets:{fr:[
+        '<b>Le projet</b> : illustration du bateau, récit du projet, tableau des 18 phases de route, dates de retour de la famille.',
+        '<b>La Genèse</b> : l’origine (Hwangap 환갑 — les 60 ans, début d’un nouveau cycle), les années de préparation depuis 2022.',
+        'Liens vers le Programme et la carte.'],
+        en:[
+        '<b>The project</b>: boat illustration, project story, 18-phase route table, family return dates.',
+        '<b>The Genesis</b>: the origin (Hwangap 환갑 — turning 60, the start of a new cycle), the preparation years since 2022.',
+        'Links to the Programme and the map.']},
+      cap:{fr:'« Le projet » : tableau des 18 phases.',en:'"The project": the 18-phase table.'} },
 
-    async function sendV(fid) {
-      const v = voteState[fid];
-      if (!v || !v.vote) { alert('Choisissez une note (1-5)'); return; }
-      const name = document.getElementById('voter-name')?.value || '';
+    { id:'pub-programme', level:'public', icon:'🗓️', shot:3,
+      t:{fr:'Le Programme (route prévue)',en:'The Programme (planned route)'},
+      d:{fr:"Le plan complet du tour du monde, phase par phase.",en:'The full round-the-world plan, phase by phase.'},
+      bullets:{fr:[
+        'Les <b>18 phases</b> : itinéraires, distances, escales clés, points forts.',
+        'Fenêtres de <b>retour de la famille</b> à chaque phase.',
+        'Lien vers <b>l’Animation</b> du voyage.'],
+        en:[
+        'The <b>18 phases</b>: itineraries, distances, key stops, highlights.',
+        '<b>Family-return</b> windows at each phase.',
+        'Link to the voyage <b>Animation</b>.']},
+      cap:{fr:'Le Programme : 18 phases.',en:'The Programme: 18 phases.'} },
 
-      const res = await fetch(SB_URL + '/rest/v1/feature_votes', {
-        method: 'POST', headers: { ...headers, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ feature_id: fid, vote: v.vote, urgency: v.urgency || 'medium', author_name: name || null }),
-      });
+    { id:'pub-animation', level:'public', icon:'🎬', shot:4,
+      t:{fr:'Animation du voyage',en:'Voyage animation'},
+      d:{fr:"La route prévue rejouée sur la carte.",en:'The planned route replayed on the map.'},
+      bullets:{fr:[
+        'Un <b>voilier animé</b> parcourt la route d’escale en escale.',
+        'Overlay : drapeau, ville, période de chaque étape.',
+        '<b>Lecture / pause</b>, barre de progression (scrubber) avec infobulles, points d’étape cliquables.'],
+        en:[
+        'An <b>animated sailboat</b> travels the route stop to stop.',
+        'Overlay: flag, city, period for each leg.',
+        '<b>Play / pause</b>, progress scrubber with tooltips, clickable stage dots.']},
+      cap:{fr:'Animation : voilier sur la route prévue.',en:'Animation: sailboat on the planned route.'} },
 
-      const btn = document.getElementById('send-' + fid);
-      if (res.ok) {
-        btn.textContent = '✓';
-        btn.classList.add('sent');
-      } else {
-        btn.textContent = '✗';
-        btn.style.color = 'var(--coral)';
-      }
-    }
+    { id:'pub-map', level:'public', icon:'🗺️', shot:5,
+      t:{fr:'Carte publique',en:'Public map'},
+      d:{fr:"Toute la carte interactive, accessible aux visiteurs.",en:'The full interactive map, open to visitors.'},
+      bullets:{fr:[
+        '<b>Trace GPS</b> colorée par chapitre/étape ; regroupement (clusters) + éclatement « spider » au zoom.',
+        '<b>Miniatures photo</b> aux points publiés → carte de prévisualisation → modale détail (photo, blocs nav/conditions/tech, galerie, lightbox, coordonnées, tags).',
+        '<b>Position en direct</b> : point doré pulsant si AIS actif.',
+        '<b>Couches</b> : 📷 Posts · ✿ Tracé · 🗺 Plan (route prévue segmentée + étiquettes) · 📍 Marks.',
+        '<b>Filtres</b> : dropdown chapitre, dropdown tags ; <b>fond marin</b> (OpenSeaMap/ESRI) en option.',
+        '<b>Contrôles</b> : centrer sur la position, vue monde, zoom/boussole, lire le Programme.'],
+        en:[
+        '<b>GPS track</b> coloured by chapter/leg; clustering + "spider" fan-out on zoom.',
+        '<b>Photo thumbnails</b> at published points → preview card → detail modal (photo, nav/conditions/tech blocks, gallery, lightbox, coordinates, tags).',
+        '<b>Live position</b>: pulsing gold dot when AIS is active.',
+        '<b>Layers</b>: 📷 Posts · ✿ Track · 🗺 Plan (segmented planned route + labels) · 📍 Marks.',
+        '<b>Filters</b>: chapter dropdown, tag dropdown; optional <b>nautical chart</b> (OpenSeaMap/ESRI).',
+        '<b>Controls</b>: center on position, world view, zoom/compass, play the Programme.']},
+      cap:{fr:'Carte publique : trace, posts, route.',en:'Public map: track, posts, route.'} },
 
-    // ═══ Feedback form ═══
-    let fbType = 'bug';
-    let fbUrgency = 'medium';
+    { id:'pub-newsletter', level:'public', icon:'💌', shot:6,
+      t:{fr:'Newsletter — s’abonner & archive',en:'Newsletter — subscribe & archive'},
+      d:{fr:"Recevoir les nouvelles par email et relire les éditions passées.",en:'Get the news by email and re-read past editions.'},
+      bullets:{fr:[
+        "<b>Abonnement</b> : formulaire en bas de l’accueil (email seulement), confirmation par retour.",
+        '<b>Désabonnement</b> en un clic via le lien en bas de chaque email (token unique, sans compte).',
+        '<b>Archive publique</b> sur /newsletters : index + page détail par édition (reprise aussi dans archive.wangap.fr).'],
+        en:[
+        '<b>Subscribe</b>: form at the bottom of the home page (email only), confirmation by return.',
+        '<b>One-click unsubscribe</b> via the link at the bottom of every email (unique token, no account).',
+        '<b>Public archive</b> at /newsletters: index + per-edition detail page (also inherited into archive.wangap.fr).']},
+      cap:{fr:'Abonnement + archive publique.',en:'Subscribe + public archive.'} },
 
-    function setFbType(t) {
-      fbType = t;
-      const bugBtn = document.getElementById('fb-type-bug');
-      const impBtn = document.getElementById('fb-type-improvement');
-      if (t === 'bug') {
-        bugBtn.style.border = '2px solid var(--coral)';
-        bugBtn.style.background = 'rgba(224,122,95,0.08)';
-        bugBtn.style.color = 'var(--coral)';
-        impBtn.style.border = '1px solid var(--sand)';
-        impBtn.style.background = '#fff';
-        impBtn.style.color = 'var(--gray)';
-      } else {
-        impBtn.style.border = '2px solid var(--teal)';
-        impBtn.style.background = 'rgba(27,154,170,0.08)';
-        impBtn.style.color = 'var(--teal)';
-        bugBtn.style.border = '1px solid var(--sand)';
-        bugBtn.style.background = '#fff';
-        bugBtn.style.color = 'var(--gray)';
-      }
-    }
+    { id:'pub-contact', level:'public', icon:'✉️', shot:7,
+      t:{fr:'Commentaires & contact',en:'Comments & contact'},
+      d:{fr:"Rester en lien sans compte.",en:'Stay in touch without an account.'},
+      bullets:{fr:[
+        '<b>Commentaires</b> sous chaque post public : nom + email + message (email privé, sert aux notifications), modérés par les skippers, mise à jour en direct.',
+        '<b>« Écrire à Catherine et Bertrand »</b> : formulaire (nom, email, sujet, message) → boîte de réception + notification push + email.',
+        'En cas de blocage réseau (filtre anti-DDoS Vercel), un message propose d’essayer en 4G/5G.'],
+        en:[
+        '<b>Comments</b> under each public post: name + email + message (email private, used for notifications), moderated by the skippers, live-updated.',
+        '<b>"Message Catherine and Bertrand"</b>: form (name, email, subject, body) → inbox + push notification + email.',
+        'If a network block hits (Vercel anti-DDoS), a message suggests trying on 4G/5G.']},
+      cap:{fr:'Commentaires + formulaire de contact.',en:'Comments + contact form.'} },
 
-    function setFbUrgency(u) {
-      fbUrgency = u;
-      const colors = { low: 'var(--teal)', medium: 'var(--gold)', high: '#E8A030', critical: 'var(--coral)' };
-      ['low','medium','high','critical'].forEach(v => {
-        const btn = document.getElementById('fb-urg-' + v);
-        if (v === u) {
-          btn.style.border = '2px solid ' + colors[v];
-          btn.style.fontWeight = '600';
-          btn.style.color = colors[v];
-        } else {
-          btn.style.border = '1px solid var(--sand)';
-          btn.style.fontWeight = 'normal';
-          btn.style.color = 'var(--gray)';
-        }
-      });
-    }
+    { id:'pub-livreor', level:'public', icon:'🖋️', shot:8,
+      t:{fr:'Contribuer au Livre d’Or',en:'Contribute to the Guest Book'},
+      d:{fr:"Pour un équipier ou ami invité, via un lien.",en:'For an invited crew member or friend, via a link.'},
+      bullets:{fr:[
+        'Lien <b>à usage unique</b> (token) reçu de la part des skippers — pas de compte à créer.',
+        'Formulaire : <b>nom, message, photos</b>.',
+        'La contribution part <b>en modération</b> ; elle n’apparaît qu’après validation.',
+        'Lien expiré/déjà utilisé → message clair.'],
+        en:[
+        '<b>Single-use</b> link (token) received from the skippers — no account to create.',
+        'Form: <b>name, message, photos</b>.',
+        'The contribution goes <b>to moderation</b>; it appears only after approval.',
+        'Expired/already-used link → clear message.']},
+      cap:{fr:"Page de contribution (lien d'invitation).",en:'Contribution page (invite link).'} },
 
-    document.getElementById('feedback-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const body = document.getElementById('fb-body').value.trim();
-      if (!body) return;
+    // ════════════ FAMILY ════════════
+    { id:'fam-login', level:'family', icon:'🔑', shot:9,
+      t:{fr:'Connexion',en:'Login'},
+      d:{fr:"L’entrée pour la famille et les skippers.",en:'The entry point for family and skippers.'},
+      bullets:{fr:[
+        'Email + <b>mot de passe</b>, ou <b>lien magique</b> par email.',
+        '<b>Mot de passe oublié</b> → email de réinitialisation (les skippers sont prévenus).',
+        'Sous-titre contextuel (mot de passe / lien / reset), retour à l’accueil.',
+        'La session reste active <b>plusieurs semaines</b> sur le même appareil.'],
+        en:[
+        'Email + <b>password</b>, or email <b>magic link</b>.',
+        '<b>Forgot password</b> → reset email (the skippers are notified).',
+        'Context-aware subtitle (password / link / reset), back to home.',
+        'The session stays active <b>for several weeks</b> on the same device.']},
+      cap:{fr:'Écran de connexion.',en:'Login screen.'} },
 
-      const data = {
-        section: document.getElementById('fb-section').value || null,
-        body,
-        type: fbType,
-        urgency: fbUrgency,
-        author_name: document.getElementById('fb-name').value || null,
-      };
+    { id:'fam-dashboard', level:'family', icon:'🏡', shot:10,
+      t:{fr:'Espace Famille',en:'Family space'},
+      d:{fr:"Le tableau de bord après connexion (rôle famille).",en:'The dashboard after login (family role).'},
+      bullets:{fr:[
+        '<b>Position en direct</b> du bateau.',
+        '<b>Dernières nouvelles</b> (posts famille + publics).',
+        'Accès direct aux <b>messages</b> ; pastille de réponse non lue.',
+        'Tuile <b>« Page publique »</b> → aperçu visiteur sans se déconnecter (?asVisitor=1).'],
+        en:[
+        '<b>Live position</b> of the boat.',
+        '<b>Latest news</b> (family + public posts).',
+        'Direct access to <b>messages</b>; unread-reply dot.',
+        '<b>"Public page"</b> tile → visitor preview without logging out (?asVisitor=1).']},
+      cap:{fr:'Tableau de bord famille.',en:'Family dashboard.'} },
 
-      const status = document.getElementById('fb-status');
-      const res = await fetch(SB_URL + '/rest/v1/feedback', { method: 'POST', headers, body: JSON.stringify(data) });
+    { id:'fam-statusbar', level:'family', icon:'📶', shot:null,
+      t:{fr:'Les icônes d’état (sous le logo)',en:'The status icons (under the logo)'},
+      d:{fr:"La rangée d’icônes juste sous le titre « wang'ap », en haut, indique l’état du système. Touche une icône pour ouvrir directement le réglage correspondant ; une petite pastille de couleur en bas à droite de chaque icône donne l’état.",
+         en:"The row of icons just under the wang'ap title, at the top, shows system status. Tap an icon to jump straight to the matching setting; a small coloured dot at the bottom-right of each icon gives the state."},
+      bullets:{fr:[
+        '<b>📶 / 📴 Connexion</b> : vert = en ligne (WiFi / 4G-5G), gold = 3G, rouge = 2G, 📴 rouge = hors-ligne.',
+        '<b>🔄 Synchronisation</b> : tourne pendant l’envoi ; reflète le mode (Auto / Manuel / Off) et la file en attente.',
+        '<b>📡 AIS</b> (skipper) : vert clignotant = actif (&lt; 5 min), gold = pause ou limité (429), rouge = erreur, gris = éteint/silencieux.',
+        '<b>📱 GPS téléphone</b> (skipper) : vert = enregistre, gold = fix périmé, rouge = éteint.',
+        '<b>👁 Visibilité publique</b> (skipper) : vert = Direct, gold = Différé, corail = Manuel.'],
+        en:[
+        '<b>📶 / 📴 Connection</b>: green = online (WiFi / 4G-5G), gold = 3G, red = 2G, 📴 red = offline.',
+        '<b>🔄 Sync</b>: spins while sending; reflects the mode (Auto / Manual / Off) and the pending queue.',
+        '<b>📡 AIS</b> (skipper): flashing green = active (&lt; 5 min), gold = paused or rate-limited (429), red = error, grey = off/quiet.',
+        '<b>📱 Phone GPS</b> (skipper): green = recording, gold = stale fix, red = off.',
+        '<b>👁 Public visibility</b> (skipper): green = Live, gold = Delayed, coral = Manual.']},
+      note:{fr:'La famille voit 2 icônes (connexion + synchronisation) ; le skipper en voit 5.',en:'Family sees 2 icons (connection + sync); the skipper sees all 5.'} },
 
-      if (res.ok) {
-        status.innerHTML = '<span style="color: var(--teal);">✓ Feedback envoye ! Merci 🙏</span>';
-        document.getElementById('fb-body').value = '';
-        document.getElementById('fb-section').value = '';
-        setFbType('bug');
-        setFbUrgency('medium');
-      } else {
-        status.innerHTML = '<span style="color: var(--coral);">❌ Erreur — reessayez</span>';
-      }
+    { id:'fam-timeline', level:'family', icon:'📖', shot:11,
+      t:{fr:'Le Voyage — Timeline & filtres',en:'The Voyage — Timeline & filters'},
+      d:{fr:"La vue dense de tous les posts (menu 🌹 / 📖).",en:'The dense view of all posts (menu 🌹 / 📖).'},
+      bullets:{fr:[
+        'Posts chargés <b>par paquets de 20</b> au défilement ; vue persistante (pas de rechargement au changement d’onglet).',
+        '<b>Filtres</b> : zone (Tous · Public · Famille · Privé), chapitre (dropdown), étape, auteur, type (📓 journal / 💬 post).',
+        '<b>Recherche</b> : barre révélée en tirant vers le bas.',
+        '<b>Badge de date flottant</b> au défilement, bouton retour-en-haut.',
+        'Filtres <b>partagés avec la carte</b> (changer l’un met l’autre à jour).',
+        '(Skipper) bouton <b>« + Nouvelle entrée »</b>.'],
+        en:[
+        'Posts load <b>in batches of 20</b> as you scroll; persistent view (no reload on tab switch).',
+        '<b>Filters</b>: zone (All · Public · Family · Private), chapter (dropdown), leg, author, type (📓 log / 💬 post).',
+        '<b>Search</b>: bar revealed by pulling down.',
+        '<b>Floating date badge</b> while scrolling, scroll-to-top button.',
+        'Filters <b>shared with the map</b> (changing one updates the other).',
+        '(Skipper) <b>"+ New entry"</b> button.']},
+      cap:{fr:'Timeline + rangée de filtres.',en:'Timeline + filter row.'} },
+
+    { id:'fam-post', level:'family', icon:'🖼️', shot:12,
+      t:{fr:'Lire un post (détail & lightbox)',en:'Reading a post (detail & lightbox)'},
+      d:{fr:"Tout ce qu’un post peut contenir.",en:'Everything a post can contain.'},
+      bullets:{fr:[
+        'Titre, date, auteur, étape ; corps tronqué à 3 lignes + « Lire la suite ».',
+        '<b>Galerie photo</b> → lightbox plein écran : swipe, flèches, compteur, fermeture, scroll bloqué.',
+        '<b>Vidéos</b> : miniature (poster) + lecture inline avec contrôles natifs.',
+        'Blocs <b>Navigation</b> (cap, vitesse, allure, voiles), <b>Conditions</b> (vent, mer, baromètre, températures), <b>Technique</b> s’ils sont remplis.',
+        '<b>Commentaires</b>, <b>coordonnées GPS</b> cliquables → carte, <b>tags</b> → /tags, partage (Web Share).',
+        '(Skipper) ✏️ modifier / 🗑 supprimer.'],
+        en:[
+        'Title, date, author, leg; body clamped to 3 lines + "Read more".',
+        '<b>Photo gallery</b> → full-screen lightbox: swipe, arrows, counter, close, scroll lock.',
+        '<b>Videos</b>: poster thumbnail + inline playback with native controls.',
+        '<b>Navigation</b> (heading, speed, point of sail, sails), <b>Conditions</b> (wind, sea, barometer, temperatures), <b>Technical</b> blocks when filled in.',
+        '<b>Comments</b>, clickable <b>GPS coordinates</b> → map, <b>tags</b> → /tags, share (Web Share).',
+        '(Skipper) ✏️ edit / 🗑 delete.']},
+      cap:{fr:'Post ouvert + lightbox.',en:'Open post + lightbox.'} },
+
+    { id:'fam-bilingual', level:'family', icon:'🌐', shot:13,
+      t:{fr:'Contenu bilingue FR/EN',en:'Bilingual content FR/EN'},
+      d:{fr:"L’app et les récits dans ta langue.",en:'The app and the stories in your language.'},
+      bullets:{fr:[
+        'Bascule <b>FR/EN</b> instantanée (Réglages → Langue).',
+        'Le <b>contenu des posts</b> est traduit automatiquement (Claude) et affiché dans ta langue.',
+        'Un post tout neuf peut apparaître en VO quelques secondes avant sa traduction.'],
+        en:[
+        'Instant <b>FR/EN</b> toggle (Settings → Language).',
+        '<b>Post content</b> is auto-translated (Claude) and shown in your language.',
+        'A brand-new post may briefly appear in its original language before translation.']},
+      cap:{fr:'Bascule de langue FR/EN.',en:'FR/EN language toggle.'} },
+
+    { id:'fam-stats', level:'family', icon:'✨', shot:14,
+      t:{fr:'Statistiques (Stats)',en:'Statistics (Stats)'},
+      d:{fr:"Les chiffres du voyage (menu ✨ / 📊).",en:'The voyage figures (menu ✨ / 📊).'},
+      bullets:{fr:[
+        '<b>KPIs</b> : milles, jours, escales, étapes, vitesse moyenne et max, nuits en mer, distance, plus longue étape, carburant.',
+        '<b>Graphiques</b> : vitesse par jour (barres), distance cumulée (aire), répartition par catégorie (camembert).',
+        '<b>Filtre par période</b> : semaine / mois / total.'],
+        en:[
+        '<b>KPIs</b>: miles, days, stops, legs, average & max speed, nights at sea, distance, longest leg, fuel.',
+        '<b>Charts</b>: speed per day (bars), cumulative distance (area), category breakdown (pie).',
+        '<b>Period filter</b>: week / month / all-time.']},
+      cap:{fr:'Stats : graphiques + KPIs.',en:'Stats: charts + KPIs.'} },
+
+    { id:'fam-messages', level:'family', icon:'📨', shot:15,
+      t:{fr:'Messages',en:'Messages'},
+      d:{fr:"Le dialogue avec les skippers (menu 🐦 / ✉️).",en:'The conversation with the skippers (menu 🐦 / ✉️).'},
+      bullets:{fr:[
+        '<b>Écrire</b> un message direct à Catherine & Bertrand.',
+        '<b>Lire les réponses</b> en vue liste → détail ; suivi des non-lus à 3 niveaux.',
+        '<b>Pastille rouge</b> dans l’en-tête + notification push à l’arrivée d’une réponse.',
+        'Message d’erreur clair (astuce 4G/5G) si le réseau bloque.'],
+        en:[
+        '<b>Write</b> a direct message to Catherine & Bertrand.',
+        '<b>Read replies</b> in list → detail; 3-way unread tracking.',
+        '<b>Red dot</b> in the header + push notification when a reply arrives.',
+        'Clear error message (4G/5G tip) if the network blocks.']},
+      cap:{fr:'Fil de messages (liste + détail).',en:'Message thread (list + detail).'} },
+
+    { id:'fam-livreor', level:'family', icon:'📖', shot:16,
+      t:{fr:"Le Livre d'Or (album)",en:'The Guest Book (album)'},
+      d:{fr:"Les mots des équipiers et amis.",en:'The notes from crew and friends.'},
+      bullets:{fr:[
+        'Vue <b>album</b> des entrées approuvées, avec photos et lightbox partagée.',
+        '<b>Filtres</b> : pastilles d’étape, recherche, filtre par date.',
+        'Album partagé entre famille et skippers.'],
+        en:[
+        '<b>Album</b> view of approved entries, with photos and a shared lightbox.',
+        '<b>Filters</b>: stage pills, search, date filter.',
+        'Album shared between family and skippers.']},
+      cap:{fr:"Album du Livre d'Or.",en:'Guest Book album.'} },
+
+    { id:'fam-settings', level:'family', icon:'🪐', shot:17,
+      t:{fr:'Réglages (famille)',en:'Settings (family)'},
+      d:{fr:"Les préférences personnelles (menu 🪐 / ⚙️). Menu en sous-menus avec bouton retour.",en:'Personal preferences (menu 🪐 / ⚙️). Sub-menus with a back button.'},
+      bullets:{fr:[
+        '<b>Identité</b> : nom affiché + avatar (recadrage carré).',
+        '<b>Langue</b> : FR / EN.',
+        '<b>Apparence</b> : mode poétique (icônes Petit Prince, défaut ON), mode nuit, fond uni (6 couleurs) ou photo (6 ambiances).',
+        '<b>Synchronisation</b> : Auto / Manuel / Off.',
+        '<b>GPS du téléphone</b> : enregistrer sa position (utile en annexe).',
+        '<b>Notifications push</b> : commentaires, réponses, nouveaux posts.',
+        '<b>Aide</b> : raccourci vers ce guide. Les préférences sont stockées par utilisateur (sync entre appareils).'],
+        en:[
+        '<b>Identity</b>: display name + avatar (square crop).',
+        '<b>Language</b>: FR / EN.',
+        '<b>Appearance</b>: poetic mode (Little Prince icons, default ON), night mode, solid background (6 colours) or photo (6 moods).',
+        '<b>Sync</b>: Auto / Manual / Off.',
+        '<b>Phone GPS</b>: record your position (useful in the dinghy).',
+        '<b>Push notifications</b>: comments, replies, new posts.',
+        '<b>Help</b>: shortcut to this guide. Preferences are stored per user (synced across devices).']},
+      cap:{fr:'Menu Réglages (sous-menu).',en:'Settings menu (drill).'} },
+
+    // ════════════ SKIPPER ════════════
+    { id:'sk-compose', level:'skipper', icon:'✍️', shot:18,
+      t:{fr:'Compositeur de post',en:'Post composer'},
+      d:{fr:"Écrire une entrée de journal complète.",en:'Write a full logbook entry.'},
+      bullets:{fr:[
+        'Ouverture : <b>« + Nouvelle entrée »</b> (Timeline) ou <b>long-press</b> sur la carte (pré-remplit lat/lon + étape).',
+        '<b>Chapitre</b> (auto-sélectionne le dernier), <b>titre</b>, <b>corps</b> (texte simple), <b>étape</b> (auto selon la date).',
+        '<b>Photos</b> : multi-ajout, compression en 3 tailles, HEIC→JPG ; <b>vidéos</b> : poster généré à 0,5 s.',
+        '<b>Géolocalisation</b> : GPS du téléphone, EXIF de la photo, ou long-press carte.',
+        '<b>Visibilité</b> 🌍/❤️/🔒, <b>catégorie</b> (9), <b>tags</b> multiples.',
+        'Bloc <b>Navigation</b> (route, distance, vitesse, cap, allure, voiles, ris), <b>Conditions</b> (vent force/direction, mer, creux, baromètre, températures, visibilité, ciel), <b>Technique</b> (heures moteur, carburant, eau, batteries, solaire, incidents).',
+        '<b>Publier</b> ou <b>Brouillon</b> ; écriture hors-ligne (file de synchro) ; ✏️ modifier / 🗑 supprimer (définitif).'],
+        en:[
+        'Open: <b>"+ New entry"</b> (Timeline) or <b>long-press</b> on the map (pre-fills lat/lon + leg).',
+        '<b>Chapter</b> (auto-selects the latest), <b>title</b>, <b>body</b> (plain text), <b>leg</b> (auto by date).',
+        '<b>Photos</b>: multi-add, 3-size compression, HEIC→JPG; <b>videos</b>: poster generated at 0.5 s.',
+        '<b>Geolocation</b>: phone GPS, photo EXIF, or long-press map.',
+        '<b>Visibility</b> 🌍/❤️/🔒, <b>category</b> (9), multiple <b>tags</b>.',
+        '<b>Navigation</b> block (route, distance, speed, heading, point of sail, sails, reefs), <b>Conditions</b> (wind force/direction, sea, swell, barometer, temperatures, visibility, sky), <b>Technical</b> (engine hours, fuel, water, batteries, solar, incidents).',
+        '<b>Publish</b> or <b>Draft</b>; offline writing (sync queue); ✏️ edit / 🗑 delete (permanent).']},
+      cap:{fr:'Compositeur + blocs journal de bord.',en:'Composer + logbook blocks.'} },
+
+    { id:'sk-mapedit', level:'skipper', icon:'✂️', shot:19,
+      t:{fr:'Carte : affichage & édition de la trace',en:'Map: display & track editing'},
+      d:{fr:"Choisir ce qu’on affiche, puis corriger et nettoyer la trace GPS.",en:'Choose what is shown, then fix and clean the GPS track.'},
+      bullets:{fr:[
+        '<b>Afficher / masquer les couches</b> : 📷 Posts · ✿ Tracé · 🗺 Plan (route prévue) · 📍 Marks ; filtre par chapitre / étape ; fond marin nautique (OpenSeaMap / ESRI).',
+        'Bouton <b>✂️ Édition tracé</b> : les waypoints deviennent des cercles cliquables.',
+        '<b>Glisser</b> un waypoint pour le repositionner ; tap = sélection, second tap = sélection d’une <b>plage</b>.',
+        '<b>Supprimer en lot</b> : batché par 200 (limite PostgREST), toast de résultat (vert / orange partiel / rouge).',
+        '<b>Forcer une étape</b> sur la sélection ; <b>décaler les dates</b> d’une période.',
+        '<b>Créer une nouvelle trace</b> à la main, point par point (source = manual, dates interpolées), quand la balise a manqué une portion.',
+        '<b>Simplifier la trace</b> (Douglas-Peucker) avec aperçu et <b>annulation</b> pendant quelques secondes.',
+        '<b>Réglages → 🛠 Trace : visualisation et maintenance</b> : <b>tolérance de simplification au zoom</b> (optimisation du rendu — moins de points au zoom faible), <b>détection des coupures</b> (la trace se scinde en segments, les « lignes de rupture », dès que l’écart de temps dépasse N h ou la vitesse implicite N nœuds), et historique de maintenance des waypoints.'],
+        en:[
+        '<b>Show / hide layers</b>: 📷 Posts · ✿ Track · 🗺 Plan (planned route) · 📍 Marks; filter by chapter / leg; nautical chart (OpenSeaMap / ESRI).',
+        '<b>✂️ Edit track</b> button: waypoints become tappable circles.',
+        '<b>Drag</b> a waypoint to reposition; tap = select, second tap = select a <b>range</b>.',
+        '<b>Bulk delete</b>: batched in 200s (PostgREST limit), result toast (green / orange partial / red).',
+        '<b>Force a leg</b> on the selection; <b>shift dates</b> of a period.',
+        '<b>Create a new track</b> by hand, point by point (source = manual, interpolated dates), when the tracker missed a section.',
+        '<b>Simplify the track</b> (Douglas-Peucker) with a preview and <b>undo</b> for a few seconds.',
+        '<b>Settings → 🛠 Track: visualisation &amp; maintenance</b>: <b>zoom simplification tolerance</b> (render optimisation — fewer points at low zoom), <b>gap detection</b> (the track splits into segments, the "break lines", once the time gap exceeds N h or implied speed N knots), and waypoint maintenance history.']},
+      cap:{fr:'Carte en mode édition tracé.',en:'Map in track-edit mode.'} },
+
+    { id:'sk-marks', level:'skipper', icon:'📍', shot:20,
+      t:{fr:'Marks & points d’intérêt',en:'Marks & points of interest'},
+      d:{fr:"Annoter la carte de repères utiles.",en:'Annotate the map with useful markers.'},
+      bullets:{fr:[
+        'Poser des <b>marks</b> personnels : mouillages, ports, points d’intérêt.',
+        '<b>Couches POI</b> filtrables : mouillages, marinas, fuel, restos, plongée.',
+        'Couche 📍 Marks activable comme les autres calques.'],
+        en:[
+        'Drop personal <b>marks</b>: anchorages, ports, points of interest.',
+        'Filterable <b>POI layers</b>: anchorages, marinas, fuel, food, diving.',
+        '📍 Marks layer toggled like the other layers.']},
+      cap:{fr:'Couche Marks / POIs.',en:'Marks / POI layer.'} },
+
+    { id:'sk-chapters', level:'skipper', icon:'📚', shot:21,
+      t:{fr:'Chapitres, étapes & visibilité',en:'Chapters, legs & visibility'},
+      d:{fr:"Organiser le voyage en chapitres et étapes.",en:'Organise the voyage into chapters and legs.'},
+      bullets:{fr:[
+        'Hiérarchie : <b>Chapitre</b> (mois/région) → <b>Étape</b> (port → port) → posts + waypoints.',
+        'Réglages → <b>📚 Chapitres</b> : créer, renommer, <b>réordonner ▲▼</b>, choisir la couleur, supprimer (confirmation).',
+        'Réglages → <b>🚢 Étapes</b> : nom (Port A → Port B), chapitre parent, ports de départ/arrivée, dates prévues. Les dates fixent l’assignation par défaut des nouveaux posts.',
+        '<b>Suppression sûre</b> : les posts/waypoints orphelins tombent dans « Non classés » (chapitre/étape sentinelle immuable) — jamais perdus.',
+        '<b>Masquer un chapitre</b> (œil barré) : disparaît de l’app, mais reste lisible par les sauvegardes, l’archive, les stats et le Renard (visibilité, pas confidentialité).'],
+        en:[
+        'Hierarchy: <b>Chapter</b> (month/region) → <b>Leg</b> (port → port) → posts + waypoints.',
+        'Settings → <b>📚 Chapters</b>: create, rename, <b>reorder ▲▼</b>, pick the colour, delete (confirm).',
+        'Settings → <b>🚢 Legs</b>: name (Port A → Port B), parent chapter, start/end ports, planned dates. Dates set the default assignment of new posts.',
+        '<b>Safe delete</b>: orphan posts/waypoints fall into "Unsorted" (immutable sentinel chapter/leg) — never lost.',
+        '<b>Hide a chapter</b> (eye-off): disappears from the app, but stays readable by backups, the archive, stats and Le Renard (visibility, not privacy).']},
+      cap:{fr:'Chapitres & étapes + toggle visibilité.',en:'Chapters & legs + visibility toggle.'} },
+
+    { id:'sk-position', level:'skipper', icon:'🎯', shot:22,
+      t:{fr:'Position manuelle & visibilité publique',en:'Manual position & public visibility'},
+      d:{fr:"Maîtriser ce que voient les visiteurs.",en:'Control what visitors see.'},
+      bullets:{fr:[
+        '<b>Position manuelle</b> : forcer un point précis quand l’AIS est éteint. Le résolveur prend la plus récente entre point manuel et waypoint visible, avec un tampon « collant » d’1 h qui protège un geste humain récent.',
+        '<b>Visibilité publique</b> : afficher la position <b>en direct</b>, <b>différée</b> (avec délai) ou <b>figée</b> pour le public.',
+        'Famille et skippers voient la position réelle ; le public voit la version choisie — <b>par audience, pas par hasard</b>.'],
+        en:[
+        '<b>Manual position</b>: force a precise point when AIS is off. The resolver takes the most recent of manual point vs visible waypoint, with a 1 h "sticky" buffer protecting a recent human gesture.',
+        '<b>Public visibility</b>: show the position <b>live</b>, <b>delayed</b> (with a buffer) or <b>frozen</b> for the public.',
+        'Family and skippers see the real position; the public sees the chosen version — <b>per audience, by design</b>.']},
+      cap:{fr:'Position manuelle + visibilité publique.',en:'Manual position + public visibility.'} },
+
+    { id:'sk-ais', level:'skipper', icon:'📡', shot:23,
+      t:{fr:'AIS — suivi en direct',en:'AIS — live tracking'},
+      d:{fr:"La configuration du suivi automatique du bateau.",en:'The automatic boat-tracking configuration.'},
+      bullets:{fr:[
+        '<b>Bateau suivi</b> : nom, MMSI (9 chiffres), indicatif, pavillon, <b>fournisseur</b> (aisstream), <b>clé API</b> — partagé entre tous les skippers.',
+        '<b>État du worker</b> : Éteint / En attente du 1er message / Actif (N min) / Inactif / Limité (réessai auto) / Erreur.',
+        '<b>Flux DB</b> : pastille verte ≤ 10 min, gold ≤ 60 min, rouge au-delà — confirme l’écriture en base.',
+        '<b>Filtre anti-jitter</b> (rejette les points trop proches) réglable en avancé ; <b>pause manuelle</b> au port.'],
+        en:[
+        '<b>Tracked boat</b>: name, MMSI (9 digits), call sign, flag, <b>provider</b> (aisstream), <b>API key</b> — shared across all skippers.',
+        '<b>Worker status</b>: Off / Waiting for 1st message / Active (N min) / Inactive / Rate-limited (auto retry) / Error.',
+        '<b>DB feed</b>: green ≤ 10 min, gold ≤ 60 min, red beyond — confirms writes to the database.',
+        '<b>Anti-jitter filter</b> (rejects points too close together) tunable in advanced; <b>manual pause</b> in port.']},
+      note:{fr:'Le silence AIS au port est normal. Seul un Flux DB rouge en mer (bateau en marche) est suspect.',en:'AIS silence in port is normal. Only a red DB feed at sea (boat under way) is suspicious.'},
+      cap:{fr:'Config AIS + état + Flux DB.',en:'AIS config + status + DB feed.'} },
+
+    { id:'sk-maintenance', level:'skipper', icon:'🔧', shot:24,
+      t:{fr:'Carnet de maintenance (Tech)',en:'Maintenance log (Tech)'},
+      d:{fr:"Le suivi technique du bateau (menu 🐘 / 🔧).",en:'The boat’s technical tracking (menu 🐘 / 🔧).'},
+      bullets:{fr:[
+        '<b>Nouvelle intervention</b> : titre, catégorie (12 : moteur, voiles, électricité, plomberie, électronique, gréement, sécurité, coque, dessalinisateur, solaire, frigo, autre), description, heures moteur, pièces, coût, date.',
+        '<b>Historique</b> chronologique filtrable par catégorie + recherche + badge de date flottant.',
+        '<b>Statistiques</b> : nombre d’interventions, dernière vidange, heures moteur cumulées, prochaine échéance + alertes.',
+        'Lit aussi le bloc Technique des posts ; ✏️ modifier une entrée.'],
+        en:[
+        '<b>New job</b>: title, category (12: engine, sails, electrical, plumbing, electronics, rigging, safety, hull, watermaker, solar, fridge, other), description, engine hours, parts, cost, date.',
+        '<b>History</b> chronological, filterable by category + search + floating date badge.',
+        '<b>Stats</b>: number of jobs, last oil change, total engine hours, next-due + alerts.',
+        'Also reads posts’ Technical block; ✏️ edit an entry.']},
+      cap:{fr:'Carnet de maintenance + stats.',en:'Maintenance log + stats.'} },
+
+    { id:'sk-todos', level:'skipper', icon:'✅', shot:25,
+      t:{fr:'To-dos',en:'To-dos'},
+      d:{fr:"La liste des choses à faire (onglet « À faire » de Tech).",en:'The to-do list (Tech "To-do" tab).'},
+      bullets:{fr:[
+        '<b>Nouvelle todo</b> : titre, description, <b>priorité</b> (4 niveaux), étape associée, <b>date butoir</b>.',
+        '<b>Cocher / décocher</b> (texte barré + opacité), <b>alerte de retard</b>.',
+        'Swipe gauche (mobile) ou 🗑 pour supprimer.',
+        'Prospectif (à faire) — par opposition au carnet, rétrospectif (fait).'],
+        en:[
+        '<b>New to-do</b>: title, description, <b>priority</b> (4 levels), associated leg, <b>due date</b>.',
+        '<b>Check / uncheck</b> (struck-through + dimmed), <b>overdue warning</b>.',
+        'Swipe left (mobile) or 🗑 to delete.',
+        'Prospective (to do) — vs the log, retrospective (done).']},
+      cap:{fr:'Liste de to-dos.',en:'To-do list.'} },
+
+    { id:'sk-renard', level:'skipper', icon:'🦊', shot:26,
+      t:{fr:'Le Renard — assistant IA',en:'Le Renard — AI assistant'},
+      d:{fr:"Poser des questions techniques sur le bateau.",en:'Ask technical questions about the boat.'},
+      bullets:{fr:[
+        'Question en langage naturel → <b>réponse en streaming</b> (mot à mot), rendu Markdown.',
+        '<b>Sources</b> sous chaque réponse : chips sable (manuels/textes) et chips or 🎬 (vidéos handover) avec <b>deep-link au timecode</b> dans Drive.',
+        '<b>Bascule Haiku</b> (rapide, ~centimes) <b>/ Sonnet</b> (réfléchi, ~10×) + compteur de tokens.',
+        '<b>Mode hors-ligne</b> 🟢/🟡 : recherche plein-texte locale dans la base, sans Claude — utile en mer.',
+        '<b>Fils de conversation</b> conservés (mémoire).'],
+        en:[
+        'Natural-language question → <b>streamed answer</b> (word by word), Markdown rendering.',
+        '<b>Sources</b> under each answer: sand chips (manuals/texts) and gold 🎬 chips (handover videos) with a <b>deep-link to the timecode</b> in Drive.',
+        '<b>Haiku</b> (fast, ~cents) <b>/ Sonnet</b> (thorough, ~10×) toggle + token counter.',
+        '<b>Offline mode</b> 🟢/🟡: local full-text search in the base, no Claude — useful at sea.',
+        '<b>Conversation threads</b> kept (memory).']},
+      cap:{fr:'Chat du Renard + bande Sources.',en:'Le Renard chat + Sources bar.'} },
+
+    { id:'sk-renard-admin', level:'skipper', icon:'📚', shot:27,
+      t:{fr:'Base de connaissances du Renard',en:'Le Renard knowledge base'},
+      d:{fr:"Nourrir l’assistant (page /renard/admin).",en:'Feed the assistant (the /renard/admin page).'},
+      bullets:{fr:[
+        '<b>Uploader un manuel</b> PDF/TXT/MD/HTML avec un <b>thème</b> (moteur, voiles…) + une <b>source</b> (outremer-officiel, vendor, communauté, littérature, wangap-app) ; indexation avec barre de progression (parsing → découpage → upload).',
+        '<b>Ingérer une vidéo handover</b> depuis Drive : transcription Whisper côté serveur (GitHub Action), découpée en chunks horodatés. Guidelines : un sujet/vidéo, ≤ 10 min, ré-énoncer le contexte à l’oral.',
+        '<b>Backfill d’embeddings</b> (vectorisation pgvector, idempotent).',
+        '<b>Base indexée</b> : documents (type, nb de chunks, source, 🗑) + travaux d’ingestion ; listes complètes /documents et /ingests.'],
+        en:[
+        '<b>Upload a manual</b> PDF/TXT/MD/HTML with a <b>theme</b> (engine, sails…) + a <b>source</b> (outremer-official, vendor, community, literature, wangap-app); indexing with a progress bar (parsing → chunking → upload).',
+        '<b>Ingest a handover video</b> from Drive: server-side Whisper transcription (GitHub Action), split into timecoded chunks. Guidelines: one subject/video, ≤ 10 min, re-state context aloud.',
+        '<b>Embeddings backfill</b> (pgvector vectorisation, idempotent).',
+        '<b>Indexed base</b>: documents (type, chunk count, source, 🗑) + ingestion jobs; full lists /documents and /ingests.']},
+      cap:{fr:'Administration de la base de connaissances.',en:'Knowledge base administration.'} },
+
+    { id:'sk-newsletter', level:'skipper', icon:'📧', shot:28,
+      t:{fr:'Newsletter — composer & envoyer',en:'Newsletter — compose & send'},
+      d:{fr:"Préparer et diffuser une newsletter (onglet de la boîte Liens).",en:'Prepare and send a newsletter (a tab in the Bonds inbox).'},
+      bullets:{fr:[
+        '<b>Composition par sections</b> : titre, collage photo (grille avec suggestions IA), carte auto-générée, métriques (distance/jours/escales/posts/photos/vitesse max), texte (éditeur TipTap), équipage (filtré sur la période).',
+        '<b>Sélecteur de posts</b> par période avec chips de visibilité (🌍/💛/🔒, privé masqué par défaut) + aperçu rapide.',
+        '<b>Brouillon IA</b> Sonnet/Opus avec formulaire multi-champs (titre, thème, ton, style, longueur, audience).',
+        '<b>Envoyer un test à moi</b> (vrai email via Resend), puis <b>envoi en masse</b> aux abonnés (lots de 50/min).',
+        '<b>Abonnés</b> (ajout/édition/suppression + nb de newsletters reçues), <b>brouillons</b> & envoyées, <b>archive publique</b> /newsletters.',
+        '<b>Rappel automatique</b> (cron) si trop longtemps sans envoi avec assez de nouveaux posts.'],
+        en:[
+        '<b>Section-based composition</b>: title, photo collage (grid with AI suggestions), auto-generated map, metrics (distance/days/stops/posts/photos/max speed), text (TipTap editor), crew (filtered to the period).',
+        '<b>Post selector</b> by period with visibility chips (🌍/💛/🔒, private hidden by default) + quick preview.',
+        '<b>AI draft</b> Sonnet/Opus with a multi-field form (title, theme, tone, style, length, audience).',
+        '<b>Send a test to me</b> (real email via Resend), then <b>mass-send</b> to subscribers (batches of 50/min).',
+        '<b>Subscribers</b> (add/edit/delete + count received), <b>drafts</b> & sent, <b>public archive</b> /newsletters.',
+        '<b>Automatic reminder</b> (cron) after too long without a send with enough new posts.']},
+      note:{fr:'L’envoi en masse reste bloqué tant que le domaine d’envoi n’est pas vérifié (étape DNS V2.5). Le test fonctionne déjà.',en:'Mass-send stays blocked until the sending domain is verified (V2.5 DNS step). The test send already works.'},
+      cap:{fr:'Compositeur de newsletter par sections.',en:'Section-based newsletter composer.'} },
+
+    { id:'sk-livreor-admin', level:'skipper', icon:'🖋️', shot:29,
+      t:{fr:"Livre d'Or — administration",en:'Guest Book — administration'},
+      d:{fr:"Inviter et modérer les contributions.",en:'Invite and moderate contributions.'},
+      bullets:{fr:[
+        '<b>Inviter un équipier</b> via un lien à usage unique (token) — il contribue sans compte ; gestion des équipiers sur une page dédiée.',
+        '<b>File de modération</b> : approuver ou écarter chaque contribution (modale de confirmation).',
+        'Choisir la <b>visibilité</b> (public / famille) de chaque entrée validée.',
+        'Indicateur ⭐ dans l’en-tête quand une contribution attend.'],
+        en:[
+        '<b>Invite a crew member</b> via a single-use link (token) — they contribute without an account; crew managed on a dedicated page.',
+        '<b>Moderation queue</b>: approve or dismiss each contribution (confirmation modal).',
+        'Set the <b>visibility</b> (public / family) of each approved entry.',
+        '⭐ indicator in the header when a contribution is waiting.']},
+      cap:{fr:"Modération du Livre d'Or + invitations.",en:'Guest Book moderation + invites.'} },
+
+    { id:'sk-backup', level:'skipper', icon:'💾', shot:30,
+      t:{fr:'Sauvegarde, archive, accès & maintenance',en:'Backup, archive, access & maintenance'},
+      d:{fr:"Les outils d’exploitation, dans les Réglages (admin).",en:'The operational tools, in Settings (admin).'},
+      bullets:{fr:[
+        '<b>Tout exporter</b> : toutes les tables (JSON) + photos (sm/md/lg) + waypoints → zip Google Drive (manuel + cron dimanche 03:00 UTC). Historique sur /backups.',
+        '<b>Snapshot archive</b> : régénère <b>archive.wangap.fr</b> (version statique long-terme et immuable) — cron lundi 03:00 UTC. Historique sur /archives.',
+        '<b>Gestion des accès</b> : promouvoir un utilisateur (famille / admin), désactiver un compte (comptes fondateurs protégés).',
+        '<b>Maintenance technique</b> : « Forcer la mise à jour » (vide le cache du Service Worker), version de l’app, backfill des variantes photo.',
+        '<b>Cohérence du trace</b> (consolidation : réduit la trace à ~1 pt/min en marquant les points redondants « supersédés ») et <b>maintenance de la trace</b> pour les cas avancés.'],
+        en:[
+        '<b>Export all</b>: every table (JSON) + photos (sm/md/lg) + waypoints → Google Drive zip (manual + Sunday 03:00 UTC cron). History at /backups.',
+        '<b>Archive snapshot</b>: regenerates <b>archive.wangap.fr</b> (long-term immutable static version) — Monday 03:00 UTC cron. History at /archives.',
+        '<b>Access management</b>: promote a user (family / admin), disable an account (founder accounts protected).',
+        '<b>Technical maintenance</b>: "Force update" (clears the Service Worker cache), app version, photo-variant backfill.',
+        '<b>Track consolidation</b> (thins the track to ~1 pt/min by marking redundant points "superseded") and <b>track maintenance</b> for advanced cases.']},
+      cap:{fr:'Sauvegarde/archive + accès + maintenance.',en:'Backup/archive + access + maintenance.'} },
+
+    { id:'sk-settings-all', level:'skipper', icon:'🪐', shot:null,
+      t:{fr:'Réglages — toutes les sections',en:'Settings — all sections'},
+      d:{fr:"Le menu Réglages du skipper, section par section (en plus des réglages famille : identité, langue, apparence, synchro, GPS, notifications).",en:'The skipper Settings menu, section by section (on top of the family settings: identity, language, appearance, sync, GPS, notifications).'},
+      bullets:{fr:[
+        '<b>💡 Aide</b> : ce guide, le démarrage rapide, la FAQ.',
+        '<b>🧭 Navigation & position</b> : regroupe <b>🎯 Position manuelle</b>, <b>📱 GPS du téléphone</b> et <b>📡 AIS — Suivi en direct</b>.',
+        '<b>👁 Visibilité publique</b> : position montrée au public en <b>Direct</b>, <b>Différé</b> ou <b>Manuel</b>.',
+        '<b>🔄 Synchronisation</b> : Auto / Manuel / Off + file en attente.',
+        '<b>🛠 Trace : visualisation et maintenance</b> : tolérance de simplification au zoom, détection des coupures (lignes de rupture), historique de maintenance des waypoints.',
+        '<b>🧬 Cohérence du trace</b> : consolidation — priorité des sources (AIS/GPS/manuel), mode (toujours 1 pt/min ou multi-sources uniquement), recalcul (points « supersédés »), surcharges par étape.',
+        '<b>🌐 Langue</b> : FR / EN. &nbsp;<b>🎨 Apparence</b> : mode poétique, mode nuit, fond uni ou photo.',
+        '<b>📚 Chapitres</b> & <b>🚢 Étapes</b> : créer, renommer, réordonner, couleur, masquer ; Port→Port + dates.',
+        '<b>🔧 Maintenance technique</b> : forcer la mise à jour (vide le cache), version de l’app, backfill des variantes photo.',
+        '<b>🔔 Notifications</b> : push. &nbsp;<b>👥 Gestion des accès</b> : rôles (famille/admin), désactivation, comptes fondateurs protégés.',
+        '<b>💾 Sauvegarde & archive</b> : export Drive, snapshot archive.wangap.fr. &nbsp;<b>👤 Connecté</b> : identité, avatar, déconnexion.'],
+        en:[
+        '<b>💡 Help</b>: this guide, the quick start, the FAQ.',
+        '<b>🧭 Navigation & position</b>: groups <b>🎯 Manual position</b>, <b>📱 Phone GPS</b> and <b>📡 AIS — live tracking</b>.',
+        '<b>👁 Public visibility</b>: position shown to the public <b>Live</b>, <b>Delayed</b> or <b>Manual</b>.',
+        '<b>🔄 Sync</b>: Auto / Manual / Off + pending queue.',
+        '<b>🛠 Track: visualisation & maintenance</b>: zoom simplification tolerance, gap detection (break lines), waypoint maintenance history.',
+        '<b>🧬 Track consolidation</b>: source priority (AIS/GPS/manual), mode (always 1 pt/min or cross-source only), recompute (superseded points), per-leg overrides.',
+        '<b>🌐 Language</b>: FR / EN. &nbsp;<b>🎨 Appearance</b>: poetic mode, night mode, solid or photo background.',
+        '<b>📚 Chapters</b> & <b>🚢 Legs</b>: create, rename, reorder, colour, hide; Port→Port + dates.',
+        '<b>🔧 Technical maintenance</b>: force update (clears cache), app version, photo-variant backfill.',
+        '<b>🔔 Notifications</b>: push. &nbsp;<b>👥 Access management</b>: roles (family/admin), disable, protected founder accounts.',
+        '<b>💾 Backup & archive</b>: Drive export, archive.wangap.fr snapshot. &nbsp;<b>👤 Logged in</b>: identity, avatar, sign out.']},
+      note:{fr:'Plusieurs sections ont leur propre rubrique détaillée ci-dessus (AIS, chapitres, position, sauvegarde).',en:'Several sections have their own detailed topic above (AIS, chapters, position, backup).'} },
+  ];
+
+  let lang='fr', tab='all';
+  function setLang(l){
+    lang=(l==='en')?'en':'fr';
+    localStorage.setItem('lang', lang);
+    document.documentElement.lang=lang;
+    document.getElementById('lang-fr').classList.toggle('active', lang==='fr');
+    document.getElementById('lang-en').classList.toggle('active', lang==='en');
+    applyChrome(); render();
+  }
+  function applyChrome(){
+    const u=UI[lang];
+    document.querySelector('[data-i18n="subtitle"]').textContent=u.subtitle;
+    document.querySelector('[data-i18n="backApp"]').textContent=u.backApp;
+    document.getElementById('q').placeholder=u.searchPlaceholder;
+    document.getElementById('lead').textContent=u.lead;
+    document.getElementById('footerLinks').innerHTML=u.footerLinks;
+    document.getElementById('footerNote').textContent=u.footerNote;
+    const tabsEl=document.getElementById('tabs'); tabsEl.innerHTML='';
+    ['all','public','family','skipper'].forEach(k=>{
+      const b=document.createElement('button');
+      b.className='tab'+(tab===k?' active':'');
+      b.textContent=u.tabs[k];
+      b.onclick=()=>{ tab=k; document.getElementById('q').value=''; applyChrome(); render(); };
+      tabsEl.appendChild(b);
     });
-
-    // Init
-    renderV2Features();
+  }
+  function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+  // bullets may contain trusted <b> tags from our own data — allow them through.
+  function bul(s){ return esc(s).replace(/&lt;b&gt;/g,'<b>').replace(/&lt;\/b&gt;/g,'</b>'); }
+  function cardHtml(s){
+    const u=UI[lang];
+    const lvlLabel=u.tabs[s.level].replace(/^[^\s]+\s/,'');
+    let html=`<div class="card">`;
+    html+=`<h3><span class="icon">${s.icon}</span>${esc(s.t[lang])} <span class="badge ${s.level}">${esc(lvlLabel)}</span></h3>`;
+    html+=`<p class="desc">${esc(s.d[lang])}</p>`;
+    if(s.bullets){ html+='<ul>'+s.bullets[lang].map(b=>`<li>${bul(b)}</li>`).join('')+'</ul>'; }
+    if(s.note){ html+=`<p class="note">ℹ️ ${esc(s.note[lang])}</p>`; }
+    if(s.shot){
+      const nn=String(s.shot).padStart(2,'0');
+      const cap=s.cap?esc(s.cap[lang]):'';
+      html+=`<figure class="shot">`
+        +`<a class="shotlink" href="/help-shots/${nn}.webp" target="_blank" rel="noopener"><img src="/help-shots/${nn}.webp" alt="${cap}" loading="lazy" onerror="this.closest('figure').querySelector('.shot-ph').style.display='flex';this.closest('a').style.display='none';"></a>`
+        +`<div class="shot-ph" style="display:none"><span class="num">📸 #${nn}</span><span class="cap">${cap}</span><span class="path">${u.shotPath(s.shot)}</span></div>`
+        +`<figcaption>#${nn} — ${cap} · ${u.zoom}</figcaption>`
+        +`</figure>`;
+    }
+    html+=`</div>`;
+    return html;
+  }
+  function render(){
+    const u=UI[lang];
+    const q=document.getElementById('q').value.trim().toLowerCase();
+    let list=G.slice();
+    if(q){
+      list=list.filter(s=>{
+        const hay=[s.t.fr,s.t.en,s.d.fr,s.d.en,
+          (s.bullets?(s.bullets.fr.join(' ')+s.bullets.en.join(' ')):''),
+          (s.note?s.note.fr+s.note.en:''),(s.cap?s.cap.fr+s.cap.en:'')].join(' ').toLowerCase();
+        return hay.includes(q);
+      });
+    } else if(tab!=='all'){
+      list=list.filter(s=>s.level===tab);
+    }
+    const cards=document.getElementById('cards');
+    const none=document.getElementById('noResults');
+    document.getElementById('count').textContent=u.count(list.length);
+    if(!list.length){ cards.innerHTML=''; none.textContent=u.noResults; none.classList.remove('hidden'); return; }
+    none.classList.add('hidden');
+    cards.innerHTML=list.map(cardHtml).join('');
+  }
+  document.getElementById('q').addEventListener('input', render);
+  (function init(){
+    const p=new URLSearchParams(location.search).get('lang');
+    setLang(p||localStorage.getItem('lang')||'fr');
+  })();
   </script>
-
-  <!-- FOOTER -->
-  <footer>
-    <img src="images/logo.png" alt="Wang'ap" />
-    <p>Wang'ap — Journal de Bord &middot; Catherine & Bertrand</p>
-    <p style="margin-top: 4px; font-size: 0.65rem; opacity: 0.5;">
-      Outremer 52 &middot; 2026-2029 &middot; Saint-Cyr-sur-Mer &rarr; Tour du Monde
-    </p>
-  </footer>
-
 </body>
 </html>
