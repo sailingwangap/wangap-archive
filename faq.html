@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wang'ap — FAQ</title>
+  <meta name="description" content="Questions fréquentes sur l'application Wang'ap — usage, dépannage, hors-ligne, confidentialité." />
+  <style>
+    :root {
+      --night:#0B1026; --navy:#162447; --teal:#1B9AAA; --gold:#E8B059;
+      --gold-deep:#B07820; --coral:#E07A5F; --sand:#F4F1DE; --cream:#FFFCF2;
+      --slate:#3D405B; --gray:#8D99AE;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:var(--slate); background:var(--cream); line-height:1.6; -webkit-font-smoothing:antialiased; }
+    a { color:var(--teal); }
+    header.top { position:sticky; top:0; z-index:50; background:linear-gradient(180deg,var(--night) 0%,var(--navy) 100%); color:var(--sand); padding:14px 18px; box-shadow:0 2px 14px rgba(0,0,0,.25); }
+    .top-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; max-width:880px; margin:0 auto; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:800; font-size:18px; letter-spacing:.5px; }
+    .brand .logo { width:34px; height:34px; border-radius:9px; background:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .brand small { display:block; font-weight:500; font-size:11px; color:var(--gold); }
+    .spacer { flex:1; }
+    .search { flex:1 1 240px; min-width:180px; max-width:420px; position:relative; }
+    .search input { width:100%; padding:9px 12px 9px 32px; border-radius:10px; border:none; background:rgba(255,255,255,.95); color:var(--slate); font-size:14px; }
+    .search::before { content:'🔍'; position:absolute; left:10px; top:8px; font-size:13px; opacity:.6; }
+    .lang-toggle { display:flex; background:rgba(255,255,255,.12); border-radius:9px; overflow:hidden; }
+    .lang-toggle button { border:none; background:transparent; color:var(--sand); padding:7px 12px; cursor:pointer; font-weight:700; font-size:12px; }
+    .lang-toggle button.active { background:var(--gold); color:var(--night); }
+    .back-app { color:var(--sand); text-decoration:none; font-size:12px; opacity:.85; border:1px solid rgba(255,255,255,.25); padding:6px 11px; border-radius:9px; white-space:nowrap; }
+    .tabs { max-width:880px; margin:0 auto; padding:14px 18px 0; display:flex; gap:8px; flex-wrap:wrap; }
+    .tab { border:1px solid rgba(0,0,0,.08); background:#fff; color:var(--slate); padding:7px 15px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; }
+    .tab.active { background:var(--navy); color:var(--sand); border-color:var(--navy); }
+    main { max-width:880px; margin:0 auto; padding:16px 18px 60px; }
+    .lead { font-size:14px; color:var(--gray); margin:6px 2px 16px; }
+    details.qa { background:#fff; border-radius:14px; margin-bottom:10px; box-shadow:0 1px 8px rgba(0,0,0,.05); border:1px solid rgba(0,0,0,.04); overflow:hidden; }
+    details.qa summary { cursor:pointer; padding:15px 18px; font-weight:700; font-size:15px; color:var(--navy); list-style:none; display:flex; gap:10px; align-items:flex-start; }
+    details.qa summary::-webkit-details-marker { display:none; }
+    details.qa summary .chev { margin-left:auto; transition:transform .2s; color:var(--gray); }
+    details.qa[open] summary .chev { transform:rotate(90deg); }
+    details.qa .a { padding:0 18px 16px 18px; font-size:14px; }
+    details.qa .a ul { margin:8px 0 0 2px; padding-left:18px; }
+    .cat-pill { font-size:10px; font-weight:700; padding:2px 8px; border-radius:999px; background:var(--sand); color:var(--gold-deep); text-transform:uppercase; letter-spacing:.3px; }
+    .no-results { text-align:center; padding:50px 20px; color:var(--gray); }
+    footer { max-width:880px; margin:0 auto; padding:24px 18px 60px; border-top:1px solid rgba(0,0,0,.08); color:var(--gray); font-size:13px; }
+    footer a { margin-right:14px; }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-row">
+      <div class="brand"><span class="logo">💬</span><span>wang'ap<small data-i18n="subtitle">FAQ</small></span></div>
+      <div class="spacer"></div>
+      <div class="search"><input id="q" type="search" autocomplete="off" /></div>
+      <div class="lang-toggle">
+        <button id="lang-fr" onclick="setLang('fr')">FR</button>
+        <button id="lang-en" onclick="setLang('en')">EN</button>
+      </div>
+      <a class="back-app" href="/" data-i18n="backApp">← l'app</a>
+    </div>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+  <main>
+    <p class="lead" id="lead"></p>
+    <div id="list"></div>
+    <div class="no-results hidden" id="noResults"></div>
+  </main>
+  <footer><p id="footerLinks" style="margin-bottom:10px;"></p><p id="footerNote"></p></footer>
+
+  <script>
+  const UI = {
+    fr: {
+      subtitle:'Foire aux questions', backApp:"← l'app",
+      searchPlaceholder:'Rechercher une question…',
+      lead:'Questions fréquentes et dépannage rapide. Cherche un mot-clé ou filtre par thème.',
+      cats:{ all:'Tout', usage:'Usage', trouble:'Dépannage', offline:'Hors-ligne', privacy:'Confidentialité' },
+      noResults:'Aucune question ne correspond.',
+      footerLinks:'<a href="/guide.html">Guide complet</a><a href="/roadmap.html">Feuille de route</a><a href="/">Ouvrir l’app</a>',
+      footerNote:'Une question non couverte ? Demande au Renard 🦊 dans l’app, ou écris à sailing.wangap@gmail.com.'
+    },
+    en: {
+      subtitle:'Frequently asked questions', backApp:'← the app',
+      searchPlaceholder:'Search a question…',
+      lead:'Frequent questions and quick troubleshooting. Search a keyword or filter by topic.',
+      cats:{ all:'All', usage:'Usage', trouble:'Troubleshooting', offline:'Offline', privacy:'Privacy' },
+      noResults:'No question matches.',
+      footerLinks:'<a href="/guide.html">Full guide</a><a href="/roadmap.html">Roadmap</a><a href="/">Open the app</a>',
+      footerNote:"A question not covered here? Ask Le Renard 🦊 in the app, or email sailing.wangap@gmail.com."
+    }
+  };
+
+  // cat: usage | trouble | offline | privacy
+  const FAQ = [
+    { cat:'trouble',
+      q:{fr:"L'application semble bloquée sur une ancienne version.",en:'The app seems stuck on an old version.'},
+      a:{fr:"Réglages → Maintenance technique → « Forcer la mise à jour ». Ça vide le cache du Service Worker et recharge l'app proprement.",
+         en:'Settings → Technical maintenance → "Force update". This clears the Service Worker cache and reloads the app cleanly.'} },
+    { cat:'usage',
+      q:{fr:"J'ai oublié d'ajouter une photo, je peux la rajouter ?",en:'I forgot to add a photo — can I add it later?'},
+      a:{fr:"Oui : ouvre le post, ✏️ Modifier, ajoute la photo via le compositeur, puis enregistre.",
+         en:'Yes: open the post, ✏️ Edit, add the photo via the composer, then save.'} },
+    { cat:'usage',
+      q:{fr:"Comment partager un post avec un ami non-connecté ?",en:'How do I share a post with a friend who has no account?'},
+      a:{fr:"Si le post est public, copie l'URL et envoie-la — pas besoin de compte. S'il est famille/privé, rends-le public le temps du partage (✏️ → zone → Public), puis re-privatise.",
+         en:'If the post is public, copy its URL and send it — no account needed. If it is family/private, make it public for the share (✏️ → zone → Public), then set it back.'} },
+    { cat:'trouble',
+      q:{fr:"Comment savoir si l'AIS est en panne ?",en:'How do I know if AIS is down?'},
+      a:{fr:"Réglages → AIS → panneau d'état. Si le « Flux DB » est rouge depuis plus d'une heure alors que vous êtes en mer, c'est suspect. Au port, le silence est normal (pas d'émission proche ou pause manuelle).",
+         en:'Settings → AIS → status panel. If the "DB feed" has been red for over an hour while you are at sea, that is suspicious. In port, silence is normal (no nearby transmission or manual pause).'} },
+    { cat:'offline',
+      q:{fr:"Comment écrire un post depuis le bateau sans réseau ?",en:'How do I write a post from the boat without a connection?'},
+      a:{fr:"Compose normalement et valide : en mode Auto, le post est stocké localement et part dès que la connexion revient. Un voyant ↻ reste sur le post tant qu'il n'est pas synchronisé.",
+         en:'Compose and submit as usual: in Auto mode the post is stored locally and sent as soon as you reconnect. A ↻ indicator stays on the post until it syncs.'} },
+    { cat:'usage',
+      q:{fr:"Le Renard cite une page de manuel mais je ne la trouve pas.",en:'Le Renard cites a manual page I cannot find.'},
+      a:{fr:"Les manuels sont indexés côté serveur (pas dans Drive). Le Renard cite en général un nom de fichier + page (ex. « Manuel-N4.50 p.12 ») — cherche ce PDF dans Drive /Wang'ap Knowledge Base/.",
+         en:'Manuals are indexed server-side (not in Drive). Le Renard usually cites a filename + page (e.g. "Manuel-N4.50 p.12") — look for that PDF in Drive /Wang’ap Knowledge Base/.'} },
+    { cat:'trouble',
+      q:{fr:"J'ai supprimé un post par erreur.",en:'I deleted a post by mistake.'},
+      a:{fr:"Les suppressions sont définitives (pas de corbeille). Une restauration est possible depuis la dernière sauvegarde Drive — contacte Flavien.",
+         en:'Deletions are permanent (no trash). A restore is possible from the latest Drive backup — contact Flavien.'} },
+    { cat:'usage',
+      q:{fr:"J'ai oublié mon mot de passe.",en:'I forgot my password.'},
+      a:{fr:"Sur la page de connexion, « Mot de passe oublié ? » envoie un email de réinitialisation. Si ça ne marche pas, contacte Flavien.",
+         en:'On the login page, "Forgot password?" sends a reset email. If that does not work, contact Flavien.'} },
+    { cat:'trouble',
+      q:{fr:"Je ne reçois pas les notifications.",en:'I am not receiving notifications.'},
+      a:{fr:"Active-les dans Réglages → Notifications (le navigateur demandera la permission à la première activation). Sur iPhone, il faut iOS 16.4+ et l'app installée sur l'écran d'accueil (PWA).",
+         en:'Enable them in Settings → Notifications (the browser will ask permission on first activation). On iPhone you need iOS 16.4+ and the app installed to the home screen (PWA).'} },
+    { cat:'trouble',
+      q:{fr:"La newsletter ne part pas aux abonnés.",en:'The newsletter is not sending to subscribers.'},
+      a:{fr:"L'envoi en masse est volontairement bloqué tant que le domaine d'envoi n'est pas vérifié (étape DNS V2.5). L'« Envoyer un test à moi » fonctionne déjà. Le compositeur affiche un bandeau rouge quand le blocage est actif.",
+         en:'Mass-send is intentionally blocked until the sending domain is verified (V2.5 DNS step). "Send a test to me" already works. The composer shows a red banner while the gate is active.'} },
+    { cat:'usage',
+      q:{fr:"Quelle est la différence entre le carnet de maintenance et les to-dos ?",en:'What is the difference between the maintenance log and to-dos?'},
+      a:{fr:"Le carnet est rétrospectif (ce qui a été fait, avec heures moteur et historique). Les to-dos sont prospectifs (ce qu'il reste à faire, avec priorité et date butoir).",
+         en:'The log is retrospective (what was done, with engine hours and history). To-dos are prospective (what is left to do, with priority and due date).'} },
+    { cat:'offline',
+      q:{fr:"Qu'est-ce qui fonctionne hors-ligne ?",en:'What works offline?'},
+      a:{fr:"Lecture des posts et photos récents, écriture (mise en file et envoyée au retour du réseau), la carte sur les zones déjà visitées, et Le Renard en mode local (recherche plein-texte sans Claude).",
+         en:'Reading recent posts and photos, writing (queued and sent when back online), the map for already-visited areas, and Le Renard in local mode (full-text search without Claude).'} },
+    { cat:'privacy',
+      q:{fr:"Mes posts privés ou famille peuvent-ils devenir publics ?",en:'Can my private or family posts become public?'},
+      a:{fr:"Non. Les posts 🔒 privés et ❤️ famille ne quittent jamais le compte : pas indexés par Google, pas dans l'archive publique. Seuls les posts 🌍 publics le sont.",
+         en:'No. 🔒 Private and ❤️ family posts never leave the account: not indexed by Google, not in the public archive. Only 🌍 public posts are.'} },
+    { cat:'usage',
+      q:{fr:"Comment changer la langue ?",en:'How do I switch the language?'},
+      a:{fr:"Réglages → Langue (FR/EN), bascule instantanée. Sur ce guide et la FAQ, utilise le bouton FR/EN en haut à droite.",
+         en:'Settings → Language (FR/EN), instant switch. On this guide and the FAQ, use the FR/EN button at the top right.'} },
+    { cat:'privacy',
+      q:{fr:"Combien ça coûte de faire tourner Wang'ap ?",en:'How much does it cost to run Wang’ap?'},
+      a:{fr:"Environ 5–10 $/mois au total : Supabase et Vercel sur leurs tiers gratuits, Fly.io ~5 $/mois pour le worker AIS, et quelques dizaines de dollars par an pour OpenAI (transcriptions) et Anthropic (Le Renard).",
+         en:'About $5–10/month total: Supabase and Vercel on their free tiers, Fly.io ~$5/month for the AIS worker, and a few tens of dollars per year for OpenAI (transcriptions) and Anthropic (Le Renard).'} },
+  ];
+
+  let lang='fr', cat='all';
+
+  function setLang(l){
+    lang = (l==='en')?'en':'fr';
+    localStorage.setItem('lang', lang);
+    document.documentElement.lang = lang;
+    document.getElementById('lang-fr').classList.toggle('active', lang==='fr');
+    document.getElementById('lang-en').classList.toggle('active', lang==='en');
+    applyChrome(); render();
+  }
+  function applyChrome(){
+    const u=UI[lang];
+    document.querySelector('[data-i18n="subtitle"]').textContent=u.subtitle;
+    document.querySelector('[data-i18n="backApp"]').textContent=u.backApp;
+    document.getElementById('q').placeholder=u.searchPlaceholder;
+    document.getElementById('lead').textContent=u.lead;
+    document.getElementById('footerLinks').innerHTML=u.footerLinks;
+    document.getElementById('footerNote').textContent=u.footerNote;
+    const tabsEl=document.getElementById('tabs'); tabsEl.innerHTML='';
+    ['all','usage','trouble','offline','privacy'].forEach(k=>{
+      const b=document.createElement('button');
+      b.className='tab'+(cat===k?' active':'');
+      b.textContent=u.cats[k];
+      b.onclick=()=>{ cat=k; document.getElementById('q').value=''; applyChrome(); render(); };
+      tabsEl.appendChild(b);
+    });
+  }
+  function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+  function render(){
+    const u=UI[lang];
+    const query=document.getElementById('q').value.trim().toLowerCase();
+    let list=FAQ.slice();
+    if(query){
+      list=list.filter(f=>(f.q.fr+f.q.en+f.a.fr+f.a.en).toLowerCase().includes(query));
+    } else if(cat!=='all'){
+      list=list.filter(f=>f.cat===cat);
+    }
+    const el=document.getElementById('list');
+    const none=document.getElementById('noResults');
+    if(!list.length){ el.innerHTML=''; none.textContent=u.noResults; none.classList.remove('hidden'); return; }
+    none.classList.add('hidden');
+    el.innerHTML=list.map(f=>(
+      `<details class="qa"><summary><span class="cat-pill">${esc(u.cats[f.cat])}</span><span>${esc(f.q[lang])}</span><span class="chev">›</span></summary>`
+      + `<div class="a">${esc(f.a[lang])}</div></details>`
+    )).join('');
+  }
+  document.getElementById('q').addEventListener('input', render);
+  (function init(){
+    const p=new URLSearchParams(location.search).get('lang');
+    setLang(p||localStorage.getItem('lang')||'fr');
+  })();
+  </script>
+</body>
+</html>

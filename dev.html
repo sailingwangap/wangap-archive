@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Wang'ap — Dev Dashboard</title>
+  <style>
+    :root {
+      --night: #0B1026; --navy: #162447; --teal: #1B9AAA; --gold: #E8B059;
+      --coral: #E07A5F; --sand: #F4F1DE; --cream: #FFFCF2; --slate: #3D405B;
+      --gray: #8D99AE; --green: #2EC4B6; --red: #E63946;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--night); color: var(--sand); line-height: 1.5; }
+
+    .topbar {
+      background: var(--navy); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 0; z-index: 10;
+    }
+    .topbar h1 { font-family: Georgia, serif; font-size: 1.3rem; color: var(--gold); }
+    .topbar .version { font-size: 0.7rem; color: var(--gray); }
+
+    .tabs {
+      display: flex; gap: 0; background: var(--navy); border-bottom: 1px solid rgba(255,255,255,0.06);
+      position: sticky; top: 56px; z-index: 9;
+    }
+    .tab {
+      flex: 1; padding: 10px; text-align: center; font-size: 0.8rem; font-weight: 600;
+      color: var(--gray); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
+    }
+    .tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+    .tab:hover { color: var(--sand); }
+
+    .panel { display: none; padding: 20px; max-width: 900px; margin: 0 auto; }
+    .panel.active { display: block; }
+
+    h2 { font-family: Georgia, serif; font-size: 1.2rem; color: var(--gold); margin-bottom: 16px; }
+    h3 { font-size: 0.9rem; color: var(--teal); margin-bottom: 8px; }
+
+    .card {
+      background: var(--navy); border-radius: 12px; padding: 14px; margin-bottom: 10px;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.65rem; font-weight: 600;
+    }
+    .badge-bug { background: rgba(230,57,70,0.15); color: var(--red); }
+    .badge-improvement { background: rgba(27,154,170,0.15); color: var(--teal); }
+    .badge-low { background: rgba(46,196,182,0.15); color: var(--green); }
+    .badge-medium { background: rgba(232,176,89,0.15); color: var(--gold); }
+    .badge-high { background: rgba(224,122,95,0.15); color: var(--coral); }
+    .badge-critical { background: rgba(230,57,70,0.2); color: var(--red); }
+
+    .todo-item {
+      display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;
+      background: var(--navy); border-radius: 10px; margin-bottom: 6px;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .todo-check {
+      width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--gray);
+      cursor: pointer; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; color: transparent; transition: all 0.15s;
+    }
+    .todo-check.done { background: var(--teal); border-color: var(--teal); color: #fff; }
+    .todo-content { flex: 1; }
+    .todo-title { font-size: 0.82rem; color: var(--sand); }
+    .todo-title.done { text-decoration: line-through; opacity: 0.5; }
+    .todo-sub { font-size: 0.7rem; color: var(--gray); margin-top: 2px; }
+
+    .sprint-header {
+      font-size: 0.85rem; font-weight: 700; color: var(--gold); margin: 20px 0 8px;
+      padding-bottom: 6px; border-bottom: 1px solid rgba(232,176,89,0.2);
+    }
+
+    .vote-row {
+      display: flex; align-items: center; justify-content: space-between; padding: 10px 14px;
+      background: var(--navy); border-radius: 10px; margin-bottom: 6px;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .vote-name { font-size: 0.82rem; color: var(--sand); flex: 1; }
+    .vote-score { font-size: 1rem; font-weight: 700; color: var(--gold); width: 40px; text-align: center; }
+    .vote-bar-bg { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; margin: 0 10px; }
+    .vote-bar { height: 100%; border-radius: 4px; background: var(--teal); transition: width 0.3s; }
+    .vote-count { font-size: 0.7rem; color: var(--gray); width: 50px; text-align: right; }
+    .vote-urgency { font-size: 0.7rem; margin-left: 8px; }
+
+    .fb-meta { font-size: 0.7rem; color: var(--gray); margin-top: 6px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .fb-body { font-size: 0.82rem; color: var(--sand); margin-top: 4px; white-space: pre-wrap; }
+    .fb-resolve {
+      font-size: 0.65rem; padding: 3px 10px; border-radius: 8px; border: 1px solid var(--gray);
+      background: transparent; color: var(--gray); cursor: pointer; margin-left: auto;
+    }
+    .fb-resolve:hover { border-color: var(--teal); color: var(--teal); }
+    .fb-resolved { opacity: 0.4; }
+
+    .empty { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 0.85rem; font-style: italic; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
+    .stat-card {
+      background: var(--navy); border-radius: 10px; padding: 14px; text-align: center;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .stat-value { font-size: 1.4rem; font-weight: 700; color: var(--teal); }
+    .stat-label { font-size: 0.65rem; color: var(--gray); margin-top: 2px; }
+
+    @media (max-width: 600px) {
+      .vote-row { flex-wrap: wrap; gap: 6px; }
+      .vote-bar-bg { order: 3; flex-basis: 100%; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div>
+      <h1>🛠 Wang'ap Dev</h1>
+      <div class="version">V1.0 released &middot; V2 roadmap</div>
+    </div>
+    <a href="/guide.html" style="color: var(--teal); font-size: 0.8rem; text-decoration: none;">📖 Guide</a>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showPanel('roadmap')">📋 Roadmap V2</div>
+    <div class="tab" onclick="showPanel('feedback')">💬 Feedback</div>
+    <div class="tab" onclick="showPanel('votes')">🗳 Votes V2</div>
+  </div>
+
+  <!-- ROADMAP PANEL -->
+  <div class="panel active" id="panel-roadmap">
+    <h2>Roadmap V2 — Sailing Map & Interactive Logbook</h2>
+
+    <div class="sprint-header">Sprint V2.1 — Passages & Sailing Events</div>
+    <div id="tasks-v21"></div>
+
+    <div class="sprint-header">Sprint V2.2 — Sail Configuration & Allures</div>
+    <div id="tasks-v22"></div>
+
+    <div class="sprint-header">Sprint V2.3 — Enhanced Map</div>
+    <div id="tasks-v23"></div>
+
+    <div class="sprint-header">Sprint V2.4 — Passage Stats & Insights</div>
+    <div id="tasks-v24"></div>
+
+    <div class="sprint-header">Sprint V2.5 — Story Mode & Sharing</div>
+    <div id="tasks-v25"></div>
+
+    <div class="sprint-header">Sprint V2.6 — Weather & AIS</div>
+    <div id="tasks-v26"></div>
+
+    <div class="sprint-header">Sprint V2.7 — Map Layers Architecture</div>
+    <div id="tasks-v27"></div>
+
+    <div class="sprint-header">Sprint V2.8 — Enhanced Geolocalized Posts</div>
+    <div id="tasks-v28"></div>
+
+    <div class="sprint-header">Sprint V2.9 — Backup, Newsletter & Gallery</div>
+    <div id="tasks-v29"></div>
+  </div>
+
+  <!-- FEEDBACK PANEL -->
+  <div class="panel" id="panel-feedback">
+    <h2>Feedback V1</h2>
+    <div id="fb-stats" class="stat-grid"></div>
+    <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+      <button onclick="filterFb('all')" class="fb-filter active" style="padding:5px 14px; border-radius:8px; border:1px solid var(--teal); background:rgba(27,154,170,0.15); color:var(--teal); font-size:0.75rem; font-weight:600; cursor:pointer;">Tous</button>
+      <button onclick="filterFb('bug')" class="fb-filter" style="padding:5px 14px; border-radius:8px; border:1px solid var(--gray); background:transparent; color:var(--gray); font-size:0.75rem; cursor:pointer;">🐛 Bugs</button>
+      <button onclick="filterFb('improvement')" class="fb-filter" style="padding:5px 14px; border-radius:8px; border:1px solid var(--gray); background:transparent; color:var(--gray); font-size:0.75rem; cursor:pointer;">💡 Ameliorations</button>
+      <button onclick="filterFb('unresolved')" class="fb-filter" style="padding:5px 14px; border-radius:8px; border:1px solid var(--gray); background:transparent; color:var(--gray); font-size:0.75rem; cursor:pointer;">⏳ Non resolus</button>
+    </div>
+    <div id="fb-list"></div>
+  </div>
+
+  <!-- VOTES PANEL -->
+  <div class="panel" id="panel-votes">
+    <h2>Votes V2 — Classement des fonctionnalites</h2>
+    <p style="font-size: 0.8rem; color: var(--gray); margin-bottom: 16px;">Classement par note moyenne. Les barres montrent le score sur 5.</p>
+    <div id="votes-ranking"></div>
+    <h3 style="margin-top: 24px;">Commentaires recents</h3>
+    <div id="votes-comments" style="margin-top: 10px;"></div>
+  </div>
+
+  <script>
+    const SB_URL = 'https://ccgtnpwzdgxcewadlvmd.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjZ3RucHd6ZGd4Y2V3YWRsdm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNTk5MTYsImV4cCI6MjA5MTkzNTkxNn0.mfbtAOUD-bllHO_9bw_CCVpSFqSLNIowlaZ8Ebf7B3g';
+    const headers = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY };
+
+    // ═══ Tab navigation ═══
+    function showPanel(name) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      event.target.classList.add('active');
+      if (name === 'feedback') loadFeedback();
+      if (name === 'votes') loadVotes();
+    }
+
+    // ═══ Roadmap tasks ═══
+    const TASKS = {
+      'v21': [
+        { id: 'v211', title: 'passages table + migration', sub: 'DB schema, RLS (admin only), seed' },
+        { id: 'v212', title: 'sailing_events table + migration', sub: 'DB schema, RLS, indexes' },
+        { id: 'v213', title: 'usePassages.js hook', sub: 'CRUD, active passage tracking, auto-compute stats' },
+        { id: 'v214', title: 'useSailingEvents.js hook', sub: 'CRUD, quick-add from map, offline queue' },
+        { id: 'v215', title: 'Start/End passage UI', sub: 'Button on map: Start passage (departure) → End passage (arrival)' },
+        { id: 'v216', title: 'Sailing event quick-add buttons', sub: 'Floating buttons on map: virement, voile, ris, moteur, mouillage' },
+        { id: 'v217', title: 'Passage summary card', sub: 'Stats panel: distance, duration, speed, VMG, motor vs sail' },
+        { id: 'v218', title: 'Passage list page', sub: '/passages — chronological list with mini-stats' },
+      ],
+      'v22': [
+        { id: 'v221', title: 'Sail config picker component', sub: 'GV (0-3 ris), genois, solent, spi, code 0, trinquette' },
+        { id: 'v222', title: 'Allure picker component', sub: 'Visual: pres, bon plein, travers, largue, grand largue, VA' },
+        { id: 'v223', title: 'Sail config logging', sub: 'On sail_change event, record config as segment' },
+        { id: 'v224', title: 'Allure segment coloring on map', sub: 'Blue (pres) → green (travers) → orange → red (VA)' },
+        { id: 'v225', title: 'Motor vs sail coloring', sub: 'Solid teal (sail) vs dashed coral (motor)' },
+        { id: 'v226', title: 'Color mode toggle on map', sub: 'Switch: default / allure / speed / motor-sail' },
+      ],
+      'v23': [
+        { id: 'v231', title: 'Event markers on trace', sub: 'Pictogram pins for sailing events. Click → popup' },
+        { id: 'v232', title: 'Post pin clustering', sub: 'Auto-cluster at low zoom. MapLibre cluster source' },
+        { id: 'v233', title: 'Post category filter on map', sub: 'Toggleable chips above map' },
+        { id: 'v234', title: 'Time slider / date range filter', sub: 'Range input at bottom of map' },
+        { id: 'v235', title: 'Passage segments on map', sub: 'Distinct polyline per passage. Click → stats popup' },
+        { id: 'v236', title: 'Speed color gradient on trace', sub: 'Blue (slow) → green → red (fast)' },
+      ],
+      'v24': [
+        { id: 'v241', title: 'Allure distribution pie chart', sub: 'Recharts PieChart per passage' },
+        { id: 'v242', title: 'Motor vs sail time chart', sub: 'Recharts donut or bar' },
+        { id: 'v243', title: 'Day-by-day segmentation', sub: 'Auto-split passages >24h into daily stats' },
+        { id: 'v244', title: 'Passage comparison table', sub: 'Side-by-side comparison of 2+ passages' },
+        { id: 'v245', title: 'Insights integration', sub: 'Add passage stats to InsightsPage' },
+      ],
+      'v25': [
+        { id: 'v251', title: 'Story mode', sub: 'Animated flyTo along trace, pause at posts/events' },
+        { id: 'v252', title: 'Shareable map URL', sub: 'Encode center/zoom/filters in URL hash' },
+        { id: 'v253', title: 'Photo gallery on map', sub: 'Click region → photo grid' },
+        { id: 'v254', title: 'Night mode map', sub: 'Red-tinted style for cockpit' },
+      ],
+      'v26': [
+        { id: 'v261', title: 'Weather metadata on waypoints', sub: 'Record wind speed/dir per GPS point' },
+        { id: 'v262', title: 'Wind overlay on map', sub: 'Animated particles via Open-Meteo API' },
+        { id: 'v263', title: 'AIS overlay', sub: 'Signal K local + MarineTraffic API remote' },
+        { id: 'v264', title: 'POI ratings & notes', sub: 'Star rating + text on anchorages/marinas' },
+        { id: 'v265', title: 'GPX export/import', sub: 'Export passages + waypoints, import routes' },
+      ],
+      'v27': [
+        { id: 'v271', title: 'Layer toggle bar component', sub: 'Social / Navigation / Trafic / Meteo / POIs — tap to toggle' },
+        { id: 'v272', title: 'Social layer', sub: 'Posts, photos, clustering, chronological trace' },
+        { id: 'v273', title: 'Navigation layer', sub: 'GPS trace, passages, sailing events, allure segments' },
+        { id: 'v274', title: 'Traffic layer', sub: 'AIS overlay (Signal K + MarineTraffic)' },
+        { id: 'v275', title: 'Weather layer', sub: 'Wind particles, sea state, pressure' },
+        { id: 'v276', title: 'POI layer (enhanced)', sub: 'Existing + ratings, notes, depth' },
+      ],
+      'v28': [
+        { id: 'v281', title: 'Photo miniature pins (enhanced)', sub: 'Round thumbnail, multi-photo stack, flyTo on click' },
+        { id: 'v282', title: 'Post detail card on map', sub: 'Bottom sheet: gallery, title, body, author, likes, comments' },
+        { id: 'v283', title: 'Photo lightbox / gallery', sub: 'Full-screen viewer, swipe, pinch-zoom, share' },
+        { id: 'v284', title: 'Post clustering', sub: 'MapLibre cluster source, count badge, expand on click' },
+        { id: 'v285', title: 'Visibility filter on map', sub: 'Toggle: All / Public / Family / Private' },
+        { id: 'v286', title: 'Map slideshow mode', sub: 'Prev/next arrows, flyTo each post, auto-play 5s' },
+        { id: 'v287', title: 'Post trace line', sub: 'Dashed line connecting posts chronologically' },
+      ],
+      'v29': [
+        { id: 'v291', title: 'Full backup / export', sub: 'Dump all tables as JSON + schema SQL + all photos → ZIP' },
+        { id: 'v292', title: 'Cloud sync backup', sub: 'Auto-upload to Google Drive / Dropbox via OAuth' },
+        { id: 'v293', title: 'Backup restore', sub: 'Upload ZIP → re-import data + photos' },
+        { id: 'v294', title: 'Newsletter sending', sub: 'Resend API, weekly digest to subscribers' },
+        { id: 'v295', title: 'Photo gallery', sub: 'Full-screen lightbox, swipe, pinch-zoom, lazy loading' },
+      ],
+    };
+
+    // Load done state from localStorage
+    const doneState = JSON.parse(localStorage.getItem('wangap_dev_done') || '{}');
+
+    function renderTasks() {
+      Object.entries(TASKS).forEach(([sprint, tasks]) => {
+        const container = document.getElementById('tasks-' + sprint);
+        container.innerHTML = tasks.map(t => {
+          const done = doneState[t.id] || false;
+          return `
+            <div class="todo-item">
+              <div class="todo-check ${done ? 'done' : ''}" onclick="toggleTask('${t.id}', this)">${done ? '✓' : ''}</div>
+              <div class="todo-content">
+                <div class="todo-title ${done ? 'done' : ''}">${t.title}</div>
+                <div class="todo-sub">${t.sub}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      });
+    }
+
+    function toggleTask(id, el) {
+      doneState[id] = !doneState[id];
+      localStorage.setItem('wangap_dev_done', JSON.stringify(doneState));
+      renderTasks();
+    }
+
+    // ═══ Feedback ═══
+    let allFeedback = [];
+
+    async function loadFeedback() {
+      const res = await fetch(SB_URL + '/rest/v1/feedback?order=created_at.desc', { headers });
+      if (!res.ok) { document.getElementById('fb-list').innerHTML = '<div class="empty">Erreur de chargement</div>'; return; }
+      allFeedback = await res.json();
+      renderFeedback('all');
+      renderFbStats();
+    }
+
+    function renderFbStats() {
+      const bugs = allFeedback.filter(f => f.type === 'bug').length;
+      const impr = allFeedback.filter(f => f.type === 'improvement').length;
+      const unresolved = allFeedback.filter(f => !f.resolved).length;
+      const critical = allFeedback.filter(f => f.urgency === 'critical' && !f.resolved).length;
+      document.getElementById('fb-stats').innerHTML = `
+        <div class="stat-card"><div class="stat-value">${allFeedback.length}</div><div class="stat-label">Total</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--red)">${bugs}</div><div class="stat-label">Bugs</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--teal)">${impr}</div><div class="stat-label">Ameliorations</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--gold)">${unresolved}</div><div class="stat-label">Non resolus</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--red)">${critical}</div><div class="stat-label">Critiques</div></div>
+      `;
+    }
+
+    function filterFb(filter) {
+      document.querySelectorAll('.fb-filter').forEach(b => {
+        b.style.border = '1px solid var(--gray)';
+        b.style.background = 'transparent';
+        b.style.color = 'var(--gray)';
+      });
+      event.target.style.border = '1px solid var(--teal)';
+      event.target.style.background = 'rgba(27,154,170,0.15)';
+      event.target.style.color = 'var(--teal)';
+      renderFeedback(filter);
+    }
+
+    function renderFeedback(filter) {
+      let items = allFeedback;
+      if (filter === 'bug') items = items.filter(f => f.type === 'bug');
+      if (filter === 'improvement') items = items.filter(f => f.type === 'improvement');
+      if (filter === 'unresolved') items = items.filter(f => !f.resolved);
+
+      if (items.length === 0) {
+        document.getElementById('fb-list').innerHTML = '<div class="empty">Aucun feedback pour le moment</div>';
+        return;
+      }
+
+      document.getElementById('fb-list').innerHTML = items.map(f => `
+        <div class="card ${f.resolved ? 'fb-resolved' : ''}">
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            <span class="badge badge-${f.type}">${f.type === 'bug' ? '🐛 Bug' : '💡 Amelioration'}</span>
+            <span class="badge badge-${f.urgency}">${f.urgency}</span>
+            ${f.section ? `<span style="font-size:0.7rem; color:var(--gray);">📂 ${f.section}</span>` : ''}
+            ${f.resolved ? '<span style="font-size:0.7rem; color:var(--green);">✓ Resolu</span>' : ''}
+          </div>
+          <div class="fb-body">${f.body}</div>
+          <div class="fb-meta">
+            <span>${f.author_name || 'Anonyme'}</span>
+            <span>${new Date(f.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ═══ Votes ═══
+    const FEATURE_NAMES = {
+      'A2': 'A2 Couleur par vitesse', 'A3': 'A3 Couleur par allure', 'A4': 'A4 Couleur moteur/voile',
+      'A5': 'A5 Couleur jour/nuit', 'A6': 'A6 Passages (port→port)', 'A7': 'A7 Animation replay',
+      'A8': 'A8 Heatmap',
+      'B1': 'B1 Virement/empannage', 'B2': 'B2 Changement voile', 'B3': 'B3 Prise de ris',
+      'B4': 'B4 Moteur on/off', 'B5': 'B5 Mouillage', 'B6': 'B6 MOB',
+      'B7': 'B7 Meteo event', 'B8': 'B8 Boutons flottants',
+      'C1': 'C1 Log voilure', 'C2': 'C2 Allure', 'C3': 'C3 Segments allure',
+      'C4': 'C4 Camembert allures', 'C5': 'C5 Rose des vents', 'C6': 'C6 Polaire',
+      'D2': 'D2 Galerie par zone', 'D3': 'D3 Clustering', 'D4': 'D4 Filtre categorie',
+      'D5': 'D5 Story mode', 'D6': 'D6 Lien partage',
+      'E2': 'E2 Notes POI', 'E3': 'E3 GPX export', 'E4': 'E4 Profondeur POI',
+      'E5': 'E5 Detection arret', 'E6': 'E6 Cercle evitage',
+      'F1': 'F1 Passage depart→arrivee', 'F2': 'F2 Stats passage', 'F3': 'F3 Moteur vs voile',
+      'F4': 'F4 Allures/passage', 'F5': 'F5 Jour par jour', 'F6': 'F6 Quarts nuit',
+      'G2': 'G2 Vent anime', 'G3': 'G3 Houle', 'G4': 'G4 Marees', 'G5': 'G5 Historique meteo',
+      'H1': 'H1 AIS temps reel', 'H2': 'H2 Trace AIS',
+      'I1': 'I1 Slider temporel', 'I2': 'I2 Mode nuit', 'I3': 'I3 Recherche lieu', 'I4': 'I4 Mesure distance',
+      'J1': 'J1 Toggle couches', 'J2': 'J2 Couche Social', 'J3': 'J3 Couche Navigation',
+      'J4': 'J4 Couche Trafic', 'J5': 'J5 Couche Meteo',
+      'K1': 'K1 Miniature photo', 'K2': 'K2 Clic→zoom post', 'K3': 'K3 Galerie plein ecran',
+      'K4': 'K4 Multi-photos', 'K5': 'K5 Filtre visibilite', 'K6': 'K6 Popup enrichi',
+      'K7': 'K7 Trace posts', 'K8': 'K8 Diaporama carte',
+      'L1': 'L1 Export complet', 'L2': 'L2 Sync cloud', 'L3': 'L3 Restore backup',
+      'L4': 'L4 Newsletter', 'L5': 'L5 Galerie photo',
+      // Legacy IDs (backward compat with old votes)
+      'passages': '⛵ Passages', 'events': '🎯 Evenements', 'colored-trace': '🎨 Trace coloree',
+      'sail-config': '🪂 Voilure', 'allures': '🧭 Allures', 'time-slider': '🕐 Slider temporel',
+      'story-mode': '▶️ Story Mode', 'weather': '🌊 Meteo', 'ais': '📡 AIS',
+      'poi-rating': '📍 POIs', 'night-mode': '🌙 Mode nuit', 'passage-stats': '📊 Stats passage',
+    };
+
+    async function loadVotes() {
+      const res = await fetch(SB_URL + '/rest/v1/feature_votes?order=created_at.desc', { headers });
+      if (!res.ok) { document.getElementById('votes-ranking').innerHTML = '<div class="empty">Erreur</div>'; return; }
+      const votes = await res.json();
+
+      // Aggregate by feature
+      const agg = {};
+      votes.forEach(v => {
+        if (!agg[v.feature_id]) agg[v.feature_id] = { votes: [], urgencies: [], comments: [] };
+        agg[v.feature_id].votes.push(v.vote);
+        agg[v.feature_id].urgencies.push(v.urgency);
+        if (v.comment) agg[v.feature_id].comments.push({ text: v.comment, author: v.author_name, date: v.created_at });
+      });
+
+      // Sort by average score
+      const ranked = Object.entries(agg)
+        .map(([fid, data]) => ({
+          fid,
+          name: FEATURE_NAMES[fid] || fid,
+          avg: data.votes.reduce((a, b) => a + b, 0) / data.votes.length,
+          count: data.votes.length,
+          topUrgency: data.urgencies.includes('high') ? 'high' : data.urgencies.includes('medium') ? 'medium' : 'low',
+          comments: data.comments,
+        }))
+        .sort((a, b) => b.avg - a.avg);
+
+      if (ranked.length === 0) {
+        document.getElementById('votes-ranking').innerHTML = '<div class="empty">Aucun vote pour le moment. Partagez /guide.html#v2</div>';
+        document.getElementById('votes-comments').innerHTML = '';
+        return;
+      }
+
+      document.getElementById('votes-ranking').innerHTML = ranked.map((r, i) => `
+        <div class="vote-row">
+          <span style="font-size:0.75rem; color:var(--gray); width:20px;">${i + 1}.</span>
+          <span class="vote-name">${r.name}</span>
+          <div class="vote-bar-bg"><div class="vote-bar" style="width: ${r.avg / 5 * 100}%;"></div></div>
+          <span class="vote-score">${r.avg.toFixed(1)}</span>
+          <span class="vote-count">${r.count} vote${r.count > 1 ? 's' : ''}</span>
+          <span class="vote-urgency badge badge-${r.topUrgency}">${r.topUrgency}</span>
+        </div>
+      `).join('');
+
+      // All comments
+      const allComments = ranked.flatMap(r => r.comments.map(c => ({ ...c, feature: r.name })));
+      allComments.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      document.getElementById('votes-comments').innerHTML = allComments.length === 0
+        ? '<div class="empty" style="padding: 16px;">Aucun commentaire</div>'
+        : allComments.slice(0, 20).map(c => `
+          <div class="card" style="padding: 10px 14px;">
+            <div style="font-size: 0.7rem; color: var(--gray);">${c.feature} &middot; ${c.author || 'Anonyme'} &middot; ${new Date(c.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</div>
+            <div style="font-size: 0.82rem; color: var(--sand); margin-top: 4px;">${c.text}</div>
+          </div>
+        `).join('');
+    }
+
+    // Init
+    renderTasks();
+  </script>
+</body>
+</html>
