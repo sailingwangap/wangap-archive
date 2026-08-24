@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>wang'ap — Guide de démarrage</title>
+<style>
+  :root{
+    --navy:#162447; --slate:#3D405B; --teal:#1B9AAA; --gold:#E8B059; --gold-deep:#B07820;
+    --coral:#E07A5F; --green:#2EC4B6; --sand:#EFE9DA; --cream:#F7F3E8; --gray:#8D99AE;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:#fff; color:var(--slate);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  .page{ width:210mm; min-height:297mm; padding:16mm 15mm; margin:0 auto; background:#fff;
+    position:relative; }
+  .page + .page{ page-break-before:always; }
+  h1.brand{ font-family:Georgia,'Times New Roman',serif; font-size:42px; color:var(--navy);
+    text-align:center; margin:4px 0 2px; letter-spacing:.5px; }
+  .eyebrow{ text-align:center; letter-spacing:4px; font-size:11px; color:var(--gold-deep);
+    text-transform:uppercase; font-weight:700; }
+  .subtitle{ text-align:center; font-style:italic; color:var(--slate); font-size:14px; margin:8px 0; }
+  .emojis{ text-align:center; font-size:22px; letter-spacing:8px; margin:6px 0 2px; }
+  .rule{ border:none; border-top:2px solid var(--sand); margin:14px 0; }
+  h2{ font-family:Georgia,serif; color:var(--navy); font-size:17px; margin:18px 0 6px;
+    border-bottom:1px solid var(--sand); padding-bottom:4px; }
+  h2 .num{ color:var(--gold-deep); font-style:italic; margin-right:6px; }
+  p{ font-size:12.5px; line-height:1.55; margin:6px 0; }
+  .callout{ border-left:4px solid var(--gold); background:#FBF6E9; padding:10px 14px;
+    border-radius:0 8px 8px 0; margin:10px 0; font-size:12.5px; line-height:1.5; }
+  .callout.teal{ border-left-color:var(--teal); background:rgba(27,154,170,.06); }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:10px 0; }
+  .box{ border:1px solid var(--sand); border-radius:10px; padding:10px 12px; font-size:12px; line-height:1.45; }
+  .box .t{ font-weight:700; color:var(--slate); }
+  .box .ic{ font-size:16px; margin-right:4px; }
+  .zone{ text-align:center; border:1px solid var(--sand); border-radius:10px; padding:12px 8px; }
+  .zone .z{ font-size:26px; } .zone .zt{ color:var(--navy); font-weight:700; margin:4px 0 2px; }
+  .zone .zd{ font-size:11px; color:var(--gray); }
+  .badge{ display:inline-block; font-size:9px; font-weight:700; padding:1px 7px; border-radius:20px;
+    background:rgba(232,176,89,.22); color:var(--gold-deep); vertical-align:middle; margin-left:6px; }
+  .route{ font-family:ui-monospace,Menlo,monospace; font-size:10px; color:var(--gray);
+    background:var(--sand); padding:1px 6px; border-radius:5px; margin-left:6px; }
+  .card{ border:1px solid var(--sand); border-radius:12px; padding:12px 14px; margin:10px 0;
+    page-break-inside:avoid; }
+  .card h3{ font-family:Georgia,serif; color:var(--navy); font-size:15px; margin:0 0 2px; }
+  .card .icons{ font-size:18px; margin-right:6px; }
+  .card .intro{ color:var(--gray); font-size:11.5px; font-style:italic; margin:0 0 6px; }
+  ul{ margin:4px 0; padding-left:0; list-style:none; }
+  li{ font-size:12px; line-height:1.5; margin:3px 0; padding-left:18px; position:relative; }
+  li::before{ content:'✓'; color:var(--teal); position:absolute; left:0; font-weight:700; }
+  .sk{ margin-top:8px; padding-top:8px; border-top:1px dashed var(--sand); }
+  .sk .lbl{ font-size:10px; font-weight:700; color:var(--gold-deep); margin-bottom:3px; }
+  .sk li::before{ content:'✦'; color:var(--gold-deep); }
+  .foot{ text-align:center; font-size:10px; color:var(--gray); font-style:italic; margin-top:18px; }
+  .quote{ text-align:center; font-style:italic; color:var(--slate); font-size:12.5px;
+    border-top:2px solid var(--sand); padding-top:14px; margin-top:18px; }
+  @media print{ .page{ margin:0; } @page{ size:A4; margin:0; } }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1 -->
+<div class="page">
+  <div class="eyebrow">Guide de démarrage rapide</div>
+  <h1 class="brand">wang'ap</h1>
+  <div class="subtitle">Le carnet de voyage du bord — pour la famille, l'équipage et le skipper</div>
+  <div class="emojis">⚓ · ⛵ · 🌹</div>
+  <hr class="rule" />
+
+  <h2>📲 App ou navigateur ?</h2>
+  <p>Wang'ap s'ouvre dans ton navigateur à l'adresse <b>wangap.fr</b> — rien à télécharger. Pour la meilleure
+  expérience, installe-la comme une vraie application :</p>
+  <div class="grid3">
+    <div class="box"><span class="ic">📱</span><span class="t">iPhone (Safari)</span><br/>Partager ⬆️ → « Sur l'écran d'accueil ».</div>
+    <div class="box"><span class="ic">🤖</span><span class="t">Android (Chrome)</span><br/>Menu ⋮ → « Installer l'application ».</div>
+    <div class="box"><span class="ic">💻</span><span class="t">Ordinateur (Chrome/Edge)</span><br/>L'icône ⊕ dans la barre d'adresse.</div>
+  </div>
+  <p>L'app installée démarre en plein écran, <b>fonctionne hors-ligne</b> et reçoit les <b>notifications</b>.
+  C'est exactement la même app — simplement posée sur ton écran d'accueil.</p>
+
+  <h2>🔑 Se connecter : Famille ou Skipper</h2>
+  <p>La page publique (wangap.fr) est ouverte à tous. Pour voir plus, connecte-toi avec « Se connecter ».</p>
+  <div class="grid3">
+    <div class="box"><span class="ic">❤️</span><span class="t">Famille</span><br/>Compte (email + mot de passe) créé par les skippers. Accès au Voyage, à la Carte, aux Stats, aux Messages et au Livre d'Or.</div>
+    <div class="box"><span class="ic">⛵</span><span class="t">Skipper</span><br/>Catherine &amp; Bertrand. Tout ce que voit la famille, plus l'écriture, le Tech, Le Renard et toute la configuration.</div>
+    <div class="box"><span class="ic">✍️</span><span class="t">Équipier</span><br/>Reçoit un lien à usage unique des skippers pour signer le Livre d'Or — sans compte à créer.</div>
+  </div>
+  <p style="font-size:11px;color:var(--gray);font-style:italic">Mot de passe oublié → email de réinitialisation (les skippers sont prévenus).</p>
+
+  <h2><span class="num">I.</span>Deux jeux d'icônes</h2>
+  <div class="callout">Par défaut, le menu utilise les <b>icônes poétiques du Petit Prince</b>. Tu peux repasser aux
+  <b>icônes classiques</b> dans <i>Réglages → Apparence → « Mode poétique »</i>. Ci-dessous, chaque menu est montré
+  avec ses deux icônes : <b>poétique / classique</b>.</div>
+
+  <div class="foot">wang'ap · Guide de démarrage · page 1 / 4</div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page">
+  <h2><span class="num">II.</span>Les icônes d'état (sous le logo)</h2>
+  <p>En haut, juste sous « wang'ap », une rangée d'icônes montre l'état du système. Touche-en une pour ouvrir le
+  réglage correspondant. La famille voit 2 icônes (connexion + synchro) ; le skipper en voit 5.</p>
+  <div class="grid2">
+    <div class="box"><span class="ic">📶</span><span class="t">Connexion.</span> Vert = en ligne (WiFi/4G-5G), gold = 3G, rouge = 2G, 📴 = hors-ligne.</div>
+    <div class="box"><span class="ic">🔄</span><span class="t">Synchro.</span> Tourne pendant l'envoi ; mode Auto / Manuel / Off + file en attente.</div>
+    <div class="box"><span class="ic">📡</span><span class="t">AIS</span> <span class="badge">skipper</span> Vert clignotant = actif, gold = pause/limité, rouge = erreur, gris = éteint.</div>
+    <div class="box"><span class="ic">📱</span><span class="t">GPS téléphone</span> <span class="badge">skipper</span> Vert = enregistre, gold = fix périmé, rouge = éteint.</div>
+  </div>
+  <div class="box" style="margin:0 0 4px"><span class="ic">👁</span><span class="t">Visibilité publique</span> <span class="badge">skipper</span> Vert = Direct, gold = Différé, corail = Manuel.</div>
+
+  <h2><span class="num">III.</span>Les trois zones de visibilité</h2>
+  <div class="grid3">
+    <div class="zone"><div class="z">🌍</div><div class="zt">Public</div><div class="zd">Visible de tout le monde sur wangap.fr.</div></div>
+    <div class="zone"><div class="z">❤️</div><div class="zt">Famille</div><div class="zd">Visible des proches connectés.</div></div>
+    <div class="zone"><div class="z">🔒</div><div class="zt">Privé / Skipper</div><div class="zd">Visible seulement de Catherine et Bertrand.</div></div>
+  </div>
+
+  <h2>📶 Hors-ligne, par défaut</h2>
+  <div class="callout teal">L'app fonctionne sans réseau : posts et photos récents restent lisibles, la carte garde
+  les zones déjà vues. Et <b>tout ce que tu fais en mer</b> — écrire un post (avec photos et vidéos), commenter,
+  envoyer un message, éditer la trace, poser une position — est <b>mis en file et part automatiquement</b> dès que
+  la connexion revient (mode Auto). L'icône 🔄 montre la file en attente ; une vidéo ajoutée hors-ligne s'affiche
+  tout de suite et se téléverse plus tard.</div>
+
+  <h2>🔔 Notifications</h2>
+  <p>Active les notifications dans <i>Réglages → 🔔 Notifications</i>, puis choisis ce que tu reçois — chaque rôle
+  ne reçoit que ce qui le concerne.</p>
+  <div class="grid2">
+    <div class="box"><span class="t">❤️ Famille</span><br/>Nouveaux posts · réponses des skippers à tes messages · position du bateau (quand il « refait surface » après un long silence en mer).</div>
+    <div class="box"><span class="t">⛵ Skipper</span><br/>Nouveaux messages et commentaires · nouvelles entrées du Livre d'Or à valider.</div>
+  </div>
+
+  <div class="foot">wang'ap · Guide de démarrage · page 2 / 4</div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page">
+  <h2><span class="num">IV.</span>Les écrans, un par un</h2>
+
+  <div class="card">
+    <h3><span class="icons">🏠</span>Accueil <span class="route">/family</span></h3>
+    <div class="intro">Le point de départ de la famille.</div>
+    <ul>
+      <li>La position du bateau en direct.</li>
+      <li>Les dernières nouvelles du bord.</li>
+      <li>Un bouton « voir la page publique » (aperçu visiteur).</li>
+    </ul>
+    <div class="sk"><div class="lbl">⛵ En plus, pour le skipper</div><ul><li>L'accueil ouvre directement Le Voyage (Journal).</li></ul></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="icons">🌹 / 📖</span>Le Voyage (Journal) <span class="route">/timeline</span></h3>
+    <div class="intro">Tous les récits et photos du bord.</div>
+    <ul>
+      <li>Lire les posts, classés par étape et chapitre (chargement par 20 au défilement).</li>
+      <li>Filtrer par zone, étape, chapitre, auteur, type (📓 journal / 💬 post) ; recherche en tirant vers le bas.</li>
+      <li>Ouvrir un post → galerie photo plein écran (swipe / flèches), vidéos en lecture inline.</li>
+      <li>Voir les blocs Navigation / Conditions / Technique quand ils sont remplis.</li>
+      <li>Le contenu s'affiche dans ta langue (FR / EN) — traduction automatique.</li>
+    </ul>
+    <div class="sk"><div class="lbl">⛵ En plus, pour le skipper</div><ul>
+      <li>« + Nouvelle entrée » : titre, corps, étape, photos (3 tailles, HEIC → JPG) et vidéos.</li>
+      <li>Géolocalisation (GPS, EXIF photo, long-press carte), visibilité 🌍/❤️/🔒, catégorie, tags.</li>
+      <li>Blocs journal : Navigation (cap, vitesse, voiles…), Conditions (vent, mer…), Technique (moteur, batteries…).</li>
+      <li>Publier ou Brouillon ; ✏️ modifier, 🗑 supprimer (définitif).</li>
+    </ul></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="icons">⭐ / 🗺️</span>Carte <span class="route">/map</span></h3>
+    <div class="intro">Le voyage sur une carte interactive.</div>
+    <ul>
+      <li>La trace GPS colorée par étape + miniatures photo aux points publiés.</li>
+      <li>Position en direct (point doré) si l'AIS est actif.</li>
+      <li>Couches : 📷 Posts · ✿ Tracé · 🗺 Plan (route prévue) · 📍 Marks ; fond marin (OpenSeaMap) en option.</li>
+      <li>Filtre par chapitre / étape.</li>
+    </ul>
+    <div class="sk"><div class="lbl">⛵ En plus, pour le skipper</div><ul>
+      <li>Mode Édition tracé : glisser / supprimer des waypoints (lots de 200), forcer une étape, décaler les dates.</li>
+      <li>Simplifier la trace (annulable) ; dessiner une trace manuelle ; poser des marks / POIs.</li>
+      <li>Poser la position manuelle 📍 — utile au large quand l'AIS ne passe pas ; ça prévient la famille.</li>
+    </ul></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="icons">✨ / 📊</span>Stats <span class="route">/insights</span></h3>
+    <div class="intro">Les chiffres et graphiques du voyage.</div>
+    <ul>
+      <li>Milles parcourus, jours en mer, escales, vitesses moyenne et max, nuits en mer.</li>
+      <li>Graphiques : vitesse par jour, distance cumulée, répartition par catégorie.</li>
+      <li>Filtre par période (semaine / mois / total).</li>
+    </ul>
+  </div>
+
+  <div class="foot">wang'ap · Guide de démarrage · page 3 / 4</div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page">
+  <div class="card">
+    <h3><span class="icons">🐦 / ✉️</span>Liens / Messages <span class="route">/inbox</span></h3>
+    <div class="intro">Le lien avec l'équipage.</div>
+    <ul>
+      <li>Écrire un message direct à Catherine &amp; Bertrand et lire leurs réponses (pastille rouge = non lu).</li>
+      <li>Feuilleter le Livre d'Or : mots et photos des équipiers et amis.</li>
+      <li>Commenter les posts publics.</li>
+    </ul>
+    <div class="sk"><div class="lbl">⛵ En plus, pour le skipper</div><ul>
+      <li>Boîte de réception : modérer commentaires et messages, répondre (par email via Resend).</li>
+      <li>Livre d'Or (admin) : inviter un équipier par lien, modérer les contributions.</li>
+      <li>Onglet Newsletter : composer (sections + IA), test, envoi aux abonnés, abonnés, brouillons.</li>
+    </ul></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="icons">🐘 / 🔧</span>Tech <span class="badge">skipper</span> <span class="route">/maintenance</span></h3>
+    <div class="intro">Le carnet technique du bateau.</div>
+    <ul>
+      <li>Carnet de maintenance : enregistrer chaque intervention (catégorie, heures moteur, pièces, coût).</li>
+      <li>Alertes de prochaine échéance + statistiques (dernière vidange, heures moteur cumulées).</li>
+      <li>To-dos : liste à faire avec priorité, étape, date butoir, alerte si en retard.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3><span class="icons">🦊</span>Le Renard <span class="badge">skipper</span> <span class="route">/renard</span></h3>
+    <div class="intro">L'assistant IA technique du bord.</div>
+    <ul>
+      <li>Poser des questions techniques en langage naturel ; réponses en streaming citant manuels et vidéos.</li>
+      <li>Bascule Haiku (rapide) / Sonnet (réfléchi) ; mode hors-ligne (recherche locale sans Claude).</li>
+      <li>Citations vidéo avec deep-link au timecode dans Drive.</li>
+      <li>Base de connaissances (/renard/admin) : uploader PDF / TXT, ingérer une vidéo, lancer le backfill, voir / supprimer les documents.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3><span class="icons">🪐 / ⚙️</span>Réglages <span class="route">/settings</span></h3>
+    <div class="intro">Tes préférences et la configuration. Le menu s'ouvre en sous-menus (bouton retour).</div>
+    <ul>
+      <li>Identité : nom affiché + avatar. · Langue : FR / EN.</li>
+      <li>Apparence : mode poétique (icônes Petit Prince), mode nuit, fond uni (6 couleurs) ou photo.</li>
+      <li>Synchronisation : Auto / Manuel / Off. · GPS du téléphone + Notifications push.</li>
+    </ul>
+    <div class="sk"><div class="lbl">⛵ En plus, pour le skipper</div><ul>
+      <li>Chapitres &amp; étapes (créer, réordonner, masquer), navigation &amp; position manuelle.</li>
+      <li>AIS — suivi en direct (MMSI, fournisseur, état, Flux DB), visibilité publique de la position.</li>
+      <li>Sauvegarde &amp; archive (export Drive, snapshot archive.wangap.fr), gestion des accès (rôles).</li>
+      <li>Maintenance technique (version, backfill photos), cohérence du tracé (consolidation) et maintenance de la trace.</li>
+    </ul></div>
+  </div>
+
+  <div class="quote">« On ne voit bien qu'avec le cœur. L'essentiel est invisible pour les yeux. »</div>
+  <div class="foot">wang'ap · Guide de démarrage · page 4 / 4</div>
+</div>
+
+</body>
+</html>

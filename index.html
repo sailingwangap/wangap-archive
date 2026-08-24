@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- V1.9.3 — REVERT V1.9-A11Y-1(a): re-add maximum-scale=1.0 +
+         user-scalable=no. The original change satisfied Lighthouse a11y
+         (-8 points reclaimed) but real-world UX broke: accidental pinches
+         while sailing zoomed the whole page including the StarryHeader and
+         TabBar, dropping the user out of the navigation. At-sea PWA UX
+         (gloves, wet hands, one hand on a winch) > a11y audit score. Users
+         who genuinely need zoom can use iOS Settings → Accessibility →
+         Zoom (system-level, works on top of any web app). Lighthouse a11y
+         drops back from 93 to ~85, still > 80, well above the public
+         landing's other score floors. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#0B1026" />
+    <meta name="description" content="Wang'ap — Journal de Bord. Catherine & Bertrand, tour du monde à la voile sur un Outremer 52. Suivez notre aventure en direct." />
+    <meta name="keywords" content="sailing, voile, tour du monde, catamaran, Outremer 52, journal de bord, logbook, Wang'ap" />
+    <meta name="author" content="Catherine & Bertrand" />
+
+    <!-- Open Graph / Social sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Wang'ap — Journal de Bord" />
+    <meta property="og:description" content="Tour du monde à la voile — Catherine & Bertrand sur un Outremer 52. Suivez notre aventure en direct." />
+    <meta property="og:image" content="/images/lagoon-hero.jpg" />
+    <meta property="og:url" content="https://jdb-wangap-bay.vercel.app" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:locale:alternate" content="en_GB" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Wang'ap" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Wang'ap — Journal de Bord</title>
+    <script type="module" crossorigin src="/assets/index-o83iA9rV.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/chunk-DseTPa7n.js">
+    <link rel="modulepreload" crossorigin href="/assets/preload-helper-ca-nBW7U.js">
+    <link rel="modulepreload" crossorigin href="/assets/offline-BvSD-ONg.js">
+    <link rel="modulepreload" crossorigin href="/assets/jsx-runtime-C6D02mtk.js">
+    <link rel="modulepreload" crossorigin href="/assets/createLucideIcon-Dtwl8pH0.js">
+    <link rel="modulepreload" crossorigin href="/assets/book-open-Cr1zwJYa.js">
+    <link rel="modulepreload" crossorigin href="/assets/mail-DD4PRfRD.js">
+    <link rel="modulepreload" crossorigin href="/assets/map-DtrRLyRu.js">
+    <link rel="modulepreload" crossorigin href="/assets/supabase-xBreiSsJ.js">
+    <link rel="modulepreload" crossorigin href="/assets/useLivreOrPendingCount--SDGSDmE.js">
+    <link rel="modulepreload" crossorigin href="/assets/react-dom-BdqGs-ys.js">
+    <link rel="modulepreload" crossorigin href="/assets/useTranslation-DuxZkkun.js">
+    <link rel="modulepreload" crossorigin href="/assets/chunk-OE4NN4TA-CGv4dpUj.js">
+    <link rel="modulepreload" crossorigin href="/assets/Avatar-D5kVJc-P.js">
+    <link rel="modulepreload" crossorigin href="/assets/offline-policy-9v7iuhhE.js">
+    <link rel="modulepreload" crossorigin href="/assets/useAuth-D6XrcU_a.js">
+    <link rel="modulepreload" crossorigin href="/assets/geo-DpcpnY5v.js">
+    <link rel="modulepreload" crossorigin href="/assets/tracking-ByMP4ZIm.js">
+    <link rel="modulepreload" crossorigin href="/assets/useBoatConfig-JvqbENm8.js">
+    <link rel="modulepreload" crossorigin href="/assets/usePageTracking-g1ByWoo2.js">
+    <link rel="modulepreload" crossorigin href="/assets/imageVariants-Bal9wR5-.js">
+    <link rel="modulepreload" crossorigin href="/assets/fireRemux-D1HsUpOt.js">
+    <link rel="modulepreload" crossorigin href="/assets/notifications-_ChL_Ecd.js">
+    <link rel="modulepreload" crossorigin href="/assets/useSync-KEAeGiwa.js">
+    <link rel="modulepreload" crossorigin href="/assets/useTracking-CdyRMMBL.js">
+    <link rel="modulepreload" crossorigin href="/assets/commentActivity-D9ix3Q-L.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-UgI4Dlw_.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>JavaScript is required to run Wang'ap.</noscript>
+    <script>
+      // V1.9.3 — emergency reset via ?reset=1 (or ?reset).
+      // Self-service recovery for users whose PWA is stuck on a stale SW
+      // (e.g., the V1.9.3-INC-1 Vercel DDoS challenge blocked sw.js update,
+      // or any other SW lifecycle wedge). Append ?reset=1 to any URL —
+      // unregisters every SW for this origin, deletes wangap-* caches,
+      // strips the param and reloads from network.
+      // Runs BEFORE the SW gate below so it works even when the SW is
+      // currently active (because at this point the SW is just a fetch
+      // interceptor; calling unregister() releases its claim before the
+      // reload).
+      //
+      // V3.0 F12 — protective confirm. Reset does NOT touch the IDB queue
+      // directly (only Cache Storage), but the user usually reaches this
+      // path expecting a clean slate, and if they then re-install or wipe
+      // app data the queue goes with it. So when there are unsynced rows
+      // we make them explicitly acknowledge before proceeding. We talk
+      // straight to IndexedDB here — Dexie isn't loaded at this point in
+      // page bootstrap.
+      (function () {
+        try {
+          var sp = new URLSearchParams(window.location.search);
+          if (!sp.has('reset')) return;
+
+          var done = function () {
+            var clean = window.location.pathname + (window.location.hash || '');
+            window.location.replace(clean);
+          };
+          var abort = function () {
+            // Strip the ?reset param so the user is on the normal URL
+            // again — don't reload (which would re-trigger).
+            var clean = window.location.pathname + (window.location.hash || '');
+            window.history.replaceState({}, '', clean);
+          };
+          var proceed = function () {
+            var unreg = ('serviceWorker' in navigator)
+              ? navigator.serviceWorker.getRegistrations().then(function (rs) {
+                  return Promise.all(rs.map(function (r) { return r.unregister(); }));
+                }).catch(function () {})
+              : Promise.resolve();
+            var clearCaches = ('caches' in window)
+              ? caches.keys().then(function (ks) {
+                  return Promise.all(ks
+                    .filter(function (k) { return k.indexOf('wangap-') === 0; })
+                    .map(function (k) { return caches.delete(k); }));
+                }).catch(function () {})
+              : Promise.resolve();
+            Promise.all([unreg, clearCaches]).then(done, done);
+            // Safety: even if Promise.all hangs (rare), force reload after 4 s.
+            setTimeout(done, 4000);
+          };
+
+          // Skip the confirm prompt if the URL also carries ?force=1 — the
+          // in-app "Force fresh reload" button uses it (it already shows its
+          // own confirm).
+          if (sp.has('force')) { proceed(); return; }
+
+          if (!('indexedDB' in window)) { proceed(); return; }
+
+          var req = indexedDB.open('WangapJDB');
+          var timer = setTimeout(function () { try { req.onsuccess = null; } catch (_) {} proceed(); }, 1500);
+          req.onerror = function () { clearTimeout(timer); proceed(); };
+          req.onsuccess = function () {
+            clearTimeout(timer);
+            var idb = req.result;
+            try {
+              if (!idb.objectStoreNames.contains('syncQueue')) { idb.close(); proceed(); return; }
+              var tx = idb.transaction('syncQueue', 'readonly');
+              var store = tx.objectStore('syncQueue');
+              var countReq = store.count();
+              countReq.onsuccess = function () {
+                idb.close();
+                var n = countReq.result || 0;
+                if (n === 0) { proceed(); return; }
+                var ok = window.confirm(
+                  'Vider le cache et recharger ?\n\n' +
+                  n + ' modification' + (n > 1 ? 's' : '') + ' en attente de synchronisation. ' +
+                  'Le cache web sera vidé mais les modifications resteront stockées hors-ligne.\n\n' +
+                  'Astuce : Réglages → Maintenance → "Exporter la file" sauvegarde ces données dans un fichier avant de continuer.'
+                );
+                if (ok) proceed(); else abort();
+              };
+              countReq.onerror = function () { idb.close(); proceed(); };
+            } catch (_) { try { idb.close(); } catch (__) {} proceed(); }
+          };
+        } catch (_) { /* best effort */ }
+      })();
+    </script>
+    <script>
+      // V1.9-DEV-1: gate SW off on localhost/LAN. Prod stays a PWA. The SW's
+      // stale-while-revalidate on `/@vite/client` serves a previous dev
+      // session's HMR token and breaks the WebSocket handshake; same branch
+      // shadows code edits to /src/* until the cache revalidates. On dev
+      // loads we also unregister any pre-existing SW + purge wangap-* caches
+      // so existing installs self-heal on first visit.
+      (function () {
+        if (!('serviceWorker' in navigator)) return;
+        var h = location.hostname;
+        var isLocal =
+          h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' ||
+          /^10\./.test(h) || /^192\.168\./.test(h) ||
+          /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(h);
+        if (isLocal) {
+          navigator.serviceWorker.getRegistrations()
+            .then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); })
+            .catch(function () {});
+          if ('caches' in window) {
+            caches.keys()
+              .then(function (keys) {
+                return Promise.all(keys
+                  .filter(function (k) { return k.indexOf('wangap-') === 0; })
+                  .map(function (k) { return caches.delete(k); }));
+              })
+              .catch(function () {});
+          }
+          return;
+        }
+        // V2.1.2 Batch 11 — archive-mode builds actively UNREGISTER any
+        // pre-existing service worker (from a Batch 6-8 visit that DID
+        // register one) AND purge the wangap-* caches. Without this, Chrome
+        // serves stale assets from the old SW indefinitely, redirecting
+        // /wangap-archive/genese back through the broken old worker and
+        // landing on /genese (404 on the github.io root). Safari is less
+        // aggressive so it tends to work without this hard reset.
+        if ('true' === 'true') {
+          navigator.serviceWorker.getRegistrations()
+            .then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); })
+            .catch(function () {});
+          if ('caches' in window) {
+            caches.keys()
+              .then(function (ks) { return Promise.all(ks
+                .filter(function (k) { return k.indexOf('wangap-') === 0; })
+                .map(function (k) { return caches.delete(k); })); })
+              .catch(function () {});
+          }
+          return;
+        }
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').catch(function () {});
+        });
+      })();
+    </script>
+  </body>
+</html>
