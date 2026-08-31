@@ -1,0 +1,13 @@
+{
+  "snapshot_date": "2026-08-31T09:33:49.347Z",
+  "snapshot_number": 21,
+  "stats": {
+    "posts": 37,
+    "etapes": 7,
+    "chapters": 3,
+    "photos": 428,
+    "waypoints": 332
+  },
+  "generator": "wangap-archive V2.1.2 Batch 6 (frozen SPA)",
+  "archive_repo": "sailingwangap/wangap-archive"
+}

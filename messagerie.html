@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wang'ap — La messagerie, mode d'emploi</title>
+  <meta name="description" content="Guide de la messagerie Wang'ap pour Catherine & Bertrand : famille, visiteurs, réponses, vérification email, persistance." />
+<style>
+  :root {
+    --sand:   #F4F1DE;  --paper:  #FBFAF2;  --paper2: #FFFFFF;
+    --ink:    #33364B;  --ink-soft:#5C6079;
+    --teal:   #148A99;  --teal-tint: rgba(20,138,153,0.10); --teal-line: rgba(20,138,153,0.30);
+    --terra:  #D06A4F;  --terra-tint: rgba(208,106,79,0.10);
+    --gold:   #C68A2E;  --gold-tint: rgba(198,138,46,0.12);
+    --muted:  #8D99AE;
+    --line:   rgba(51,54,75,0.12);
+    --shadow: 0 1px 3px rgba(51,54,75,0.06), 0 8px 24px rgba(51,54,75,0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --sand:  #0C1230;  --paper: #161D3C;  --paper2: #1C2547;
+      --ink:   #ECEBE0;  --ink-soft:#B4B8CC;
+      --teal:  #52C7D6;  --teal-tint: rgba(82,199,214,0.12); --teal-line: rgba(82,199,214,0.34);
+      --terra: #F0987F;  --terra-tint: rgba(240,152,127,0.13);
+      --gold:  #E7BD6E;  --gold-tint: rgba(231,189,110,0.14);
+      --muted: #97A2B8;
+      --line:  rgba(255,255,255,0.11);
+      --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 10px 30px rgba(0,0,0,0.28);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--sand); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.62; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 664px; margin: 0 auto; padding: 0 20px 72px; }
+
+  header { text-align: center; padding: 54px 0 30px; }
+  .kicker { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--teal); font-weight: 700; margin: 0 0 14px; }
+  h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 700;
+    font-size: clamp(28px, 6vw, 38px); line-height: 1.08; margin: 0 0 12px;
+    color: var(--ink); text-wrap: balance; }
+  h1 .ap { color: var(--teal); }
+  .lede { font-size: 16.5px; color: var(--ink-soft); margin: 0 auto; max-width: 52ch; text-wrap: pretty; }
+  .rule { width: 46px; height: 3px; border-radius: 3px; background: var(--teal); margin: 22px auto 0; }
+
+  section { margin-top: 40px; }
+  h2 { font-family: Georgia, serif; font-size: 21px; margin: 0 0 4px; color: var(--ink);
+    display: flex; align-items: baseline; gap: 10px; text-wrap: balance; }
+  h2 .n { font-size: 13px; font-weight: 700; color: var(--teal); font-family: system-ui, sans-serif;
+    letter-spacing: 0.04em; flex: none; min-width: 1.4em; }
+  .sub { color: var(--ink-soft); font-size: 15px; margin: 2px 0 16px 0; padding-left: calc(1.4em + 10px); }
+  p { margin: 0 0 12px; }
+  strong { color: var(--ink); font-weight: 650; }
+  .mail { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.92em;
+    background: var(--teal-tint); color: var(--teal); padding: 1px 6px; border-radius: 6px; font-weight: 600; white-space: nowrap; }
+
+  .cards { display: grid; gap: 14px; }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px;
+    padding: 18px 18px 16px; box-shadow: var(--shadow); }
+  .card .top { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .chip { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center;
+    font-size: 21px; flex: none; }
+  .chip.fam { background: var(--terra-tint); }
+  .chip.vis { background: var(--teal-tint); }
+  .chip.com { background: var(--gold-tint); }
+  .card h3 { margin: 0; font-size: 16px; font-family: Georgia, serif; color: var(--ink); }
+  .card .who { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: 0.02em; }
+  .card p { font-size: 14.5px; color: var(--ink-soft); margin: 0; }
+
+  .callout { background: var(--paper); border: 1px solid var(--teal-line); border-radius: 16px;
+    padding: 18px 20px; box-shadow: var(--shadow); }
+  .callout h3 { margin: 0 0 12px; font-size: 15px; font-family: Georgia, serif; color: var(--teal); }
+  .flow { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .flow li { display: flex; gap: 12px; align-items: flex-start; font-size: 14.5px; color: var(--ink-soft); }
+  .flow .ic { font-size: 17px; flex: none; line-height: 1.3; }
+  .flow strong { color: var(--ink); }
+
+  .note { font-size: 13.5px; color: var(--ink-soft); background: var(--gold-tint);
+    border-radius: 12px; padding: 12px 15px; margin-top: 14px; }
+  .note b { color: var(--ink); }
+
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700;
+    padding: 2px 9px; border-radius: 999px; vertical-align: middle; }
+  .pill.vis { background: var(--teal-tint); color: var(--teal); }
+  .pill.fam { background: rgba(141,153,174,0.18); color: var(--muted); }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 520px; background: var(--paper); }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
+    font-weight: 700; background: var(--paper2); }
+  tr:last-child td { border-bottom: none; }
+  td b { color: var(--ink); font-weight: 650; }
+  td .s { color: var(--muted); }
+
+  footer { margin-top: 46px; padding-top: 20px; border-top: 1px solid var(--line);
+    text-align: center; font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="kicker">Guide pour Catherine &amp; Bertrand</p>
+    <h1>La messagerie <span class="ap">Wang'ap</span>, mode d'emploi</h1>
+    <p class="lede">Trois personnes différentes peuvent vous écrire depuis le site — et tout arrive au même endroit&nbsp;: dans l'application. Voici comment ça marche, pas à pas.</p>
+    <div class="rule"></div>
+  </header>
+
+  <section>
+    <h2><span class="n">1</span> Qui peut vous écrire</h2>
+    <p class="sub">Trois provenances, une seule application pour tout recevoir.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="top">
+          <div class="chip fam">❤️</div>
+          <div><h3>La famille</h3><div class="who">Un proche connecté (avec un compte)</div></div>
+        </div>
+        <p>Ils vous envoient un message ou commentent un article. Vous leur répondez dans l'app&nbsp;: ils voient votre réponse dans leur espace, <strong>sans email</strong>.</p>
+      </div>
+      <div class="card">
+        <div class="top">
+          <div class="chip vis">🌍</div>
+          <div><h3>Un visiteur — un message</h3><div class="who">Depuis « Nous envoyer un message »</div></div>
+        </div>
+        <p>N'importe qui, depuis le bas de la page publique. Il doit donner son <strong>nom</strong>, un <strong>email ou un téléphone</strong>, et son message.</p>
+      </div>
+      <div class="card">
+        <div class="top">
+          <div class="chip com">🌍</div>
+          <div><h3>Un visiteur — un commentaire</h3><div class="who">Un mot sous un article du journal</div></div>
+        </div>
+        <p>Mêmes règles&nbsp;: nom, email ou téléphone, et le commentaire. Il peut aussi le laisser via la petite bulle 💬 sur les cartes, sans ouvrir tout l'article.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">2</span> L'email se vérifie une seule fois</h2>
+    <p class="sub">Fini les mots marqués « email non vérifié ».</p>
+    <p>La <strong>première fois</strong> qu'un visiteur laisse son email, il reçoit un lien de confirmation. Tant qu'il n'a pas cliqué, son mot ne vous parvient pas — c'est ce qui garantit que l'adresse est réelle.</p>
+    <p>Une fois confirmé, <strong>c'est réglé pour toujours</strong>&nbsp;: il ne revérifie jamais, même s'il change de téléphone ou d'ordinateur. Son nouvel appareil est automatiquement rattaché à son email déjà vérifié.</p>
+    <div class="note">📱 <b>Sans email&nbsp;?</b> S'il ne laisse qu'un téléphone, il n'y a rien à vérifier — vous lui répondrez par <b>WhatsApp</b>.</div>
+  </section>
+
+  <section>
+    <h2><span class="n">3</span> Où tout arrive dans l'app</h2>
+    <p class="sub">Les messages d'un côté, les commentaires de l'autre.</p>
+    <p>Les <strong>messages</strong> (famille et visiteurs) arrivent dans votre <strong>boîte Messages</strong>.</p>
+    <p>Les <strong>commentaires</strong> arrivent dans l'onglet <strong>Commentaires</strong>. Cet onglet est votre <strong>liste de suivi</strong> — il vous dit ce qu'il reste à traiter. Chaque ligne indique d'un coup d'œil sa provenance&nbsp;:</p>
+    <ul class="flow">
+      <li><span class="ic">🌍</span><span><span class="pill vis">🌍 Visiteur</span> — <strong>reste dans la liste</strong> tant qu'un skipper n'a pas répondu, et réapparaît si le visiteur vous réécrit.</span></li>
+      <li><span class="ic">❤️</span><span><span class="pill fam">❤️ Famille</span> — un simple lien qui <strong>disparaît dès que vous l'avez ouvert</strong> (aucune réponse attendue).</span></li>
+    </ul>
+    <div class="note">👤 <b>À deux, sans doublon.</b> Un commentaire de visiteur non traité s'affiche chez Catherine <b>et</b> chez Bertrand. Dès que l'un de vous répond, il disparaît de sa propre liste. Pour l'autre, il reste visible (pour l'info) jusqu'à ce qu'il l'ouvre&nbsp;: comme le visiteur a déjà eu sa réponse, l'ouvrir suffit à le retirer de sa liste.</div>
+  </section>
+
+  <section>
+    <h2><span class="n">4</span> Comment vous répondez</h2>
+    <p class="sub">Aux messages depuis la boîte, aux commentaires depuis le journal.</p>
+    <p>À un <strong>message</strong> → directement depuis la boîte <strong>Messages</strong>.</p>
+    <p>À un <strong>commentaire</strong> → depuis l'<strong>article, dans le journal</strong> (le fil du commentaire). L'onglet Commentaires sert seulement au suivi&nbsp;; la réponse, elle, se tape sous le commentaire. Elle se place <strong>juste sous le mot du visiteur</strong> — ce n'est pas un message envoyé à tout le monde.</p>
+    <div class="callout">
+      <h3>Ce qui se passe quand vous répondez</h3>
+      <ul class="flow">
+        <li><span class="ic">✉️</span><span>Un email part depuis <span class="mail">contact@wangap.fr</span>. <strong>Votre adresse Gmail personnelle reste privée.</strong></span></li>
+        <li><span class="ic">↩️</span><span>Si le visiteur répond à cet email, sa réponse arrive dans <span class="mail">sailing.wangap@gmail.com</span> — votre boîte du bateau.</span></li>
+        <li><span class="ic">🚫</span><span>Aucun logiciel de mail ne s'ouvre&nbsp;: <strong>tout se fait dans l'app</strong>.</span></li>
+        <li><span class="ic">📱</span><span>La réponse apparaît <strong>aussi</strong> directement dans l'espace du visiteur, sur le site.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">5</span> L'espace privé de chaque visiteur</h2>
+    <p class="sub">Chacun voit sa propre conversation, et rien d'autre.</p>
+    <p>Sur le site, chaque visiteur retrouve — <strong>dans son propre navigateur</strong> — ses messages, ses commentaires et vos réponses. Personne d'autre ne les voit&nbsp;: c'est <strong>privé, sur son appareil</strong>.</p>
+    <p>Il peut vous <strong>re-répondre</strong> depuis cet espace. Sa nouvelle réponse relance le fil… et le fait <strong>revenir dans votre liste</strong>.</p>
+    <div class="note">👀 <b>Qui voit les commentaires des visiteurs&nbsp;?</b> Tous les skippers, toujours. La <b>famille</b> ne les voit que si vous avez activé l'option dans les Réglages.</div>
+  </section>
+
+  <section>
+    <h2><span class="n">6</span> Rien ne se perd</h2>
+    <p class="sub">Le principe le plus important à retenir.</p>
+    <p>Un commentaire de visiteur <strong>reste sous vos yeux tant qu'il n'a pas de réponse</strong>. Un skipper répond → il quitte sa liste. Le visiteur relance → il revient. Vous gardez toujours la trace de ce qu'il reste à faire, sans rien noter à la main.</p>
+    <div class="note">💬 <b>La bulle sur les cartes.</b> Sur la page publique et le journal, une petite bulle 💬 à côté du cœur permet de commenter sans ouvrir l'article. Quand une conversation est en cours, elle <b>se colore et affiche le nombre d'échanges</b>.</div>
+  </section>
+
+  <section>
+    <h2><span class="n">✓</span> En un coup d'œil</h2>
+    <p class="sub">La même chose, résumée.</p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Qui</th><th>Où ça arrive</th><th>Vous répondez…</th><th>La ligne…</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>❤️ <b>Famille</b><br><span class="s">message</span></td>
+            <td>Boîte <b>Messages</b></td>
+            <td>dans l'app</td>
+            <td class="s">—</td>
+          </tr>
+          <tr>
+            <td>❤️ <b>Famille</b><br><span class="s">commentaire</span></td>
+            <td>Onglet <b>Commentaires</b></td>
+            <td>dans le journal</td>
+            <td><b>disparaît</b> une fois vue</td>
+          </tr>
+          <tr>
+            <td>🌍 <b>Visiteur</b><br><span class="s">message</span></td>
+            <td>Boîte <b>Messages</b></td>
+            <td>dans l'app → email <span class="mail">contact@wangap.fr</span></td>
+            <td class="s">—</td>
+          </tr>
+          <tr>
+            <td>🌍 <b>Visiteur</b><br><span class="s">commentaire</span></td>
+            <td>Onglet <b>Commentaires</b> <span class="s">(suivi)</span></td>
+            <td>dans le journal → email <span class="mail">contact@wangap.fr</span></td>
+            <td><b>reste</b> tant que non répondu</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Wang'ap · Journal de bord de Catherine &amp; Bertrand · Messagerie v2 (juillet 2026)
+  </footer>
+</div>
+</body>
+</html>

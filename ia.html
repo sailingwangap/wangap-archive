@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wang'ap — IA & données / AI & data</title>
+  <meta name="robots" content="noindex" />
+  <meta name="description" content="Comment Wang'ap utilise l'IA (Le Renard, newsletter, traduction, vision), l'architecture technique RAG, et l'alignement avec les standards (ISO/IEC 42001, NIST AI RMF, AI Act)." />
+  <style>
+    :root { --night:#0B1026; --navy:#162447; --teal:#1B9AAA; --gold:#E8B059; --gold-deep:#B07820; --coral:#E07A5F; --sand:#F4F1DE; --cream:#FFFCF2; --slate:#3D405B; --gray:#8D99AE; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:var(--slate); background:var(--cream); line-height:1.62; -webkit-font-smoothing:antialiased; }
+    a { color:var(--teal); }
+    code { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.85em; background:var(--sand); padding:1px 5px; border-radius:5px; }
+    header.top { position:sticky; top:0; z-index:50; background:linear-gradient(180deg,var(--night) 0%,var(--navy) 100%); color:var(--sand); padding:14px 18px; box-shadow:0 2px 14px rgba(0,0,0,.25); }
+    .top-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; max-width:960px; margin:0 auto; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:800; font-size:18px; }
+    .brand .logo { width:34px; height:34px; border-radius:9px; background:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .brand small { display:block; font-weight:500; font-size:11px; color:var(--gold); }
+    .spacer { flex:1; }
+    .lang-toggle { display:flex; background:rgba(255,255,255,.12); border-radius:9px; overflow:hidden; }
+    .lang-toggle button { border:none; background:transparent; color:var(--sand); padding:7px 12px; cursor:pointer; font-weight:700; font-size:12px; }
+    .lang-toggle button.active { background:var(--gold); color:var(--night); }
+    .back-app { color:var(--sand); text-decoration:none; font-size:12px; opacity:.85; border:1px solid rgba(255,255,255,.25); padding:6px 11px; border-radius:9px; white-space:nowrap; }
+    main { max-width:960px; margin:0 auto; padding:18px 18px 70px; }
+    .intro { background:rgba(27,154,170,.10); color:var(--navy); border-radius:10px; padding:12px 16px; font-size:13.5px; margin-bottom:16px; }
+    .toc { background:#fff; border-radius:12px; padding:12px 16px; margin-bottom:18px; box-shadow:0 1px 8px rgba(0,0,0,.05); }
+    .toc b { font-size:12px; text-transform:uppercase; letter-spacing:.5px; color:var(--gray); }
+    .toc a { display:inline-block; font-size:13px; margin:4px 12px 2px 0; }
+    .card { background:#fff; border-radius:14px; padding:16px 20px; margin-bottom:14px; box-shadow:0 1px 8px rgba(0,0,0,.05); border:1px solid rgba(0,0,0,.04); scroll-margin-top:72px; }
+    .card h2 { font-size:18px; color:var(--navy); margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+    .card h3 { font-size:14px; color:var(--navy); margin:12px 0 4px; }
+    .card p { font-size:14px; margin:6px 0; }
+    .card ul { margin:8px 0 0 2px; padding-left:18px; }
+    .card li { font-size:13.5px; margin-bottom:6px; }
+    .card li b, .card p b { color:var(--navy); }
+    .steps { counter-reset:step; list-style:none; padding-left:0; margin-top:8px; }
+    .steps li { position:relative; padding-left:34px; margin-bottom:12px; font-size:13.5px; }
+    .steps li::before { counter-increment:step; content:counter(step); position:absolute; left:0; top:0; width:24px; height:24px; border-radius:50%; background:var(--teal); color:#fff; font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; }
+    table.spec { width:100%; border-collapse:collapse; margin-top:8px; font-size:13px; }
+    table.spec th, table.spec td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--sand); vertical-align:top; }
+    table.spec th { color:var(--gray); font-size:11px; text-transform:uppercase; letter-spacing:.4px; font-weight:700; }
+    table.spec td:first-child { font-weight:700; color:var(--navy); white-space:nowrap; }
+    .pill { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; }
+    .ok { background:rgba(6,214,160,.16); color:#0a7f5f; }
+    .partial { background:rgba(232,176,89,.20); color:var(--gold-deep); }
+    .diagram { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; white-space:pre; overflow-x:auto; background:var(--night); color:#cfe3e7; border-radius:10px; padding:14px 16px; line-height:1.65; margin-top:8px; }
+    .diagram .c { color:#E8B059; }
+    footer { max-width:960px; margin:0 auto; padding:22px 18px 60px; border-top:1px solid rgba(0,0,0,.08); color:var(--gray); font-size:12.5px; }
+    /* language toggle */
+    body[data-lang="fr"] .en { display:none; }
+    body[data-lang="en"] .fr { display:none; }
+  </style>
+</head>
+<body data-lang="fr">
+  <header class="top">
+    <div class="top-row">
+      <div class="brand"><span class="logo">🤖</span><span>wang'ap<small class="fr">IA &amp; données</small><small class="en">AI &amp; data</small></span></div>
+      <div class="spacer"></div>
+      <div class="lang-toggle">
+        <button id="lang-fr" class="active" onclick="setLang('fr')">FR</button>
+        <button id="lang-en" onclick="setLang('en')">EN</button>
+      </div>
+      <a class="back-app" href="/"><span class="fr">← l'app</span><span class="en">← the app</span></a>
+    </div>
+  </header>
+
+  <main>
+    <div class="intro">
+      <span class="fr"><b>Note d'usage de l'IA & alignement.</b> Comment Wang'ap utilise l'intelligence artificielle, avec quelles données, comment elle est encadrée — et sa correspondance avec les standards reconnus. Suivi de l'architecture technique détaillée.</span>
+      <span class="en"><b>AI usage & alignment note.</b> How Wang'ap uses AI, with what data, how it is governed — and how it maps to recognised standards. Followed by the detailed technical architecture.</span>
+    </div>
+
+    <div class="toc">
+      <b class="fr">Sommaire</b><b class="en">Contents</b><br>
+      <a href="#usages"><span class="fr">① Où l'IA est utilisée</span><span class="en">① Where AI is used</span></a>
+      <a href="#alignement"><span class="fr">② Alignement standards</span><span class="en">② Standards alignment</span></a>
+      <a href="#archi"><span class="fr">③ Architecture technique (RAG)</span><span class="en">③ Technical architecture (RAG)</span></a>
+      <a href="#fournisseurs"><span class="fr">④ Fournisseurs & données</span><span class="en">④ Providers & data</span></a>
+    </div>
+
+    <!-- ① USAGES -->
+    <div class="card" id="usages">
+      <h2>① <span class="fr">Où l'IA est utilisée</span><span class="en">Where AI is used</span></h2>
+      <ul>
+        <li class="fr"><b>🦊 Le Renard</b> — assistant technique du bord. Répond aux questions sur le bateau en s'appuyant sur <b>ta</b> documentation (manuels, vidéos, schémas), avec citation des sources. <em>Réservé au skipper.</em></li>
+        <li class="en"><b>🦊 Le Renard</b> — the on-board technical assistant. Answers boat questions grounded in <b>your</b> documentation (manuals, videos, schematics), citing sources. <em>Skipper-only.</em></li>
+        <li class="fr"><b>📰 Newsletter</b> — génère un <em>brouillon</em> à partir des articles choisis ; <b>toujours relu et envoyé par un humain</b>.</li>
+        <li class="en"><b>📰 Newsletter</b> — generates a <em>draft</em> from the selected posts; <b>always reviewed and sent by a human</b>.</li>
+        <li class="fr"><b>🌍 Traduction FR↔EN</b> — traduit le contenu public (articles, newsletter) à la demande.</li>
+        <li class="en"><b>🌍 FR↔EN translation</b> — translates public content (posts, newsletter) on demand.</li>
+        <li class="fr"><b>🔌 Vision (schémas)</b> — « lit » les schémas électriques scannés pour les rendre cherchables par Le Renard.</li>
+        <li class="en"><b>🔌 Vision (schematics)</b> — "reads" scanned electrical diagrams to make them searchable in Le Renard.</li>
+      </ul>
+      <p class="fr" style="margin-top:10px;"><b>Principe clé :</b> l'IA <em>assiste</em>, un humain <em>décide</em>. Rien n'est publié ni envoyé automatiquement.</p>
+      <p class="en" style="margin-top:10px;"><b>Key principle:</b> AI <em>assists</em>, a human <em>decides</em>. Nothing is published or sent automatically.</p>
+    </div>
+
+    <!-- ② ALIGNEMENT -->
+    <div class="card" id="alignement">
+      <h2>② <span class="fr">Alignement avec les standards</span><span class="en">Alignment with standards</span></h2>
+      <p class="fr">Wang'ap est une application <b>personnelle/familiale</b> qui <em>utilise</em> des services d'IA tiers (elle n'en produit pas). Une <b>certification ISO/IEC 42001</b> (système de management de l'IA) vise des organisations qui commercialisent de l'IA — elle serait disproportionnée ici. En revanche, l'app <b>s'aligne volontairement sur les principes</b> de ces cadres :</p>
+      <p class="en">Wang'ap is a <b>personal/family</b> app that <em>consumes</em> third-party AI (it does not build AI). An <b>ISO/IEC 42001</b> (AI management system) certification targets organisations that ship AI — it would be disproportionate here. Instead, the app <b>voluntarily aligns with the principles</b> of these frameworks:</p>
+      <ul>
+        <li><b>ISO/IEC 42001:2023</b> — <span class="fr">système de management de l'IA (le référentiel certifiable).</span><span class="en">AI management system (the certifiable standard).</span></li>
+        <li><b>ISO/IEC 23894:2023</b> — <span class="fr">gestion des risques liés à l'IA.</span><span class="en">AI risk management guidance.</span></li>
+        <li><b>NIST AI RMF 1.0</b> — <span class="fr">cadre de gestion des risques (Govern / Map / Measure / Manage).</span><span class="en">risk framework (Govern / Map / Measure / Manage).</span></li>
+        <li><b>EU AI Act</b> — <span class="fr">un assistant documentaire + rédaction relève du risque <b>minimal/limité</b> → surtout des obligations de <b>transparence</b>.</span><span class="en">a documentation assistant + drafting is <b>minimal/limited</b> risk → mainly <b>transparency</b> duties.</span></li>
+      </ul>
+      <h3 class="fr">Auto-évaluation</h3><h3 class="en">Self-assessment</h3>
+      <table class="spec">
+        <thead><tr>
+          <th><span class="fr">Principe</span><span class="en">Principle</span></th>
+          <th>Wang'ap</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span class="fr">Supervision humaine</span><span class="en">Human oversight</span></td><td><span class="pill ok">OK</span> <span class="fr">newsletter relue + envoyée par un humain ; Le Renard est consultatif, réservé admin.</span><span class="en">newsletter reviewed + sent by a human; Le Renard is advisory, admin-only.</span></td></tr>
+          <tr><td><span class="fr">Ancrage / exactitude</span><span class="en">Grounding / accuracy</span></td><td><span class="pill ok">OK</span> <span class="fr">réponses citées (document + page) ; consigne « ne jamais inventer, renvoyer vers un pro pour la sécurité ».</span><span class="en">answers cite document + page; instructed to "never fabricate, refer to a pro for safety".</span></td></tr>
+          <tr><td><span class="fr">Transparence</span><span class="en">Transparency</span></td><td><span class="pill partial">Partiel</span> <span class="fr">Le Renard affiche ses sources et « réponse issue des connaissances générales » ; les newsletters n'indiquent pas explicitement « rédigé avec l'IA ».</span><span class="en">Le Renard shows sources + "answer from general knowledge"; newsletters don't explicitly say "AI-assisted".</span></td></tr>
+          <tr><td><span class="fr">Gouvernance des données</span><span class="en">Data governance</span></td><td><span class="pill ok">OK</span> <span class="fr">accès IA réservé admin (RLS) ; secrets en variables d'environnement, jamais dans le code.</span><span class="en">AI access admin-only (RLS); secrets in env vars, never in code.</span></td></tr>
+          <tr><td><span class="fr">Vie privée</span><span class="en">Privacy</span></td><td><span class="pill partial">Partiel</span> <span class="fr">les prompts (documents, photos) transitent chez les fournisseurs — voir §④ ; éviter d'y inclure des données personnelles de tiers.</span><span class="en">prompts (docs, photos) transit through providers — see §④; avoid third-party personal data in prompts.</span></td></tr>
+          <tr><td><span class="fr">Robustesse</span><span class="en">Robustness</span></td><td><span class="pill ok">OK</span> <span class="fr">récupération résiliente (recherche hybride + repli), dégradation contrôlée hors-ligne.</span><span class="en">resilient retrieval (hybrid search + fallback), graceful offline degradation.</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ③ ARCHITECTURE -->
+    <div class="card" id="archi">
+      <h2>③ <span class="fr">Architecture technique — Le Renard (RAG)</span><span class="en">Technical architecture — Le Renard (RAG)</span></h2>
+      <p class="fr">Le Renard repose sur une architecture <b>RAG</b> (<em>Retrieval-Augmented Generation</em>). Plutôt que de répondre « de mémoire », le modèle reçoit d'abord les <b>extraits pertinents de ta documentation</b>, puis rédige à partir d'eux.</p>
+      <p class="en">Le Renard is built on <b>RAG</b> (<em>Retrieval-Augmented Generation</em>). Instead of answering "from memory", the model is first given the <b>relevant excerpts of your documentation</b>, then writes from them.</p>
+
+      <div class="diagram">Drive ──▶ <span class="c">Ingestion multimodale</span> ──▶ Chunks ──▶ <span class="c">Embeddings (1536-d)</span> ──▶ pgvector
+   ├─ PDF / Word / Docs  → texte (pdfjs / mammoth)              │
+   ├─ Vidéos             → ffmpeg → Whisper (horodaté)          │
+   └─ Schémas scannés    → image → vision Claude                ▼
+question ─▶ embedding ┐                                 <span class="c">recherche hybride (RRF)</span>
+            mots-clés  ┴──────────────────────────────────▶ top-12 ──▶ <span class="c">Claude</span> ──▶ réponse + sources
+                                        + <span class="c">carnet de maintenance</span> (contexte)</div>
+
+      <h3 class="fr">1. Ingestion multimodale & découpage</h3><h3 class="en">1. Multimodal ingestion & chunking</h3>
+      <p class="fr">Un worker <code>GitHub Actions</code> récupère les fichiers d'un dossier Google Drive. Le texte (PDF via <code>pdfjs</code>, Word via <code>mammoth</code>, Google Docs exportés) est nettoyé (retrait des caractères de contrôle C0/NUL — sinon Postgres refuse l'insertion) puis découpé en <b>chunks d'environ 2000 caractères avec 800 de chevauchement</b>, la coupe se calant sur une fin de phrase (pour ne pas scinder une idée). Vidéos et schémas suivent des chemins dédiés (ci-dessous) mais aboutissent au même index.</p>
+      <p class="en">A <code>GitHub Actions</code> worker pulls files from a Google Drive folder. Text (PDF via <code>pdfjs</code>, Word via <code>mammoth</code>, exported Google Docs) is cleaned (C0/NUL control chars stripped — Postgres rejects them) then split into <b>~2000-char chunks with 800 overlap</b>, cutting on sentence boundaries. Videos and schematics take dedicated paths (below) but land in the same index.</p>
+
+      <h3 class="fr">2. Vidéos — extraction du son puis transcription</h3><h3 class="en">2. Video — audio extraction then transcription</h3>
+      <p class="fr">Une vidéo n'a pas de texte : l'information est dans la parole. <b><code>ffmpeg</code></b> extrait la piste audio en <b>MP3 mono 16 kHz</b>, découpée en <b>segments de 20 min</b> (l'API de transcription plafonne à 25 Mo / ~25 min). Chaque segment passe chez <b><code>OpenAI Whisper</code></b> en mode <code>verbose_json</code> (horodatage par segment de parole) ; les timestamps sont décalés de <code>index × 1200 s</code> pour se recoller sur une timeline continue. La transcription est regroupée en <b>chunks de ~600 caractères</b> portant <code>t_start_sec</code> / <code>t_end_sec</code>. Résultat : la source cite « voir vidéo … à 4:32 » et <b>le lien ouvre la vidéo Drive au bon timecode</b>.</p>
+      <p class="en">A video has no text — the information is in speech. <b><code>ffmpeg</code></b> extracts the audio as <b>16 kHz mono MP3</b>, split into <b>20-min segments</b> (the transcription API caps at 25 MB / ~25 min). Each segment goes to <b><code>OpenAI Whisper</code></b> in <code>verbose_json</code> mode (per-speech-segment timestamps); timestamps are offset by <code>index × 1200 s</code> onto a continuous timeline. The transcript is grouped into <b>~600-char chunks</b> carrying <code>t_start_sec</code> / <code>t_end_sec</code>. The source then cites "see video … at 4:32" and <b>the link opens the Drive video at that timecode</b>.</p>
+
+      <h3 class="fr">3. Schémas — vision Claude</h3><h3 class="en">3. Schematics — Claude vision</h3>
+      <p class="fr">Un PDF scanné (sans couche texte) est rendu page → image (<code>pdfjs</code> + <code>@napi-rs/canvas</code>), puis <b>décrit par la vision de Claude</b> (composants, numéros de câbles, connexions X→Y, repères de zone). Cette description devient un chunk normal (embeddé + indexé), avec <code>meta.image_url</code> vers l'image — d'où le lien 🔌 qui montre le schéma sous la réponse.</p>
+      <p class="en">A scanned PDF (no text layer) is rendered page → image (<code>pdfjs</code> + <code>@napi-rs/canvas</code>), then <b>described by Claude vision</b> (components, cable numbers, X→Y connections, zone markers). That description becomes a normal chunk (embedded + indexed) with <code>meta.image_url</code> to the image — hence the 🔌 link that shows the diagram under the answer.</p>
+
+      <h3 class="fr">4. Embeddings & stockage vectoriel</h3><h3 class="en">4. Embeddings & vector store</h3>
+      <p class="fr">Chaque chunk (texte, transcription vidéo ou description de schéma) est transformé en <b>vecteur de 1536 dimensions</b> par <code>OpenAI text-embedding-3-small</code> — une position dans un espace où <b>proximité géométrique ≈ proximité de sens</b> (« préfiltre 5 microns » ≈ « cartouche de filtration », sans mot commun). Stocké dans <b>PostgreSQL + <code>pgvector</code></b> : colonne <code>embedding vector(1536)</code> (index approximatif IVFFlat/HNSW pour les plus proches voisins) + colonne <code>tsvector</code> (config <code>french</code>, stemming) pour le plein-texte. Les lots d'embeddings sont bornés par budget de caractères (le plafond OpenAI de 300k tokens se calcule mal en caractères/4 pour l'arabe / le CJK).</p>
+      <p class="en">Each chunk (text, video transcript or schematic description) becomes a <b>1536-dimension vector</b> via <code>OpenAI text-embedding-3-small</code> — a point in a space where <b>geometric closeness ≈ semantic closeness</b>. Stored in <b>PostgreSQL + <code>pgvector</code></b>: an <code>embedding vector(1536)</code> column (approximate IVFFlat/HNSW nearest-neighbour index) + a <code>tsvector</code> column (<code>french</code> config, stemming) for full-text. Embedding batches are bounded by a character budget (OpenAI's 300k-token cap is mis-estimated by chars/4 for Arabic / CJK).</p>
+
+      <h3 class="fr">5. Recherche hybride (dense + creuse) + RRF</h3><h3 class="en">5. Hybrid retrieval (dense + sparse) + RRF</h3>
+      <p class="fr">Un seul appel SQL (<code>match_rag_documents</code>) lance deux recherches :</p>
+      <p class="en">One SQL call (<code>match_rag_documents</code>) runs two searches:</p>
+      <ul>
+        <li class="fr"><b>Vectorielle (dense)</b> — <code>ORDER BY embedding &lt;=&gt; :q</code> (distance <b>cosinus</b>), top-24 par le sens.</li>
+        <li class="en"><b>Vector (dense)</b> — <code>ORDER BY embedding &lt;=&gt; :q</code> (<b>cosine</b>), top-24 by meaning.</li>
+        <li class="fr"><b>Plein-texte (creuse)</b> — sur le <code>tsvector</code> FR, lexèmes reliés en <b>OU</b> (<code>'a' | 'b' | 'c'</code>) pour ne pas exiger tous les mots ; classé par <code>ts_rank</code>.</li>
+        <li class="en"><b>Full-text (sparse)</b> — on the FR <code>tsvector</code>, lexemes <b>OR</b>-ed (<code>'a' | 'b' | 'c'</code>) so not every word is required; ranked by <code>ts_rank</code>.</li>
+      </ul>
+      <p class="fr">Fusion par <b>RRF</b> (<em>Reciprocal Rank Fusion</em>, k=60) — on additionne les <b>rangs</b> (pas les scores bruts, non comparables) :</p>
+      <p class="en">Merged by <b>RRF</b> (<em>Reciprocal Rank Fusion</em>, k=60) — summing <b>ranks</b> (not raw, incomparable scores):</p>
+      <div class="diagram">score = 1 / (60 + rang_vecteur) + 1 / (60 + rang_texte)   →   garder les 12 meilleurs</div>
+      <p class="fr">Le vecteur apporte le sens, les mots-clés la précision (numéros de pièce, sigles) ; et si l'embedding échoue, le plein-texte porte seul la récupération (résilience).</p>
+      <p class="en">Vector brings meaning, keywords bring precision (part numbers, acronyms); and if the embedding fails, full-text carries retrieval alone (resilience).</p>
+
+      <h3 class="fr">6. Carnet de maintenance — contexte ambiant</h3><h3 class="en">6. Maintenance log — ambient context</h3>
+      <p class="fr">En plus des extraits récupérés, Le Renard injecte <b>l'état vivant du bord</b> : les <b>5 dernières entrées</b> de <code>maintenance_logs</code> (titre, catégorie, description, heures moteur, date) sont ajoutées au contexte sous un bloc « MAINTENANCE RÉCENTE » — <b>sans</b> pastille source (ce sont des faits opérationnels, pas de la doc). C'est ce qui permet à Claude de <b>croiser la doc avec le réel</b> (« je ne trouve aucune trace d'entretien récent du dessalinisateur »).</p>
+      <p class="en">Beyond the retrieved excerpts, Le Renard injects <b>the boat's live state</b>: the <b>last 5</b> <code>maintenance_logs</code> entries (title, category, description, engine hours, date) are added to the context as a "RECENT MAINTENANCE" block — <b>without</b> a source chip (operational facts, not documentation). This lets Claude <b>cross-check docs against reality</b> ("I find no recent watermaker service").</p>
+
+      <h3 class="fr">7. Génération, citations & modèle en direct</h3><h3 class="en">7. Generation, citations & live model</h3>
+      <p class="fr">Le contexte (extraits + maintenance) part chez <b>Claude</b> avec un prompt strict : <b>citer la source (document + page), ne rien inventer, renvoyer vers un pro pour la sécurité</b>. La réponse est <b>streamée en SSE</b> delta par delta ; les sources (et l'image d'un schéma) arrivent dans un événement séparé, rendu sous la réponse. Le modèle (Haiku / Sonnet) est <b>résolu en direct</b> depuis la liste <code>/v1/models</code> d'Anthropic (le plus récent de la famille), avec repli automatique — donc aucun identifiant de modèle codé en dur ne peut « expirer ».</p>
+      <p class="en">The context (excerpts + maintenance) goes to <b>Claude</b> with a strict prompt: <b>cite the source (document + page), never fabricate, defer to a pro for safety</b>. The answer is <b>streamed over SSE</b> delta by delta; sources (and a schematic's image) arrive in a separate event rendered under the answer. The model (Haiku / Sonnet) is <b>resolved live</b> from Anthropic's <code>/v1/models</code> list (newest of the family), with automatic fallback — so no hardcoded model id can "expire".</p>
+    </div>
+
+    <!-- ④ FOURNISSEURS -->
+    <div class="card" id="fournisseurs">
+      <h2>④ <span class="fr">Fournisseurs & données</span><span class="en">Providers & data</span></h2>
+      <p class="fr">Wang'ap s'appuie sur des services établis. On <b>hérite</b> de leurs certifications plutôt que d'en viser une propre :</p>
+      <p class="en">Wang'ap relies on established services. We <b>inherit</b> their certifications rather than pursuing our own:</p>
+      <table class="spec">
+        <thead><tr>
+          <th><span class="fr">Fournisseur</span><span class="en">Provider</span></th>
+          <th><span class="fr">Rôle</span><span class="en">Role</span></th>
+          <th><span class="fr">Données envoyées</span><span class="en">Data sent</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td>Anthropic (Claude)</td><td><span class="fr">réponses, brouillons, vision</span><span class="en">answers, drafts, vision</span></td><td><span class="fr">question + extraits docs / images de schémas</span><span class="en">question + doc excerpts / schematic images</span></td></tr>
+          <tr><td>OpenAI</td><td><span class="fr">embeddings (recherche)</span><span class="en">embeddings (search)</span></td><td><span class="fr">texte des chunks + la question</span><span class="en">chunk text + the question</span></td></tr>
+          <tr><td>Supabase</td><td><span class="fr">base de données + stockage</span><span class="en">database + storage</span></td><td><span class="fr">documents, vecteurs, images</span><span class="en">documents, vectors, images</span></td></tr>
+          <tr><td>Vercel</td><td><span class="fr">hébergement + fonctions</span><span class="en">hosting + functions</span></td><td><span class="fr">requêtes de l'app</span><span class="en">app requests</span></td></tr>
+        </tbody>
+      </table>
+      <p class="fr" style="margin-top:10px;font-size:12.5px;color:var(--gray)">Anthropic et OpenAI publient leurs conformités (SOC 2, ISO 27001) et leurs conditions de traitement des données ; par défaut, les API professionnelles n'entraînent pas leurs modèles sur les données envoyées. Vérifie leurs pages « Trust / DPA » pour le détail à jour.</p>
+      <p class="en" style="margin-top:10px;font-size:12.5px;color:var(--gray)">Anthropic and OpenAI publish their compliance (SOC 2, ISO 27001) and data-processing terms; by default, their business APIs do not train on submitted data. Check their "Trust / DPA" pages for current details.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p class="fr">Wang'ap — note d'usage de l'IA. Document indicatif, non contractuel. Pour l'architecture complète du code, voir le guide « Stack technique ».</p>
+    <p class="en">Wang'ap — AI usage note. Indicative, non-contractual. For the full code architecture, see the "Tech stack" guide.</p>
+  </footer>
+
+  <script>
+    function setLang(l) {
+      document.body.setAttribute('data-lang', l);
+      document.documentElement.lang = l;
+      document.getElementById('lang-fr').classList.toggle('active', l === 'fr');
+      document.getElementById('lang-en').classList.toggle('active', l === 'en');
+      try { localStorage.setItem('wangap-guide-lang', l); } catch (e) {}
+    }
+    // honor ?lang= (from the in-app Help link) then a saved pref
+    const url = new URLSearchParams(location.search).get('lang');
+    const saved = (() => { try { return localStorage.getItem('wangap-guide-lang'); } catch (e) { return null; } })();
+    setLang(url === 'en' || url === 'fr' ? url : (saved === 'en' ? 'en' : 'fr'));
+  </script>
+</body>
+</html>
