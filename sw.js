@@ -167,7 +167,7 @@
 // (migration 083), not per-device localStorage. The skipper sets "cut if silence >
 // N h / implied speed > M kn" once and every map (skipper/family/public) uses it.
 // MapView + Settings read/write boat_config; debounced write. (needs migration 083.)
-const CACHE_NAME = 'wangap-v181';
+const CACHE_NAME = 'wangap-v188';
 const IMAGE_CACHE = 'wangap-images-v1';
 const TILE_CACHE = 'wangap-tiles-v1';
 const EXPECTED_CACHES = new Set([CACHE_NAME, IMAGE_CACHE, TILE_CACHE]);
@@ -271,9 +271,21 @@ self.addEventListener('install', (event) => {
 // they'd be deleted on every SW update.
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((names) =>
-      Promise.all(names.filter((n) => !EXPECTED_CACHES.has(n)).map((n) => caches.delete(n)))
-    )
+    caches.keys()
+      .then((names) =>
+        Promise.all(names.filter((n) => !EXPECTED_CACHES.has(n)).map((n) => caches.delete(n)))
+      )
+      // V3.2.1 — evict the CARTO tiles left in TILE_CACHE. Bumping CACHE_NAME
+      // does not touch TILE_CACHE (it is in EXPECTED_CACHES and its name never
+      // changes), so without this every device keeps up to 2 000 dead CARTO
+      // entries — some of them the watermarked ones — occupying the FIFO cap
+      // and evicting the Esri tiles that replaced them. Nothing requests those
+      // URLs any more, so this only ever deletes.
+      .then(() => caches.open(TILE_CACHE))
+      .then((cache) => cache.keys().then((reqs) => Promise.all(
+        reqs.filter((r) => r.url.includes('basemaps.cartocdn.com')).map((r) => cache.delete(r))
+      )))
+      .catch(() => { /* a cache-eviction failure must never block activation */ })
   );
   self.clients.claim();
 });
@@ -318,14 +330,22 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // V3.0 F3 — Map basemap (CARTO raster + OpenSeaMap raster overlay +
+  // V3.0 F3 — Map basemap (raster tiles + OpenSeaMap raster overlay +
   // demotiles.maplibre.org glyph PBFs) — cache-first into a dedicated
   // FIFO-capped cache. Without this the map is grey squares offline.
-  // CARTO subdomain rotates (a./b./c./d.basemaps.cartocdn.com), hence
-  // `endsWith`; OpenSeaMap likewise uses t.openseamap.org / tiles.* etc.
+  // OpenSeaMap uses t.openseamap.org / tiles.* etc, hence `endsWith`.
   // Cross-origin responses come back opaque (response.ok === false);
   // we cache them anyway since the browser serves opaque responses fine.
+  //
+  // V3.2.1 — `server.arcgisonline.com` added: it is the basemap provider now
+  // (CARTO started watermarking keyless tiles — see src/lib/basemap.js). It
+  // ALSO fixes a pre-existing gap: the 🧭 nautical mode has been pulling its
+  // Esri ocean base from that host since V1.9-MAP-1 and was never cached, so
+  // nautical mode has always been blank offline. The CARTO entry stays only as
+  // a safety net for any call site the swap missed; the activate handler above
+  // purges what it had already cached.
   if (
+    url.hostname === 'server.arcgisonline.com' ||
     url.hostname.endsWith('basemaps.cartocdn.com') ||
     url.hostname.endsWith('openseamap.org') ||
     url.hostname === 'demotiles.maplibre.org'
