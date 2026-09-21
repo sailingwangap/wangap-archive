@@ -167,7 +167,22 @@
 // (migration 083), not per-device localStorage. The skipper sets "cut if silence >
 // N h / implied speed > M kn" once and every map (skipper/family/public) uses it.
 // MapView + Settings read/write boat_config; debounced write. (needs migration 083.)
-const CACHE_NAME = 'wangap-v188';
+// ⚠️ DELIBERATELY NOT BUMPED for the 2026-09-11 egress outage fix.
+//
+// Supabase REST responses are stored in CACHE_NAME, and `activate` deletes
+// every cache outside EXPECTED_CACHES — so bumping this version DELETES the
+// cached journal on every device that installs the new worker. During an
+// outage whose only mitigation is "serve what this browser last saw", that is
+// exactly backwards: the bump would wipe the data the fix exists to serve.
+//
+// The browser byte-compares sw.js and installs a changed worker regardless of
+// this constant, so the new logic ships without it.
+//
+// ⚠️ FOLLOW-UP: REST responses do not belong in a version-stamped cache at
+// all. They should live in their own `wangap-api-v1` — like IMAGE_CACHE and
+// TILE_CACHE, which survive every bump by design. Until that lands, every
+// routine version bump silently throws the offline journal away.
+const CACHE_NAME = 'wangap-v214';
 const IMAGE_CACHE = 'wangap-images-v1';
 const TILE_CACHE = 'wangap-tiles-v1';
 const EXPECTED_CACHES = new Set([CACHE_NAME, IMAGE_CACHE, TILE_CACHE]);
@@ -313,18 +328,38 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Supabase API — network first, fallback to cache (GET only)
+  //
+  // ⚠️ AN ERROR RESPONSE IS NOT A NETWORK FAILURE, and this handler used to
+  // treat only the second as worth falling back from. On 2026-09-11 Supabase
+  // restricted the whole project for exceeding its egress quota and answered
+  // every request with **402** — a perfectly successful HTTP exchange. `fetch`
+  // resolved, `.catch` never ran, the cached copy was never consulted, and the
+  // 402 went straight through to the app. Measured on wangap.fr that day: 15
+  // Supabase requests, all 402, and a public home page reading
+  // "0 milles · 0 jours · 0 pays · 0 escales" with no error anywhere. A page
+  // that looks fine and states a falsehood is worse than one that admits it is
+  // offline.
+  //
+  // So the fallback is keyed on "did we get usable data", not on "did the
+  // socket open". 4xx and 5xx alike fall back to whatever this browser last
+  // saw, which for a returning visitor is the whole journal.
   if (url.hostname.includes('supabase.co') && url.pathname.includes('/rest/') && event.request.method === 'GET') {
+    const fromCache = () => caches.match(event.request).then(
+      (r) => r || new Response('[]', { status: 503, headers: { 'Content-Type': 'application/json' } }),
+    );
     safeRespond(
       event,
       () =>
         fetch(event.request)
           .then((response) => {
-            if (response && response.ok) safePut(event.request, response.clone());
-            return response;
+            if (response && response.ok) {
+              safePut(event.request, response.clone());
+              return response;
+            }
+            // An error the server chose to send. Prefer stale truth over it.
+            return fromCache();
           })
-          .catch(() =>
-            caches.match(event.request).then((r) => r || new Response('[]', { status: 503, headers: { 'Content-Type': 'application/json' } }))
-          ),
+          .catch(fromCache),
       new Response('[]', { status: 503, headers: { 'Content-Type': 'application/json' } })
     );
     return;
