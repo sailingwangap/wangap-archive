@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /renard
+Disallow: /renard/admin
+Disallow: /inbox
+Disallow: /settings
+Disallow: /maintenance
+Disallow: /todos
+
+Sitemap: https://jdb-wangap-bay.vercel.app/sitemap.xml
