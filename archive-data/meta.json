@@ -1,11 +1,11 @@
 {
-  "snapshot_date": "2026-09-21T08:47:01.243Z",
-  "snapshot_number": 23,
+  "snapshot_date": "2026-09-28T09:35:26.876Z",
+  "snapshot_number": 24,
   "stats": {
-    "posts": 41,
+    "posts": 42,
     "etapes": 8,
     "chapters": 4,
-    "photos": 464,
+    "photos": 465,
     "waypoints": 363
   },
   "generator": "wangap-archive V2.1.2 Batch 6 (frozen SPA)",
