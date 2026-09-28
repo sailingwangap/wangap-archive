@@ -167,31 +167,40 @@
 // (migration 083), not per-device localStorage. The skipper sets "cut if silence >
 // N h / implied speed > M kn" once and every map (skipper/family/public) uses it.
 // MapView + Settings read/write boat_config; debounced write. (needs migration 083.)
-// ⚠️ DELIBERATELY NOT BUMPED for the 2026-09-11 egress outage fix.
+// V3.4 item 2 — REST RESPONSES NOW LIVE IN THEIR OWN CACHE, and that is what
+// unfreezes this constant.
 //
-// Supabase REST responses are stored in CACHE_NAME, and `activate` deletes
-// every cache outside EXPECTED_CACHES — so bumping this version DELETES the
-// cached journal on every device that installs the new worker. During an
-// outage whose only mitigation is "serve what this browser last saw", that is
-// exactly backwards: the bump would wipe the data the fix exists to serve.
+// Until today Supabase REST responses were stored in CACHE_NAME, and `activate`
+// deletes every cache outside EXPECTED_CACHES — so bumping this version DELETED
+// the cached journal on every device that installed the new worker. During the
+// 11 September outage, whose only mitigation was "serve what this browser last
+// saw", that was exactly backwards, and the bump had to be skipped by hand
+// (it sat at v214 from 8 September to 22 September for this reason alone).
 //
-// The browser byte-compares sw.js and installs a changed worker regardless of
-// this constant, so the new logic ships without it.
+// They live in `API_CACHE` ('wangap-api-v1') now, alongside IMAGE_CACHE and
+// TILE_CACHE, which survive every bump by design because their names never
+// change. ⚠️ The activate handler RESCUES existing REST entries out of the old
+// version-stamped cache before purging it, so this very bump does not throw
+// away the journal it exists to protect.
 //
-// ⚠️ FOLLOW-UP: REST responses do not belong in a version-stamped cache at
-// all. They should live in their own `wangap-api-v1` — like IMAGE_CACHE and
-// TILE_CACHE, which survive every bump by design. Until that lands, every
-// routine version bump silently throws the offline journal away.
-const CACHE_NAME = 'wangap-v214';
+// So: bump CACHE_NAME on a release again, as the repo always said.
+const CACHE_NAME = 'wangap-v265';
 const IMAGE_CACHE = 'wangap-images-v1';
 const TILE_CACHE = 'wangap-tiles-v1';
-const EXPECTED_CACHES = new Set([CACHE_NAME, IMAGE_CACHE, TILE_CACHE]);
+// V3.4 item 2 — Supabase REST responses: the offline journal. Unversioned on
+// purpose, so it survives every shell bump.
+const API_CACHE = 'wangap-api-v1';
+const EXPECTED_CACHES = new Set([CACHE_NAME, IMAGE_CACHE, TILE_CACHE, API_CACHE]);
 // Approx upper-bounds per cache. Tile entries are small (10-40 KB raster,
 // ~5-20 KB glyph PBF) so 2000 ≈ 50-100 MB. Image entries vary (sm 15 KB,
 // md 80 KB, lg 300 KB); 500 covers thousands of variants at most-used
 // sizes, ≈ 100-200 MB ceiling on photo storage growth.
 const TILE_CACHE_MAX = 2000;
 const IMAGE_CACHE_MAX = 500;
+// Generous on purpose: the whole offline journal is a few dozen queries. The
+// cap exists so a pathological caller cannot grow this without bound — not to
+// ration the thing an outage depends on.
+const API_CACHE_MAX = 400;
 
 // Guaranteed-Response wrapper. Wraps any handler so a thrown exception or a
 // resolved-non-Response value never bubbles up to the platform (which would
@@ -286,7 +295,32 @@ self.addEventListener('install', (event) => {
 // they'd be deleted on every SW update.
 self.addEventListener('activate', (event) => {
   event.waitUntil(
+    // ⚠️ V3.4 item 2 — RESCUE BEFORE PURGE. Every device installing this worker
+    // still holds its Supabase REST responses — its offline journal — inside the
+    // OLD version-stamped cache, which the purge below is about to delete. Copy
+    // them into API_CACHE first. An entry already in API_CACHE wins (it is the
+    // newer one), and the whole thing is wrapped so a failure degrades to "the
+    // journal is re-fetched when there is signal" rather than breaking activate.
     caches.keys()
+      .then((names) => {
+        const stale = names.filter((n) => n.startsWith('wangap-v') && n !== CACHE_NAME);
+        if (!stale.length) return undefined;
+        return caches.open(API_CACHE).then((api) =>
+          Promise.all(stale.map((n) =>
+            caches.open(n)
+              .then((old) => old.keys().then((reqs) => Promise.all(
+                reqs
+                  .filter((r) => r.url.includes('supabase.co') && r.url.includes('/rest/'))
+                  .map((r) => api.match(r).then((have) => (have ? undefined : old.match(r)
+                    .then((res) => (res ? api.put(r, res.clone()) : undefined))
+                    .catch(() => undefined))))
+              )))
+              .catch(() => undefined)
+          ))
+        );
+      })
+      .catch(() => undefined)
+      .then(() => caches.keys())
       .then((names) =>
         Promise.all(names.filter((n) => !EXPECTED_CACHES.has(n)).map((n) => caches.delete(n)))
       )
@@ -344,6 +378,10 @@ self.addEventListener('fetch', (event) => {
   // socket open". 4xx and 5xx alike fall back to whatever this browser last
   // saw, which for a returning visitor is the whole journal.
   if (url.hostname.includes('supabase.co') && url.pathname.includes('/rest/') && event.request.method === 'GET') {
+    // ⚠️ `caches.match` with no cacheName searches EVERY cache, and that is what
+    // makes the V3.4-item-2 move seamless: a device still holding REST entries
+    // in the old version-stamped cache keeps reading them right up until the
+    // rescue in `activate` has moved them into API_CACHE.
     const fromCache = () => caches.match(event.request).then(
       (r) => r || new Response('[]', { status: 503, headers: { 'Content-Type': 'application/json' } }),
     );
@@ -353,7 +391,7 @@ self.addEventListener('fetch', (event) => {
         fetch(event.request)
           .then((response) => {
             if (response && response.ok) {
-              safePut(event.request, response.clone());
+              safePutWithCap(API_CACHE, event.request, response.clone(), API_CACHE_MAX);
               return response;
             }
             // An error the server chose to send. Prefer stale truth over it.
