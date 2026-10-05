@@ -1,0 +1,1 @@
+function e(e){let t=(Number(e)||0)/(1024*1024);return t>100?{ok:!1,level:`refused`,mb:t,capMb:100}:t>50?{ok:!0,level:`warn`,mb:t,capMb:100}:{ok:!0,level:`ok`,mb:t,capMb:100}}export{e as t};

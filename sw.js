@@ -184,7 +184,7 @@
 // away the journal it exists to protect.
 //
 // So: bump CACHE_NAME on a release again, as the repo always said.
-const CACHE_NAME = 'wangap-v265';
+const CACHE_NAME = 'wangap-v274';
 const IMAGE_CACHE = 'wangap-images-v1';
 const TILE_CACHE = 'wangap-tiles-v1';
 // V3.4 item 2 — Supabase REST responses: the offline journal. Unversioned on
