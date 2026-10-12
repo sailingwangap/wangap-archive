@@ -104,17 +104,17 @@
       body:{
         fr:`<ul>
           <li><b>Frontend</b> : React 19, Vite 8 (Rolldown), Tailwind CSS 4, react-router 7, i18next, <b>MapLibre GL 4.7.1</b> (épinglé — v5 plante sous Rolldown), Recharts, Dexie, TipTap (newsletter), react-markdown.</li>
-          <li><b>Backend</b> : Supabase (Postgres + RLS + Storage + Auth + <b>pgvector</b>) ; <b>12 fonctions Vercel</b> (plafond Hobby — d’où les routeurs d’action) ; 58 migrations SQL.</li>
+          <li><b>Backend</b> : Supabase (Postgres + RLS + Storage + Auth + <b>pgvector</b>) ; <b>12 fonctions Vercel</b> (plafond Hobby — d’où les routeurs d’action) ; 105 migrations SQL (appliquées à la main, chacune avec son rollback).</li>
           <li><b>Tâches lourdes</b> : GitHub Actions via <code>workflow_dispatch</code> (timeout 6 h, hors limite Vercel 60 s).</li>
-          <li><b>Worker</b> : Fly.io <code>wangap-ais-worker</code> (région cdg) — écoute AIS et écrit les waypoints.</li>
+          <li><b>Worker</b> : Fly.io <code>wangap-ais-worker</code> (région cdg) — écoute l’AIS, <b>reçoit les instruments du bord</b> (<code>/ingest-nmea</code>, décodés côté serveur), les rapports du collecteur, et appelle la notification du soir toutes les heures.</li>
           <li><b>Services</b> : Resend (emails), Google Drive (sauvegardes + .docx, OAuth), OpenAI (Whisper + embeddings), Anthropic (Claude : Renard, newsletter, traduction).</li>
           <li>Dépendances notables : <code>@resvg/resvg-js</code> + <code>world-atlas</code> (carte newsletter PNG côté serveur), <code>heic2any</code> (HEIC→JPG à la volée), <code>browser-image-compression</code>, <code>pdfjs-dist</code>, <code>docx</code>, <code>web-push</code>.</li>
         </ul>`,
         en:`<ul>
           <li><b>Frontend</b>: React 19, Vite 8 (Rolldown), Tailwind CSS 4, react-router 7, i18next, <b>MapLibre GL 4.7.1</b> (pinned — v5 crashes under Rolldown), Recharts, Dexie, TipTap (newsletter), react-markdown.</li>
-          <li><b>Backend</b>: Supabase (Postgres + RLS + Storage + Auth + <b>pgvector</b>); <b>12 Vercel functions</b> (Hobby cap — hence action routers); 58 SQL migrations.</li>
+          <li><b>Backend</b>: Supabase (Postgres + RLS + Storage + Auth + <b>pgvector</b>); <b>12 Vercel functions</b> (Hobby cap — hence action routers); 105 SQL migrations (applied by hand, each with its rollback).</li>
           <li><b>Heavy work</b>: GitHub Actions via <code>workflow_dispatch</code> (6 h timeout, beyond Vercel's 60 s).</li>
-          <li><b>Worker</b>: Fly.io <code>wangap-ais-worker</code> (region cdg) — listens to AIS and writes waypoints.</li>
+          <li><b>Worker</b>: Fly.io <code>wangap-ais-worker</code> (region cdg) — listens to AIS, <b>receives the boat instruments</b> (<code>/ingest-nmea</code>, decoded server-side), the collector’s reports, and calls the evening digest hourly.</li>
           <li><b>Services</b>: Resend (email), Google Drive (backups + .docx, OAuth), OpenAI (Whisper + embeddings), Anthropic (Claude: Renard, newsletter, translation).</li>
           <li>Notable deps: <code>@resvg/resvg-js</code> + <code>world-atlas</code> (server-side newsletter map PNG), <code>heic2any</code> (HEIC→JPG on the fly), <code>browser-image-compression</code>, <code>pdfjs-dist</code>, <code>docx</code>, <code>web-push</code>.</li>
         </ul>`
@@ -212,6 +212,10 @@
       body:{
         fr:`<ul>
           <li><b>Acquisition AIS</b> : worker Fly.io abonné à AISStream (filtre MMSI), écrit dans <code>waypoints</code> avec la clé service-role (contourne RLS).</li>
+          <li><b>Instruments du bord (ADR-0028 / 0031)</b> : un <b>collecteur</b> sur le PC Windows du bord (<code>scripts/COLLECTEUR-BORD-PC.bat</code>, PowerShell 5.1, en tâche de fond avec icône) se connecte en TCP à la passerelle Yacht Devices YDEN-03 et au processeur B&amp;G, garde <b>une phrase NMEA par type et par minute</b> dans un <b>tampon sur disque</b>, et pousse toutes les 5 min vers <code>/ingest-nmea</code>. ⭐ <b>Il ne décode rien</b> : le décodage (<code>worker/ais-worker/lib/nmea.js</code>) se fait au serveur, pour qu’une correction ne demande jamais de toucher le PC du bateau. Le tampon n’est effacé qu’après un 200.</li>
+          <li><b>Deux tables</b> : la position va dans <code>waypoints</code> (<code>source='nmea'</code>), le vent, les vitesses, la profondeur, les températures, la pression, la gîte, la barre et le loch dans <code>boat_telemetry</code> — <b>famille et skipper seulement (RLS)</b>, unités marines, angles signés (bâbord négatif). Index d’idempotence : un ré-envoi n’écrit jamais deux fois.</li>
+          <li><b>Consolidation</b> : à la minute, priorité <code>nmea &gt; gpx &gt; yden &gt; ais &gt; gps</code> ; le manuel n’est jamais écrasé.</li>
+          <li><b>Surveillance</b> : le collecteur envoie des rapports (démarrage, horaire, erreurs avec ligne exacte) vers <code>/collecteur/etat</code>, rangés dans le dépôt privé <code>originals</code> et lus par Réglages → 📡 Collecteur du bord ; sa version s’affiche dans <code>/health</code>. Un « direct » = environ 5 min, et seulement PC + Starlink allumés.</li>
           <li><b>Filtre anti-jitter</b> : rejette tout waypoint trop proche du précédent (distance + Δtemps sous seuil) — sinon la base se remplirait de milliers de points superposés.</li>
           <li><b>Position effective (décision)</b> : une fonction pure <code>effectivePosition(waypoints, boatConfig, livePosition, isPublic)</code> renvoie la plus récente entre (override manuel, dernier waypoint visible par l’audience), avec un tampon « collant » d’1 h qui protège un geste humain récent contre un point AIS entrant. <b>Public, famille et skipper voient des positions différentes par conception</b> (modes live / différé / manuel).</li>
           <li><b>Filtre canonique des waypoints</b> : <code>superseded_by IS NULL OR source = 'manual'</code> partout (évite d’afficher des points « legacy »).</li>
@@ -222,6 +226,10 @@
         </ul>`,
         en:`<ul>
           <li><b>AIS acquisition</b>: Fly.io worker subscribed to AISStream (MMSI filter), writes to <code>waypoints</code> with the service-role key (bypasses RLS).</li>
+          <li><b>Boat instruments (ADR-0028 / 0031)</b>: a <b>collector</b> on the boat’s Windows PC (<code>scripts/COLLECTEUR-BORD-PC.bat</code>, PowerShell 5.1, background with a tray icon) connects over TCP to the Yacht Devices YDEN-03 gateway and the B&amp;G processor, keeps <b>one NMEA sentence per type per minute</b> in an <b>on-disk buffer</b>, and pushes every 5 min to <code>/ingest-nmea</code>. ⭐ <b>It decodes nothing</b>: decoding (<code>worker/ais-worker/lib/nmea.js</code>) happens server-side, so a fix never requires touching the boat PC. The buffer is cleared only after a 200.</li>
+          <li><b>Two tables</b>: position goes to <code>waypoints</code> (<code>source='nmea'</code>); wind, speeds, depth, temperatures, pressure, heel, rudder and log to <code>boat_telemetry</code> — <b>family and skipper only (RLS)</b>, marine units, signed angles (port negative). Idempotency index: a re-send never writes twice.</li>
+          <li><b>Consolidation</b>: per minute, priority <code>nmea &gt; gpx &gt; yden &gt; ais &gt; gps</code>; manual is never overridden.</li>
+          <li><b>Monitoring</b>: the collector sends reports (startup, hourly, errors with the exact line) to <code>/collecteur/etat</code>, stored in the private <code>originals</code> bucket and read by Settings → 📡 Onboard collector; its version shows in <code>/health</code>. “Live” = about 5 min, and only with PC + Starlink on.</li>
           <li><b>Anti-jitter filter</b>: rejects any waypoint too close to the previous one (distance + Δtime under threshold) — otherwise the DB fills with thousands of stacked points.</li>
           <li><b>Effective position (decision)</b>: a pure function <code>effectivePosition(waypoints, boatConfig, livePosition, isPublic)</code> returns the most recent of (manual override, latest audience-visible waypoint), with a 1 h "sticky" buffer protecting a recent human gesture from an incoming AIS point. <b>Public, family and skipper see different positions by design</b> (live / delayed / manual modes).</li>
           <li><b>Canonical waypoint filter</b>: <code>superseded_by IS NULL OR source = 'manual'</code> everywhere (avoids showing "legacy" points).</li>
@@ -308,10 +316,11 @@
   components/   <span class="c">admin · home · insights · layout · map · messages · newsletter · posts · settings · shared</span>
   data/ · i18n/ <span class="c">helpContent.js · fr.json / en.json</span>
 api/            <span class="c">12 Vercel functions (action-routed: renard-admin, newsletter, rag)</span>
-supabase/migrations/   <span class="c">58 migrations (+ .rollback.sql)</span>
+supabase/migrations/   <span class="c">105 migrations (+ .rollback.sql)</span>
 scripts/        <span class="c">backup · archive · ingest · newsletter · translate · renard</span>
 .github/workflows/     <span class="c">backup · archive-snapshot · ingest-video · embeddings-backfill · newsletter-send · newsletter-reminder</span>
-worker/ais-worker/     <span class="c">Fly.io AIS listener</span>
+worker/ais-worker/     <span class="c">Fly.io : AIS + réception du bord (lib/nmea.js, lib/gpx.js, fiche-yden.json)</span>
+scripts/*-BORD-PC.bat  <span class="c">collecteur du PC de bord (Windows, PowerShell 5.1) + scripts de diagnostic historiques</span>
 public/         <span class="c">guide.html · faq.html · tech.html · roadmap.html · help-shots/</span>`;
 
   const DOCS = {
