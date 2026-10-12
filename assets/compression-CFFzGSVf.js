@@ -1,0 +1,1 @@
+import{n as e}from"./browser-image-compression-3gnyMeKg.js";var t={maxSizeMB:.9,maxWidthOrHeight:1600,useWebWorker:!0,fileType:`image/jpeg`};async function n(n){return e(n,t)}export{n as t};
