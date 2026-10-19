@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Wang'ap — Journal de bord (démo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wg.css">
+<style>
+:root{
+  --paper:#FBF8F0;--paper2:#F4EDDC;--buff:#EED9A4;--shoal:#B9D7E8;--mag:#B0207E;--ink:#1D2B44;--sig:#F4CC4B;
+  --muted:#4A556A;--rule:#C6DAE7;--line:rgba(29,43,68,.16);
+  --mono:'Courier Prime',ui-monospace,Menlo,monospace;--serif:'Newsreader',Georgia,serif;--cond:'Barlow Condensed','Arial Narrow',sans-serif;
+  --rd-bg:#FBF8F0;--rd-ink:#1D2B44;--rd-muted:#4A556A;--rd-accent:#B0207E;--rd-title:#1D2B44;--rd-title-font:'Newsreader',Georgia,serif;--rd-body-font:'Newsreader',Georgia,serif;--rd-radius:6px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 18px/1.6 var(--serif);
+  background-image:radial-gradient(1100px 520px at 0 0,rgba(238,217,164,.28),transparent 60%),radial-gradient(900px 700px at 100% 55%,rgba(185,215,232,.16),transparent 60%);
+  overflow-x:hidden}
+img{max-width:100%}
+a{color:inherit}
+h1,h2,h3{margin:0;font-weight:500}
+p{margin:0}
+.wrap{max-width:1320px;margin:0 auto;padding:0 16px}
+.mono{font-family:var(--mono)}
+.cond{font-family:var(--cond);text-transform:uppercase;letter-spacing:.07em}
+[id]{scroll-margin-top:58px}
+
+/* ── header ───────────────────────── */
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:12px;min-height:64px;padding-top:max(0px,env(safe-area-inset-top))}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:auto;min-height:44px}
+.brand img{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--ink);background:#fff;object-fit:cover}
+.brand b{font:700 27px/1 var(--cond);letter-spacing:.02em}
+.brand small{display:block;font:400 11.5px/1.2 var(--mono);color:var(--muted)}
+.nav{display:none;gap:2px}
+.nav a{font:400 14px/1 var(--mono);text-decoration:none;padding:15px 8px;border-radius:4px}
+.nav a:hover{background:var(--paper2)}
+.lang{display:flex;border:1.5px solid var(--ink);border-radius:4px;overflow:hidden}
+.lang button{font:700 13px/1 var(--mono);border:0;background:transparent;color:var(--ink);min-width:40px;min-height:40px;cursor:pointer}
+.lang button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:4px;border:1.5px solid var(--ink);font:700 14px/1 var(--mono);text-decoration:none;color:var(--ink);background:transparent;cursor:pointer;white-space:nowrap}
+.btn--ink{background:var(--ink);color:var(--paper)}
+.btn--mag{background:var(--mag);border-color:var(--mag);color:#fff}
+.btn--sm{min-height:44px;padding:0 12px;font-size:13px}
+.login{display:none}
+@media(min-width:560px){.login{display:inline-flex}}
+@media(min-width:1100px){.nav{display:flex}}
+
+/* divider tabs (sticky) */
+.tabs{position:sticky;top:0;z-index:600;background:rgba(251,248,240,.94);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-bottom:2px solid var(--ink)}
+.tabs .wrap{display:flex;align-items:flex-end;gap:0;padding-top:8px}
+.tab{position:relative;display:flex;align-items:center;gap:7px;min-height:44px;padding:0 14px;margin-right:-1px;margin-bottom:-2px;
+  border:1.5px solid var(--ink);border-bottom:2px solid var(--ink);border-radius:9px 9px 0 0;text-decoration:none;
+  font:600 17px/1 var(--cond);text-transform:uppercase;letter-spacing:.06em;color:var(--ink)}
+.tab i{font:400 12px/1 var(--mono);font-style:normal;opacity:.75}
+.tab:nth-child(1){background:var(--buff)}.tab:nth-child(2){background:var(--shoal)}.tab:nth-child(3){background:var(--sig)}
+.tab.on{background:var(--paper);border-bottom-color:var(--paper);z-index:1}
+.burger{margin-left:auto;align-self:center;display:flex;align-items:center;gap:8px;min-height:44px;min-width:44px;justify-content:center;border:0;background:none;color:var(--ink);cursor:pointer;font:700 13px/1 var(--mono);padding:0 4px}
+.burger svg{width:24px;height:24px}
+.burger span{display:none}
+@media(min-width:560px){.burger span{display:inline}.tab{padding:0 20px}}
+@media(max-width:419px){.tab{padding:0 11px;font-size:16px}.tab i{display:none}}
+
+.menu{position:fixed;inset:0;z-index:800;background:var(--paper);display:flex;flex-direction:column;padding:calc(14px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));overflow-y:auto;animation:wgFade .18s}
+.menu[hidden]{display:none}
+.menu-h{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--ink);padding-bottom:10px}
+.menu-x{width:48px;height:48px;border:1.5px solid var(--ink);border-radius:4px;background:none;font-size:20px;color:var(--ink);cursor:pointer}
+.menu ol{list-style:none;margin:8px 0 18px;padding:0}
+.menu li a{display:flex;align-items:baseline;gap:14px;padding:12px 2px;border-bottom:1px solid var(--rule);text-decoration:none;font:600 27px/1.1 var(--cond);text-transform:uppercase;letter-spacing:.04em}
+.menu li a i{font:400 13px/1 var(--mono);color:var(--mag);font-style:normal;width:24px}
+.menu-f{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:auto}
+
+/* ── hero chart ───────────────────────── */
+.hero{position:relative}
+.cw{position:relative}
+.chart{position:relative;height:430px;background:#e9f1f4;overflow:hidden}
+.map{position:absolute;inset:0;overflow:hidden}
+.frame{position:absolute;inset:8px;pointer-events:none;z-index:2;border:1px solid var(--ink);outline:1px solid var(--ink);outline-offset:-7px;
+  background:
+    repeating-linear-gradient(90deg,var(--ink) 0 22px,var(--paper) 22px 44px) top/100% 5px no-repeat,
+    repeating-linear-gradient(90deg,var(--ink) 0 22px,var(--paper) 22px 44px) bottom/100% 5px no-repeat,
+    repeating-linear-gradient(180deg,var(--ink) 0 22px,var(--paper) 22px 44px) left/5px 100% no-repeat,
+    repeating-linear-gradient(180deg,var(--ink) 0 22px,var(--paper) 22px 44px) right/5px 100% no-repeat}
+.chart .map::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 55%,rgba(238,217,164,.35));mix-blend-mode:multiply;z-index:1}
+.grat text{font:400 10.5px var(--mono);fill:var(--ink);paint-order:stroke;stroke:rgba(251,248,240,.9);stroke-width:3px}
+.grat line{stroke:var(--ink);stroke-width:.6;opacity:.32}
+.rose{position:absolute;z-index:2;color:var(--mag);top:22px;right:20px;width:96px;height:96px;pointer-events:none;opacity:.9}
+.chartno{position:absolute;z-index:2;left:22px;top:22px;font:700 11px/1.3 var(--mono);background:rgba(251,248,240,.88);padding:5px 8px;border:1px solid var(--ink)}
+.boatmk{display:block;width:18px;height:18px;border-radius:50%;background:var(--sig);border:3px solid var(--mag);box-shadow:0 0 0 4px rgba(251,248,240,.85)}
+.boatlbl{position:absolute;left:16px;top:-6px;white-space:nowrap;font:700 11px/1 var(--mono);background:var(--paper);border:1px solid var(--ink);padding:4px 6px}
+
+.cart{position:relative;z-index:3;margin:-58px 16px 0;background:var(--paper);border:1.5px solid var(--ink);padding:6px;box-shadow:0 10px 30px -14px rgba(29,43,68,.45)}
+.cart-in{border:1px solid var(--ink);padding:18px 18px 20px;text-align:center}
+.badge{display:inline-block;font:600 14px/1.25 var(--cond);text-transform:uppercase;letter-spacing:.14em;padding:5px 10px;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+.cart h1{font:500 29px/1.16 var(--serif);margin:14px 0 12px;letter-spacing:-.005em;text-wrap:balance}
+.cart .nm{font:700 15px/1.3 var(--mono);color:var(--mag)}
+.cart .sub{font:400 13px/1.4 var(--mono);color:var(--muted);margin-top:6px}
+.ctas{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+.ctas .btn{flex:1 1 150px}
+
+.intro{display:grid;gap:22px;padding:30px 0 10px}
+.rq{font:italic 400 22px/1.4 var(--serif);text-align:center;max-width:34ch;margin:0 auto;text-wrap:balance}
+.rq cite,.qt cite{display:block;font:400 12.5px/1.4 var(--mono);font-style:normal;color:var(--muted);margin-top:8px}
+.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1.5px solid var(--ink);background:var(--paper)}
+.figs div{padding:14px 12px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);text-align:center}
+.figs div:nth-child(2n){border-right:0}.figs div:nth-child(n+3){border-bottom:0}
+.figs b{display:block;font:700 34px/1 var(--cond);letter-spacing:.02em}
+.figs span{display:block;font:400 13.5px/1.3 var(--mono);color:var(--muted);margin-top:6px}
+.figcap{font:600 14px/1 var(--cond);text-transform:uppercase;letter-spacing:.12em;text-align:center;margin-bottom:8px;color:var(--muted)}
+
+@media(min-width:760px){
+  .chart{height:600px}
+  .cw{position:absolute;top:44px;left:0;right:0;pointer-events:none}
+  .cart{margin:0;width:min(470px,48%);pointer-events:auto}
+  .cart-in{text-align:left;padding:24px 26px 26px}.ctas{justify-content:flex-start}
+  .cart h1{font-size:38px}
+  .rose{width:150px;height:150px;top:auto;bottom:34px;right:34px}
+  .chartno{left:auto;right:30px;top:30px}
+  .intro{grid-template-columns:1fr 1.2fr;align-items:center;gap:40px;padding:44px 0 20px}
+  .rq{text-align:left;font-size:25px}
+  .figs{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .figs div{border-bottom:0}.figs div:nth-child(2n){border-right:1px solid var(--rule)}.figs div:last-child{border-right:0}
+}
+
+/* ── section heads ───────────────────────── */
+.sec{padding:56px 0 8px}
+.sh{margin-bottom:22px}
+.kick{font:400 13px/1.2 var(--mono);color:var(--mag);margin-bottom:6px}
+.kick::before{content:"◆ "}
+.sh h2{font:700 34px/1 var(--cond);text-transform:uppercase;letter-spacing:.05em}
+.lead{font:400 19px/1.5 var(--serif);color:var(--muted);margin-top:8px;max-width:60ch}
+@media(min-width:760px){.sec{padding:76px 0 12px}.sh h2{font-size:44px}}
+
+/* ── chart table ───────────────────────── */
+.tbl{display:flex;flex-direction:column;gap:30px}
+.col{display:contents}
+.o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}.o6{order:6}.o7{order:7}.o8{order:8}.o9{order:9}
+.box{border:1.5px solid var(--ink);background:var(--paper)}
+.bh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1.5px solid var(--ink);background:var(--paper2)}
+.bh h3{font:700 19px/1.1 var(--cond);text-transform:uppercase;letter-spacing:.08em}
+.bh small{font:400 12.5px/1.2 var(--mono);color:var(--muted)}
+
+.today p{font:400 17px/1.45 var(--serif);margin-bottom:10px}
+.today dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0;border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+.today dl div{padding:10px 4px;text-align:center;border-right:1px solid var(--rule)}
+.today dl div:last-child{border:0}
+.today dt{font:700 26px/1 var(--cond)}
+.today dd{margin:5px 0 0;font:400 12.5px/1.2 var(--mono);color:var(--muted)}
+
+.filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:end}
+.filters label{display:block;font:400 12.5px/1.2 var(--mono);color:var(--muted);margin-bottom:4px}
+.sel{position:relative}
+.sel select{width:100%;appearance:none;-webkit-appearance:none;min-height:46px;padding:0 30px 0 10px;border:1.5px solid var(--ink);border-radius:4px;background:var(--paper);color:var(--ink);font:400 16px/1.2 var(--mono);text-overflow:ellipsis}
+.sel::after{content:"▾";position:absolute;right:10px;bottom:13px;pointer-events:none;font-size:14px}
+.fstat{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:10px;font:400 13.5px/1.3 var(--mono);color:var(--muted);min-height:30px}
+.reset{border:0;background:none;color:var(--mag);font:700 13.5px/1 var(--mono);text-decoration:underline;min-height:40px;cursor:pointer;padding:0}
+
+.list{display:flex;flex-direction:column}
+.entry{position:relative;padding:22px 0 20px;border-bottom:1px solid var(--rule);cursor:pointer}
+.entry:first-child{padding-top:4px}
+.entry:focus-visible{outline:2px solid var(--mag);outline-offset:4px}
+.ll{font:400 13.5px/1.45 var(--mono);color:var(--muted);margin-bottom:8px;letter-spacing:-.01em;overflow-wrap:anywhere}
+.ll b{color:var(--mag);font-weight:700}
+.entry h3{font:500 22px/1.22 var(--serif);text-wrap:balance}
+.entry:hover h3{text-decoration:underline;text-decoration-color:var(--mag);text-decoration-thickness:1.5px;text-underline-offset:4px}
+.ex{font-size:17px;line-height:1.55;margin-top:8px;color:#26324A}
+.sig{font:italic 400 17px/1.3 var(--serif);margin-top:8px;color:var(--muted)}
+.ef{display:flex;align-items:center;gap:4px;margin-top:10px;font:700 14px/1 var(--mono)}
+.ef .more{margin-right:auto;color:var(--mag);min-height:44px;display:flex;align-items:center}
+.ef a{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;text-decoration:none;font-size:18px;border-radius:50%}
+.ef a:hover{background:var(--paper2)}
+.erow{display:grid;grid-template-columns:minmax(0,1fr) 108px;gap:16px;align-items:start}
+.erow .mount{margin-top:6px}
+.empty{padding:26px 16px;border:1.5px dashed var(--ink);text-align:center;font:400 15px/1.5 var(--mono);color:var(--muted)}
+
+.entry--big{padding-bottom:26px;border-bottom:1.5px solid var(--ink)}
+.entry--big h3{font-size:30px;line-height:1.14;margin-bottom:14px}
+.entry--big .ll{font-size:14.5px;color:var(--ink);background:linear-gradient(transparent 62%,rgba(244,204,75,.55) 62%);display:inline;padding:0 2px}
+.entry--big .llw{margin-bottom:12px}
+.entry--big .ex{font-size:18px;margin-top:16px}
+.tw.typing::after{content:"▌";color:var(--mag);margin-left:1px}
+.latest{display:inline-block;font:700 12px/1 var(--mono);background:var(--mag);color:#fff;padding:5px 7px;margin-bottom:10px;letter-spacing:.04em}
+
+/* photo with paper corners */
+.mount{position:relative;display:block;margin:0;padding:5px;background:#fff;box-shadow:0 1px 1px rgba(29,43,68,.18),0 6px 14px -8px rgba(29,43,68,.35)}
+.mount img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--paper2);filter:saturate(.74) sepia(.08) contrast(1.03)}
+.mount i{position:absolute;width:20px;height:20px;background:linear-gradient(135deg,#34445f,#1D2B44)}
+.mount i:nth-of-type(1){top:-3px;left:-3px;clip-path:polygon(0 0,100% 0,0 100%)}
+.mount i:nth-of-type(2){top:-3px;right:-3px;clip-path:polygon(0 0,100% 0,100% 100%)}
+.mount i:nth-of-type(3){bottom:-3px;left:-3px;clip-path:polygon(0 0,0 100%,100% 100%)}
+.mount i:nth-of-type(4){bottom:-3px;right:-3px;clip-path:polygon(100% 0,100% 100%,0 100%)}
+.erow .mount{padding:3px}.erow .mount i{width:13px;height:13px}
+.pcap{margin-top:8px;font:400 13px/1.4 var(--mono);color:var(--muted)}
+.pcap em{display:block;font:italic 400 15px/1.4 var(--serif);color:var(--ink);margin-top:2px}
+.tilt{transform:rotate(-.6deg)}
+
+.lacts{display:flex;flex-wrap:wrap;gap:10px}
+.lacts .btn{flex:1 1 180px}
+
+/* étapes log table */
+.etab{width:100%;border-collapse:collapse;font:400 14px/1.3 var(--mono)}
+.etab th{font:600 13px/1 var(--cond);text-transform:uppercase;letter-spacing:.1em;text-align:left;padding:9px 6px;border-bottom:1.5px solid var(--ink);color:var(--muted)}
+.etab th:first-child,.etab td:first-child{padding-left:12px;border-right:1.5px solid var(--mag)}
+.etab .num{text-align:right;padding-right:12px}
+.etab td{padding:0 6px;border-bottom:1px solid var(--rule);height:50px;vertical-align:middle}
+.etab tr.ch td{height:auto;padding:12px 12px 6px;font:700 13px/1.2 var(--cond);text-transform:uppercase;letter-spacing:.1em;color:var(--mag);border-right:0;background:var(--paper2)}
+.etab tr[data-etape]{cursor:pointer}
+.etab tr[data-etape]:hover td{background:rgba(185,215,232,.25)}
+.etab tr.on td{background:rgba(244,204,75,.42)}
+.etab .n{font-weight:700;width:40px}
+.etab .d{white-space:nowrap;color:var(--muted);font-size:12.5px;width:1%}
+.etab .nm button{all:unset;cursor:pointer;display:block;font:500 16px/1.25 var(--serif);color:var(--ink);padding:6px 0}
+.etab .nm button::first-letter{text-transform:uppercase}
+.etab .nm button:focus-visible{outline:2px solid var(--mag)}
+.etab .z{color:#8A93A3}
+
+.rem{padding:16px 16px 18px;position:relative}
+.qt{font:italic 400 19px/1.45 var(--serif)}
+
+.cal{padding:10px 8px 14px}
+.cal-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px 0;text-align:center}
+.cal-g span,.cal-g a{display:flex;align-items:center;justify-content:center;height:40px;min-width:0;font:400 14px/1 var(--mono);text-decoration:none;border-radius:50%}
+.cal-g .wd{font:600 12px/1 var(--cond);letter-spacing:.08em;color:var(--muted);height:24px}
+.cal-g a{background:var(--mag);color:#fff;font-weight:700;height:44px;border-radius:22px;margin:0 1px}
+.cal-g .td{box-shadow:inset 0 0 0 2px var(--ink)}
+.cal-g a.td{box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--sig)}
+.cal-k{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font:400 12.5px/1.3 var(--mono);color:var(--muted)}
+.cal-k i{display:inline-block;width:11px;height:11px;border-radius:50%;background:var(--mag);vertical-align:-1px;margin-right:5px}
+
+.where .wmap{position:relative;height:300px;overflow:hidden;border-bottom:1.5px solid var(--ink)}
+.where .wmap .frame{inset:6px}
+.where .wb{padding:14px 14px 16px}
+.where .wb p{font-size:17px;line-height:1.45}
+.pos{font:700 16px/1.3 var(--mono);color:var(--mag);margin:6px 0}
+.delay{font:400 13.5px/1.4 var(--mono);color:var(--muted)}
+.wbtn{display:flex;gap:8px;margin-top:12px}.wbtn .btn{flex:1}
+.cockpit{display:flex;gap:12px;align-items:center;margin:0 14px 14px;padding:12px;background:var(--sig);border:1.5px solid var(--ink);text-decoration:none}
+.cockpit b{display:block;font:700 16px/1.2 var(--cond);text-transform:uppercase;letter-spacing:.05em}
+.cockpit span{font:400 13px/1.35 var(--mono)}
+.cockpit em{margin-left:auto;font-style:normal;font-size:20px}
+
+.sillage{overflow:hidden}
+.sil-img{position:relative}
+.sil-img img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;filter:saturate(.7) sepia(.1)}
+.sil-tr{position:absolute;right:10px;bottom:10px;width:44%;background:rgba(251,248,240,.92);border:1px solid var(--ink);padding:4px}
+.sil-tr svg{display:block;width:100%;height:auto}
+.sillage .wb{padding:14px}
+.sillage h3{font:700 22px/1.1 var(--cond);text-transform:uppercase;letter-spacing:.06em}
+.sillage p{font-size:17px;margin:6px 0 12px;color:var(--muted)}
+
+@media(min-width:760px){
+  .tbl{display:grid;grid-template-columns:minmax(0,1fr) 300px;grid-template-areas:"C R" "L L";gap:34px 34px;align-items:start}
+  .col{display:flex;flex-direction:column;gap:30px;min-width:0}
+  .cC{grid-area:C}.cR{grid-area:R}.cL{grid-area:L}
+  .erow{grid-template-columns:minmax(0,1fr) 168px;gap:22px}
+  .entry h3{font-size:24px}
+  .entry--big h3{font-size:36px}
+}
+@media(min-width:1180px){
+  .tbl{grid-template-columns:320px minmax(0,1fr) 300px;grid-template-areas:"L C R";gap:40px}
+  .cL{position:sticky;top:66px}
+  .where .wmap{height:360px}
+}
+
+/* ── crew ───────────────────────── */
+.crew{display:grid;gap:26px}
+.cm{display:grid;grid-template-columns:116px 1fr;gap:16px;align-items:center;padding-bottom:22px;border-bottom:1px solid var(--rule)}
+.cm .mount img{aspect-ratio:1}
+.cm .boat img{object-position:top;filter:none}
+.cm .no{font:400 12.5px/1 var(--mono);color:var(--mag)}
+.cm h3{font:700 26px/1.05 var(--cond);text-transform:uppercase;letter-spacing:.05em;margin:4px 0}
+.cm .al{font:italic 400 19px/1.2 var(--serif)}
+.cm .ro{font:400 14px/1.35 var(--mono);color:var(--muted);margin-top:4px}
+.tame{margin-top:26px;text-align:center}
+@media(min-width:760px){.crew{grid-template-columns:repeat(3,minmax(0,1fr));gap:30px}.cm{grid-template-columns:1fr;border:0;padding:0}.cm .mount img{aspect-ratio:4/3}}
+
+/* ── genèse ───────────────────────── */
+.gen{display:grid;gap:26px;align-items:center}
+.hg{text-align:center;border:1.5px solid var(--ink);padding:26px 16px;background:var(--paper2);position:relative}
+.hg b{display:block;font:500 76px/1 "Noto Serif KR",serif;letter-spacing:.06em}
+.hg span{display:block;font:400 14px/1.3 var(--mono);margin-top:10px;color:var(--muted)}
+.gen h3{font:500 28px/1.2 var(--serif);margin-bottom:12px;text-wrap:balance}
+.gen p{max-width:62ch}
+.lnk{display:inline-flex;align-items:center;min-height:44px;font:700 15px/1 var(--mono);color:var(--mag);margin-top:8px}
+.doodle{width:150px;height:auto;margin:14px auto 0;display:block;color:#6d6a63}
+@media(min-width:760px){.gen{grid-template-columns:330px 1fr;gap:50px}}
+
+/* ── programme ───────────────────────── */
+.pmap{position:relative;height:210px;overflow:hidden;border:1.5px solid var(--ink);background:#e9f1f4}
+.pmap .frame{inset:5px}
+.ph{display:flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:var(--paper);border:1.5px solid var(--mag);font:700 10px/1 var(--mono);color:var(--mag)}
+.pstrip{display:flex;flex-wrap:wrap;gap:6px 18px;font:700 14px/1.4 var(--mono);padding:12px 0;border-bottom:1.5px solid var(--ink);margin-bottom:6px}
+.pstrip span:nth-child(2){color:var(--mag)}
+.plist{list-style:none;margin:0;padding:0;columns:1}
+.plist li{display:grid;grid-template-columns:30px 26px 1fr;gap:8px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--rule);break-inside:avoid}
+.plist .n{font:700 13px/1 var(--mono);color:var(--mag)}
+.plist .pl{font:600 18px/1.15 var(--cond);text-transform:uppercase;letter-spacing:.04em}
+.plist .pd{font:400 13px/1.35 var(--mono);color:var(--muted)}
+.plist .pd b{color:var(--ink)}
+.pacts{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+@media(min-width:760px){.pmap{height:400px}.plist{columns:2;column-gap:40px}}
+
+/* ── forms ───────────────────────── */
+.forms{display:grid;gap:28px}
+.form{padding:18px 16px 20px}
+.form h3{font:700 23px/1.1 var(--cond);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.form .lead{font-size:17px;margin:0 0 12px}
+.fld{display:block;margin-top:14px}
+.fld span{display:block;font:400 13px/1.2 var(--mono);color:var(--muted);margin-bottom:2px}
+.fld input,.fld textarea{width:100%;border:0;border-bottom:1.5px solid var(--ink);background:repeating-linear-gradient(transparent 0 31px,var(--rule) 31px 32px);font:400 17px/32px var(--mono);color:var(--ink);padding:4px 2px;border-radius:0;min-height:44px}
+.fld textarea{min-height:128px;resize:vertical;border:0;border-bottom:1.5px solid var(--ink)}
+.fld input:focus,.fld textarea:focus{outline:none;background-color:rgba(244,204,75,.18)}
+.hint{font:400 13px/1.4 var(--mono);color:var(--muted);margin-top:10px}
+.form .btn{margin-top:16px;width:100%}
+.ck{display:flex;align-items:center;gap:12px;min-height:46px;border-bottom:1px solid var(--rule);font-size:17px;cursor:pointer}
+.ck input{width:22px;height:22px;accent-color:var(--mag);flex:none}
+@media(min-width:760px){.forms{grid-template-columns:1.3fr 1fr;align-items:start}}
+
+/* ── closing / footer ───────────────────────── */
+.close{margin-top:70px;background:var(--ink);color:var(--paper);text-align:center;padding:64px 0 60px;position:relative;overflow:hidden}
+.close .st{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+.close blockquote{position:relative;margin:0 auto;max-width:30ch;font:italic 400 26px/1.4 var(--serif);text-wrap:balance}
+.close cite{display:block;font:400 13px/1 var(--mono);font-style:normal;color:#C9D2E0;margin-top:14px}
+.close .btn{position:relative;margin-top:26px;border-color:var(--sig);color:var(--sig)}
+footer.ft{padding:30px 0 calc(30px + env(safe-area-inset-bottom));border-top:2px solid var(--ink)}
+.ft .wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.ft svg{width:58px;height:58px;flex:none}
+.ft b{font:700 18px/1.2 var(--cond);text-transform:uppercase;letter-spacing:.08em}
+.ft p{font:400 13px/1.5 var(--mono);color:var(--muted)}
+
+[data-reveal]{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+[data-reveal].is-in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}[data-reveal]{opacity:1;transform:none}}
+
+/* revue: garde-fou */ #app{overflow-x:clip}
+@media (max-width:599px){.filters{grid-template-columns:1fr}}
+.cm .mount.boat{overflow:hidden}.cm .mount.boat img{transform:scale(1.75);transform-origin:50% 20%}
+</style>
+</head>
+<body data-design="d3">
+<div id="app"></div>
+<script src="data.js"></script>
+<script src="wg.js"></script>
+<script>
+(() => {
+const { t, esc, D } = WG;
+const app = document.getElementById('app');
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const st = { chap: '', etape: '' };
+let typed = false, first = true, menuOpen = false;
+
+const pad = (n) => String(n).padStart(2, '0');
+const dmy = (iso) => { const d = new Date(iso); return `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`; };
+const hm = (iso) => { const d = new Date(iso); return `${pad(d.getUTCHours())}${pad(d.getUTCMinutes())} UTC`; };
+const dm = (s) => `${s.slice(8, 10)}/${s.slice(5, 7)}`;
+const hasPos = (p) => p.lat != null && p.lon != null && p.lat !== '' && p.lon !== '';
+const pos = (p) => (hasPos(p) ? WG.fmtPos([+p.lon, +p.lat]) : '');
+const nf = (n) => WG.fmtNm(n);
+const chapters = [...D.chapters].sort((a, b) => a.date_start.localeCompare(b.date_start));
+const etapes = [...D.etapes].sort((a, b) => a.date_start.localeCompare(b.date_start) || a.date_end.localeCompare(b.date_end));
+const eNo = Object.fromEntries(etapes.map((e, i) => [e.id, i + 1]));
+const eCount = {}; D.posts.forEach((p) => { if (p.etape_id) eCount[p.etape_id] = (eCount[p.etape_id] || 0) + 1; });
+const logParts = (p) => [dmy(p.date), hm(p.date), pos(p), p.etape_id ? `${t('Étape', 'Stage')} ${pad(eNo[p.etape_id] || 0)} · ${WG.etape(p.etape_id)}` : WG.chapter(p.chapter_id)].filter(Boolean);
+const logline = (p) => logParts(p).join(' · ');
+const corners = '<i></i><i></i><i></i><i></i>';
+
+const ROSE = (() => {
+  let s = '<svg class="rose" viewBox="-100 -100 200 200" aria-hidden="true"><g fill="none" stroke="currentColor"><circle r="97" stroke-width="1.2"/><circle r="86" stroke-width=".8"/><circle r="60" stroke-width=".8"/><circle r="52" stroke-width=".5"/></g><g stroke="currentColor">';
+  for (let a = 0; a < 360; a += 2) {
+    const L = a % 30 === 0 ? 11 : a % 10 === 0 ? 7 : 3.5, r = (a * Math.PI) / 180, s1 = Math.sin(r), c = Math.cos(r);
+    s += `<line x1="${(s1 * 97).toFixed(1)}" y1="${(-c * 97).toFixed(1)}" x2="${(s1 * (97 - L)).toFixed(1)}" y2="${(-c * (97 - L)).toFixed(1)}" stroke-width="${a % 10 ? .5 : .9}"/>`;
+    if (a % 5 === 0 && a % 30 !== 0) s += `<line x1="${(s1 * 60).toFixed(1)}" y1="${(-c * 60).toFixed(1)}" x2="${(s1 * 56).toFixed(1)}" y2="${(-c * 56).toFixed(1)}" stroke-width=".5"/>`;
+  }
+  s += '</g><g fill="currentColor" font-family="Courier Prime,monospace" font-size="9" text-anchor="middle">';
+  for (let a = 30; a < 360; a += 30) { const r = (a * Math.PI) / 180; s += `<text x="${(Math.sin(r) * 76).toFixed(1)}" y="${(-Math.cos(r) * 76 + 3).toFixed(1)}" transform="rotate(${a} ${(Math.sin(r) * 76).toFixed(1)} ${(-Math.cos(r) * 76).toFixed(1)})">${String(a).padStart(3, '0')}</text>`; }
+  s += '</g>';
+  const pt = (a, len, w) => { const r = (a * Math.PI) / 180, l = (a - 90) * Math.PI / 180, rr = (a + 90) * Math.PI / 180;
+    const tip = [Math.sin(r) * len, -Math.cos(r) * len], L = [Math.sin(l) * w, -Math.cos(l) * w], R = [Math.sin(rr) * w, -Math.cos(rr) * w];
+    const f = (p) => p.map((v) => v.toFixed(1)).join(',');
+    return `<path d="M0,0L${f(L)}L${f(tip)}Z" fill="currentColor"/><path d="M0,0L${f(R)}L${f(tip)}Z" fill="#FBF8F0" stroke="currentColor" stroke-width=".8"/>`; };
+  [45, 135, 225, 315].forEach((a) => { s += pt(a, 34, 7); });
+  [0, 90, 180, 270].forEach((a) => { s += pt(a, 50, 9); });
+  s += '<circle r="3" fill="#FBF8F0" stroke="currentColor"/><path d="M0,-90 l-5,-0 l5,-8 l5,8z" fill="currentColor"/><text y="-63" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="11" text-anchor="middle" fill="currentColor">N</text></svg>';
+  return s;
+})();
+
+const FOX = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M13 22 15 6 27 17h10L49 6l2 16v8c0 12-8 20-19 26C21 50 13 42 13 30z" fill="#EED9A4" stroke="#1D2B44" stroke-width="2" stroke-linejoin="round"/><path d="M13 30c7 1 13 6 19 16 6-10 12-15 19-16" fill="none" stroke="#1D2B44" stroke-width="2" stroke-linejoin="round"/><path d="M27 46c2 3 8 3 10 0-2 5-8 5-10 0z" fill="#FBF8F0"/><circle cx="24" cy="30" r="2" fill="#1D2B44"/><circle cx="40" cy="30" r="2" fill="#1D2B44"/><path d="M29.5 50h5l-2.5 3z" fill="#1D2B44"/><path d="M18 11l5 5M46 11l-5 5" stroke="#1D2B44" stroke-width="1.5"/></svg>';
+
+const DOODLE = '<svg class="doodle" viewBox="0 0 160 110" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20c18-4 26 6 40 2s16-14 34-12 22 14 30 22 10 26 26 30 18 14 18 26" stroke-width="1.6"/><path d="M8 26c16-3 24 5 38 2M108 40c8 8 9 22 24 27" stroke-width=".7" stroke-dasharray="2 3"/><path d="M14 30c4 8 2 18 8 24s16 4 20 12 0 16 8 22" stroke-width="1.2" opacity=".7"/><g stroke-width="1.5" transform="translate(84 70)"><circle cy="-12" r="3"/><path d="M0-9v20M-7-3h14M-10 6c2 7 6 9 10 9s8-2 10-9"/></g><path d="M126 92c4 2 8 2 12 0M134 98c4 2 8 2 12 0" stroke-width=".8"/></svg>';
+
+const sh = (k, h, lead) => `<header class="sh" data-reveal><p class="kick">${k}</p><h2>${h}</h2>${lead ? `<p class="lead">${lead}</p>` : ''}</header>`;
+
+/* ── carnet (log) ── */
+const filtered = () => D.posts.filter((p) => (!st.chap || p.chapter_id === st.chap) && (!st.etape || p.etape_id === st.etape));
+const entry = (p, big, isLatest) => {
+  const ph = p.photos[0];
+  const ll = logline(p);
+  const lls = big ? `<p class="llw"><span class="ll"><span class="tw" aria-label="${esc(ll)}" data-full="${esc(ll)}">${esc(ll)}</span></span></p>` : `<p class="ll">${esc(ll)}</p>`;
+  const foot = `<div class="ef"><span class="more">${t('Lire la suite', 'Read more')} →</span><a href="#!" aria-label="${t('J’aime', 'Like')}">❤️</a><a href="#!" aria-label="${t('Commentaires', 'Comments')}">💬</a></div>`;
+  if (big) {
+    return `<article class="entry entry--big" data-post="${esc(p.id)}" tabindex="0">
+      ${isLatest ? `<span class="latest">${t('DERNIÈRE ENTRÉE', 'LATEST ENTRY')}</span>` : ''}
+      ${lls}<h3>${esc(WG.title(p))}</h3>
+      ${ph ? `<figure class="mount tilt" style="margin:0"><img src="${esc(WG.img(ph.url, 1200))}" alt="${esc(WG.cap(ph))}">${corners}</figure>
+      <p class="pcap">${hasPos(p) ? `⌖ ${esc(pos(p))} · ` : ''}${t('photo', 'photo')} 1/${p.nPhotos}${WG.cap(ph) ? `<em>${esc(WG.cap(ph))}</em>` : ''}</p>` : ''}
+      <p class="ex">${esc(WG.excerpt(p, 520))}</p>
+      <p class="sig">— ${esc(p.author)}</p>${foot}</article>`;
+  }
+  return `<article class="entry" data-post="${esc(p.id)}" tabindex="0" data-reveal>${lls}
+    <div class="erow"><div><h3>${esc(WG.title(p))}</h3><p class="ex">${esc(WG.excerpt(p, 150))}</p><p class="sig">— ${esc(p.author)}</p></div>
+    ${ph ? `<figure class="mount"><img src="${esc(WG.img(ph.url, 600))}" alt="" loading="lazy">${corners}</figure>` : ''}</div>${foot}</article>`;
+};
+const listHTML = () => {
+  const ps = filtered();
+  if (!ps.length) return `<div class="empty">${t('Aucune entrée au journal pour cette étape — le carnet n’a rien noté ici.', 'No log entries for this stage — nothing was written up here.')}</div>`;
+  const latest = !st.chap && !st.etape;
+  return ps.slice(0, 7).map((p, i) => entry(p, i === 0, latest && i === 0)).join('');
+};
+const fstat = () => {
+  const n = filtered().length;
+  const txt = n === 0 ? t('aucune entrée', 'no entries') : n === 1 ? t('1 entrée', '1 entry') : t(`${n} entrées`, `${n} entries`);
+  return `<span>${txt}${n > 7 ? t(' · les 7 plus récentes', ' · the 7 most recent') : ''}</span>${st.chap || st.etape ? `<button class="reset" data-reset>${t('Tout afficher', 'Show all')} ✕</button>` : ''}`;
+};
+
+const etapeTable = () => {
+  let rows = '';
+  for (const c of chapters) {
+    const es = etapes.filter((e) => e.chapter_id === c.id);
+    if (!es.length) continue;
+    rows += `<tr class="ch"><td colspan="4">${esc(WG.chapter(c.id))}</td></tr>`;
+    rows += es.map((e) => { const n = eCount[e.id] || 0; return `<tr data-etape="${esc(e.id)}" class="${st.etape === e.id ? 'on' : ''}"><td class="n">${pad(eNo[e.id])}</td><td class="d">${dm(e.date_start)}<br>${dm(e.date_end)}</td><td class="nm"><button type="button" aria-pressed="${st.etape === e.id}">${esc(WG.etape(e.id))}</button></td><td class="num ${n ? '' : 'z'}">${n || '—'}</td></tr>`; }).join('');
+  }
+  return `<table class="etab"><thead><tr><th>N°</th><th>${t('Dates', 'Dates')}</th><th>${t('Étape', 'Stage')}</th><th class="num" title="${t('récits', 'stories')}">${t('Réc.', 'Posts')}</th></tr></thead><tbody>${rows}</tbody></table>`;
+};
+
+const calendar = () => {
+  const last = new Date(D.posts[0].date), y = last.getUTCFullYear(), m = last.getUTCMonth();
+  const days = {}; D.posts.forEach((p) => { const d = new Date(p.date); if (d.getUTCFullYear() === y && d.getUTCMonth() === m) days[d.getUTCDate()] = (days[d.getUTCDate()] || 0) + 1; });
+  const startDow = (new Date(Date.UTC(y, m, 1)).getUTCDay() + 6) % 7, nDays = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+  const now = new Date(), isNow = now.getFullYear() === y && now.getMonth() === m;
+  const wd = t('L M M J V S D', 'M T W T F S S').split(' ');
+  let g = wd.map((w) => `<span class="wd">${w}</span>`).join('') + '<span></span>'.repeat(startDow);
+  for (let d = 1; d <= nDays; d++) {
+    const td = isNow && now.getDate() === d ? ' td' : '';
+    const lbl = new Date(Date.UTC(y, m, d)).toLocaleDateString(WG.lang === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' });
+    g += days[d] ? `<a href="#!" class="${td}" aria-label="${esc(lbl)} : ${days[d]} ${t('récit', 'post')}${days[d] > 1 ? 's' : ''}">${d}</a>` : `<span class="${td}">${d}</span>`;
+  }
+  const title = new Date(Date.UTC(y, m, 1)).toLocaleDateString(WG.lang === 'fr' ? 'fr-FR' : 'en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  return `<div class="box o7" id="calendrier"><div class="bh"><h3>${esc(title)}</h3><small>${t('calendrier', 'calendar')}</small></div><div class="cal"><div class="cal-g">${g}</div>
+    <p class="cal-k"><span><i></i>${t('un récit ce jour-là', 'a story that day')}</span>${isNow ? `<span>◯ ${t('aujourd’hui', 'today')}</span>` : ''}</p></div></div>`;
+};
+
+const miniTrack = () => {
+  const segs = WG.segments(D.track); const all = D.track;
+  const lo = Math.min(...all.map((p) => p[0])), hi = Math.max(...all.map((p) => p[0])), la = Math.min(...all.map((p) => p[1])), ha = Math.max(...all.map((p) => p[1]));
+  const k = Math.cos(((la + ha) / 2) * Math.PI / 180), W = 200, sc = (W - 12) / ((hi - lo) * k), H = Math.round((ha - la) * sc + 12);
+  const d = segs.map((s) => s.filter((_, i) => i % 3 === 0 || i === s.length - 1).map((p, i) => `${i ? 'L' : 'M'}${(6 + (p[0] - lo) * k * sc).toFixed(1)},${(6 + (ha - p[1]) * sc).toFixed(1)}`).join('')).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="${d}" fill="none" stroke="#B0207E" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+};
+
+/* ── page ── */
+const render = () => {
+  const s = D.stats, last = WG.lastPoint();
+  const nav = WG.NAV();
+  const inPage = { programme: '#programme', equipage: '#equipage', contact: '#contact', carte: '#carte', journal: '#carnet' };
+  const silPost = D.posts.find((p) => p.photos.length > 2) || D.posts[0];
+  const silPh = silPost.photos[1] || silPost.photos[0];
+  const lastAt = new Date(D.lastPublicAt);
+  const lastTxt = lastAt.toLocaleDateString(WG.lang === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' });
+  const langBtns = `<div class="lang" role="group" aria-label="${t('Langue', 'Language')}"><button data-lang="fr" aria-pressed="${WG.lang === 'fr'}">FR</button><button data-lang="en" aria-pressed="${WG.lang === 'en'}">EN</button></div>`;
+
+  app.innerHTML = `
+<header class="top"><div class="wrap">
+  <a class="brand" href="#!" aria-label="Wang'ap"><img src="/images/logo.webp" alt="" width="40" height="40"><span><b>wang'ap</b><small>${t('journal de bord', 'ship’s log')}</small></span></a>
+  <nav class="nav" aria-label="${t('Menu principal', 'Main menu')}">${nav.map((n) => `<a href="#!">${esc(n.label)}</a>`).join('')}</nav>
+  ${langBtns}
+  <a class="btn btn--sm login" href="#!">${t('Connexion', 'Sign in')}</a>
+</div></header>
+<nav class="tabs" aria-label="${t('Sections', 'Sections')}"><div class="wrap">
+  <a class="tab" href="#carnet" data-tab="carnet"><i>I</i>${t('Journal', 'Log')}</a>
+  <a class="tab" href="#carte" data-tab="carte"><i>II</i>${t('Carte', 'Map')}</a>
+  <a class="tab" href="#calendrier" data-tab="calendrier"><i>III</i>${t('Calendrier', 'Calendar')}</a>
+  <button class="burger" data-menu aria-expanded="${menuOpen}" aria-controls="menu"><span>Menu</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+</div></nav>
+<div class="menu" id="menu" ${menuOpen ? '' : 'hidden'} role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="menu-h"><a class="brand" href="#!"><img src="/images/logo.webp" alt="" width="40" height="40"><span><b>wang'ap</b></span></a><button class="menu-x" data-menu aria-label="${t('Fermer le menu', 'Close menu')}">✕</button></div>
+  <ol>${nav.map((n, i) => `<li><a href="${inPage[n.id] && n.id !== 'carte' && n.id !== 'journal' ? inPage[n.id] : '#!'}" data-close><i>${pad(i + 1)}</i>${esc(n.label)}</a></li>`).join('')}</ol>
+  <div class="menu-f">${langBtns}<a class="btn" href="#!">${t('Connexion', 'Sign in')}</a></div>
+</div>
+
+<main>
+<div class="hero"><section class="chart" aria-label="${t('Carte de la route suivie', 'Chart of the route sailed')}">
+  <div class="map" id="heroMap"></div><div class="frame"></div>${ROSE}
+  <p class="chartno">${t('CARTE N° 1 · MÉDITERRANÉE', 'CHART No. 1 · MEDITERRANEAN')}</p>
+</section>
+<div class="wrap cw">
+  <div class="cart"><div class="cart-in">
+    <span class="badge">Outremer 52 · ${t('Tour du Monde', 'Round the World')} 2026–2029</span>
+    <h1>${t('Catherine & Bertrand larguent les amarres pour 3 ans de navigation à la voile.', 'Catherine & Bertrand cast off for 3 years of sailing.')}</h1>
+    <p class="nm">${t('36 000 milles nautiques · 30+ pays', '36,000 nautical miles · 30+ countries')}</p>
+    <p class="sub">${t('En magenta : la route suivie depuis mai 2026', 'In magenta: the route sailed since May 2026')}</p>
+    <div class="ctas"><a class="btn btn--ink" href="#!">${t('Où sommes-nous ?', 'Where are we?')}</a><a class="btn" href="#carnet">${t('Lire le carnet', 'Read the log')} ↓</a></div>
+  </div></div>
+</div></div>
+<div class="wrap"><div class="intro">
+  <blockquote class="rq" data-reveal style="margin:0 auto">${esc(WG.quote('rose'))}<cite>Antoine de Saint-Exupéry · ${t('Le Petit Prince', 'The Little Prince')}</cite></blockquote>
+  <div data-reveal><p class="figcap">${t('Le projet, en quatre chiffres', 'The plan, in four numbers')}</p>
+  <div class="figs"><div><b>⭐ ${t('36 000', '36,000')}</b><span>${t('milles nautiques', 'nautical miles')}</span></div><div><b>🌙 3</b><span>${t('ans de voyage', 'years at sea')}</span></div><div><b>🪐 30+</b><span>${t('pays — ou planètes', 'countries — or planets')}</span></div><div><b>🌹 18</b><span>${t('étapes', 'stages')}</span></div></div></div>
+</div></div>
+
+<section class="sec" id="carnet"><div class="wrap">
+  ${sh(t('Le carnet de bord', 'The ship’s log'), t('Journal de bord', 'Ship’s log'), t('Les nouvelles du bord, écrites par Catherine et Bertrand. La plus récente en premier ; chaque entrée commence par sa ligne de livre de bord.', 'News from on board, written by Catherine and Bertrand. Newest first; each entry starts with its logbook line.'))}
+  <div class="tbl">
+    <div class="col cL">
+      <div class="box where o8" id="carte">
+        <div class="bh"><h3>${t('Où sommes-nous ?', 'Where are we?')}</h3><small>${t('carte', 'chart')}</small></div>
+        <div class="wmap" id="whereMap"><div class="frame"></div></div>
+        <div class="wb">
+          <p>${t(`Dernière position publiée, le ${esc(lastTxt)} à ${pad(lastAt.getUTCHours())} h ${pad(lastAt.getUTCMinutes())} UTC :`, `Last published position, on ${esc(lastTxt)} at ${pad(lastAt.getUTCHours())}${pad(lastAt.getUTCMinutes())} UTC:`)}</p>
+          <p class="pos">⌖ ${esc(WG.fmtPos(last))}</p>
+          <p class="delay">${t(`La position est publiée avec ${D.delayHours} h de retard.`, `The position is published ${D.delayHours} hours late, on purpose.`)}</p>
+          <div class="wbtn"><a class="btn btn--sm" href="#!">⛶ ${t('Plein écran', 'Full screen')}</a><a class="btn btn--sm btn--ink" href="#!">${t('Carte interactive', 'Interactive map')}</a></div>
+        </div>
+        <a class="cockpit" href="#!"><span style="font-size:24px">⚓</span><span><b>${t('Demander l’accès au cockpit en direct', 'Ask for live cockpit access')}</b><span>${t('Pour les amis marins : les instruments du bord, en direct.', 'For sailing friends: the boat’s instruments, live.')}</span></span><em>→</em></a>
+      </div>
+    </div>
+    <div class="col cC">
+      <div class="today o1"><p>${t('Où en est le voyage aujourd’hui :', 'Where the voyage stands today:')}</p>
+        <dl><div><dt>${nf(s.nm)}</dt><dd>${t('milles parcourus', 'miles sailed')}</dd></div><div><dt>${s.days}</dt><dd>${t('jours', 'days')}</dd></div><div><dt>${s.etapes}</dt><dd>${t('étapes', 'stages')}</dd></div><div><dt>${s.posts}</dt><dd>${t('récits', 'stories')}</dd></div></dl></div>
+      <div class="filters o2">
+        <div><label for="fChap">${t('Chapitre', 'Chapter')}</label><div class="sel"><select id="fChap"><option value="">${t('Tous les chapitres', 'All chapters')}</option>${chapters.map((c) => `<option value="${esc(c.id)}"${st.chap === c.id ? ' selected' : ''}>${esc(WG.chapter(c.id))}</option>`).join('')}</select></div></div>
+        <div><label for="fEt">${t('Étape', 'Stage')}</label><div class="sel"><select id="fEt"><option value="">${t('Toutes les étapes', 'All stages')}</option>${chapters.map((c) => `<optgroup label="${esc(WG.chapter(c.id))}">${etapes.filter((e) => e.chapter_id === c.id).map((e) => `<option value="${esc(e.id)}"${st.etape === e.id ? ' selected' : ''}>${pad(eNo[e.id])} · ${esc(WG.etape(e.id))}</option>`).join('')}</optgroup>`).join('')}</select></div></div>
+        <p class="fstat" id="fstat" aria-live="polite">${fstat()}</p>
+      </div>
+      <div class="list o3" id="list">${listHTML()}</div>
+      <div class="lacts o4"><a class="btn btn--ink" href="#!">📖 ${t('Voir tout le journal', 'See the whole log')}</a><a class="btn" href="#!">📷 ${t('La galerie', 'The gallery')}</a></div>
+    </div>
+    <div class="col cR">
+      <div class="box o5"><div class="bh"><h3>${t('Les étapes', 'The stages')}</h3><small>${t('touchez une ligne', 'tap a row')}</small></div><div id="etab">${etapeTable()}</div></div>
+      <div class="box o6"><div class="bh"><h3>${t('Remarques', 'Remarks')}</h3></div><div class="rem"><p class="qt">${esc(WG.quote('heart'))}<cite>A. de Saint-Exupéry, ${t('aviateur', 'aviator')}</cite></p></div></div>
+      ${calendar()}
+      <div class="box sillage o9" data-reveal>
+        <div class="sil-img"><img src="${esc(WG.img(silPh.url, 900))}" alt="" loading="lazy"><div class="sil-tr">${miniTrack()}</div></div>
+        <div class="wb"><h3>${t('Sillage', 'Wake')}</h3><p>${t('Le voyage rejoué — la route telle qu’elle a été naviguée.', 'The voyage replayed — the route exactly as it was sailed.')}</p><a class="btn btn--mag" href="#!" style="width:100%">▶ ${t('Rejouer le voyage', 'Replay the voyage')}</a></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" id="equipage"><div class="wrap">
+  ${sh(t('Rôle d’équipage', 'Crew list'), t('L’équipage', 'The crew'), t('Deux marins et un bateau — et, pour chacun, son nom dans l’histoire.', 'Two sailors and a boat — each with a part in the story.'))}
+  <div class="crew">
+    ${[['photo2.webp', 'Catherine', '🌹', t('La Rose', 'The Rose'), t('Co-skipper · Navigatrice', 'Co-skipper · Navigator'), ''],
+       ['photo3.webp', 'Bertrand', '🦊', t('Le Renard', 'The Fox'), t('Skipper · Capitaine', 'Skipper · Captain'), ''],
+       ['boat.webp', "Wang'ap", '⭐', t('L’Astéroïde', 'The Asteroid'), 'Outremer 52 · Catamaran', 'boat']].map((c, i) => `
+    <article class="cm" data-reveal><figure class="mount ${c[5]}" style="margin:0"><img src="/images/${c[0]}" alt="${esc(c[1])}" loading="lazy">${corners}</figure>
+      <div><p class="no">${t('Inscrit n°', 'Entry no.')} ${i + 1}</p><h3>${esc(c[1])}</h3><p class="al">${c[2]} ${c[3]}</p><p class="ro">${c[4]}</p></div></article>`).join('')}
+  </div>
+  <blockquote class="rq tame" data-reveal>${esc(WG.quote('tame'))}<cite>${t('Le Petit Prince', 'The Little Prince')}</cite></blockquote>
+</div></section>
+
+<section class="sec" id="genese"><div class="wrap">
+  ${sh(t('Page de garde', 'Front page'), t('La Genèse', 'Genesis'))}
+  <div class="gen">
+    <div class="hg" data-reveal><b lang="ko">환갑</b><span>Hwangap · ${t('les 60 ans, début d’un nouveau cycle', 'turning 60, the start of a new cycle')}</span>${DOODLE}</div>
+    <div data-reveal><h3>${t('Une décision, un bateau, quatre ans de préparation', 'One decision, one boat, four years of preparation')}</h3>
+      <p>${t('Wang’ap est né d’un mot coréen — 환갑 (Hwangap) — une tradition millénaire célébrant les 60 ans comme le début d’un nouveau cycle. Depuis 2022, Catherine et Bertrand préparent ce tour du monde : formations, construction du bateau, logistique.', 'Wang’ap comes from a Korean word — 환갑 (Hwangap) — an age-old tradition that celebrates turning 60 as the start of a new cycle. Since 2022, Catherine and Bertrand have been preparing this voyage round the world: training, building the boat, logistics.')}</p>
+      <a class="lnk" href="#!">${t('Lire la genèse complète', 'Read the full story')} →</a></div>
+  </div>
+</div></section>
+
+<section class="sec" id="programme"><div class="wrap">
+  ${sh(t('Route prévue', 'Planned route'), t('Le Programme', 'The plan'), t('Le tour du monde tel qu’il est prévu — le pointillé, c’est la route à venir.', 'The voyage round the world as planned — the dotted line is the route still to come.'))}
+  <div class="pstrip"><span>${t('~36 000 nm · 35 étapes · 2026–2029', '~36,000 nm · 35 stages · 2026–2029')}</span></div>
+  <div class="pmap" id="progMap" data-allow-overflow><div class="frame"></div></div>
+  <div class="pstrip"><span>${t('Départ Saint-Cyr Sep 2026', 'Leaving Saint-Cyr Sep 2026')}</span><span>${t('3 océans', '3 oceans')}</span><span>${t('Retour Saint-Cyr Été 2029', 'Back in Saint-Cyr Summer 2029')}</span></div>
+  <ol class="plist">${WG.PHASES.map((ph, i) => `<li><span class="n">${pad(i + 1)}</span><span>${ph.flag}</span><span><span class="pl">${esc(ph.place)}</span><br><span class="pd"><b>${esc(ph.period())}</b> · ${esc(ph.desc())}</span></span></li>`).join('')}</ol>
+  <div class="pacts"><a class="btn btn--mag" href="#!">▶ ${t('Voir l’animation', 'Watch the animation')}</a><a class="btn" href="#!">${t('Voir le programme', 'See the full plan')} →</a></div>
+</div></section>
+
+<section class="sec" id="contact"><div class="wrap">
+  ${sh(t('Courrier du bord', 'Mail for the boat'), t('Écrire au bord', 'Write to the boat'))}
+  <div class="forms">
+    <form class="box form" data-reveal><h3>${t('Nous envoyer un message', 'Send us a message')}</h3><p class="lead">${t('Un mot, une question, des nouvelles de la famille : tout arrive au bord.', 'A note, a question, news from home: it all reaches the boat.')}</p>
+      <label class="fld"><span>${t('Prénom *', 'First name *')}</span><input name="n" required autocomplete="given-name"></label>
+      <label class="fld"><span>Email</span><input type="email" name="e" autocomplete="email"></label>
+      <label class="fld"><span>${t('Téléphone (WhatsApp)', 'Phone (WhatsApp)')}</span><input type="tel" name="p" autocomplete="tel"></label>
+      <label class="fld"><span>Message</span><textarea name="m" rows="4"></textarea></label>
+      <p class="hint">${t('Indiquez un email ou un téléphone pour que nous puissions vous répondre.', 'Give an email or a phone number so we can reply.')}</p>
+      <button class="btn btn--ink" type="submit">${t('Envoyer', 'Send')} →</button></form>
+    <form class="box form" data-reveal><h3>${t('Suivre le voyage par email', 'Follow the voyage by email')}</h3><p class="lead">${t('Choisissez ce que vous voulez recevoir.', 'Choose what you’d like to receive.')}</p>
+      <label class="ck"><input type="checkbox" checked> 📰 ${t('La newsletter', 'The newsletter')}</label>
+      <label class="ck"><input type="checkbox" checked> 📝 ${t('Les nouvelles publications', 'New posts')}</label>
+      <label class="ck"><input type="checkbox"> 🧭 ${t('Les nouvelles étapes', 'New stages')}</label>
+      <label class="fld"><span>Email</span><input type="email" name="se" autocomplete="email"></label>
+      <button class="btn btn--mag" type="submit">${t('S’inscrire', 'Sign up')}</button></form>
+  </div>
+</div></section>
+
+<section class="close"><svg class="st" aria-hidden="true">${Array.from({ length: 34 }, (_, i) => `<circle cx="${(i * 37.3) % 100}%" cy="${(i * 53.7) % 100}%" r="${i % 5 ? 1 : 1.7}" fill="#FBF8F0"/>`).join('')}</svg>
+  <div class="wrap"><blockquote>${esc(WG.quote('stars'))}<cite>${t('Le Petit Prince', 'The Little Prince')}</cite></blockquote><a class="btn" href="#!">${t('Espace skippers', 'Skippers’ area')} →</a></div>
+</section>
+</main>
+<footer class="ft"><div class="wrap">${FOX}<div><b>Wang'ap · Outremer 52 · 2026–2029</b><p>${t('Démo de design — contenus réels, liens inactifs', 'Design demo — real content, inactive links')}</p></div></div></footer>`;
+
+  mountMaps();
+  WG.reveal();
+  tabsSpy();
+  if (!typed) typeLatest();
+  first = false;
+};
+
+/* ── maps ── */
+const CHART_FILTER = 'saturate(.5) sepia(.18) brightness(1.08) contrast(.94)';
+const grat = (el, m, minStep) => {
+  const W = el.clientWidth, H = el.clientHeight, p0 = m.project([0, 0]), p1 = m.project([1, 0]);
+  if (!W || !p0) return;
+  el.querySelector(':scope > .grat')?.remove();
+  const a = p1[0] - p0[0], b = p0[0], lA = -b / a, lB = (W - b) / a, span = lB - lA;
+  const step = Math.max(minStep || 1, [1, 2, 5, 10, 15, 30, 60].find((s) => span / s <= 7) || 90);
+  const lonL = (L) => { const v = ((L + 540) % 360) - 180; return `${Math.abs(v)}°${v < 0 ? 'W' : v > 0 ? 'E' : ''}`; };
+  let s = `<svg class="grat" width="${W}" height="${H}" style="position:absolute;inset:0;pointer-events:none">`;
+  for (let L = Math.ceil(lA / step) * step; L <= lB; L += step) { const x = (a * L + b).toFixed(1); if (x < 20 || x > W - 20) continue; s += `<line x1="${x}" x2="${x}" y1="0" y2="${H}"/><text x="${+x + 3}" y="27">${lonL(L)}</text>`; }
+  for (let la = -78; la <= 78; la += step) { const y = m.project([0, la])[1]; if (y < 34 || y > H - 20) continue; s += `<line x1="0" x2="${W}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/><text x="19" y="${(y - 4).toFixed(1)}">${Math.abs(la)}°${la < 0 ? 'S' : la > 0 ? 'N' : ''}</text>`; }
+  s += '</svg>';
+  const tl = el.querySelector(':scope > div.wg-map-layer');
+  if (tl) tl.insertAdjacentHTML('afterend', s); else el.insertAdjacentHTML('afterbegin', s);
+};
+const withGrat = (el, opts, minStep) => {
+  const m = WG.staticMap(el, opts);
+  grat(el, m, minStep);
+  let rt; if ('ResizeObserver' in window) new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => grat(el, m, minStep), 220); }).observe(el);
+  return m;
+};
+const trackBounds = () => { const tr = D.track; return [[Math.min(...tr.map((p) => p[0])), Math.min(...tr.map((p) => p[1]))], [Math.max(...tr.map((p) => p[0])), Math.max(...tr.map((p) => p[1]))]]; };
+const mountMaps = () => {
+  const hero = document.getElementById('heroMap'), wide = innerWidth >= 760, b = trackBounds();
+  const span = b[1][0] - b[0][0];
+  const hb = wide ? [[b[0][0] - span * 0.62, b[0][1] - 1.2], [b[1][0] + 0.6, b[1][1] + 0.6]] : [[b[0][0] - 0.3, b[0][1] - 0.4], [b[1][0], b[1][1] + 1.6]];
+  const boat = { html: `<span class="boatmk"></span><span class="boatlbl">${t(`position publiée (−${D.delayHours} h)`, `published position (−${D.delayHours} h)`)}</span>` };
+  withGrat(hero, { tiles: 'ocean', filter: CHART_FILTER, bounds: hb, pad: 16, maxZoom: 7, line: { color: '#B0207E', width: 2.6, draw: first }, boat });
+  const [lo, la] = WG.lastPoint();
+  withGrat(document.getElementById('whereMap'), { tiles: 'ocean', filter: CHART_FILTER, bounds: [[lo - 2.6, la - 1.7], [lo + 2.6, la + 1.7]], pad: 10, maxZoom: 9, line: { color: '#B0207E', width: 2.6 }, boat: { html: '<span class="boatmk"></span>' } });
+  const dots = WG.PHASES.map((ph, i) => ({ lon: ph.lonlat[0], lat: ph.lonlat[1], html: `<span class="ph">${i + 1}</span>`, title: ph.place })).filter((_, i) => i !== 1 && i !== 2);
+  withGrat(document.getElementById('progMap'), { tiles: 'ocean', filter: CHART_FILTER, track: WG.ROUTE, split: false, boat: false, pad: 22, maxZoom: 3, line: { color: '#B0207E', width: 2.2, dash: '7 6' }, dots }, 30);
+};
+
+/* ── typewriter (once, latest entry only) ── */
+const typeLatest = () => {
+  const el = document.querySelector('.entry--big .tw');
+  if (!el || st.chap || st.etape) return;
+  typed = true;
+  if (RM || !('IntersectionObserver' in window)) return;
+  const full = el.dataset.full; el.textContent = ''; el.classList.add('typing');
+  const go = () => { let i = 0; const tick = () => { const cur = document.querySelector('.entry--big .tw'); if (!cur || cur !== el) return; i = Math.min(full.length, i + 1); el.textContent = full.slice(0, i); if (i < full.length) setTimeout(tick, full[i - 1] === '·' ? 140 : 32); else el.classList.remove('typing'); }; setTimeout(tick, 350); };
+  const io = new IntersectionObserver((en) => { if (en[0].isIntersecting) { io.disconnect(); go(); } }, { threshold: 0.6 });
+  io.observe(el);
+};
+
+/* ── tabs spy ── */
+let spy;
+const tabsSpy = () => {
+  spy?.disconnect();
+  if (!('IntersectionObserver' in window)) return;
+  const seen = new Map();
+  spy = new IntersectionObserver((ens) => {
+    ens.forEach((e) => seen.set(e.target.id === 'list' ? 'carnet' : e.target.id, e.isIntersecting ? e.intersectionRatio : 0));
+    const best = [...seen.entries()].filter((x) => x[1] > 0).sort((a, b) => b[1] - a[1])[0];
+    document.querySelectorAll('.tab').forEach((tb) => tb.classList.toggle('on', !!best && tb.dataset.tab === best[0]));
+  }, { threshold: [0, 0.1, 0.25, 0.5, 0.75], rootMargin: '-60px 0px -35% 0px' });
+  ['list', 'carte', 'calendrier'].forEach((id) => { const el = document.getElementById(id); if (el) spy.observe(el); });
+};
+
+/* ── filtering (re-renders the list only) ── */
+const refreshLog = () => {
+  document.getElementById('list').innerHTML = listHTML();
+  document.getElementById('fstat').innerHTML = fstat();
+  document.getElementById('etab').innerHTML = etapeTable();
+  document.getElementById('fChap').value = st.chap;
+  document.getElementById('fEt').value = st.etape;
+  WG.reveal();
+};
+const ETmap = Object.fromEntries(etapes.map((e) => [e.id, e]));
+document.addEventListener('change', (e) => {
+  if (e.target.id === 'fChap') { st.chap = e.target.value; if (st.etape && ETmap[st.etape].chapter_id !== st.chap && st.chap) st.etape = ''; refreshLog(); }
+  if (e.target.id === 'fEt') { st.etape = e.target.value; if (st.etape) st.chap = ETmap[st.etape].chapter_id; refreshLog(); }
+});
+document.addEventListener('click', (e) => {
+  const row = e.target.closest('tr[data-etape]');
+  if (row) { const id = row.dataset.etape; st.etape = st.etape === id ? '' : id; st.chap = st.etape ? ETmap[id].chapter_id : ''; refreshLog(); document.getElementById('carnet').scrollIntoView({ behavior: RM ? 'auto' : 'smooth' }); return; }
+  if (e.target.closest('[data-reset]')) { st.chap = ''; st.etape = ''; refreshLog(); return; }
+  const lb = e.target.closest('[data-lang]'); if (lb) { WG.setLang(lb.dataset.lang); return; }
+  if (e.target.closest('[data-menu]')) { setMenu(!menuOpen); return; }
+  if (e.target.closest('[data-close]') && !e.target.closest('a[href="#!"]')) setMenu(false);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && menuOpen) setMenu(false);
+  if (e.key === 'Enter' && e.target.matches?.('.entry')) e.target.click();
+});
+const setMenu = (on) => {
+  menuOpen = on;
+  document.getElementById('menu').hidden = !on;
+  document.querySelector('.burger').setAttribute('aria-expanded', on);
+  document.body.style.overflow = on ? 'hidden' : '';
+  if (on) document.querySelector('.menu-x').focus();
+};
+window.addEventListener('wg:lang', () => { const y = scrollY; render(); scrollTo(0, y); });
+
+WG.inert();
+render();
+})();
+</script>
+<script src="survey.js"></script>
+</body>
+</html>
