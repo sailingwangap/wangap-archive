@@ -125,6 +125,7 @@
         '<b>Post mis en avant</b> + grille des posts récents (publics uniquement).',
         '<b>Récit d’intro</b> + galerie photo publique.',
         "<b>Mini-carte</b> « où sommes-nous » (clic → carte plein écran).",
+        '<b>🦊 Le mot du bord</b>, en différé : quelques lignes écrites par l’IA sur la navigation — sans position ni destination.',
         '<b>Abonnement newsletter</b> + bouton « Écrire aux skippers ».',
         'Bascule de langue FR/EN, bouton Connexion, retour-en-haut.'],
         en:[
@@ -134,6 +135,7 @@
         '<b>Featured post</b> + recent posts grid (public only).',
         '<b>Intro narrative</b> + public photo gallery.',
         '<b>Mini-map</b> "where are we" (click → full-screen map).',
+        '<b>🦊 Word from the boat</b>, delayed: a few lines written by the AI about the sailing — without position or destination.',
         '<b>Newsletter signup</b> + "Message the skippers" button.',
         'FR/EN language toggle, Login button, scroll-to-top.']},
       cap:{fr:"Accueil : hero, stats, posts, aperçu carte.",en:'Home: hero, stats, posts, map preview.'} },
@@ -183,16 +185,16 @@
       bullets:{fr:[
         '<b>Trace GPS</b> colorée par chapitre/étape ; regroupement (clusters) + éclatement « spider » au zoom.',
         '<b>Miniatures photo</b> aux points publiés → carte de prévisualisation → modale détail (photo, blocs nav/conditions/tech, galerie, lightbox, coordonnées, tags).',
-        '<b>Position en direct</b> : point doré pulsant si AIS actif.',
-        '<b>Couches</b> : 📷 Posts · ✿ Tracé · 🗺 Plan (route prévue segmentée + étiquettes) · 📍 Marks.',
-        '<b>Filtres</b> : dropdown chapitre, dropdown tags ; <b>fond marin</b> (OpenSeaMap/ESRI) en option.',
+        '<b>Jamais la position du moment</b> : la trace s’arrête au délai choisi par les skippers.',
+        '<b>Le panneau</b> : Calques (type de carte Classique / Marine / Satellite, Filtre par chapitre, étape ou thème) et Trace (Posts, Trace, Plan — la route prévue…).',
+        'Le long de la trace, la vitesse et le vent réel mesurés à bord, avec le même délai.',
         '<b>Contrôles</b> : centrer sur la position, vue monde, zoom/boussole, lire le Programme.'],
         en:[
         '<b>GPS track</b> coloured by chapter/leg; clustering + "spider" fan-out on zoom.',
         '<b>Photo thumbnails</b> at published points → preview card → detail modal (photo, nav/conditions/tech blocks, gallery, lightbox, coordinates, tags).',
-        '<b>Live position</b>: pulsing gold dot when AIS is active.',
-        '<b>Layers</b>: 📷 Posts · ✿ Track · 🗺 Plan (segmented planned route + labels) · 📍 Marks.',
-        '<b>Filters</b>: chapter dropdown, tag dropdown; optional <b>nautical chart</b> (OpenSeaMap/ESRI).',
+        '<b>Never the current position</b>: the track stops at the delay the skippers chose.',
+        '<b>The panel</b>: Layers (map type Default / Nautical / Satellite, Filter by chapter, leg or topic) and Track (Posts, Track, Plan — the planned route…).',
+        'Along the track, the speed and true wind measured aboard, with the same delay.',
         '<b>Controls</b>: center on position, world view, zoom/compass, play the Programme.']},
       cap:{fr:'Carte publique : trace, posts, route.',en:'Public map: track, posts, route.'} },
 
@@ -257,13 +259,13 @@
       t:{fr:'Espace Famille',en:'Family space'},
       d:{fr:"Le tableau de bord après connexion (rôle famille).",en:'The dashboard after login (family role).'},
       bullets:{fr:[
-        '<b>Position en direct</b> du bateau.',
+        '<b>Position en direct</b> du bateau, et juste dessous <b>🦊 le mot du bord</b> (quelques lignes écrites par l’IA).',
         '<b>Cockpit</b> : un bandeau façon écran de barre (vitesse, vent, cap, fond) avec <b>● EN DIRECT</b> / <b>◐ DIFFÉRÉ</b> ; le toucher — ou l’onglet ⏱ Cockpit — ouvre le cadran de vent, tous les instruments et la trace des 24 h.',
         '<b>Dernières nouvelles</b> (posts famille + publics).',
         'Accès direct aux <b>messages</b> ; pastille de réponse non lue.',
         'Tuile <b>« Page publique »</b> → aperçu visiteur sans se déconnecter (?asVisitor=1).'],
         en:[
-        '<b>Live position</b> of the boat.',
+        '<b>Live position</b> of the boat, and just below <b>🦊 the word from the boat</b> (a few lines written by the AI).',
         '<b>Cockpit</b>: a helm-display strip (speed, wind, heading, depth) with <b>● LIVE</b> / <b>◐ DELAYED</b>; tapping it — or the ⏱ Cockpit tab — opens the wind dial, every instrument and the last 24 h track.',
         '<b>Latest news</b> (family + public posts).',
         'Direct access to <b>messages</b>; unread-reply dot.',
@@ -277,14 +279,14 @@
       bullets:{fr:[
         '<b>📶 / 📴 Ce téléphone</b> : en ligne ou hors ligne (Wi-Fi / 5G quand le téléphone le dit — l’iPhone ne le dit pas). Pour la famille, la pastille dit aussi si tes messages sont partis ; un chiffre = en attente. Skipper : une pastille <b>bleue</b> en haut à gauche = GPS du téléphone qui enregistre.',
         '<b>⛵ Le bord</b> : vert = mesures en direct (&lt; 15 min), or = différé (normal en mer, Starlink coupé), gris = PC du bord éteint, rouge = le PC répond mais aucune mesure n’arrive.',
-        '<b>👁 Public</b> (skipper) : le délai écrit — « 48 h », « ✍️ » (positions à la main) ou « Direct » (or : le public voit la position du moment).',
+        '<b>👁 Public</b> (skipper) : le délai choisi par les skippers, écrit à côté (par exemple « 10 h »), « ✍️ » (positions à la main) ou « Direct » (or : le public voit la position du moment).',
         '<b>🔄 Synchro</b> (skipper) : le mode écrit — « Au large » (bleu), « Manuel », « Off » — ou le nombre d’envois en attente.'],
         en:[
         '<b>📶 / 📴 This phone</b>: online or offline (Wi-Fi / 5G when the phone tells — iPhone does not). For family the dot also tells whether your messages went out; a number = pending. Skipper: a <b>blue</b> dot top-left = phone GPS recording.',
         '<b>⛵ The boat</b>: green = live readings (&lt; 15 min), gold = delayed (normal at sea, Starlink off), grey = boat PC off, red = the PC answers but no reading arrives.',
-        '<b>👁 Public</b> (skipper): the delay written out — “48 h”, “✍️” (hand-placed positions) or “Direct” (gold: the public sees the current position).',
+        '<b>👁 Public</b> (skipper): the delay the skippers chose, written beside it (e.g. “10 h”), “✍️” (hand-placed positions) or “Direct” (gold: the public sees the current position).',
         '<b>🔄 Sync</b> (skipper): the mode written out — “Offshore” (blue), “Manual”, “Off” — or the number of pending sends.']},
-      note:{fr:'La famille voit 2 pastilles (téléphone + le bord) ; le skipper en voit 4. L’AIS n’a plus de pastille : il est dans la feuille, sous « Le bord ».',en:'Family sees 2 chips (phone + boat); the skipper sees 4. AIS no longer has a chip: it is in the sheet, under “The boat”.'} },
+      note:{fr:'La famille voit 2 pastilles (téléphone + le bord) ; le skipper en voit 4. Sur un petit écran, elles passent sur une deuxième ligne. L’AIS n’a plus de pastille : il est dans la feuille, sous « Le bord ».',en:'Family sees 2 chips (phone + boat); the skipper sees 4. On a small screen they wrap onto a second line. AIS no longer has a chip: it is in the sheet, under “The boat”.'} },
 
     { id:'fam-live', level:'family', icon:'⛵', shot:null,
       t:{fr:'Le direct : position et paramètres du bord',en:'Live: position and boat instruments'},
@@ -295,14 +297,94 @@
         '<b>« En direct » = il y a environ 5 minutes</b>, jamais à la seconde — et seulement quand le PC <b>et</b> Starlink sont allumés.',
         '🟢 <b>En direct</b> : dernière mesure il y a moins de 15 min · 🟡 <b>il y a X h</b> : dernières valeurs connues — <b>l’état normal en mer</b>, Starlink coupé · ⚪ <b>hors ligne</b> : plus de 6 h sans nouvelle (PC, Starlink ou instruments éteints).',
         'Rien n’est perdu pendant une coupure : tout part d’un coup au retour de la connexion, et la trace se complète.',
-        '<b>Famille et skipper seulement</b> : le site public ne voit que la trace, avec le délai choisi (48 h par défaut), jamais la position du moment ni les instruments.'],
+        '🟣 <b>ARCHIVE</b> : dans la TimeCapsule du Cockpit, vous regardez un moment passé.',
+        '<b>Famille et skipper seulement</b> : le site public ne voit que la trace, avec le délai choisi par les skippers, jamais la position du moment, ni les instruments, ni la destination.'],
         en:[
         'On board, a program runs on the <b>chart-table PC</b> (the “collector”): it reads the instruments <b>once a minute</b>, keeps them on disk and sends them <b>every 5 minutes</b> over Starlink.',
         '<b>“Live” = about 5 minutes ago</b>, never to the second — and only while the PC <b>and</b> Starlink are on.',
         '🟢 <b>Live</b>: last reading under 15 min ago · 🟡 <b>X h ago</b>: last known values — <b>the normal state at sea</b>, Starlink off · ⚪ <b>offline</b>: over 6 h without news (PC, Starlink or instruments off).',
         'Nothing is lost during an outage: it all goes out at once when the link returns, and the track fills in.',
-        '<b>Family and skippers only</b>: the public site only sees the track, with the chosen delay (48 h by default), never the current position nor the instruments.']},
+        '🟣 <b>ARCHIVE</b>: in the Cockpit’s TimeCapsule, you are looking at a past moment.',
+        '<b>Family and skippers only</b>: the public site only sees the track, with the delay the skippers chose, never the current position, the instruments or the destination.']},
       note:{fr:'Une pastille « il y a 8 h » en pleine traversée n’est pas une panne : c’est Starlink coupé pour économiser l’énergie.',en:'A “8 h ago” dot mid-passage is not a failure: it is Starlink switched off to save power.'} },
+
+    // ── V3.36.5 (23 Oct.) — the Cockpit and what came with it ──
+    { id:'fam-cockpit', level:'family', icon:'⏱', shot:null,
+      t:{fr:'Le Cockpit',en:'The Cockpit'},
+      d:{fr:"Les instruments du bateau, comme à la barre — en petit. Onglet ⏱ Cockpit (famille), ou le menu de l’avatar / la Carte (skippers).",en:'The boat’s instruments, as at the helm — in miniature. The ⏱ Cockpit tab (family), or the avatar menu / the Map (skippers).'},
+      bullets:{fr:[
+        'En haut, un mot : <b>● EN DIRECT</b> (vert, mesure de moins de 15 min), <b>◐ DIFFÉRÉ</b> (or, les dernières valeurs connues — normal en mer quand Starlink est coupé), <b>◷ ARCHIVE</b> (violet, un moment passé dans la TimeCapsule).',
+        '<b>Le cadran de vent</b> et les <b>tuiles</b> : vitesses, route et cap, profondeur, températures, pression, gîte, loch…',
+        '<b>La mini-carte</b> : son bouton passe de « Vue proche » à « Destination » puis à « Tout le passage ».',
+        '<b>Les graphiques</b> : touchez-en un, puis glissez le doigt à gauche ou à droite pour déplacer la barre du temps.',
+        '<b>◷ La TimeCapsule</b> : remonter le temps — −1 j, −1 h, 📅, +1 h, +1 j ; « Direct » ramène au présent.',
+        '<b>⚑ Destination</b> : le point de route actif du traceur B&amp;G — distance, relèvement, arrivée. « Pas de route active sur le traceur » quand il n’y en a pas. Famille et skippers seulement, jamais les voileux ni le public.'],
+        en:[
+        'At the top, one word: <b>● LIVE</b> (green, reading under 15 min old), <b>◐ DELAYED</b> (gold, the last known values — normal at sea when Starlink is off), <b>◷ ARCHIVE</b> (purple, a past moment in the TimeCapsule).',
+        '<b>The wind dial</b> and the <b>tiles</b>: speeds, course and heading, depth, temperatures, pressure, heel, log…',
+        '<b>The mini map</b>: its button switches from “Close view” to “Destination” then to “Whole passage”.',
+        '<b>The charts</b>: tap one, then slide your finger left or right to move the time bar.',
+        '<b>◷ The TimeCapsule</b>: go back in time — −1 d, −1 h, 📅, +1 h, +1 d; “Live” brings you back to now.',
+        '<b>⚑ Destination</b>: the active waypoint of the B&amp;G plotter — distance, bearing, arrival. “No active route on the plotter” when there is none. Family and skippers only, never sailors or the public.']},
+      note:{fr:'« Différé » en pleine traversée n’est pas une panne : Starlink est coupé pour économiser l’énergie.',en:'“Delayed” mid-passage is not a failure: Starlink is off to save power.'} },
+
+    { id:'fam-mot', level:'family', icon:'🦊', shot:null,
+      t:{fr:'Le mot du bord',en:'Word from the boat'},
+      d:{fr:"Deux ou trois lignes sur la navigation, écrites par une IA (Claude) à partir des données du bateau.",en:'Two or three lines about the sailing, written by an AI (Claude) from the boat’s data.'},
+      bullets:{fr:[
+        'Environ <b>toutes les 8 heures</b> quand le bateau navigue ; rien au mouillage.',
+        'En <b>français ou en anglais</b>, selon la langue de chacun.',
+        'Marqué <b>« ✨ écrit par l’IA »</b> — sauf si un skipper l’a réécrit.',
+        'Dans le <b>Cockpit</b> : ‹ › pour lire les précédents, « ⏭ Le dernier » (vert) pour revenir au plus récent ; dans la TimeCapsule, « ⏱ À l’instant » (violet) = le mot de ce moment-là.',
+        'Sur l’<b>Accueil famille</b>, sous « Position en direct ». Le public lit une version en différé, sans position ni destination.'],
+        en:[
+        'About <b>every 8 hours</b> while the boat sails; none at anchor.',
+        'In <b>French or English</b>, following each reader’s language.',
+        'Marked <b>“✨ AI-written”</b> — unless a skipper rewrote it.',
+        'In the <b>Cockpit</b>: ‹ › to read earlier ones, “⏭ Latest” (green) to come back to the newest; in the TimeCapsule, “⏱ At the moment” (purple) = the word in effect then.',
+        'On the <b>family Home</b>, under “Live position”. The public reads a delayed version, without position or destination.']} },
+
+    { id:'fam-carre', level:'family', icon:'💬', shot:null,
+      t:{fr:'La discussion du carré',en:'Saloon talk'},
+      d:{fr:"Un petit fil de discussion sur la page Cockpit, quand les skippers l’ont ouvert.",en:'A small chat on the Cockpit page, when the skippers have opened it.'},
+      bullets:{fr:[
+        'Pour les amis voileux qui ont un lien, et la famille de la liste <b>« 📡 Cockpit en direct »</b>.',
+        'Un <b>point</b> signale les messages non lus.',
+        'Un message peut <b>épingler un moment</b> : il s’ouvre dans la TimeCapsule.',
+        'Ce que vous écrivez est <b>lu tout de suite</b> : le délai protège les données du bateau, pas les mots.'],
+        en:[
+        'For sailing friends who have a link, and the family on the <b>“📡 Live cockpit”</b> list.',
+        'A <b>dot</b> shows unread messages.',
+        'A message can <b>pin a moment</b>: it opens in the TimeCapsule.',
+        'What you write is <b>read right away</b>: the delay protects the boat’s data, not words.']} },
+
+    { id:'fam-passage', level:'family', icon:'⛵', shot:null,
+      t:{fr:'« Wang’ap reprend la mer »',en:'“Wang’ap sets sail again”'},
+      d:{fr:"La notification d’un nouveau départ.",en:'The notification of a new departure.'},
+      bullets:{fr:[
+        'Envoyée seulement quand un <b>nouveau passage</b> commence : le bateau repart après au moins 4 h au mouillage.',
+        '<b>Jamais</b> quand Starlink ou le PC du bord se reconnecte en route.',
+        'Famille : Réglages → Notifications → <b>« ⛵ Un passage commence (Cockpit) »</b>. Amis voileux et liste « Cockpit en direct » : par email.'],
+        en:[
+        'Sent only when a <b>new passage</b> starts: the boat leaves after at least 4 h at anchor.',
+        '<b>Never</b> when Starlink or the boat PC reconnects mid-passage.',
+        'Family: Settings → Notifications → <b>“⛵ A passage starts (Cockpit)”</b>. Sailing friends and the “Live cockpit” list: by email.']} },
+
+    { id:'fam-map', level:'family', icon:'⭐', shot:null,
+      t:{fr:'La Carte (famille)',en:'The Map (family)'},
+      d:{fr:"Le voyage sur une carte qu’on touche (menu ⭐ / 🗺️).",en:'The voyage on a map you can touch (menu ⭐ / 🗺️).'},
+      bullets:{fr:[
+        '<b>Calques</b> : type de carte (Classique, Marine, Satellite), <b>Filtre</b> par chapitre et étape (dans l’ordre des dates), <b>Météo</b>.',
+        '<b>Trace</b> : Posts, <b>Médias</b> (les photos de la galerie, interrupteur à part), Trace, Plan, Voilure, Barbules, POI, ⚑ Destination ; <b>Couleur de la trace</b>, avec des « ? » qui expliquent.',
+        '<b>Météo</b> : prévision sur 7 jours avec un curseur ; « Couleurs » colore la carte ; « Détail au toucher » : touchez n’importe où pour le vent et les vagues de ce point dans le temps.',
+        '<b>Touchez la trace</b> : un petit compas de poche — la route (aiguille), la flèche du vent, la vitesse, le chapitre · l’étape.',
+        '<b>En bas à droite</b> : les instruments (le même compas pour la dernière position du bateau, le feu du bord et le lien ⏱ Cockpit) et le bouton de vue : « Vue large » → « Étape en cours » → « Le bateau ».'],
+        en:[
+        '<b>Layers</b>: map type (Default, Nautical, Satellite), <b>Filter</b> by chapter and leg (in date order), <b>Weather</b>.',
+        '<b>Track</b>: Posts, <b>Media</b> (the gallery photos, a separate switch), Track, Plan, Sails, Wind barbs, POI, ⚑ Destination; <b>Track colour</b>, with “?” explanations.',
+        '<b>Weather</b>: 7-day forecast with a slider; “Colours” tints the map; “Detail on tap”: tap anywhere for the wind and waves at that spot over time.',
+        '<b>Tap the track</b>: a small pocket compass — the course (needle), the wind arrow, the speed, the chapter · leg.',
+        '<b>Bottom right</b>: the instruments (the same compass for the boat’s latest position, the boat light and the ⏱ Cockpit link) and the view button: “Wide view” → “Current stage” → “The boat”.']} },
 
     { id:'fam-timeline', level:'family', icon:'📖', shot:11,
       t:{fr:'Le Voyage — Timeline & filtres',en:'The Voyage — Timeline & filters'},
@@ -355,18 +437,19 @@
         'A brand-new post may briefly appear in its original language before translation.']},
       cap:{fr:'Bascule de langue FR/EN.',en:'FR/EN language toggle.'} },
 
-    { id:'fam-stats', level:'family', icon:'✨', shot:14,
-      t:{fr:'Statistiques (Stats)',en:'Statistics (Stats)'},
-      d:{fr:"Les chiffres du voyage (menu ✨ / 📊).",en:'The voyage figures (menu ✨ / 📊).'},
+    // The « Stats » tab was replaced by Calendrier (V3.4.42); the full charts
+    // live in Réglages → Statistiques (skipper).
+    { id:'fam-calendar', level:'family', icon:'📅', shot:null,
+      t:{fr:'Calendrier',en:'Calendar'},
+      d:{fr:"Le voyage par chapitre et par date (menu 📅).",en:'The voyage by chapter and by date (menu 📅).'},
       bullets:{fr:[
-        '<b>KPIs</b> : milles, jours, escales, étapes, vitesse moyenne et max, nuits en mer, distance, plus longue étape, carburant.',
-        '<b>Graphiques</b> : vitesse par jour (barres), distance cumulée (aire), répartition par catégorie (camembert).',
-        '<b>Filtre par période</b> : semaine / mois / total.'],
+        'Un bandeau de <b>chiffres clés</b> : milles, jours en mer, escales, nuits en mer.',
+        '<b>Par chapitre</b> : chaque chapitre avec sa photo de couverture et son nombre de publications.',
+        '<b>Par date</b> : les jours où il s’est passé quelque chose, mois par mois ; toucher un jour ouvre ses publications.'],
         en:[
-        '<b>KPIs</b>: miles, days, stops, legs, average & max speed, nights at sea, distance, longest leg, fuel.',
-        '<b>Charts</b>: speed per day (bars), cumulative distance (area), category breakdown (pie).',
-        '<b>Period filter</b>: week / month / all-time.']},
-      cap:{fr:'Stats : graphiques + KPIs.',en:'Stats: charts + KPIs.'} },
+        'A <b>key-figures</b> banner: miles, days at sea, stops, nights at sea.',
+        '<b>By chapter</b>: each chapter with its cover photograph and its number of posts.',
+        '<b>By date</b>: the days when something happened, month by month; tapping a day opens its posts.']} },
 
     { id:'fam-messages', level:'family', icon:'📨', shot:15,
       t:{fr:'Messages',en:'Messages'},
@@ -405,7 +488,7 @@
         '<b>Apparence</b> : mode poétique (icônes Petit Prince, défaut ON), mode nuit, fond uni (6 couleurs) ou photo (6 ambiances).',
         '<b>Synchronisation</b> : Auto / Manuel / Off.',
         '<b>GPS du téléphone</b> : enregistrer sa position (utile en annexe).',
-        '<b>Notifications push</b> : commentaires, réponses, nouveaux posts.',
+        '<b>Notifications push</b> : nouveaux posts, réponses, photos du soir, position du bateau, <b>« ⛵ Un passage commence (Cockpit) »</b>.',
         '<b>Aide</b> : raccourci vers ce guide. Les préférences sont stockées par utilisateur (sync entre appareils).'],
         en:[
         '<b>Identity</b>: display name + avatar (square crop).',
@@ -413,7 +496,7 @@
         '<b>Appearance</b>: poetic mode (Little Prince icons, default ON), night mode, solid background (6 colours) or photo (6 moods).',
         '<b>Sync</b>: Auto / Manual / Off.',
         '<b>Phone GPS</b>: record your position (useful in the dinghy).',
-        '<b>Push notifications</b>: comments, replies, new posts.',
+        '<b>Push notifications</b>: new posts, replies, evening photos, boat position, <b>“⛵ A passage starts (Cockpit)”</b>.',
         '<b>Help</b>: shortcut to this guide. Preferences are stored per user (synced across devices).']},
       cap:{fr:'Menu Réglages (sous-menu).',en:'Settings menu (drill).'} },
 
@@ -428,7 +511,7 @@
         '<b>Géolocalisation</b> : GPS du téléphone, EXIF de la photo, ou long-press carte.',
         '<b>Visibilité</b> 🌍/❤️/🔒, <b>catégorie</b> (9), <b>tags</b> multiples.',
         'Bloc <b>Navigation</b> (route, distance, vitesse, cap, allure, voiles, ris), <b>Conditions</b> (vent force/direction, mer, creux, baromètre, températures, visibilité, ciel), <b>Technique</b> (heures moteur, carburant, eau, batteries, solaire, incidents).',
-        '<b>Publier</b> ou <b>Brouillon</b> ; écriture hors-ligne (file de synchro) ; ✏️ modifier / 🗑 supprimer (définitif).'],
+        '<b>Publier</b> ou <b>Brouillon</b> ; écriture hors-ligne (file de synchro) ; ✏️ modifier / 🗑 supprimer (photos et vidéos vont à la corbeille, récupérables 30 jours).'],
         en:[
         'Open: <b>"+ New entry"</b> (Timeline) or <b>long-press</b> on the map (pre-fills lat/lon + leg).',
         '<b>Chapter</b> (auto-selects the latest), <b>title</b>, <b>body</b> (plain text), <b>leg</b> (auto by date).',
@@ -436,15 +519,18 @@
         '<b>Geolocation</b>: phone GPS, photo EXIF, or long-press map.',
         '<b>Visibility</b> 🌍/❤️/🔒, <b>category</b> (9), multiple <b>tags</b>.',
         '<b>Navigation</b> block (route, distance, speed, heading, point of sail, sails, reefs), <b>Conditions</b> (wind force/direction, sea, swell, barometer, temperatures, visibility, sky), <b>Technical</b> (engine hours, fuel, water, batteries, solar, incidents).',
-        '<b>Publish</b> or <b>Draft</b>; offline writing (sync queue); ✏️ edit / 🗑 delete (permanent).']},
+        '<b>Publish</b> or <b>Draft</b>; offline writing (sync queue); ✏️ edit / 🗑 delete (photos and videos go to the bin, recoverable for 30 days).']},
       cap:{fr:'Compositeur + blocs journal de bord.',en:'Composer + logbook blocks.'} },
 
     { id:'sk-mapedit', level:'skipper', icon:'✂️', shot:19,
       t:{fr:'Carte : affichage & édition de la trace',en:'Map: display & track editing'},
       d:{fr:"Choisir ce qu’on affiche, puis corriger et nettoyer la trace GPS.",en:'Choose what is shown, then fix and clean the GPS track.'},
       bullets:{fr:[
-        '<b>Afficher / masquer les couches</b> : 📷 Posts · ✿ Tracé · 🗺 Plan (route prévue) · 📍 Marks ; filtre par chapitre / étape ; fond marin nautique (OpenSeaMap / ESRI).',
-        'Bouton <b>✂️ Édition tracé</b> : les waypoints deviennent des cercles cliquables.',
+        '<b>Le panneau</b> : Calques et Trace comme pour la famille (voir « La Carte »), plus un troisième onglet, <b>Outils</b>, pour les skippers.',
+        '<b>📍 Marquer un point</b> : la position du bateau est notée après confirmation ; <b>Outils → Points marqués</b> pour les revoir, les déplacer ou les supprimer.',
+        '<b>⚑ Destination</b> (onglet Trace) : le point de route actif du traceur B&amp;G, sur la carte.',
+        'Dans la bulle d’un point de trace, un <b>petit badge</b> (icône + mot) dit d’où vient le point : instruments du bord, AIS, téléphone, fichier GPX, manuel…',
+        'Bouton <b>✂️ Édition tracé</b> (Outils) : les waypoints deviennent des cercles cliquables.',
         '<b>Glisser</b> un waypoint pour le repositionner ; tap = sélection, second tap = sélection d’une <b>plage</b>.',
         '<b>Supprimer en lot</b> : batché par 200 (limite PostgREST), toast de résultat (vert / orange partiel / rouge).',
         '<b>Forcer une étape</b> sur la sélection ; <b>décaler les dates</b> d’une période.',
@@ -452,8 +538,11 @@
         '<b>Simplifier la trace</b> (Douglas-Peucker) avec aperçu et <b>annulation</b> pendant quelques secondes.',
         '<b>Réglages → 🛠 Trace : visualisation et maintenance</b> : <b>tolérance de simplification au zoom</b> (optimisation du rendu — moins de points au zoom faible), <b>détection des coupures</b> (la trace se scinde en segments, les « lignes de rupture », dès que l’écart de temps dépasse N h ou la vitesse implicite N nœuds), et historique de maintenance des waypoints.'],
         en:[
-        '<b>Show / hide layers</b>: 📷 Posts · ✿ Track · 🗺 Plan (planned route) · 📍 Marks; filter by chapter / leg; nautical chart (OpenSeaMap / ESRI).',
-        '<b>✂️ Edit track</b> button: waypoints become tappable circles.',
+        '<b>The panel</b>: Layers and Track as for the family (see “The Map”), plus a third tab, <b>Tools</b>, for the skippers.',
+        '<b>📍 Mark a point</b>: the boat’s position is noted after you confirm; <b>Tools → Marked points</b> to review, move or delete them.',
+        '<b>⚑ Destination</b> (Track tab): the active waypoint of the B&amp;G plotter, on the map.',
+        'In a track point’s bubble, a <b>small badge</b> (icon + word) tells where the point comes from: boat instruments, AIS, phone, GPX file, manual…',
+        '<b>✂️ Edit track</b> button (Tools): waypoints become tappable circles.',
         '<b>Drag</b> a waypoint to reposition; tap = select, second tap = select a <b>range</b>.',
         '<b>Bulk delete</b>: batched in 200s (PostgREST limit), result toast (green / orange partial / red).',
         '<b>Force a leg</b> on the selection; <b>shift dates</b> of a period.',
@@ -496,12 +585,12 @@
       t:{fr:'Position manuelle & visibilité publique',en:'Manual position & public visibility'},
       d:{fr:"Maîtriser ce que voient les visiteurs.",en:'Control what visitors see.'},
       bullets:{fr:[
-        '<b>Position manuelle</b> : forcer un point précis quand l’AIS est éteint. Le résolveur prend la plus récente entre point manuel et waypoint visible, avec un tampon « collant » d’1 h qui protège un geste humain récent.',
-        '<b>Visibilité publique</b> : afficher la position <b>en direct</b>, <b>différée</b> (avec délai) ou <b>figée</b> pour le public.',
+        '<b>Position manuelle 🎯</b> (Réglages → Navigation & position) : poser un point précis quand rien ne passe (AIS ou PC éteint). Elle prévient la famille ; le public, lui, ne la voit qu’après le délai public, comme la trace.',
+        '<b>Visibilité publique</b> : afficher la position <b>en direct</b>, <b>différée</b> (avec délai) ou <b>figée</b> pour le public. Une position manuelle attend le même délai que la trace avant d’être montrée au public.',
         'Famille et skippers voient la position réelle ; le public voit la version choisie — <b>par audience, pas par hasard</b>.'],
         en:[
-        '<b>Manual position</b>: force a precise point when AIS is off. The resolver takes the most recent of manual point vs visible waypoint, with a 1 h "sticky" buffer protecting a recent human gesture.',
-        '<b>Public visibility</b>: show the position <b>live</b>, <b>delayed</b> (with a buffer) or <b>frozen</b> for the public.',
+        '<b>Manual position 🎯</b> (Settings → Navigation & position): drop a precise point when nothing gets through (AIS or PC off). It notifies family; the public only sees it after the public delay, like the track.',
+        '<b>Public visibility</b>: show the position <b>live</b>, <b>delayed</b> (with a buffer) or <b>frozen</b> for the public. A manual position waits for the same delay as the track before the public sees it.',
         'Family and skippers see the real position; the public sees the chosen version — <b>per audience, by design</b>.']},
       cap:{fr:'Position manuelle + visibilité publique.',en:'Manual position + public visibility.'} },
 
@@ -534,7 +623,49 @@
         '<b>Version aboard</b> and last contact, <b>Internet (Starlink)</b>, today’s sends, sentences waiting on disk, connected sources (Yacht Devices gateway + B&amp;G processor).',
         '<b>Errors</b> with their exact line, and the PC’s <b>latest activity lines</b> — enough to fix things from ashore without asking anything aboard.',
         'On the PC: <b>an icon by the clock</b> (green = sends OK, orange = instruments quiet or Internet down, blue = paused, red = key refused). Hover = status bubble; click = monitor window (closing it only hides it); right-click = <b>pause / restart / quit</b>. It starts by itself with Windows.']},
-      note:{fr:'Le PC éteint = pas de direct. Le journal interne de la passerelle Yacht Devices comblera ces trous (récupération automatique en préparation).',en:'PC off = no live feed. The Yacht Devices gateway’s internal log will fill those gaps (automatic retrieval being prepared).'} },
+      note:{fr:'Le PC éteint = pas de direct, mais la trace n’a plus de trous : au retour du PC, il renvoie ce que la passerelle Yacht Devices a gardé dans son journal ; si le PC est éteint mais Starlink allumé, le nuage Yacht Devices donne la position avec 15 à 30 min de retard. Les mesures du direct passent toujours en premier.',en:'PC off = no live feed, but the track no longer has gaps: when the PC comes back it sends what the Yacht Devices gateway kept in its log; if the PC is off but Starlink is on, the Yacht Devices cloud gives the position 15 to 30 min late. The live readings always win.'} },
+
+    // ── V3.36.5 (23 Oct.) ──
+    { id:'sk-voileux', level:'skipper', icon:'⛵', shot:null,
+      t:{fr:'Accès voileux, mot du bord & discussion du carré',en:'Sailor access, word from the boat & saloon talk'},
+      d:{fr:"Réglages → Accès voileux : tout ce que voient les amis voileux, et les deux nouveautés du Cockpit.",en:'Settings → Sailor access: everything your sailing friends see, and the two new Cockpit features.'},
+      bullets:{fr:[
+        '<b>Les liens voileux</b> : pour chacun, le décalage du direct, la fenêtre de la TimeCapsule et la durée du lien — des menus déroulants. Jamais la destination, rien du journal.',
+        '<b>« 🔔 Prévenir quand un passage commence »</b> : l’email « Wang’ap reprend la mer », seulement quand le bateau repart après au moins 4 h au mouillage. <b>Le flux</b> ON/OFF coupe tout d’un geste.',
+        '<b>🦊 Le mot du bord</b> ON/OFF, et ⚙️ Réglages : fréquence (4, 6, 8, 12 ou 24 h), modèle, version publique, « ✍️ Écrire maintenant ». Dans le Cockpit, sur la ligne d’un mot : ✎ le réécrire, 🗑 le supprimer.',
+        '<b>💬 La discussion du carré</b> ON/OFF. Les messages arrivent aussi dans la boîte de réception, onglet ⏲ Cockpit, d’où l’on répond.',
+        'Dans le <b>menu de l’avatar</b>, deux interrupteurs façon iPhone : « Au large » et « Flux voileux ».'],
+        en:[
+        '<b>Sailor links</b>: for each friend, the delay on the live feed, the TimeCapsule window and the link expiry — drop-down menus. Never the destination, nothing from the journal.',
+        '<b>“🔔 Warn when a passage starts”</b>: the “Wang’ap sets sail again” email, only when the boat leaves after at least 4 h at anchor. <b>The feed</b> ON/OFF cuts everything at once.',
+        '<b>🦊 Word from the boat</b> ON/OFF, and ⚙️ Settings: frequency (4, 6, 8, 12 or 24 h), model, public version, “✍️ Write now”. In the Cockpit, on a word’s line: ✎ rewrite it, 🗑 delete it.',
+        '<b>💬 Saloon talk</b> ON/OFF. Messages also land in the inbox, ⏲ Cockpit tab, where you reply.',
+        'In the <b>avatar menu</b>, two iPhone-style switches: “Offshore” and “Sailor feed”.']} },
+
+    { id:'sk-legend', level:'skipper', icon:'⏩', shot:null,
+      t:{fr:'« La fin de l’étape approche »',en:'“The end of the leg is near”'},
+      d:{fr:"Un rappel quand l’étape en cours se termine aujourd’hui ou demain (ou que des points n’ont pas d’étape).",en:'A reminder when the current leg ends today or tomorrow (or when points have no leg).'},
+      bullets:{fr:[
+        '<b>⏩ Prolonger de 2 jours</b> : l’étape est prolongée, et le chapitre aussi s’il le faut.',
+        '<b>📚 Chapitres et étapes</b> : ouvrir les réglages pour faire autrement.',
+        '<b>Plus tard</b> : ne plus le montrer jusqu’à demain, sur cet appareil seulement.'],
+        en:[
+        '<b>⏩ Extend by 2 days</b>: the leg is extended, and the chapter too if needed.',
+        '<b>📚 Chapters and legs</b>: open the settings to do it differently.',
+        '<b>Later</b>: hide it until tomorrow, on that device only.']},
+      note:{fr:'Sans étape, les points de trace et les nouveaux récits de ces jours-là ne seraient rangés nulle part.',en:'Without a leg, the track points and new stories of those days would be filed nowhere.'} },
+
+    { id:'sk-gallery-upload', level:'skipper', icon:'📷', shot:null,
+      t:{fr:'Envoyer des photos à la galerie',en:'Sending photos to the gallery'},
+      d:{fr:"Galerie → envoyer (ou Composer → 📷 Médias) : sans écrire de post.",en:'Gallery → send (or Compose → 📷 Media): without writing a post.'},
+      bullets:{fr:[
+        '<b>Datée</b> d’après la photo elle-même, ou la date que vous indiquez.',
+        '<b>Rangée</b> dans le bon chapitre et la bonne étape.',
+        '<b>Placée</b> sur la carte : GPS de la photo, sinon la trace à cette heure-là, sinon la dernière position du bateau. Elle apparaît avec l’interrupteur « Médias » de la carte.'],
+        en:[
+        '<b>Dated</b> from the photo itself, or the date you enter.',
+        '<b>Filed</b> in the right chapter and leg.',
+        '<b>Placed</b> on the map: the photo’s GPS, else the track at that time, else the boat’s last position. It shows with the map’s “Media” switch.']} },
 
     { id:'sk-maintenance', level:'skipper', icon:'🔧', shot:24,
       t:{fr:'Carnet de maintenance (Tech)',en:'Maintenance log (Tech)'},
@@ -641,13 +772,15 @@
         '<b>Snapshot archive</b> : régénère <b>archive.wangap.fr</b> (version statique long-terme et immuable) — cron lundi 03:00 UTC. Historique sur /archives.',
         '<b>Gestion des accès</b> : promouvoir un utilisateur (famille / admin), désactiver un compte (comptes fondateurs protégés).',
         '<b>Maintenance technique</b> : « Forcer la mise à jour » (vide le cache du Service Worker), version de l’app, backfill des variantes photo.',
-        '<b>Cohérence du trace</b> (consolidation : réduit la trace à ~1 pt/min en marquant les points redondants « supersédés ») et <b>maintenance de la trace</b> pour les cas avancés.'],
+        '<b>📷 Récupérer les originaux</b> : les photos dont il manque la version pleine résolution (publiées avant le 26 septembre, ou écrasées par un bug en septembre–octobre, corrigé) — à rattacher une par une depuis le téléphone, tant que la pellicule n’est pas vidée.',
+        '<b>Cohérence du trace</b> : maintenant dans Navigation & position ; la trace est aussi rangée toute seule chaque nuit.'],
         en:[
         '<b>Export all</b>: every table (JSON) + photos (sm/md/lg) + waypoints → Google Drive zip (manual + Sunday 03:00 UTC cron). History at /backups.',
         '<b>Archive snapshot</b>: regenerates <b>archive.wangap.fr</b> (long-term immutable static version) — Monday 03:00 UTC cron. History at /archives.',
         '<b>Access management</b>: promote a user (family / admin), disable an account (founder accounts protected).',
         '<b>Technical maintenance</b>: "Force update" (clears the Service Worker cache), app version, photo-variant backfill.',
-        '<b>Track consolidation</b> (thins the track to ~1 pt/min by marking redundant points "superseded") and <b>track maintenance</b> for advanced cases.']},
+        '<b>📷 Recover the originals</b>: the photos missing their full-resolution version (published before 26 September, or overwritten by a bug in September–October, fixed) — re-attach them one by one from the phone, while the camera roll still has them.',
+        '<b>Track consolidation</b>: now in Navigation & position; the track is also tidied by itself every night.']},
       cap:{fr:'Sauvegarde/archive + accès + maintenance.',en:'Backup/archive + access + maintenance.'} },
 
     { id:'sk-settings-all', level:'skipper', icon:'🪐', shot:null,
@@ -655,7 +788,8 @@
       d:{fr:"Le menu Réglages du skipper, section par section (en plus des réglages famille : identité, langue, apparence, synchro, GPS, notifications).",en:'The skipper Settings menu, section by section (on top of the family settings: identity, language, appearance, sync, GPS, notifications).'},
       bullets:{fr:[
         '<b>💡 Aide</b> : ce guide, le démarrage rapide, la FAQ.',
-        '<b>🧭 Navigation & position</b> : regroupe <b>🎯 Position manuelle</b>, <b>📱 GPS du téléphone</b>, <b>📡 AIS — Suivi en direct</b> et <b>📡 Collecteur du bord</b>.',
+        '<b>🧭 Navigation & position</b> : regroupe <b>🎯 Position manuelle</b>, <b>📱 GPS du téléphone</b>, <b>📡 AIS — Suivi en direct</b>, <b>📡 Collecteur du bord</b> et <b>🧬 Cohérence du trace</b>.',
+        '<b>⛵ Accès voileux</b> : les liens des amis voileux, l’alerte de départ, le flux ON/OFF, <b>🦊 Le mot du bord</b> et <b>💬 La discussion du carré</b> (voir la rubrique dédiée).',
         '<b>👁 Visibilité publique</b> : position montrée au public en <b>Direct</b>, <b>Différé</b> ou <b>Manuel</b>.',
         '<b>🔄 Synchronisation</b> : Auto / Manuel / Off + file en attente.',
         '<b>🛠 Trace : visualisation et maintenance</b> : tolérance de simplification au zoom, détection des coupures (lignes de rupture), historique de maintenance des waypoints.',
@@ -667,7 +801,8 @@
         '<b>💾 Sauvegarde & archive</b> : export Drive, snapshot archive.wangap.fr. &nbsp;<b>👤 Connecté</b> : identité, avatar, déconnexion.'],
         en:[
         '<b>💡 Help</b>: this guide, the quick start, the FAQ.',
-        '<b>🧭 Navigation & position</b>: groups <b>🎯 Manual position</b>, <b>📱 Phone GPS</b>, <b>📡 AIS — live tracking</b> and <b>📡 Onboard collector</b>.',
+        '<b>🧭 Navigation & position</b>: groups <b>🎯 Manual position</b>, <b>📱 Phone GPS</b>, <b>📡 AIS — live tracking</b>, <b>📡 Onboard collector</b> and <b>🧬 Track consolidation</b>.',
+        '<b>⛵ Sailor access</b>: your sailing friends’ links, the departure alert, the feed ON/OFF, <b>🦊 Word from the boat</b> and <b>💬 Saloon talk</b> (see the dedicated topic).',
         '<b>👁 Public visibility</b>: position shown to the public <b>Live</b>, <b>Delayed</b> or <b>Manual</b>.',
         '<b>🔄 Sync</b>: Auto / Manual / Off + pending queue.',
         '<b>🛠 Track: visualisation & maintenance</b>: zoom simplification tolerance, gap detection (break lines), waypoint maintenance history.',
@@ -708,7 +843,10 @@
   }
   function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
   // bullets may contain trusted <b> tags from our own data — allow them through.
-  function bul(s){ return esc(s).replace(/&lt;b&gt;/g,'<b>').replace(/&lt;\/b&gt;/g,'</b>'); }
+  // A few bullets were written with entities (B&amp;G, &lt; 15 min, &nbsp;): decode
+  // them first, or esc() shows them literally (« B&amp;G » on screen).
+  function unent(s){ return s.replace(/&nbsp;/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&'); }
+  function bul(s){ return esc(unent(s)).replace(/&lt;b&gt;/g,'<b>').replace(/&lt;\/b&gt;/g,'</b>'); }
   function cardHtml(s){
     const u=UI[lang];
     const lvlLabel=u.tabs[s.level].replace(/^[^\s]+\s/,'');
