@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#F7F4EE">
+<title>Wang'ap — La Revue (démo)</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5 13.6 10.4 21.5 12 13.6 13.6 12 21.5 10.4 13.6 2.5 12 10.4 10.4Z' fill='none' stroke='%23B5654A' stroke-width='1.4' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wg.css">
+<style>
+:root{
+  --paper:#F7F4EE; --ink:#2F2E2B; --greige:#CFC8BD; --slate:#2F5D6E; --terra:#B5654A; --terra-d:#93492F; --sage:#DBDED5;
+  --muted:#5F5A52; --rule:#CFC8BD; --white:#FFFDF9;
+  --serif:'Cormorant Garamond', Garamond, 'Times New Roman', serif;
+  --sans:Manrope, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --g:16px; --max:1240px; --ease:cubic-bezier(.22,.61,.36,1);
+  --rd-bg:#F7F4EE; --rd-ink:#2F2E2B; --rd-muted:#5F5A52; --rd-accent:#2F5D6E; --rd-title:#2F2E2B;
+  --rd-title-font:'Cormorant Garamond', Garamond, serif; --rd-body-font:Manrope, system-ui, sans-serif; --rd-radius:0px;
+}
+@media (min-width:700px){ :root{ --g:32px; } }
+@media (min-width:1100px){ :root{ --g:48px; } }
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{ margin:0; background:var(--paper); color:var(--ink); font:400 16px/1.65 var(--sans); -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+@media (min-width:1100px){ body{ font-size:17px; } }
+img{ display:block; max-width:100%; }
+a{ color:inherit; }
+button, input, select, textarea{ font:inherit; color:inherit; }
+:focus-visible{ outline:2px solid var(--slate); outline-offset:3px; }
+.wrap{ max-width:var(--max); margin:0 auto; padding:0 var(--g); }
+.kick{ font:600 12px/1.5 var(--sans); letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin:0 0 14px; }
+.h2{ font:500 clamp(40px, 9.6vw, 76px)/1.02 var(--serif); letter-spacing:-.012em; margin:0 0 22px; text-wrap:balance; }
+.serif{ font-family:var(--serif); }
+.lede{ font:italic 400 clamp(22px, 5.4vw, 28px)/1.35 var(--serif); margin:0 0 24px; }
+.sec{ padding:88px 0; }
+@media (min-width:1100px){ .sec{ padding:136px 0; } }
+[id]{ scroll-margin-top:64px; }
+.orn{ display:flex; justify-content:center; color:var(--terra); padding:8px 0; }
+.orn svg{ width:24px; height:24px; }
+.sep{ padding:56px 0; }
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:10px; min-height:48px; padding:0 22px; border:1px solid currentColor; background:transparent; text-decoration:none;
+  font:600 13px/1 var(--sans); letter-spacing:.14em; text-transform:uppercase; cursor:pointer; transition:background .4s, color .4s; }
+.btn.solid{ background:var(--slate); border-color:var(--slate); color:var(--paper); }
+.btn:hover{ background:var(--ink); border-color:var(--ink); color:var(--paper); }
+.tl{ display:inline-flex; align-items:center; min-height:44px; font:600 13px/1.3 var(--sans); letter-spacing:.14em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid currentColor; padding-top:6px; }
+.links{ display:flex; flex-wrap:wrap; gap:4px 28px; }
+.cap{ font:600 11.5px/1.5 var(--sans); letter-spacing:.12em; text-transform:uppercase; color:var(--muted); border-top:1px solid var(--rule); padding-top:9px; margin:10px 0 0; }
+.epi{ margin:0; font:italic 400 clamp(22px, 5.6vw, 30px)/1.32 var(--serif); text-wrap:balance; }
+.epi + .src{ margin:12px 0 0; font:600 11.5px/1.5 var(--sans); letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+
+/* ── barre ── */
+.bar{ position:fixed; top:0; left:0; right:0; z-index:600; color:#fff; border-bottom:1px solid transparent; transition:background .6s, color .6s, border-color .6s; }
+.bar-in{ display:flex; align-items:center; gap:6px; max-width:var(--max); margin:0 auto; padding:calc(env(safe-area-inset-top, 0px) + 4px) var(--g) 4px; }
+.bar.solid{ background:rgba(247,244,238,.97); color:var(--ink); border-color:var(--rule); }
+.mark{ display:flex; align-items:center; gap:9px; min-height:48px; text-decoration:none; margin-right:auto; font:500 27px/1 var(--serif); font-variant-caps:small-caps; letter-spacing:.07em; }
+.mark img{ width:30px; height:30px; transition:filter .6s; }
+.bar:not(.solid) .mark img{ filter:grayscale(1) invert(1) brightness(1.6); mix-blend-mode:screen; }
+.bar.solid .mark img{ mix-blend-mode:multiply; }
+.lang{ display:flex; }
+.lang button{ min-width:40px; min-height:44px; border:0; background:none; cursor:pointer; font:600 12px/1 var(--sans); letter-spacing:.14em; opacity:.62; padding:0 6px; }
+.lang button[aria-pressed="true"]{ opacity:1; text-decoration:underline; text-underline-offset:5px; }
+.bar-login{ display:none; }
+.som-btn{ display:inline-flex; align-items:center; gap:10px; min-height:44px; padding:0 14px; border:1px solid currentColor; background:none; cursor:pointer; font:600 12px/1 var(--sans); letter-spacing:.16em; text-transform:uppercase; }
+.som-btn i{ display:block; width:16px; height:7px; border-top:1px solid currentColor; border-bottom:1px solid currentColor; }
+@media (max-width:379px){ .bar .lang{ display:none; } }
+@media (min-width:860px){ .bar-login{ display:inline-flex; align-items:center; min-height:44px; padding:0 12px; font:600 12px/1 var(--sans); letter-spacing:.16em; text-transform:uppercase; text-decoration:none; } }
+
+/* ── sommaire ── */
+.som{ position:fixed; inset:0; z-index:700; background:var(--paper); color:var(--ink); overflow-y:auto; overscroll-behavior:contain; visibility:hidden; opacity:0; transition:opacity .5s var(--ease), visibility 0s .5s; }
+.som.on{ visibility:visible; opacity:1; transition:opacity .5s var(--ease); }
+.som-head{ display:flex; align-items:center; gap:8px; max-width:var(--max); margin:0 auto; padding:calc(env(safe-area-inset-top, 0px) + 4px) var(--g) 4px; border-bottom:1px solid var(--rule); }
+.som-head .mark img{ mix-blend-mode:multiply; }
+.som-body{ max-width:var(--max); margin:0 auto; padding:36px var(--g) calc(56px + env(safe-area-inset-bottom, 0px)); display:grid; gap:48px; }
+.som-title{ font:500 clamp(56px, 15vw, 128px)/.9 var(--serif); margin:0 0 8px; letter-spacing:-.02em; }
+.som-nav{ list-style:none; margin:0; padding:0; border-top:1px solid var(--rule); }
+.som-nav li{ border-bottom:1px solid var(--rule); }
+.som-nav a{ display:flex; align-items:baseline; gap:18px; padding:12px 0; min-height:56px; text-decoration:none; font:500 clamp(28px, 7vw, 40px)/1.15 var(--serif); }
+.som-nav a span{ font:600 12px/1 var(--sans); letter-spacing:.14em; color:var(--muted); width:22px; }
+.som-nav a:hover{ color:var(--slate); }
+.som-ch a{ display:block; padding:14px 0; text-decoration:none; border-bottom:1px solid var(--rule); }
+.som-ch b{ display:block; font:500 26px/1.15 var(--serif); }
+.som-ch small{ font:italic 400 18px/1.4 var(--serif); color:var(--muted); }
+.som-side{ display:grid; gap:36px; align-content:start; }
+.som-side .lang button{ min-width:56px; border:1px solid var(--ink); opacity:1; }
+.som-side .lang button + button{ border-left:0; }
+.som-side .lang button[aria-pressed="true"]{ background:var(--ink); color:var(--paper); text-decoration:none; }
+@media (min-width:900px){ .som-body{ grid-template-columns:7fr 4fr; gap:96px; padding-top:72px; } }
+
+/* ── couverture ── */
+.hero{ position:relative; min-height:100vh; min-height:100svh; display:flex; color:#fff; background:#2a2a27; overflow:hidden; }
+.hero picture, .hero picture img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.hero picture img{ object-position:50% 30%; animation:ease 2.8s var(--ease) both; }
+.hero::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(22,21,19,.5) 0%, rgba(22,21,19,0) 20%, rgba(22,21,19,0) 38%, rgba(22,21,19,.62) 66%, rgba(22,21,19,.86) 100%); }
+.hero-in{ position:relative; z-index:1; display:flex; flex-direction:column; width:100%; max-width:var(--max); margin:0 auto; padding:calc(env(safe-area-inset-top, 0px) + 76px) var(--g) calc(28px + env(safe-area-inset-bottom, 0px)); animation:fade 1.8s .3s var(--ease) both; }
+.hero .kick{ color:#fff; opacity:.92; }
+.hero-b{ margin-top:auto; max-width:900px; }
+.dateline{ font:600 12px/1.6 var(--sans); letter-spacing:.18em; text-transform:uppercase; margin:0 0 14px; }
+.hero h1{ font:500 clamp(48px, 13vw, 112px)/.94 var(--serif); letter-spacing:-.02em; margin:0 0 22px; text-wrap:balance; }
+.hero .lede{ max-width:620px; margin-bottom:10px; }
+.hero-meta{ font:500 14px/1.5 var(--sans); letter-spacing:.06em; margin:0 0 26px; opacity:.92; }
+.hero-cta{ display:flex; flex-wrap:wrap; gap:10px; }
+.hero-cta .btn.paper{ background:var(--paper); color:var(--ink); border-color:var(--paper); }
+.hero-cta .btn{ color:#fff; }
+.hero-credit{ margin:26px 0 0; font:600 11px/1.5 var(--sans); letter-spacing:.12em; text-transform:uppercase; opacity:.8; border-top:1px solid rgba(255,255,255,.35); padding-top:9px; }
+@keyframes ease{ from{ transform:scale(1.03); } }
+@keyframes fade{ from{ opacity:0; } }
+
+/* ── édito ── */
+.edito-g{ display:grid; gap:56px; }
+.figs{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:36px 20px; margin:0; }
+.figs div{ border-top:1px solid var(--ink); padding-top:12px; }
+.figs dt{ font:500 clamp(48px, 12vw, 72px)/1 var(--serif); letter-spacing:-.02em; }
+.figs dd{ margin:8px 0 0; font:500 14px/1.45 var(--sans); color:var(--muted); }
+@media (min-width:900px){ .edito-g{ grid-template-columns:5fr 6fr; gap:96px; align-items:end; } .edito .epi{ font-size:38px; } }
+
+/* ── carnet : en-tête ── */
+.carnet-h{ background:var(--sage); }
+.live{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:28px 20px; margin:36px 0 48px; }
+.live div{ border-top:1px solid var(--ink); padding-top:10px; }
+.live dt{ font:500 44px/1 var(--serif); }
+.live dd{ margin:6px 0 0; font:500 14px/1.4 var(--sans); color:#4F4B44; }
+.filters{ display:grid; gap:20px; align-items:end; }
+.fld{ display:block; }
+.fld > span{ display:block; font:600 12px/1.5 var(--sans); letter-spacing:.16em; text-transform:uppercase; color:#4F4B44; margin-bottom:4px; }
+select, .inp{ width:100%; min-height:50px; border:0; border-bottom:1px solid var(--ink); border-radius:0; background-color:transparent; padding:10px 34px 10px 0; font:400 17px/1.3 var(--sans); -webkit-appearance:none; appearance:none; }
+select{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%232F2E2B'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 4px center; cursor:pointer; }
+.count{ margin:0; font:italic 400 22px/1.3 var(--serif); display:flex; align-items:center; gap:16px; min-height:50px; }
+.count button{ border:0; background:none; min-height:44px; cursor:pointer; font:600 12px/1 var(--sans); letter-spacing:.14em; text-transform:uppercase; text-decoration:underline; text-underline-offset:4px; font-style:normal; }
+@media (min-width:700px){ .live{ grid-template-columns:repeat(4, 1fr); } .filters{ grid-template-columns:repeat(2,minmax(0,1fr)); } .count{ grid-column:1 / -1; } }
+@media (min-width:1100px){ .filters{ grid-template-columns:4fr 5fr 3fr; } .count{ grid-column:auto; justify-content:flex-end; } }
+
+/* ── chapitres ── */
+.filtering .interlude{ display:none; }
+.ch-open{ text-align:center; padding:96px var(--g) 24px; max-width:900px; margin:0 auto; }
+.ch-t{ font:500 clamp(44px, 12vw, 96px)/.98 var(--serif); letter-spacing:-.02em; margin:0 0 14px; text-wrap:balance; }
+.ch-d{ font:italic 400 22px/1.4 var(--serif); color:var(--muted); margin:0 0 36px; }
+.ch-open .epi{ max-width:620px; margin:0 auto; color:var(--slate); }
+.ch-cover{ min-height:100vh; min-height:100svh; display:grid; grid-template-rows:auto 1fr; margin-top:96px; border-top:1px solid var(--rule); }
+.ch-fig{ margin:0; position:relative; height:62vh; height:62svh; overflow:hidden; background:var(--greige); }
+.ch-fig img{ width:100%; height:100%; object-fit:cover; }
+.ch-fig figcaption{ position:absolute; left:var(--g); right:var(--g); bottom:12px; color:#fff; font:600 11px/1.5 var(--sans); letter-spacing:.12em; text-transform:uppercase; text-shadow:0 1px 8px rgba(0,0,0,.6); }
+.ch-txt{ padding:32px var(--g) 40px; display:flex; flex-direction:column; justify-content:center; }
+.roman{ font:400 clamp(72px, 20vw, 168px)/.8 var(--serif); color:var(--terra); margin:0 0 6px; letter-spacing:.02em; }
+.ch-txt .ch-d{ margin-bottom:24px; }
+.ch-txt .epi{ color:var(--slate); font-size:clamp(20px, 5vw, 26px); }
+@media (min-width:900px){
+  .ch-cover{ grid-template-rows:none; grid-template-columns:7fr 5fr; border-top:0; margin-top:120px; }
+  .ch-fig{ height:auto; min-height:100vh; }
+  .ch-txt{ padding:64px 56px; max-width:560px; }
+}
+
+/* ── cartes éditoriales ── */
+.cards{ display:grid; gap:80px; padding-top:64px; padding-bottom:24px; }
+.card{ cursor:pointer; }
+.card figure{ margin:0; }
+.ph{ overflow:hidden; background:var(--greige); aspect-ratio:4 / 3; }
+.ph img{ width:100%; height:100%; object-fit:cover; transition:transform 1.8s var(--ease); }
+.card:hover .ph img{ transform:scale(1.015); }
+.card .cap{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.txt{ padding-top:20px; }
+.no{ display:flex; align-items:center; gap:14px; margin:0 0 10px; font:500 20px/1 var(--serif); }
+.no::after{ content:""; flex:1; height:1px; background:var(--rule); }
+.no em{ font:600 11px/1 var(--sans); letter-spacing:.16em; text-transform:uppercase; color:var(--terra-d); font-style:normal; }
+.by{ margin:0 0 8px; font:italic 400 19px/1.4 var(--serif); color:var(--muted); }
+.card h3{ margin:0 0 12px; font:500 clamp(28px, 7.4vw, 34px)/1.08 var(--serif); letter-spacing:-.005em; text-wrap:balance; }
+.card h3 a{ text-decoration:none; }
+.card:hover h3 a{ text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:5px; }
+.stand{ margin:0 0 14px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.et{ margin:0 0 6px; font:600 11.5px/1.5 var(--sans); letter-spacing:.12em; text-transform:uppercase; color:var(--slate); }
+.acts{ display:flex; align-items:center; gap:2px; border-top:1px solid var(--rule); margin-top:12px; }
+.acts a.ic{ display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; color:var(--terra-d); }
+.acts a.ic + a.ic{ color:var(--slate); }
+.acts svg{ width:19px; height:19px; }
+.acts .more{ margin-left:auto; display:inline-flex; align-items:center; min-height:44px; font:600 12px/1 var(--sans); letter-spacing:.14em; text-transform:uppercase; text-decoration:none; }
+.c-big h3{ font-size:clamp(34px, 9vw, 56px); }
+.c-big .stand{ -webkit-line-clamp:4; font-size:17px; }
+.c-np{ border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); padding:28px 0 8px; }
+.c-np .pull{ font:italic 400 clamp(24px, 6vw, 34px)/1.3 var(--serif); margin:0 0 20px; color:var(--slate); }
+.more-wrap{ text-align:center; padding:32px var(--g) 0; }
+.empty{ text-align:center; padding:96px var(--g); font:italic 400 26px/1.4 var(--serif); color:var(--muted); }
+@media (min-width:900px){
+  .cards{ grid-template-columns:repeat(12, 1fr); column-gap:32px; row-gap:120px; padding-top:96px; }
+  .c-big{ grid-column:1 / -1; display:grid; grid-template-columns:8fr 4fr; gap:48px; align-items:end; }
+  .c-big .ph{ aspect-ratio:3 / 2; }
+  .c-big .txt{ padding:0 0 40px; }
+  .c-half{ grid-column:span 6; }
+  .c-half.b{ margin-top:140px; }
+  .c-alt{ grid-column:2 / span 10; display:grid; grid-template-columns:4fr 6fr; gap:48px; align-items:start; }
+  .c-alt figure{ order:2; }
+  .c-alt .txt{ padding-top:120px; }
+  .c-np{ grid-column:3 / span 8; padding:48px 0 12px; }
+  .c-np .pull{ font-size:38px; }
+}
+
+/* ── apparitions ── */
+[data-reveal]{ opacity:0; transition:opacity 1.4s var(--ease); }
+[data-reveal] .ph img, [data-reveal].sil-fig img{ transform:scale(1.03); transition:transform 2.2s var(--ease); }
+[data-reveal].is-in{ opacity:1; }
+[data-reveal].is-in .ph img, [data-reveal].is-in.sil-fig img{ transform:none; }
+
+/* ── la carte (double page) ── */
+.spread{ padding:120px 0 0; }
+.spread-h{ display:grid; gap:8px; margin-bottom:36px; }
+.spread-h p{ margin:0; max-width:520px; }
+.map{ position:relative; overflow:hidden; height:460px; background:#EDEAE3; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); }
+.boat{ position:relative; display:block; width:14px; height:14px; }
+.boat i{ position:absolute; inset:0; border-radius:50%; background:var(--terra); border:2px solid var(--paper); outline:1px solid var(--terra); }
+.boat b{ position:absolute; left:20px; top:-4px; white-space:nowrap; font:500 19px/1 var(--serif); font-variant-caps:small-caps; letter-spacing:.06em; color:var(--ink); }
+.spread-f{ display:grid; gap:28px; padding-top:18px; }
+.pos{ font:600 11.5px/1.6 var(--sans); letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:0; }
+.pos b{ color:var(--ink); font-weight:600; }
+.delay{ font:italic 400 21px/1.4 var(--serif); margin:6px 0 4px; }
+.cockpit{ display:block; text-decoration:none; border:1px solid var(--ink); padding:20px 22px; background:var(--paper); transition:background .4s; }
+.cockpit:hover{ background:var(--sage); }
+.cockpit b{ display:block; font:500 25px/1.15 var(--serif); margin:2px 0 6px; }
+.cockpit small{ display:block; font-size:14px; color:var(--muted); line-height:1.5; }
+@media (min-width:900px){ .map{ height:min(76vh, 640px); } .spread-h{ grid-template-columns:7fr 5fr; align-items:end; gap:48px; } .spread-f{ grid-template-columns:7fr 4fr; gap:96px; } }
+
+/* ── sillage ── */
+.sillage{ padding:120px 0 0; }
+.sil-g{ display:grid; gap:28px; }
+.sil-fig{ margin:0; }
+.sil-fig .ph{ aspect-ratio:3 / 2; }
+@media (min-width:900px){ .sil-g{ grid-template-columns:8fr 4fr; gap:48px; align-items:end; } .sil-t{ padding-bottom:48px; } }
+
+/* ── galerie ── */
+.gal{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:12px; }
+.gal a{ display:block; text-decoration:none; }
+.gal a:first-child{ grid-column:1 / -1; }
+.gal .ph{ aspect-ratio:4 / 3; }
+.gal a:first-child .ph{ aspect-ratio:3 / 2; }
+.j-end{ display:flex; flex-wrap:wrap; justify-content:center; gap:12px; padding-top:72px; }
+@media (min-width:900px){ .gal{ grid-template-columns:7fr 5fr; gap:24px 32px; } .gal a:first-child{ grid-column:1; grid-row:1 / span 2; } .gal a:first-child .ph{ aspect-ratio:auto; height:100%; } .gal a:first-child figure{ height:calc(100% - 44px); } }
+
+/* ── almanach ── */
+.alm{ background:var(--white); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); }
+.alm-g{ display:grid; gap:56px; }
+.cal{ display:grid; grid-template-columns:repeat(7, 1fr); border-top:1px solid var(--ink); }
+.cal > *{ display:flex; align-items:center; justify-content:center; height:48px; font:500 20px/1 var(--serif); text-decoration:none; }
+.cal .wd{ font:600 11px/1 var(--sans); letter-spacing:.12em; color:var(--muted); height:40px; }
+.cal .d{ color:#6B665E; }
+.cal a.d{ color:var(--ink); font-weight:600; flex-direction:column; gap:3px; }
+.cal a.d::after{ content:""; width:18px; height:2px; background:var(--terra); }
+.cal a.d:hover{ background:var(--sage); }
+.alm-l{ list-style:none; margin:0; padding:0; border-top:1px solid var(--ink); }
+.alm-l li{ border-bottom:1px solid var(--rule); }
+.alm-l a{ display:grid; grid-template-columns:56px 1fr; gap:14px; padding:14px 0; text-decoration:none; cursor:pointer; }
+.alm-l .dd{ font:500 34px/1 var(--serif); color:var(--terra-d); }
+.alm-l b{ display:block; font:500 22px/1.2 var(--serif); }
+.alm-l small{ font-size:13px; color:var(--muted); }
+@media (min-width:900px){ .alm-g{ grid-template-columns:5fr 6fr; gap:96px; } }
+
+/* ── équipage ── */
+.crew{ display:grid; gap:56px; margin-top:24px; }
+.crew figure{ margin:0; }
+.crew .ph{ aspect-ratio:3 / 2; }
+.crew .plate{ background:#fff; display:flex; align-items:center; }
+.crew .plate img{ height:auto; aspect-ratio:848 / 380; object-position:top; }
+.crew h3{ font:500 40px/1 var(--serif); margin:18px 0 4px; }
+.crew .alias{ font:italic 400 24px/1.3 var(--serif); color:var(--terra-d); margin:0 0 8px; }
+.crew .role{ font:600 12px/1.5 var(--sans); letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin:0; }
+.crew-q{ max-width:760px; margin:88px auto 0; text-align:center; }
+@media (min-width:800px){ .crew{ grid-template-columns:repeat(3, 1fr); gap:32px; } .crew > div:nth-child(2){ margin-top:72px; } }
+
+/* ── genèse ── */
+.gen-g{ display:grid; gap:40px; }
+.hangul{ font:400 clamp(96px, 30vw, 200px)/1 'Nanum Myeongjo', 'AppleMyungjo', 'Batang', serif; color:var(--slate); margin:0; letter-spacing:.02em; }
+.hw{ font:italic 400 24px/1.35 var(--serif); margin:8px 0 0; color:var(--muted); }
+.gen-p{ font-size:17px; line-height:1.75; margin:0 0 28px; max-width:620px; }
+.gen-p::first-letter{ float:left; font:500 76px/.8 var(--serif); padding:6px 10px 0 0; color:var(--terra); }
+.gen-fig{ margin:0 0 28px; }
+.gen-fig .ph{ aspect-ratio:16 / 9; }
+@media (min-width:900px){ .gen-g{ grid-template-columns:4fr 7fr; gap:96px; } .gen-l{ position:sticky; top:120px; align-self:start; } }
+
+/* ── programme ── */
+.prog .lede{ margin-bottom:36px; }
+.rmap{ position:relative; overflow:hidden; height:300px; background:#F1EEE7; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); }
+.pdot{ display:block; width:9px; height:9px; border-radius:50%; background:var(--terra); border:2px solid var(--paper); }
+.triad{ display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin:24px 0 56px; }
+.triad div{ border-top:1px solid var(--ink); padding-top:10px; }
+.triad b{ display:block; font:500 clamp(22px, 5.6vw, 34px)/1.1 var(--serif); }
+.triad small{ display:block; font:500 13px/1.4 var(--sans); color:var(--muted); margin-top:4px; }
+.phases{ list-style:none; margin:0 0 40px; padding:0; }
+.phases li{ display:grid; grid-template-columns:40px 1fr; gap:10px; padding:14px 0; border-bottom:1px solid var(--rule); break-inside:avoid; }
+.phases .pn{ font:500 22px/1.2 var(--serif); color:var(--terra-d); }
+.phases b{ font:500 22px/1.2 var(--serif); display:block; }
+.phases i{ font:italic 400 18px/1.3 var(--serif); color:var(--slate); }
+.phases small{ display:block; font-size:14px; color:var(--muted); line-height:1.5; margin-top:2px; }
+@media (min-width:700px){ .rmap{ height:420px; } .phases{ columns:2; column-gap:48px; } }
+@media (min-width:1100px){ .rmap{ height:520px; } .phases{ columns:3; } }
+
+/* ── courrier & abonnement ── */
+.mail-g{ display:grid; gap:96px; }
+.form{ display:grid; gap:22px; }
+.form .h2{ font-size:clamp(36px, 8.6vw, 56px); }
+textarea.inp{ min-height:120px; resize:vertical; padding-right:0; }
+.hint{ margin:0; font:italic 400 19px/1.4 var(--serif); color:var(--muted); }
+.checks{ display:grid; gap:4px; border:0; margin:0; padding:0; }
+.chk{ display:flex; align-items:center; gap:14px; min-height:48px; cursor:pointer; font-size:17px; }
+.chk input{ -webkit-appearance:none; appearance:none; flex:none; width:22px; height:22px; margin:0; border:1px solid var(--ink); border-radius:0; background:transparent; cursor:pointer; }
+.chk input:checked{ background:var(--slate) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M6 11.5l3.4 3.4L16.5 7.5' fill='none' stroke='%23F7F4EE' stroke-width='1.8'/%3E%3C/svg%3E") center / 100% no-repeat; border-color:var(--slate); }
+.form .btn{ justify-self:start; }
+@media (min-width:900px){ .mail-g{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:0; } .mail-g > form:first-child{ padding-right:64px; border-right:1px solid var(--rule); } .mail-g > form + form{ padding-left:64px; } }
+
+/* ── fin ── */
+.close{ text-align:center; }
+.close .epi{ font-size:clamp(28px, 7.4vw, 52px); max-width:920px; margin:0 auto 40px; }
+.foot{ background:var(--ink); color:var(--paper); padding:72px 0 calc(40px + env(safe-area-inset-bottom, 0px)); }
+.foot .kick{ color:#BDB6AA; }
+.colo{ font:italic 400 clamp(26px, 6.4vw, 40px)/1.3 var(--serif); margin:0 0 56px; max-width:820px; }
+.foot-g{ display:grid; gap:28px; border-top:1px solid #5A5752; padding-top:28px; }
+.foot .mark{ margin:0; }
+.foot .mark img{ filter:grayscale(1) invert(1) brightness(1.6); mix-blend-mode:screen; }
+.foot-nav{ display:flex; flex-wrap:wrap; gap:0 22px; }
+.foot-nav a{ display:inline-flex; align-items:center; min-height:44px; font-size:14px; text-decoration:none; }
+.foot-nav a:hover{ text-decoration:underline; }
+.demo{ font-size:13px; color:#BDB6AA; margin:0; }
+@media (min-width:900px){ .foot-g{ grid-template-columns:auto 1fr auto; align-items:center; gap:48px; } }
+
+@media (prefers-reduced-motion:no-preference){
+  html{ scroll-snap-type:y proximity; }
+  .hero, .ch-cover{ scroll-snap-align:start; }
+}
+@media (prefers-reduced-motion:reduce){
+  *, *::before, *::after{ animation:none !important; transition:none !important; }
+  [data-reveal]{ opacity:1; }
+  [data-reveal] .ph img, [data-reveal].sil-fig img{ transform:none; }
+}
+
+/* revue: garde-fou */ #app{overflow-x:clip}
+.bar .lang{margin-left:auto;border-left:1px solid rgba(127,127,127,.35);padding-left:4px}
+</style>
+</head>
+<body data-design="d4">
+<div id="app"></div>
+<script src="data.js"></script>
+<script src="wg.js"></script>
+<script>
+(function () {
+  const { D, t, esc } = WG;
+  const app = document.getElementById('app');
+  const STAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 13.6 10.4 21.5 12 13.6 13.6 12 21.5 10.4 13.6 2.5 12 10.4 10.4Z"/><circle cx="12" cy="12" r="1.3"/></svg>';
+  const HEART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M12 20.3S3.5 15.1 3.5 9.2A4.4 4.4 0 0 1 12 7.1a4.4 4.4 0 0 1 8.5 2.1c0 5.9-8.5 11.1-8.5 11.1Z"/></svg>';
+  const BUBBLE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 5.5h16v10.5H10l-4.5 3.5V16H4z"/></svg>';
+  const orn = (cls = '') => `<div class="orn ${cls}">${STAR}</div>`;
+  const ROMAN = ['I', 'II', 'III', 'IV', 'V'];
+
+  // Chapitres : numérotés dans l'ordre chronologique, affichés du plus récent au plus ancien.
+  const CH = [...D.chapters].sort((a, b) => (a.date_start < b.date_start ? -1 : 1)).map((c, i) => ({ ...c, n: i + 1 }));
+  const CHN = [...CH].reverse();
+  const EPI = { 3: 'desert', 2: 'flower', 1: 'heart' };
+  const post = (pre) => D.posts.find((p) => p.id.startsWith(pre));
+  const pic = (pre, i) => { const p = post(pre); return p && p.photos[i] ? p.photos[i] : null; };
+  // Choix éditorial de la photo de chaque carte (sinon la première).
+  const CARD_PH = { '97786827': 3, '4a9fdf7b': 4, '892be0d3': 2, '065a032e': 1, '92349492': 4 };
+  const cardPhoto = (p) => p.photos[CARD_PH[p.id.slice(0, 8)] ?? 0] || p.photos[0];
+  const COVER = { 2: ['b7cb6768', 4], 1: ['92349492', 1] };
+  const coverPhoto = (c) => { const k = COVER[c.n]; const ph = k && pic(k[0], k[1]); if (ph) return ph; const p = D.posts.find((x) => x.chapter_id === c.id && x.photos.length); return p && p.photos[0]; };
+
+  const day = (iso) => `${iso}T12:00:00`;
+  const range = (c) => {
+    const a = new Date(day(c.date_start)), b = new Date(day(c.date_end));
+    const m = (d) => d.toLocaleDateString(WG.lang === 'fr' ? 'fr-FR' : 'en-GB', { month: 'short' });
+    if (a.getFullYear() !== b.getFullYear()) return `${m(a)} ${a.getFullYear()} – ${m(b)} ${b.getFullYear()}`;
+    return a.getMonth() === b.getMonth() ? `${m(a)} ${b.getFullYear()}` : `${m(a)} – ${m(b)} ${b.getFullYear()}`;
+  };
+  const chTitle = (c) => t(c.title, c.title_en || c.title);
+  const nRecits = (n) => (n === 1 ? t('1 récit', '1 story') : t(`${n} récits`, `${n} stories`));
+  const ANCHOR = { carte: '#ou', journal: '#carnet', galerie: '#galerie', genese: '#genese', programme: '#programme', equipage: '#equipage', contact: '#contact' };
+  const cur = CHN[0];
+
+  const F = { ch: '', et: '' };
+  const EXP = {};
+
+  // ───────── fragments ─────────
+  const langSw = () => `<div class="lang" role="group" aria-label="${t('Langue', 'Language')}">${['fr', 'en'].map((l) => `<button type="button" data-lang="${l}" aria-pressed="${WG.lang === l}">${l.toUpperCase()}</button>`).join('')}</div>`;
+  const mark = () => `<img src="/images/logo.webp" alt="" width="30" height="30"><span>Wang'ap</span>`;
+
+  const bar = () => `
+  <header class="bar" id="bar"><div class="bar-in">
+    <a class="mark" href="#top" aria-label="Wang'ap — ${t('haut de page', 'top of page')}">${mark()}</a>
+    ${langSw()}
+    <a class="bar-login" href="#!">${t('Connexion', 'Log in')}</a>
+    <button type="button" class="som-btn" data-som aria-expanded="false" aria-controls="som"><i></i>${t('Sommaire', 'Contents')}</button>
+  </div></header>
+  <div class="som" id="som" role="dialog" aria-modal="true" aria-label="${t('Sommaire', 'Contents')}">
+    <div class="som-head"><a class="mark" href="#top" data-close>${mark()}</a>
+      <button type="button" class="som-btn" data-close>${t('Fermer', 'Close')} ✕</button></div>
+    <div class="som-body">
+      <div><p class="kick">${t('Dans ce numéro', 'In this issue')}</p><h2 class="som-title">${t('Sommaire', 'Contents')}</h2>
+        <ul class="som-nav">${WG.NAV().map((n, i) => `<li><a href="${ANCHOR[n.id] || '#!'}" data-close><span>${String(i + 1).padStart(2, '0')}</span>${esc(n.label)}</a></li>`).join('')}</ul></div>
+      <div class="som-side">
+        <div class="som-ch"><p class="kick">${t('Les chapitres', 'The chapters')}</p>
+          ${CHN.map((c) => `<a href="#ch-${c.n}" data-close><b>${ROMAN[c.n - 1]} · ${esc(chTitle(c))}</b><small>${esc(range(c))}</small></a>`).join('')}</div>
+        <div><p class="kick">${t('Langue', 'Language')}</p>${langSw()}</div>
+        <div class="links"><a class="tl" href="#!">${t('Connexion', 'Log in')}</a><a class="tl" href="#!">${t('Espace skippers', 'Skippers’ area')}</a></div>
+      </div>
+    </div>
+  </div>`;
+
+  const hero = () => {
+    const ph = pic('4a9fdf7b', 0), land = pic('4a9fdf7b', 1);
+    return `
+  <section class="hero" id="top">
+    <picture>${land ? `<source media="(min-width: 900px), (orientation: landscape)" srcset="${esc(WG.img(land.url, 1200))}">` : ''}
+      <img src="${esc(WG.img(ph.url, 1200))}" alt="${esc(WG.cap(ph))}" fetchpriority="high"></picture>
+    <div class="hero-in">
+      <p class="kick">${t('Outremer 52 · Tour du Monde 2026–2029', 'Outremer 52 · Round the World 2026–2029')}</p>
+      <div class="hero-b">
+        <p class="dateline">${t('Chapitre', 'Chapter')} ${ROMAN[cur.n - 1]} · ${esc(chTitle(cur))} · ${esc(range(cur))}</p>
+        <h1>${esc(chTitle(cur))}</h1>
+        <p class="lede">${t('Catherine & Bertrand larguent les amarres pour 3 ans de navigation à la voile.', 'Catherine & Bertrand cast off for 3 years of sailing.')}</p>
+        <p class="hero-meta">${t('36 000 milles nautiques · 30+ pays', '36,000 nautical miles · 30+ countries')}</p>
+        <div class="hero-cta"><a class="btn paper" href="#!">${t('Où sommes-nous ?', 'Where are we?')}</a><a class="btn" href="#carnet">${t('Lire le carnet', 'Read the log')} ↓</a></div>
+        <p class="hero-credit">${t('En couverture', 'Cover')} — ${esc(WG.cap(ph))}</p>
+      </div>
+    </div>
+  </section>`;
+  };
+
+  const edito = () => `
+  <section class="sec edito" id="projet"><div class="wrap edito-g">
+    <div><p class="kick">${t('Le projet', 'The project')}</p>
+      <blockquote class="epi">${esc(WG.quote('rose'))}</blockquote><p class="src">Antoine de Saint-Exupéry, ${t('Le Petit Prince', 'The Little Prince')}</p></div>
+    <dl class="figs">
+      <div><dt>${t('36 000', '36,000')}</dt><dd>${t('milles nautiques', 'nautical miles')}</dd></div>
+      <div><dt>3</dt><dd>${t('années en mer', 'years at sea')}</dd></div>
+      <div><dt>30+</dt><dd>${t('pays — autant de planètes', 'countries — as many planets')}</dd></div>
+      <div><dt>18</dt><dd>${t('étapes', 'stages')}</dd></div>
+    </dl>
+  </div></section>`;
+
+  const carnetHead = () => {
+    const s = D.stats;
+    const chOpts = CHN.map((c) => `<option value="${esc(c.id)}"${F.ch === c.id ? ' selected' : ''}>${ROMAN[c.n - 1]} · ${esc(chTitle(c))}</option>`).join('');
+    const etOpts = CHN.filter((c) => !F.ch || F.ch === c.id).map((c) => {
+      const ets = D.etapes.filter((e) => e.chapter_id === c.id).sort((a, b) => (a.date_start < b.date_start ? 1 : -1));
+      return ets.length ? `<optgroup label="${ROMAN[c.n - 1]} · ${esc(chTitle(c))}">${ets.map((e) => `<option value="${esc(e.id)}"${F.et === e.id ? ' selected' : ''}>${esc(WG.etape(e.id))}</option>`).join('')}</optgroup>` : '';
+    }).join('');
+    return `
+  <section class="sec carnet-h" id="carnet"><div class="wrap">
+    <p class="kick">${t('Carnet de bord', 'Ship’s log')}</p>
+    <h2 class="h2">${t('Où en est le voyage aujourd’hui', 'Where the voyage stands today')}</h2>
+    <dl class="live">
+      <div><dt>${WG.fmtNm(s.nm)}</dt><dd>${t('milles parcourus', 'miles sailed')}</dd></div>
+      <div><dt>${s.days}</dt><dd>${t('jours', 'days')}</dd></div>
+      <div><dt>${s.etapes}</dt><dd>${t('étapes', 'stages')}</dd></div>
+      <div><dt>${s.posts}</dt><dd>${t('récits', 'stories')}</dd></div>
+    </dl>
+    <div class="filters">
+      <label class="fld"><span>${t('Chapitre', 'Chapter')}</span><select id="f-ch"><option value="">${t('Tous les chapitres', 'All chapters')}</option>${chOpts}</select></label>
+      <label class="fld"><span>${t('Étape', 'Stage')}</span><select id="f-et"><option value="">${t('Toutes les étapes', 'All stages')}</option>${etOpts}</select></label>
+      <p class="count" id="count" aria-live="polite"></p>
+    </div>
+  </div></section>`;
+  };
+
+  const visible = () => D.posts.filter((p) => (!F.ch || p.chapter_id === F.ch) && (!F.et || p.etape_id === F.et));
+
+  // Mise en page : grande, deux paysages côte à côte, décalée, deux paysages…
+  const layouts = (list) => {
+    const L = list.map((p, i) => (!p.photos.length ? 'np' : ['big', 'half', 'half', 'alt', 'half', 'half'][i % 6]));
+    for (let i = 0; i < L.length; i++) {
+      if (L[i] !== 'half') continue;
+      if (L[i + 1] === 'half') { L[i + 1] = 'half b'; i++; } else L[i] = 'alt';
+    }
+    return L;
+  };
+
+  const card = (p, k, lay, featured) => {
+    const ph = cardPhoto(p);
+    const no = `<p class="no">n° ${String(k + 1).padStart(2, '0')}${featured ? ` <em>${t('À la une', 'Cover story')}</em>` : ''}</p>`;
+    const meta = `<p class="by">${t('par', 'by')} ${esc(p.author)} · ${esc(WG.date(p.date))}</p>`;
+    const h = `<h3><a href="#${esc(p.id)}">${esc(WG.title(p))}</a></h3>`;
+    const et = p.etape_id ? `<p class="et">${esc(WG.etape(p.etape_id))}</p>` : '';
+    const acts = `<div class="acts"><a class="ic" href="#!" aria-label="${t('J’aime', 'Like')}">${HEART}</a><a class="ic" href="#!" aria-label="${t('Commentaires', 'Comments')}">${BUBBLE}</a><a class="more" href="#${esc(p.id)}">${t('Lire la suite', 'Read more')} →</a></div>`;
+    if (lay === 'np') return `<article class="card c-np" data-post="${esc(p.id)}" data-reveal>${no}${meta}${h}<p class="pull">${esc(WG.excerpt(p, 230))}</p>${et}${acts}</article>`;
+    return `<article class="card c-${lay}" data-post="${esc(p.id)}" data-reveal>
+      <figure><div class="ph"><img src="${esc(WG.img(ph.url, lay === 'big' ? 1200 : 600))}" alt="" loading="lazy"></div>${WG.cap(ph) ? `<figcaption class="cap">${esc(WG.cap(ph))}</figcaption>` : ''}</figure>
+      <div class="txt">${no}${meta}${h}<p class="stand">${esc(WG.excerpt(p, lay === 'big' ? 420 : 220))}</p>${et}${acts}</div></article>`;
+  };
+
+  const chapterBlock = (c, list) => {
+    const filtering = F.ch || F.et;
+    const all = list.length;
+    const shown = filtering || EXP[c.id] ? list : list.slice(0, 6);
+    const L = layouts(shown);
+    const isCur = c === cur;
+    const epi = `<blockquote class="epi">${esc(WG.quote(EPI[c.n] || 'heart'))}</blockquote>`;
+    let head;
+    if (isCur) {
+      head = `<header class="ch-open" id="ch-${c.n}" data-reveal>${orn()}<p class="kick" style="margin-top:22px">${t('Chapitre', 'Chapter')} ${ROMAN[c.n - 1]} · ${t('en cours', 'under way')}</p>
+        <h2 class="ch-t">${esc(chTitle(c))}</h2><p class="ch-d">${esc(range(c))} · ${nRecits(all)}</p>${epi}</header>`;
+    } else {
+      const ph = coverPhoto(c);
+      head = `<section class="ch-cover" id="ch-${c.n}">
+        <figure class="ch-fig">${ph ? `<img src="${esc(WG.img(ph.url, 1200))}" alt="" loading="lazy">${WG.cap(ph) ? `<figcaption>${esc(WG.cap(ph))}</figcaption>` : ''}` : ''}</figure>
+        <div class="ch-txt" data-reveal><p class="kick">${t('Chapitre', 'Chapter')}</p><p class="roman">${ROMAN[c.n - 1]}</p>
+          <h2 class="ch-t">${esc(chTitle(c))}</h2><p class="ch-d">${esc(range(c))} · ${nRecits(all)}</p>${epi}</div></section>`;
+    }
+    const more = !filtering && all > 6 ? `<div class="more-wrap"><button type="button" class="btn" data-exp="${esc(c.id)}">${EXP[c.id] ? t('Replier le chapitre', 'Show fewer') : t(`Afficher les ${all - 6} autres récits`, `Show the other ${all - 6} stories`)}</button></div>` : '';
+    return `${head}<div class="wrap cards">${shown.map((p, k) => card(p, k, L[k], isCur && k === 0 && !filtering)).join('')}</div>${more}`;
+  };
+
+  const renderChapters = (instant) => {
+    const v = visible();
+    const filtering = !!(F.ch || F.et);
+    document.querySelector('main').classList.toggle('filtering', filtering);
+    CHN.forEach((c, i) => {
+      const list = v.filter((p) => p.chapter_id === c.id);
+      document.getElementById(`slot-${i}`).innerHTML = list.length ? chapterBlock(c, list) : '';
+    });
+    if (!v.length) document.getElementById('slot-0').innerHTML = `<p class="empty">${t('Aucun récit pour cette sélection.', 'No stories match this selection.')}</p>`;
+    document.getElementById('count').innerHTML = `${nRecits(v.length)}${filtering ? ` <button type="button" data-reset>${t('Effacer', 'Clear')}</button>` : ''}`;
+    if (instant) document.querySelectorAll('[data-reveal]').forEach((e) => e.classList.add('is-in'));
+    WG.reveal();
+  };
+
+  const mapSpread = () => {
+    const lp = WG.lastPoint();
+    const when = new Date(D.lastPublicAt).toLocaleString(WG.lang === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+    return `
+  <section class="spread interlude" id="ou">
+    <div class="wrap spread-h">
+      <div>${orn('sep" style="padding:0 0 40px;justify-content:flex-start')}<p class="kick">${t('Où sommes-nous ?', 'Where are we?')}</p><h2 class="h2" style="margin:0">${t('La route, à ce jour', 'The route so far')}</h2></div>
+      <p>${t(`${WG.fmtNm(D.stats.nm)} milles parcourus depuis mai 2026, de La Grande-Motte à la Grèce et retour, puis vers Gibraltar.`, `${WG.fmtNm(D.stats.nm)} miles sailed since May 2026 — from La Grande-Motte to Greece and back, then on toward Gibraltar.`)}</p>
+    </div>
+    <div class="map" id="map" role="img" aria-label="${t('Carte de la route parcourue', 'Map of the route sailed')}"></div>
+    <div class="wrap spread-f">
+      <div><p class="pos">${t('Dernière position publique', 'Latest public position')} · <b>${esc(WG.fmtPos(lp))}</b> · ${esc(when)}</p>
+        <p class="delay">${t(`La position est publiée avec ${D.delayHours} h de retard.`, `The position is published with a ${D.delayHours}-hour delay.`)}</p>
+        <div class="links"><a class="tl" href="#!">${t('Plein écran', 'Full screen')}</a><a class="tl" href="#!">${t('Carte interactive', 'Interactive map')}</a></div></div>
+      <a class="cockpit" href="#!"><span class="kick">${t('Pour les amis marins', 'For sailing friends')}</span><b>${t('Demander l’accès au cockpit en direct', 'Request live cockpit access')} →</b>
+        <small>${t('Les instruments du bord en temps réel, pour celles et ceux qui naviguent aussi.', 'The boat’s instruments in real time, for those of you who sail too.')}</small></a>
+    </div>
+  </section>`;
+  };
+
+  const sillage = () => {
+    const ph = pic('0484645a', 4);
+    return `
+  <section class="sillage interlude" id="sillage"><div class="wrap sil-g">
+    <figure class="sil-fig" data-reveal><div class="ph">${ph ? `<img src="${esc(WG.img(ph.url, 1200))}" alt="" loading="lazy">` : ''}</div>${ph && WG.cap(ph) ? `<figcaption class="cap">${esc(WG.cap(ph))}</figcaption>` : ''}</figure>
+    <div class="sil-t"><p class="kick">${t('Sillage', 'Wake')}</p><h2 class="h2">${t('Le voyage rejoué', 'The voyage, replayed')}</h2>
+      <p class="lede">${t('— la route telle qu’elle a été naviguée', '— the route exactly as it was sailed')}</p>
+      <a class="btn solid" href="#!">▶ ${t('Rejouer le voyage', 'Replay the voyage')}</a></div>
+  </div></section>`;
+  };
+
+  const galerie = () => {
+    const ps = [['892be0d3', 2], ['0faac474', 0], ['3e280968', 3]].map(([a, b]) => pic(a, b)).filter(Boolean);
+    return `
+  <div class="wrap j-end"><a class="btn solid" href="#!">${t('Voir tout le journal', 'See the whole journal')}</a></div>
+  <section class="sec" id="galerie"><div class="wrap">
+    ${orn('sep" style="padding:0 0 48px')}
+    <p class="kick">${t('La galerie', 'The gallery')}</p><h2 class="h2">${t('Les images du voyage', 'Pictures from the voyage')}</h2>
+    <div class="gal">${ps.map((ph, i) => `<a href="#!" data-reveal><figure style="margin:0"><div class="ph"><img src="${esc(WG.img(ph.url, i ? 600 : 1200))}" alt="" loading="lazy"></div><figcaption class="cap">${esc(WG.cap(ph))}</figcaption></figure></a>`).join('')}</div>
+    <p style="margin:28px 0 0"><a class="tl" href="#!">${t('Ouvrir la galerie', 'Open the gallery')} →</a></p>
+  </div></section>`;
+  };
+
+  const almanach = () => {
+    const y = 2026, m = 9, off = (new Date(y, m, 1).getDay() + 6) % 7, n = new Date(y, m + 1, 0).getDate();
+    const oct = D.posts.filter((p) => p.date.startsWith('2026-10'));
+    const days = new Set(oct.map((p) => +p.date.slice(8, 10)));
+    const wd = WG.lang === 'fr' ? ['L', 'M', 'M', 'J', 'V', 'S', 'D'] : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    const wdl = WG.lang === 'fr' ? ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'] : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    let cells = wd.map((d, i) => `<span class="wd" aria-label="${wdl[i]}">${d}</span>`).join('') + '<span></span>'.repeat(off);
+    for (let d = 1; d <= n; d++) cells += days.has(d) ? `<a class="d" href="#!" aria-label="${esc(WG.date(`2026-10-${String(d).padStart(2, '0')}T12:00:00`))} — ${t('un récit', 'a story')}">${d}</a>` : `<span class="d">${d}</span>`;
+    const month = WG.date('2026-10-15T12:00:00', { month: 'long', year: 'numeric' });
+    return `
+  <section class="sec alm" id="almanach"><div class="wrap alm-g">
+    <div><p class="kick">${t('L’almanach', 'The almanac')}</p><h2 class="h2" style="text-transform:capitalize">${esc(month)}</h2>
+      <div class="cal">${cells}</div>
+      <p class="hint" style="margin-top:18px">${t('Les jours soulignés ont un récit.', 'Underlined days have a story.')}</p></div>
+    <div><p class="kick">${t('Ce mois-ci dans le carnet', 'This month in the log')}</p>
+      <ul class="alm-l">${oct.map((p) => `<li><a href="#${esc(p.id)}" data-post="${esc(p.id)}"><span class="dd">${+p.date.slice(8, 10)}</span><span><b>${esc(WG.title(p))}</b><small>${t('par', 'by')} ${esc(p.author)}${p.etape_id ? ` · ${esc(WG.etape(p.etape_id))}` : ''}</small></span></a></li>`).join('')}</ul></div>
+  </div></section>`;
+  };
+
+  const equipage = () => {
+    const P = [
+      ['/images/photo2.webp', 'Catherine', t('La Rose', 'The Rose'), t('Co-skipper · Navigatrice', 'Co-skipper · Navigator'), ''],
+      ['/images/photo3.webp', 'Bertrand', t('Le Renard', 'The Fox'), t('Skipper · Capitaine', 'Skipper · Captain'), ''],
+      ['/images/boat.webp', 'Wang’ap', t('L’Astéroïde', 'The Asteroid'), 'Outremer 52 · Catamaran', 'plate'],
+    ];
+    return `
+  <section class="sec" id="equipage"><div class="wrap">
+    ${orn('sep" style="padding:0 0 48px')}
+    <p class="kick">${t('L’Équipage', 'The crew')}</p><h2 class="h2">${t('Les personnages', 'The characters')}</h2>
+    <div class="crew">${P.map(([src, name, alias, role, cls]) => `<div data-reveal><figure><div class="ph ${cls}"><img src="${src}" alt="${esc(name)}" loading="lazy"></div></figure>
+      <h3>${esc(name)}</h3><p class="alias">${alias}</p><p class="role">${role}</p></div>`).join('')}</div>
+    <div class="crew-q"><blockquote class="epi">${esc(WG.quote('tame'))}</blockquote><p class="src">Antoine de Saint-Exupéry</p></div>
+  </div></section>`;
+  };
+
+  const genese = () => `
+  <section class="sec" id="genese" style="background:var(--white);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)"><div class="wrap gen-g">
+    <div class="gen-l"><p class="kick">${t('La Genèse', 'Genesis')}</p><p class="hangul" lang="ko">환갑</p>
+      <p class="hw">Hwangap — ${t('soixante ans, un cycle qui recommence', 'sixty years, and a new cycle begins')}</p></div>
+    <div><h2 class="h2">${t('Une décision, un bateau, quatre ans de préparation', 'One decision, one boat, four years of preparation')}</h2>
+      <p class="gen-p">${t('Wang’ap est né d’un mot coréen — 환갑 (Hwangap) — une tradition millénaire célébrant les 60 ans comme le début d’un nouveau cycle. Depuis 2022, Catherine et Bertrand préparent ce tour du monde : formations, construction du bateau, logistique.', 'Wang’ap was born of a Korean word — 환갑 (Hwangap) — an age-old tradition that celebrates turning sixty as the start of a new cycle. Since 2022, Catherine and Bertrand have been preparing this voyage around the world: training, building the boat, logistics.')}</p>
+      <figure class="gen-fig" data-reveal><div class="ph"><img src="/images/photo1.webp" alt="Catherine & Bertrand" loading="lazy"></div><figcaption class="cap">Catherine & Bertrand</figcaption></figure>
+      <a class="tl" href="#!">${t('Lire la genèse complète', 'Read the full story')} →</a></div>
+  </div></section>`;
+
+  const programme = () => `
+  <section class="sec prog" id="programme"><div class="wrap">
+    <p class="kick">${t('Le Programme', 'The programme')}</p><h2 class="h2">${t('Le tour du monde', 'Around the world')}</h2>
+    <p class="lede">${t('~36 000 nm · 35 étapes · 2026–2029', '~36,000 nm · 35 stages · 2026–2029')}</p>
+    <div class="rmap" id="rmap" role="img" aria-label="${t('Route prévue autour du monde', 'Planned route around the world')}"></div>
+    <p class="cap" style="border:0;margin-top:8px">${t('Route prévue, approximative — un point par grande étape', 'Planned route, approximate — one point per leg')}</p>
+    <div class="triad">
+      <div><b>${t('Départ', 'Departure')}</b><small>Saint-Cyr · ${t('sept. 2026', 'Sep 2026')}</small></div>
+      <div><b>${t('3 océans', '3 oceans')}</b><small>${t('Atlantique · Pacifique · Indien', 'Atlantic · Pacific · Indian')}</small></div>
+      <div><b>${t('Retour', 'Return')}</b><small>Saint-Cyr · ${t('été 2029', 'summer 2029')}</small></div>
+    </div>
+    <ol class="phases">${WG.PHASES.map((p, i) => `<li><span class="pn">${String(i + 1).padStart(2, '0')}</span><span><b>${esc(p.place)}</b><i>${esc(p.period())}</i><small>${esc(p.desc())}</small></span></li>`).join('')}</ol>
+    <div class="links"><a class="tl" href="#!">▶ ${t('Voir l’animation', 'Watch the animation')}</a><a class="tl" href="#!">${t('Voir le programme', 'See the full programme')} →</a></div>
+  </div></section>`;
+
+  const courrier = () => `
+  <section class="sec" id="contact" style="border-top:1px solid var(--rule)"><div class="wrap mail-g">
+    <form class="form" novalidate>
+      <div><p class="kick">${t('Courrier', 'Letters')}</p><h2 class="h2">${t('Nous envoyer un message', 'Send us a message')}</h2></div>
+      <label class="fld"><span>${t('Prénom', 'First name')} *</span><input class="inp" name="prenom" required autocomplete="given-name"></label>
+      <label class="fld"><span>Email</span><input class="inp" type="email" name="email" autocomplete="email" inputmode="email"></label>
+      <label class="fld"><span>${t('Téléphone (WhatsApp)', 'Phone (WhatsApp)')}</span><input class="inp" type="tel" name="tel" autocomplete="tel"></label>
+      <p class="hint">${t('Indiquez un email ou un téléphone pour que nous puissions vous répondre.', 'Leave an email or a phone number so we can write back.')}</p>
+      <label class="fld"><span>Message</span><textarea class="inp" name="message" rows="4"></textarea></label>
+      <button class="btn solid" type="submit">${t('Envoyer', 'Send')}</button>
+    </form>
+    <form class="form" novalidate id="abonnement">
+      <div><p class="kick">${t('Abonnement', 'Subscribe')}</p><h2 class="h2">${t('Suivre le voyage par email', 'Follow the voyage by email')}</h2></div>
+      <fieldset class="checks"><legend class="fld" style="padding:0"><span style="display:block;font:600 12px/1.5 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${t('Je souhaite recevoir', 'Send me')}</span></legend>
+        <label class="chk"><input type="checkbox" checked> ${t('La newsletter', 'The newsletter')}</label>
+        <label class="chk"><input type="checkbox" checked> ${t('Les nouvelles publications', 'New posts')}</label>
+        <label class="chk"><input type="checkbox"> ${t('Les nouvelles étapes', 'New stages')}</label></fieldset>
+      <label class="fld"><span>${t('Votre email', 'Your email')}</span><input class="inp" type="email" autocomplete="email" inputmode="email"></label>
+      <button class="btn solid" type="submit">${t('S’inscrire', 'Sign up')}</button>
+    </form>
+  </div></section>`;
+
+  const fin = () => `
+  <section class="sec close" style="background:var(--sage)"><div class="wrap">
+    ${orn('sep" style="padding:0 0 36px')}
+    <blockquote class="epi">${esc(WG.quote('stars'))}</blockquote>
+    <a class="tl" href="#!">${t('Espace skippers', 'Skippers’ area')} →</a>
+  </div></section>
+  <footer class="foot"><div class="wrap">
+    <p class="kick">Colophon</p>
+    <p class="colo">${esc(WG.quote('heart'))}</p>
+    <div class="foot-g">
+      <span class="mark">${mark()}</span>
+      <nav class="foot-nav" aria-label="${t('Pied de page', 'Footer')}">${WG.NAV().map((n) => `<a href="${ANCHOR[n.id] || '#!'}">${esc(n.label)}</a>`).join('')}<a href="#!">${t('Connexion', 'Log in')}</a></nav>
+      <p class="demo">Wang'ap · Outremer 52 · 2026–2029</p>
+    </div>
+    <p class="demo" style="margin-top:28px">${t('Démo de design — contenus réels, liens inactifs', 'Design demo — real content, inactive links')}</p>
+  </div></footer>`;
+
+  // ───────── rendu ─────────
+  const render = (instant) => {
+    app.innerHTML = `${bar()}<main>${hero()}${edito()}${carnetHead()}
+      <div id="slot-0"></div>${mapSpread()}<div id="slot-1"></div>${sillage()}<div id="slot-2"></div>
+      ${galerie()}${almanach()}${equipage()}${genese()}${programme()}${courrier()}</main>${fin()}`;
+    renderChapters(instant);
+    if (instant) document.querySelectorAll('[data-reveal]').forEach((e) => e.classList.add('is-in'));
+    WG.reveal();
+    onScroll();
+    WG.staticMap(document.getElementById('map'), {
+      tiles: 'light', filter: 'sepia(.22) saturate(.7) brightness(1.03) contrast(.94)', pad: 36, maxZoom: 7,
+      line: { color: '#2F5D6E', width: 1.6, draw: !instant },
+      boat: { html: '<span class="boat"><i></i><b>Wang’ap</b></span>' },
+    });
+    WG.staticMap(document.getElementById('rmap'), {
+      tiles: 'relief', filter: 'sepia(.3) saturate(.6) brightness(1.04)', track: WG.ROUTE, split: false, boat: false, pad: 24, maxZoom: 4,
+      line: { color: '#2F5D6E', width: 1.4, dash: '5 5' },
+      dots: WG.PHASES.map((p) => ({ lon: p.lonlat[0], lat: p.lonlat[1], html: '<span class="pdot"></span>', title: `${p.place} — ${p.period()}` })),
+    });
+  };
+
+  // ───────── interactions ─────────
+  const som = () => document.getElementById('som');
+  const openSom = (on) => {
+    som().classList.toggle('on', on);
+    document.querySelector('[data-som]').setAttribute('aria-expanded', on);
+    document.body.style.overflow = on ? 'hidden' : '';
+    if (on) som().querySelector('[data-close]').focus();
+  };
+  let lastY = -1;
+  function onScroll() {
+    const b = document.getElementById('bar'); if (!b) return;
+    const h = document.querySelector('.hero');
+    b.classList.toggle('solid', window.scrollY > (h ? h.offsetHeight - 70 : 40));
+    lastY = window.scrollY;
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  document.addEventListener('click', (e) => {
+    const l = e.target.closest('[data-lang]');
+    if (l) { if (l.dataset.lang !== WG.lang) WG.setLang(l.dataset.lang); return; }
+    if (e.target.closest('[data-som]')) { openSom(true); return; }
+    const c = e.target.closest('[data-close]');
+    if (c) { openSom(false); return; }
+    const x = e.target.closest('[data-exp]');
+    if (x) { EXP[x.dataset.exp] = !EXP[x.dataset.exp]; const y = window.scrollY; renderChapters(false); window.scrollTo({ top: y, behavior: 'instant' }); return; }
+    if (e.target.closest('[data-reset]')) { F.ch = ''; F.et = ''; refreshFilters(); return; }
+    const a = e.target.closest('a[href^="#"]:not([href="#!"]):not([data-post])');
+    if (a && !e.target.closest('[data-post]')) {
+      const id = a.getAttribute('href').slice(1); const el = id && document.getElementById(id);
+      if (el) { e.preventDefault(); el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && som()?.classList.contains('on')) openSom(false);
+  });
+  const refreshFilters = () => {
+    const y = window.scrollY;
+    const head = document.getElementById('carnet');
+    head.outerHTML = carnetHead();
+    renderChapters(false);
+    window.scrollTo({ top: y, behavior: 'instant' });
+  };
+  document.addEventListener('change', (e) => {
+    if (e.target.id === 'f-ch') {
+      F.ch = e.target.value;
+      if (F.et && !D.etapes.some((x) => x.id === F.et && x.chapter_id === F.ch) && F.ch) F.et = '';
+      refreshFilters();
+    } else if (e.target.id === 'f-et') {
+      F.et = e.target.value;
+      if (F.et) F.ch = D.etapes.find((x) => x.id === F.et)?.chapter_id || F.ch;
+      refreshFilters();
+    }
+  });
+
+  window.addEventListener('wg:lang', () => { const y = window.scrollY; render(true); window.scrollTo({ top: y, behavior: 'instant' }); });
+  WG.inert();
+  render(false);
+})();
+</script>
+<script src="survey.js"></script>
+</body>
+</html>
