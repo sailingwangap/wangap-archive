@@ -1,0 +1,1 @@
+import{i as e}from"./chunk-DseTPa7n.js";import{n as t}from"./jsx-runtime-C6D02mtk.js";import{a as n,i as r,o as i}from"./useAuth-PN8eWmLy.js";var a=e(t(),1);function o(){return{night:(0,a.useSyncExternalStore)(i,r,()=>!1),setNight:n,toggle:(0,a.useCallback)(()=>n(!r()),[])}}export{o as t};

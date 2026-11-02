@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Wang'ap — Revue du design</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="wg.css">
+<style>
+  :root {
+    --bg: #FBF7EF; --card: #FFFFFF; --ink: #1D2B44; --muted: #5E6B7A; --line: #E7E1D4;
+    --teal: #1B9AAA; --teal-d: #157C89; --gold: #E8B059; --ok: #3F8A4F; --warn: #B7791F;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 var(--sans); }
+  a { color: var(--teal-d); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+  header.top { position: sticky; top: 0; z-index: 50; background: rgba(251,247,239,.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
+  header.top .wrap { display: flex; align-items: center; gap: 10px; height: 58px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+  .brand img { width: 38px; height: 38px; border-radius: 10px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+  .brand b { font-size: 19px; font-weight: 800; letter-spacing: -.01em; }
+  .brand span { font-size: 13px; color: var(--muted); display: block; line-height: 1; margin-top: 2px; }
+  .flags { margin-left: auto; display: flex; gap: 4px; }
+  .flags button { width: 40px; height: 34px; border-radius: 9px; border: 1.5px solid transparent; background: transparent; font-size: 20px; cursor: pointer; }
+  .flags button[aria-pressed="true"] { border-color: var(--teal); background: #fff; }
+
+  .intro { padding-top: 30px; padding-bottom: 8px; display: grid; gap: 22px; }
+  @media (min-width: 860px) { .intro { grid-template-columns: 1.25fr 1fr; align-items: center; padding-top: 44px; } }
+  h1 { font: 700 clamp(28px, 6vw, 42px)/1.12 var(--serif); margin: 0 0 12px; letter-spacing: -.01em; }
+  .lead { font-size: 17px; color: #354357; margin: 0 0 12px; }
+  .note { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; font-size: 15px; }
+  .note b { color: var(--ink); }
+  .note ul { margin: 6px 0 0; padding-left: 20px; }
+  .note li { margin: 3px 0; }
+  .art { display: flex; justify-content: center; }
+  .art img { width: min(320px, 70vw); height: auto; filter: drop-shadow(0 10px 24px rgba(0,0,0,.08)); }
+
+  .steps { display: grid; gap: 10px; margin: 18px 0 6px; padding: 0; list-style: none; counter-reset: s; }
+  @media (min-width: 760px) { .steps { grid-template-columns: repeat(3, 1fr); } }
+  .steps li { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px 14px 56px; position: relative; font-size: 15px; }
+  .steps li::before { counter-increment: s; content: counter(s); position: absolute; left: 14px; top: 14px; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: #fff; font-weight: 700; display: grid; place-items: center; font-size: 15px; }
+  .steps strong { display: block; margin-bottom: 2px; }
+
+  .who-box { margin: 18px 0 6px; }
+  .who-box .wg-who { max-width: 520px; }
+  .who-ok { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 12px 16px; font-size: 15px; }
+  .who-ok button { border: none; background: none; color: var(--teal-d); font-weight: 600; cursor: pointer; padding: 6px 0; font-size: 14px; }
+
+  .progress { display: flex; align-items: center; gap: 12px; margin: 26px 0 12px; }
+  .progress h2 { font: 700 24px/1.2 var(--serif); margin: 0; }
+  .bar { flex: 1; height: 8px; background: #EDE6D7; border-radius: 99px; overflow: hidden; min-width: 80px; }
+  .bar i { display: block; height: 100%; background: var(--teal); border-radius: 99px; transition: width .4s; }
+  .count { font-size: 14px; color: var(--muted); white-space: nowrap; }
+
+  .grid { display: grid; gap: 18px; }
+  @media (min-width: 760px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1080px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 2px 14px rgba(29,43,68,.05); }
+  .shots { position: relative; display: block; aspect-ratio: 16 / 11; background: #EFE9DC; overflow: hidden; text-decoration: none; }
+  .shots .desk { position: absolute; left: 4%; top: 7%; width: 74%; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.18); border: 1px solid rgba(0,0,0,.06); }
+  .shots .phone { position: absolute; right: 5%; top: 9%; width: 27%; border-radius: 14px; box-shadow: 0 8px 22px rgba(0,0,0,.25); border: 3px solid #1d1d1f; }
+  .shots .num { position: absolute; left: 12px; bottom: 10px; background: rgba(29,43,68,.88); color: #fff; font-weight: 700; font-size: 13px; padding: 5px 10px; border-radius: 99px; }
+  .shots .ph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 14px; }
+  .body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .title { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .title h3 { font: 700 22px/1.15 var(--serif); margin: 0; }
+  .title small { color: var(--muted); font-size: 14px; font-style: italic; }
+  .mood { margin: 0; font-weight: 600; color: #34465F; }
+  .xp { margin: 0; font-size: 15px; color: #3E4B5C; }
+  .meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .sw { display: flex; }
+  .sw i { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; margin-left: -5px; box-shadow: 0 0 0 1px rgba(0,0,0,.08); }
+  .sw i:first-child { margin-left: 0; }
+  .pp { color: var(--gold); letter-spacing: 1px; }
+  .chip { align-self: flex-start; font-size: 12.5px; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: #F1ECE1; color: var(--muted); }
+  .chip.started { background: #FDF1D8; color: var(--warn); }
+  .chip.done { background: #E3F2E5; color: var(--ok); }
+  .acts { display: flex; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 46px; padding: 10px 12px; border-radius: 14px; font-weight: 700; font-size: 15px; text-decoration: none; border: none; cursor: pointer; text-align: center; }
+  .btn.primary { background: var(--ink); color: #fff; }
+  .btn.ghost { background: #fff; color: var(--ink); border: 1.5px solid #CFC7B6; }
+
+  .next { margin: 18px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 16px 18px; border: 2px dashed #CBBFA6; border-radius: 20px; background: repeating-linear-gradient(135deg, rgba(232,176,89,.06) 0 12px, transparent 12px 24px), #FFFDF8; color: var(--ink); text-decoration: none; }
+  .next-n { width: 44px; height: 44px; flex: none; border-radius: 50%; background: var(--ink); color: #fff; font: 700 20px/44px var(--serif); text-align: center; }
+  .next-b { flex: 1 1 260px; display: flex; flex-direction: column; gap: 2px; }
+  .next-b b { font: 700 19px/1.25 var(--serif); }
+  .next-b span { font-size: 15px; color: #3E4B5C; }
+  .next .chip { margin-left: auto; }
+  .tips { margin: 26px 0 0; background: #fff; border: 1px dashed #D8CDB6; border-radius: 16px; padding: 14px 16px; font-size: 15px; }
+  .tips ul { margin: 6px 0 0; padding-left: 20px; }
+
+  #bilan { margin: 40px 0 0; padding: 26px 0 10px; border-top: 1px solid var(--line); }
+  #bilan h2 { font: 700 26px/1.2 var(--serif); margin: 0 0 6px; }
+  #bilan > .wrap > p { margin: 0 0 18px; color: #3E4B5C; }
+  .wg-g { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 18px; display: grid; gap: 16px; }
+  @media (min-width: 860px) { .wg-g { grid-template-columns: 1fr 1fr; } .wg-g .full { grid-column: 1 / -1; } }
+  .wg-g label > span, .wg-g .lbl { display: block; font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .wg-g .help { display: block; font-weight: 400; color: var(--muted); font-size: 13.5px; margin-top: -3px; margin-bottom: 6px; }
+  .ranks { display: grid; gap: 8px; }
+  .ranks div { display: flex; align-items: center; gap: 10px; }
+  .ranks b { width: 34px; flex: none; font-size: 15px; }
+  .send { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .send .btn { flex: 0 1 auto; padding: 12px 22px; }
+  .send .wg-save { margin: 0; }
+  footer { padding: 30px 0 calc(40px + env(safe-area-inset-bottom, 0px)); text-align: center; font-size: 13px; color: var(--muted); }
+  .wg-who { background: #FFF7E6; }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="#"><img src="/images/logo.webp" alt=""><div><b>wang'ap</b><span id="sub"></span></div></a>
+  <div class="flags" role="group" aria-label="Langue / Language">
+    <button type="button" data-lang="fr" aria-label="Français">🇫🇷</button>
+    <button type="button" data-lang="en" aria-label="English">🇬🇧</button>
+  </div>
+</div></header>
+<main id="app"></main>
+<script src="data.js"></script>
+<script src="wg.js"></script>
+<script src="survey.js"></script>
+<script>
+(function () {
+  const { t, esc, DESIGNS } = WG;
+  const app = document.getElementById('app');
+  const STATUS = () => ({ todo: t('À découvrir', 'To discover'), started: t('Avis commencé', 'View started'), done: t('✓ Avis donné', '✓ View given') });
+
+  const general = () => (WGS.read('general') || { answers: {} });
+  const opts = (sel) => `<option value="">—</option>${DESIGNS.map((d, i) => `<option value="${d.id}" ${sel === d.id ? 'selected' : ''}>${i + 1}. ${esc(t(d.fr, d.en))}</option>`).join('')}`;
+
+  function render() {
+    document.getElementById('sub').textContent = t('Revue du design · page publique', 'Design review · public page');
+    document.querySelectorAll('[data-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === WG.lang)));
+    const rev = WGS.reviewer();
+    const st = DESIGNS.map((d) => WGS.status(d.id));
+    const done = st.filter((s) => s === 'done').length;
+    const g = general().answers || {};
+    const first = rev ? rev.split(' ')[0] : '';
+    const sy = window.scrollY;
+
+    app.innerHTML = `
+    <section class="wrap intro">
+      <div>
+        <h1>${first ? esc(t(`Bonjour ${first} 👋`, `Hello ${first} 👋`)) : t('Bonjour Catherine, bonjour Bertrand 👋', 'Hello Catherine, hello Bertrand 👋')}</h1>
+        <p class="lead">${t('Voici <b>six propositions</b> de nouveau look pour la <b>page d’accueil publique</b> de wangap.fr. Votre avis va décider de la suite.', 'Here are <b>six proposals</b> for a new look for the <b>public home page</b> of wangap.fr. Your views will decide what comes next.')}</p>
+        <div class="note">
+          <b>${t('Ce qui change, ce qui ne change pas', 'What changes, what doesn’t')}</b>
+          <ul>
+            <li>${t('Seuls <b>les couleurs, les polices, les images et la mise en page</b> changent.', 'Only <b>colours, fonts, images and layout</b> change.')}</li>
+            <li>${t('<b>Toutes les fonctions restent</b> : carte, journal, galerie, sillage, calendrier, programme, contact, newsletter, accès cockpit… Dans les démos, ces liens ne mènent nulle part — c’est normal.', '<b>Every feature stays</b>: map, journal, gallery, wake replay, calendar, programme, contact, newsletter, cockpit access… In the demos these links go nowhere — that’s expected.')}</li>
+            <li>${t('Les textes et les photos sont <b>les vrais</b>, ceux que le public voit déjà.', 'Texts and photos are <b>the real ones</b>, those the public already sees.')}</li>
+            <li>${t('L’application (skipper, famille, voileux) <b>ne change pas</b>.', 'The app (skipper, family, sailors) <b>does not change</b>.')}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="art"><img src="art/prince.webp" alt="" width="900" height="600"></div>
+    </section>
+
+    <section class="wrap">
+      <ol class="steps">
+        <li><strong>${t('Dites qui vous êtes', 'Say who you are')}</strong>${t('Chacun donne son propre avis.', 'Each of you gives your own view.')}</li>
+        <li><strong>${t('Ouvrez chaque design', 'Open each design')}</strong>${t('Faites défiler, touchez, ouvrez un récit. Le bouton <b>💬 Mon avis</b> est sur le bord droit.', 'Scroll, tap, open a story. The <b>💬 My view</b> button sits on the right edge.')}</li>
+        <li><strong>${t('Faites le bilan', 'Wrap up')}</strong>${t('Votre classement, vos mélanges, vos idées.', 'Your ranking, your mixes, your ideas.')}</li>
+      </ol>
+      <div class="who-box">${rev
+        ? `<div class="who-ok">👤 ${t('Vos avis sont enregistrés au nom de', 'Your views are saved as')} <b>${esc(rev)}</b><button type="button" id="change-who">${t('Ce n’est pas moi', 'That’s not me')}</button></div>`
+        : WGS.whoHtml()}</div>
+    </section>
+
+    <section class="wrap">
+      <div class="progress"><h2>${t('Les six designs', 'The six designs')}</h2><div class="bar"><i style="width:${(done / 6) * 100}%"></i></div><span class="count">${done}/6 ${t('avis donnés', 'views given')}</span></div>
+      <div class="grid">${DESIGNS.map((d, i) => `
+        <article class="card">
+          <a class="shots" href="${d.file}" aria-label="${esc(t('Ouvrir la démo', 'Open the demo'))} ${esc(t(d.fr, d.en))}">
+            <span class="ph">${t('Aperçu…', 'Preview…')}</span>
+            <img class="desk" src="snaps/${d.id}-desktop.jpg" alt="" loading="lazy" onerror="this.remove()">
+            <img class="phone" src="snaps/${d.id}-phone.jpg" alt="" loading="lazy" onerror="this.remove()">
+            <span class="num">${i + 1}/6</span>
+          </a>
+          <div class="body">
+            <div class="title"><h3>${esc(WG.lang === 'fr' ? d.fr : d.en)}</h3><small>${esc(WG.lang === 'fr' ? d.en : d.fr)}</small></div>
+            <p class="mood">${esc(t(d.moodFr, d.moodEn))}</p>
+            <p class="xp">${esc(t(d.xpFr, d.xpEn))}</p>
+            <div class="meta"><span class="sw">${d.palette.map((c) => `<i style="background:${c}"></i>`).join('')}</span><span>${esc(d.fonts)}</span></div>
+            <div class="meta">${t('Petit Prince', 'Little Prince')} <span class="pp" aria-label="${d.pp}/5">${'★'.repeat(d.pp)}${'☆'.repeat(5 - d.pp)}</span></div>
+            <span class="chip ${st[i]}">${STATUS()[st[i]]}</span>
+            <div class="acts">
+              <a class="btn primary" href="${d.file}">${t('Ouvrir', 'Open')} →</a>
+              <a class="btn ghost" href="${d.file}#avis">💬 ${t('Mon avis', 'My view')}</a>
+            </div>
+          </div>
+        </article>`).join('')}
+      </div>
+      <a class="next" href="d7-la-synthese.html">
+        <span class="next-n">7</span>
+        <span class="next-b"><b>${t('La Synthèse — la combinaison finale', 'The Synthesis — the final combination')}</b>
+          <span>${t('La maquette qui réunira le meilleur des six, à partir de vos avis et de votre discussion. Prenez votre temps.', 'The mock-up that will bring together the best of the six, from your views and your discussion. Take your time.')}</span></span>
+        <span class="chip started">⏳ ${t('En préparation', 'In preparation')}</span>
+      </a>
+      <div class="tips"><b>${t('Quelques conseils', 'A few tips')}</b><ul>
+        <li>${t('Regardez si possible sur <b>téléphone et sur iPad ou ordinateur</b> : chaque design s’adapte différemment.', 'If you can, look on <b>phone and on iPad or computer</b>: each design adapts differently.')}</li>
+        <li>${t('Fiez-vous à la première impression, puis prenez le temps de lire un récit.', 'Trust your first impression, then take time to read a story.')}</li>
+        <li>${t('Rien n’est définitif : on peut <b>mélanger</b> (les couleurs de l’un, la mise en page d’un autre).', 'Nothing is final: we can <b>mix</b> (the colours of one, the layout of another).')}</li>
+        <li>${t('Tout s’enregistre au fur et à mesure, même sans réseau : vous pouvez vous arrêter et reprendre plus tard, ici ou sur un autre appareil.', 'Everything saves as you go, even offline: stop and resume later, here or on another device.')}</li>
+      </ul></div>
+    </section>
+
+    <section id="bilan"><div class="wrap">
+      <h2>${t('Le bilan', 'Wrap-up')}</h2>
+      <p>${t('Une fois les six designs vus — ou dès que vous avez une idée.', 'Once you have seen the six designs — or as soon as you have an idea.')}</p>
+      <div class="wg-g">
+        <div><span class="lbl">🏆 ${t('Mon classement', 'My ranking')}</span>
+          <div class="ranks">
+            ${[1, 2, 3].map((r) => `<div><b>${r}${t(r === 1 ? 'er' : 'e', r === 1 ? 'st' : r === 2 ? 'nd' : 'rd')}</b><select data-g="rank${r}" aria-label="${r}">${opts(g[`rank${r}`])}</select></div>`).join('')}
+          </div>
+        </div>
+        <label><span>🧩 ${t('Mon mélange idéal', 'My ideal mix')}</span><span class="help">${t('Ex. : « les couleurs du 2, la mise en page du 4, les polaroïds du 5 »', 'E.g. “the colours of 2, the layout of 4, the polaroids of 5”')}</span><textarea data-g="mix" rows="3">${esc(g.mix || '')}</textarea></label>
+        <label><span>⚓ ${t('Ce qui doit absolument rester de la page actuelle', 'What must stay from the current page')}</span><textarea data-g="keep" rows="3">${esc(g.keep || '')}</textarea></label>
+        <label><span>💡 ${t('Mes idées en plus', 'My extra ideas')}</span><span class="help">${t('Contenus, rubriques, fonctions, ce qui manque aujourd’hui, ce que vos proches vous disent…', 'Content, sections, features, what’s missing today, what friends and family tell you…')}</span><textarea data-g="ideas" rows="4">${esc(g.ideas || '')}</textarea></label>
+        <label class="full"><span>✉️ ${t('Un mot pour Flavien', 'A note for Flavien')}</span><textarea data-g="note" rows="3">${esc(g.note || '')}</textarea></label>
+        <div class="full send">
+          <button type="button" class="btn primary" id="send">${g.done ? '✓ ' + t('Bilan envoyé — merci !', 'Wrap-up sent — thank you!') : t('Envoyer mon bilan', 'Send my wrap-up')}</button>
+          <div class="wg-save" id="gsave"></div>
+        </div>
+      </div>
+    </div></section>
+    <footer class="wrap">${t('Vos réponses sont enregistrées au fur et à mesure et transmises à Flavien. Page de travail, non référencée.', 'Your answers save as you go and reach Flavien. A working page, not indexed.')}</footer>`;
+    if (!rev) WGS.bindWho(app, render);
+    document.getElementById('change-who')?.addEventListener('click', () => { WGS.setReviewer(''); render(); });
+    showSave();
+    window.scrollTo(0, sy);
+  }
+
+  // Le bilan : enregistrement automatique, comme dans les démos.
+  let timer;
+  const showSave = () => {
+    const el = document.getElementById('gsave'); const r = WGS.read('general');
+    if (!el || !r?.savedAt) return;
+    const at = new Date(r.savedAt).toLocaleTimeString(WG.lang === 'fr' ? 'fr-FR' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
+    el.textContent = r.synced === false ? `💾 ${t('Enregistré sur cet appareil', 'Saved on this device')} (${at}) — ${t('sera transmis dès que possible', 'will be sent as soon as possible')}`
+      : r.synced ? `✓ ${t('Enregistré et transmis', 'Saved and sent')} (${at})` : `… ${t('Enregistrement', 'Saving')}`;
+  };
+  const update = (patch) => {
+    if (!WGS.reviewer()) { WG.toast(t('Dites-nous d’abord qui vous êtes, en haut de la page 🙂', 'Tell us who you are first, at the top of the page 🙂')); return false; }
+    const r = general();
+    WGS.write('general', { answers: { ...r.answers, ...patch }, savedAt: new Date().toISOString(), synced: null });
+    showSave();
+    clearTimeout(timer); timer = setTimeout(async () => { await WGS.push('general'); showSave(); }, 1200);
+    return true;
+  };
+  app.addEventListener('input', (e) => { const k = e.target.getAttribute('data-g'); if (k && e.target.tagName === 'TEXTAREA') update({ [k]: e.target.value.slice(0, 4000) }); });
+  app.addEventListener('change', (e) => { const k = e.target.getAttribute('data-g'); if (k && e.target.tagName === 'SELECT') update({ [k]: e.target.value }); });
+  app.addEventListener('click', async (e) => {
+    if (!e.target.closest('#send')) return;
+    if (!update({ done: true })) return;
+    clearTimeout(timer);
+    const ok = await WGS.push('general');
+    render();
+    WG.toast(ok ? t('Merci ! Flavien a bien reçu votre bilan.', 'Thank you! Flavien has your wrap-up.') : t('Enregistré sur cet appareil — il partira dès que le réseau revient.', 'Saved on this device — it will go as soon as you are back online.'));
+  });
+
+  document.querySelectorAll('[data-lang]').forEach((b) => b.addEventListener('click', () => WG.setLang(b.dataset.lang)));
+  window.addEventListener('wg:lang', render);
+  window.addEventListener('wg:reviewer', render);
+  window.addEventListener('pageshow', render); // retour depuis une démo (bfcache) : l'avancement à jour
+  render();
+  WGS.pull().then(() => { WGS.flush(); render(); });
+})();
+</script>
+</body>
+</html>

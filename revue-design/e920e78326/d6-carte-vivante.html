@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Wang'ap — Carte vivante (démo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wg.css">
+<style>
+:root{
+  --ocean:#0E3B52;--ocean-2:#0A2E40;--lagoon:#36B3AE;--teal-ink:#1C7470;--sand:#F4E8D4;--sand-2:#EADBC1;
+  --sun:#F2843A;--sun-ink:#A04A0E;--white:#fff;--ink:#0F1E28;--paper:#FBF7F0;--muted:#4A5B66;--line:rgba(15,30,40,.12);
+  --hh:60px;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+  --f-d:'Bricolage Grotesque',system-ui,sans-serif;--f-b:Inter,system-ui,-apple-system,sans-serif;--f-m:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --sh:0 1px 0 rgba(15,30,40,.06),0 14px 34px -22px rgba(15,30,40,.45);
+  --rd-bg:#FBF7F0;--rd-ink:#0F1E28;--rd-muted:#4A5B66;--rd-accent:#A04A0E;--rd-title:#0E3B52;
+  --rd-title-font:'Bricolage Grotesque',system-ui,sans-serif;--rd-body-font:Inter,system-ui,sans-serif;--rd-radius:22px;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:calc(var(--hh) + var(--sat) + 12px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.55 var(--f-b);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 16px}
+@media(min-width:700px){.wrap{padding:0 32px}}
+h1,h2,h3{font-family:var(--f-d);font-weight:700;letter-spacing:-.025em;line-height:1.04;margin:0;font-variation-settings:"opsz" 72}
+.kick{font:600 12px/1.2 var(--f-m);letter-spacing:.14em;text-transform:uppercase}
+.mono{font-family:var(--f-m)}
+.sec{padding:64px 0}
+.sec-h{margin-bottom:28px}
+.sec-h .kick{color:var(--teal-ink);margin-bottom:10px}
+.sec-h h2{font-size:clamp(34px,8.6vw,60px);color:var(--ocean)}
+.sec-h p{margin:12px 0 0;color:var(--muted);max-width:620px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:999px;font:600 16px/1.1 var(--f-b);text-decoration:none;border:0;cursor:pointer;white-space:nowrap;transition:transform .15s,background .2s}
+.btn:active{transform:scale(.97)}
+.b-sun{background:var(--sun);color:var(--ink)}
+.b-sun:hover{background:#F79552}
+.b-ghost{color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55)}
+.b-ghost:hover{background:rgba(255,255,255,.1)}
+.b-ink{background:var(--ocean);color:#fff}
+.b-line{color:var(--ocean);box-shadow:inset 0 0 0 1.5px var(--ocean);background:transparent}
+.b-sm{min-height:44px;padding:0 14px;font-size:14px}
+[data-reveal]{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+[data-reveal].is-in{opacity:1;transform:none}
+
+/* ── header ── */
+.top{position:fixed;top:0;left:0;right:0;z-index:600;padding-top:var(--sat);background:rgba(10,46,64,.94);color:#fff;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.top-in{height:var(--hh);display:flex;align-items:center;gap:10px;max-width:1360px;margin:0 auto;padding:0 10px 0 14px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;min-height:44px}
+.brand img{width:38px;height:38px;border-radius:50%;background:#fff;padding:2px}
+.brand b{font:800 23px/1 var(--f-d);letter-spacing:-.035em}
+.brand b i{font-style:normal;color:var(--sun)}
+.nav{display:none}
+.lang{display:flex;border-radius:999px;background:rgba(255,255,255,.1);padding:3px;margin-left:auto}
+.lang button{min-width:44px;height:38px;border:0;border-radius:999px;background:none;color:#fff;font:600 13px/1 var(--f-m);cursor:pointer}
+.lang button[aria-pressed=true]{background:#fff;color:var(--ocean)}
+.login{display:none}
+.burger{width:44px;height:44px;border:0;border-radius:12px;background:none;color:#fff;cursor:pointer;display:grid;place-items:center}
+@media(min-width:700px){.login{display:inline-flex}}
+@media(min-width:1180px){
+  .nav{display:flex;gap:2px;margin-left:22px}
+  .nav a{padding:10px 11px;border-radius:999px;font:500 15px/1 var(--f-b);text-decoration:none;color:#E3EEF3}
+  .nav a:hover{background:rgba(255,255,255,.1)}
+  .burger{display:none}
+}
+.drawer{position:fixed;inset:0;z-index:700;background:var(--ocean-2);color:#fff;padding:calc(var(--sat) + 12px) 20px calc(24px + var(--sab));display:flex;flex-direction:column;overflow-y:auto;transform:translateY(-102%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility .32s}
+.drawer.on{transform:none;visibility:visible}
+.drawer-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.drawer nav a{display:flex;align-items:center;gap:14px;min-height:56px;border-bottom:1px solid rgba(255,255,255,.12);text-decoration:none;font:600 24px/1 var(--f-d)}
+.drawer nav a span{width:28px;font-size:20px}
+.drawer .btn{margin-top:24px;align-self:flex-start}
+
+/* ── hero (la carte) ── */
+.hero{position:relative;padding-top:calc(var(--hh) + var(--sat));background:var(--ocean);color:#fff}
+.hmap{position:relative;overflow:hidden;height:62svh;min-height:380px;background:#B8D6E4}
+.hmap::after{content:"";position:absolute;inset:auto 0 0;height:90px;background:linear-gradient(transparent,rgba(14,59,82,.55));pointer-events:none;z-index:1}
+.hmap-top{position:absolute;z-index:3;left:12px;top:12px;right:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.94);color:var(--ink);font:600 13px/1.2 var(--f-b);box-shadow:0 4px 16px -6px rgba(0,0,0,.35)}
+.chip.dark{background:rgba(15,30,40,.86);color:#fff}
+.live{width:9px;height:9px;border-radius:50%;background:var(--sun);box-shadow:0 0 0 0 rgba(242,132,58,.6);animation:ping 2s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 8px rgba(242,132,58,0)}100%{box-shadow:0 0 0 0 rgba(242,132,58,0)}}
+.hmap-bar{position:absolute;z-index:3;left:12px;right:12px;bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 10px 10px 14px;border-radius:18px;background:rgba(15,30,40,.86);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.hmap-bar .pos{flex:1 1 180px;min-width:0}
+.pos small{display:block;font:500 12px/1.3 var(--f-b);color:#BFD3DC}
+.pos b{display:block;font:600 15px/1.3 var(--f-m);color:#fff;white-space:nowrap}
+.hmap-bar .btns{display:flex;gap:6px}
+.hmap-bar .btn{min-height:44px;padding:0 12px;font-size:14px}
+.boat{position:relative;display:block;width:18px;height:18px}
+.boat i{position:absolute;inset:-16px;border-radius:50%;background:rgba(242,132,58,.4);animation:pulse 2.6s ease-out infinite}
+.boat i+i{animation-delay:1.3s}
+.boat b{position:absolute;inset:0;border-radius:50%;background:var(--sun);border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.boat em{position:absolute;left:24px;top:50%;transform:translateY(-50%);white-space:nowrap;background:var(--ink);color:#fff;font:600 12px/1 var(--f-m);font-style:normal;padding:6px 8px;border-radius:8px}
+@keyframes pulse{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+.hcopy{position:relative;padding:28px 16px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(54,179,174,.18);color:#A8E6E2;font:600 12px/1.2 var(--f-m);letter-spacing:.06em;text-transform:uppercase}
+.hcopy h1{font-size:clamp(32px,8.4vw,48px);margin:16px 0 12px;font-weight:750}
+.hcopy h1 em{font-style:normal;color:var(--sun)}
+.hsub{font:600 17px/1.3 var(--f-m);color:#CFE3EA;margin:0 0 16px}
+.hq{margin:0 0 22px;padding-left:14px;border-left:3px solid var(--lagoon);color:#E1ECF0;font-size:16px;font-style:italic}
+.ctas{display:flex;flex-wrap:wrap;gap:10px}
+@media(min-width:900px){
+  .hmap{height:calc(100svh - var(--hh) - var(--sat) - 110px);min-height:560px;max-height:860px}
+  .hmap-top{left:24px;top:24px}
+  .hmap-bar{left:auto;right:24px;bottom:24px;width:auto;max-width:520px}
+  .hcopy{position:absolute;z-index:4;left:max(32px,calc(50vw - 600px));bottom:28px;width:480px;padding:30px 30px 28px;border-radius:26px;background:rgba(10,46,64,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 30px 60px -30px rgba(0,0,0,.6)}
+  .hcopy h1{font-size:42px}
+}
+
+/* ── chiffres du projet ── */
+.figs{background:var(--ocean-2);color:#fff;padding:26px 0 30px}
+.figs ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px}
+.figs li{display:flex;gap:10px;align-items:baseline}
+.figs .e{font-size:22px}
+.figs b{display:block;font:800 36px/1 var(--f-d);letter-spacing:-.03em}
+.figs span{display:block;font-size:14px;color:#BFD3DC;margin-top:4px}
+@media(min-width:900px){.figs ul{grid-template-columns:repeat(4,minmax(0,1fr))}.figs b{font-size:46px}}
+
+/* ── bento ── */
+.board{background:var(--sand)}
+.bento{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"nm nm" "days etp" "posts next" "latest latest" "chap chap" "pos pos" "cal cal"}
+@media(min-width:900px){.bento{gap:16px;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-areas:"nm nm days etp" "nm nm posts next" "latest latest chap chap" "cal cal pos pos"}}
+.tile{position:relative;overflow:hidden;border-radius:24px;padding:18px;background:#fff;box-shadow:var(--sh);text-decoration:none;color:var(--ink);display:flex;flex-direction:column;min-width:0}
+.tile .kick{color:var(--muted);font-size:11px}
+.tile .n{white-space:nowrap;font:800 clamp(46px,13vw,64px)/.92 var(--f-d);letter-spacing:-.045em;font-variation-settings:"opsz" 96;margin-top:auto;padding-top:18px}
+.tile .l{font-size:15px;color:var(--muted);margin-top:6px}
+.t-nm{grid-area:nm;background:var(--ocean);color:#fff;min-height:250px}
+.t-nm .kick,.t-nm .l{color:#BFD3DC}
+.t-nm .n{font-size:clamp(68px,20vw,124px);position:relative;z-index:1}
+.t-nm .n small{font-size:.32em;letter-spacing:0;margin-left:6px;color:var(--lagoon)}
+.t-nm svg{position:absolute;right:0;top:6%;width:78%;height:78%;opacity:.95}
+.t-days{grid-area:days}.t-etp{grid-area:etp;background:var(--lagoon)}.t-etp .kick,.t-etp .l{color:#0F2E33}
+.t-posts{grid-area:posts}
+.by{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}.by b{color:var(--ink)}
+.t-next{grid-area:next;background:var(--sun);color:var(--ink)}
+.t-next .kick,.t-next p{color:#3A1E0B}
+.t-next h3{font-size:22px;margin:10px 0 4px}
+.t-next .flag{font-size:30px;margin-top:auto;padding-top:10px}
+.t-next p{margin:0;font-size:14px;line-height:1.35}
+.t-latest{grid-area:latest;min-height:260px;color:#fff;padding:0;justify-content:flex-end;cursor:pointer}
+.t-latest img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.t-latest:hover img{transform:scale(1.04)}
+.t-latest::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,30,40,0) 30%,rgba(15,30,40,.88));z-index:1}
+.t-latest .in{position:relative;z-index:2;padding:18px}
+.t-latest .kick{color:#FFD3B4}
+.t-latest h3{font-size:24px;margin:8px 0 6px}
+.t-latest .m{font-size:14px;color:#E1E8EC}
+.t-chap{grid-area:chap;flex-direction:row;gap:16px;align-items:center}
+.t-chap .pl{flex:0 0 auto}
+.t-chap h3{font-size:24px;color:var(--ocean);margin:6px 0 6px}
+.t-chap p{margin:0;font-size:15px;color:var(--muted);line-height:1.4}
+.t-chap .et{margin-top:10px;font-size:14px;font-weight:600;color:var(--ink)}
+.t-cal{grid-area:cal}
+.t-pos{grid-area:pos;background:var(--ink);color:#fff;gap:10px}
+.t-pos .kick{color:#9FB5C0}
+.t-pos .co{font:600 clamp(19px,5.4vw,24px)/1.25 var(--f-m);margin-top:6px}
+.t-pos .w{font-size:14px;color:#BFD3DC}
+.cockpit{margin-top:auto;display:flex;gap:12px;align-items:center;padding:14px;border-radius:18px;background:rgba(255,255,255,.07);text-decoration:none;color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.cockpit:hover{background:rgba(255,255,255,.12)}
+.cockpit .ic{flex:0 0 44px;height:44px;border-radius:12px;background:var(--lagoon);display:grid;place-items:center;font-size:20px}
+.cockpit b{display:block;font-size:15px}
+.cockpit small{display:block;font-size:13px;color:#BFD3DC;line-height:1.35}
+.cal-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.cal-h b{font:700 20px/1 var(--f-d);text-transform:capitalize}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;text-align:center}
+.cal .wd{font:600 11px/1 var(--f-m);color:var(--muted);padding:6px 0}
+.cal .d{display:grid;place-items:center;min-height:44px;border-radius:12px;font:500 15px/1 var(--f-b);color:var(--ink);text-decoration:none}
+.cal a.d{background:var(--ocean);color:#fff;font-weight:700;position:relative}
+.cal a.d::after{content:"";position:absolute;bottom:6px;width:5px;height:5px;border-radius:50%;background:var(--sun)}
+.cal .today{box-shadow:inset 0 0 0 2px var(--sun)}
+.cal-l{display:flex;gap:14px;margin-top:10px;font-size:13px;color:var(--muted)}
+.cal-l i{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--ocean);margin-right:6px;vertical-align:-1px}
+.cal-l i.o{background:none;box-shadow:inset 0 0 0 2px var(--sun)}
+
+/* ── le récit guidé ── */
+.recit{background:var(--paper);padding-top:64px}
+.mode{display:inline-flex;background:#fff;border-radius:999px;padding:4px;box-shadow:inset 0 0 0 1px var(--line);margin-top:18px}
+.mode button{min-height:44px;padding:0 18px;border-radius:999px;border:0;background:none;font:600 15px/1 var(--f-b);cursor:pointer}
+.mode button[aria-pressed=true]{background:var(--ocean);color:#fff}
+.story{display:grid;margin-top:8px}
+.story>*{grid-area:1/1}
+.smap{position:sticky;top:calc(var(--hh) + var(--sat));height:46svh;z-index:2;align-self:start;overflow:hidden;background:linear-gradient(160deg,#BFDCE8,#8EBFD6);box-shadow:0 10px 24px -14px rgba(15,30,40,.6)}
+.smap .smap-gl,.smap .smap-gl.maplibregl-map{position:absolute;inset:0}
+.smap-wait{position:absolute;inset:0;display:grid;place-items:center;font:600 13px var(--f-m);color:var(--ocean);transition:opacity .4s}
+.smap.ready .smap-wait{opacity:0;pointer-events:none}
+.smap-ov{position:absolute;z-index:3;left:10px;top:10px;right:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;pointer-events:none}
+.smap-ov .chip{min-height:32px;padding:4px 10px 4px 5px;font-size:13px}
+.smap-ov .chip svg{width:26px;height:26px}
+.smap-ov .cnt{padding:4px 10px;font:600 12px/1 var(--f-m)}
+.smap .maplibregl-ctrl-attrib{font-size:11px}
+.scards{position:relative;z-index:1;padding:calc(46svh + 22px) 16px 26svh}
+.scard{display:block;max-width:560px;margin:0 auto 14svh;background:#fff;border-radius:22px;overflow:hidden;box-shadow:var(--sh);text-decoration:none;color:var(--ink);transition:box-shadow .3s,transform .3s}
+.scard.on{box-shadow:0 0 0 2px var(--sun),0 20px 40px -24px rgba(15,30,40,.55)}
+.scard[data-post]{cursor:pointer}
+.scard .ph{position:relative;aspect-ratio:2/1;background:var(--sand-2)}
+@media(min-width:900px){.scard .ph{aspect-ratio:16/9}}
+.scard .ph img{width:100%;height:100%;object-fit:cover}
+.scard .ph .chip{position:absolute;left:10px;bottom:10px;font:600 12px/1 var(--f-m);min-height:28px;padding:4px 9px}
+.scard .bd{padding:16px 18px 18px}
+.meta{font-size:14px;color:var(--muted)}
+.scard h3{font-size:24px;margin:6px 0 8px;color:var(--ocean)}
+.scard p{margin:0 0 12px;font-size:16px;line-height:1.5}
+.foot{display:flex;align-items:center;gap:4px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:6px;font-size:14px}
+.foot .et{flex:1 1 100%;color:var(--teal-ink);font-weight:600;padding:4px 0}
+.ic{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:12px;text-decoration:none;font-size:18px}
+.ic:hover{background:var(--sand)}
+.more{margin-left:auto;font-weight:700;color:var(--sun-ink);padding:10px 0}
+.sch{background:var(--ocean);color:#fff;text-align:center;padding:26px 22px 24px}
+.sch svg{margin:0 auto 10px;width:112px;height:112px}
+.sch .kick{color:var(--lagoon)}
+.sch h3{font-size:30px;margin:8px 0 8px;color:#fff}
+.sch p{margin:0;color:#CFE0E8;font-size:15px}
+.sintro,.send{padding:22px 20px;background:var(--ink);color:#fff}
+.sintro h3,.send h3{color:#fff;font-size:28px;margin:8px 0 8px}
+.sintro .kick,.send .kick{color:var(--sun)}
+.sintro p,.send p{color:#CFE0E8;font-size:16px}
+.send .ctas{margin-top:14px}
+@media(min-width:900px){
+  .smap{height:calc(100svh - var(--hh) - var(--sat));box-shadow:none}
+  .smap-ov{left:auto;right:24px;top:20px;justify-content:flex-end;max-width:50%}
+  .scards{justify-self:start;width:calc(420px + max(32px,calc(50vw - 600px)));padding:22svh 0 44svh max(32px,calc(50vw - 600px))}
+  .scard{width:420px;margin:0 0 56svh}
+  .scard:not(.on){opacity:.86}
+}
+.xlist{padding:8px 0 40px}
+.xch{display:flex;align-items:center;gap:12px;margin:26px 0 8px}
+.xch svg{width:44px;height:44px;flex:0 0 auto}
+.xch b{display:block;font:700 20px/1.15 var(--f-d);color:var(--ocean)}
+.xch small{font-size:14px;color:var(--muted)}
+.xlist ol{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.xlist li a{display:grid;grid-template-columns:auto 1fr;gap:2px 14px;padding:12px 4px;border-bottom:1px solid var(--line);text-decoration:none;min-height:56px}
+.xlist li a:hover{background:#fff}
+.xlist .dt{font:600 13px/1.5 var(--f-m);color:var(--teal-ink);grid-row:span 2}
+.xlist .tt{font-weight:600}
+.xlist .sb{font-size:14px;color:var(--muted)}
+.sillage{margin:20px 0 0;position:relative;border-radius:28px;overflow:hidden;min-height:360px;display:flex;align-items:flex-end;color:#fff;background:var(--ocean)}
+.sillage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sillage::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(10,46,64,.92),rgba(10,46,64,.55) 60%,rgba(10,46,64,.15)),linear-gradient(0deg,rgba(10,46,64,.6),transparent 60%)}
+.sillage .in{position:relative;z-index:2;padding:26px 22px;max-width:560px}
+.sillage .kick{color:var(--sun)}
+.sillage h3{font-size:clamp(28px,7vw,44px);margin:10px 0 18px}
+
+/* ── carnet ── */
+.filters{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}
+@media(min-width:700px){.filters{grid-template-columns:1fr 1fr auto;align-items:end}}
+.filters label span{display:block;font:600 12px/1 var(--f-m);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.sel{width:100%;min-height:50px;border-radius:14px;border:1.5px solid rgba(15,30,40,.2);background:#fff;padding:0 40px 0 14px;font-size:16px;-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ocean) 50%),linear-gradient(135deg,var(--ocean) 50%,transparent 50%);background-position:calc(100% - 20px) 22px,calc(100% - 14px) 22px;background-size:6px 6px;background-repeat:no-repeat}
+.count{font:600 14px/1 var(--f-m);color:var(--muted);padding:14px 0}
+.feat{display:grid;background:#fff;border-radius:26px;overflow:hidden;box-shadow:var(--sh);margin-bottom:16px;cursor:pointer}
+.feat .ph{aspect-ratio:4/3;background:var(--sand-2)}
+.feat .ph img{width:100%;height:100%;object-fit:cover}
+.feat .bd{padding:20px}
+.feat .kick{color:var(--sun-ink)}
+.feat h3{font-size:clamp(28px,6.6vw,40px);color:var(--ocean);margin:8px 0 10px}
+.feat p{margin:0 0 14px}
+@media(min-width:900px){.feat{grid-template-columns:1.25fr 1fr}.feat .ph{aspect-ratio:auto;min-height:420px}.feat .bd{padding:34px;display:flex;flex-direction:column;justify-content:center}}
+.grid{display:grid;gap:16px}
+@media(min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1000px){.grid{grid-template-columns:1fr 1fr 1fr}}
+.pc{display:flex;flex-direction:column;background:#fff;border-radius:22px;overflow:hidden;box-shadow:var(--sh);cursor:pointer;transition:transform .2s}
+.pc:hover{transform:translateY(-3px)}
+.pc .ph{aspect-ratio:3/2;background:var(--sand-2);position:relative}
+.pc .ph img{width:100%;height:100%;object-fit:cover}
+.noph{display:grid;place-items:center;background:var(--ocean)!important}
+.pc .bd{padding:16px 18px 14px;display:flex;flex-direction:column;flex:1}
+.pc h3{font-size:22px;color:var(--ocean);margin:6px 0 8px}
+.pc p{margin:0 0 12px;font-size:16px;color:#26343D}
+.pc .foot{margin-top:auto}
+.empty{padding:40px 20px;text-align:center;background:#fff;border-radius:22px;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+
+/* ── programme ── */
+.prog{background:var(--ocean);color:#fff}
+.prog .sec-h h2{color:#fff}.prog .sec-h .kick{color:var(--lagoon)}.prog .sec-h p{color:#CFE0E8}
+.pnums{font:600 17px/1.3 var(--f-m);color:var(--sun)!important}
+.wmap{position:relative;overflow:hidden;height:230px;border-radius:22px;background:#9CC6DA}
+@media(min-width:900px){.wmap{height:340px}}
+.pdot{display:block;width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px var(--ocean)}
+.pdot.nx{width:16px;height:16px;background:var(--sun);box-shadow:0 0 0 3px #fff}
+.phases{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:18px 16px 8px;margin:0 -16px;list-style:none;scrollbar-width:thin}
+.phases li{flex:0 0 200px;scroll-snap-align:start;border-radius:18px;padding:14px;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.phases li.nx{background:var(--sun);color:var(--ink);box-shadow:none}
+.phases .no{font:600 12px/1 var(--f-m);color:#9FB5C0}
+.phases li.nx .no{color:#3A1E0B}
+.phases b{display:block;font:700 18px/1.15 var(--f-d);margin:8px 0 4px}
+.phases .pp{font:600 13px/1.3 var(--f-m)}
+.phases small{display:block;font-size:14px;line-height:1.35;margin-top:6px;opacity:.85}
+@media(min-width:700px){.phases{margin:0 -32px;padding:18px 32px 8px}}
+.legs{display:grid;grid-template-columns:1fr;gap:10px;margin:22px 0}
+.legs div{border-radius:18px;padding:14px 16px;background:rgba(255,255,255,.06)}
+.legs b{display:block;font:700 22px/1.1 var(--f-d)}
+.legs span{font-size:14px;color:#BFD3DC}
+@media(min-width:700px){.legs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.prog .links .b-line{color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.6)}
+
+/* ── équipage, genèse ── */
+.crew{display:grid;gap:16px}
+@media(min-width:800px){.crew{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.cm{background:#fff;border-radius:26px;padding:22px;box-shadow:var(--sh);text-align:center}
+.cm .av{width:152px;height:152px;margin:0 auto 14px;border-radius:50%;overflow:hidden;box-shadow:0 0 0 6px var(--sand),0 0 0 8px var(--lagoon);background:var(--sand-2)}
+.cm .av img{width:100%;height:100%;object-fit:cover}
+.cm .av.boatp img{object-fit:cover;object-position:50% 12%;transform:scale(1.35)}
+.cm .e{font-size:24px}
+.cm h3{font-size:28px;color:var(--ocean);margin:4px 0 2px}
+.cm .r{font:600 15px/1.3 var(--f-d);color:var(--sun-ink)}
+.cm small{display:block;margin-top:6px;color:var(--muted);font-size:14px}
+.tame{margin:26px auto 0;max-width:720px;text-align:center;font:600 clamp(21px,5vw,28px)/1.3 var(--f-d);color:var(--ocean)}
+.gen{background:#fff}
+.gen-in{display:grid;gap:26px;align-items:center}
+@media(min-width:900px){.gen-in{grid-template-columns:1fr 1.1fr}}
+.hwan{font:800 clamp(84px,24vw,170px)/1 var(--f-d);color:var(--ocean);letter-spacing:-.02em;position:relative}
+.hwan small{display:block;font:600 14px/1 var(--f-m);letter-spacing:.14em;color:var(--teal-ink);margin-top:10px;text-transform:uppercase}
+.gen img{width:min(320px,80%);margin-top:6px}
+.gen p{font-size:18px}
+
+/* ── contact, abonnement, fin ── */
+.forms{display:grid;gap:18px}
+@media(min-width:900px){.forms{grid-template-columns:1.2fr 1fr}}
+.card{background:#fff;border-radius:26px;padding:22px;box-shadow:var(--sh)}
+.card h3{font-size:28px;color:var(--ocean);margin:0 0 8px}
+.card>p{margin:0 0 16px;color:var(--muted);font-size:16px}
+.f{display:block;margin-bottom:12px}
+.f span{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+.f input,.f textarea{width:100%;min-height:50px;border-radius:14px;border:1.5px solid rgba(15,30,40,.2);background:var(--paper);padding:12px 14px;font-size:16px}
+.f textarea{min-height:120px;resize:vertical}
+.f input:focus,.f textarea:focus{outline:none;border-color:var(--lagoon);background:#fff}
+.two{display:grid;gap:0 12px}
+@media(min-width:560px){.two{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.hint{font-size:14px;color:var(--muted);margin:-2px 0 14px}
+.ck{display:flex;align-items:center;gap:12px;min-height:52px;padding:0 14px;border-radius:14px;background:var(--paper);margin-bottom:8px;cursor:pointer;font-weight:500}
+.ck input{width:22px;height:22px;accent-color:var(--ocean)}
+.fin{position:relative;background:var(--ink);color:#fff;text-align:center;overflow:hidden;padding:84px 0}
+.fin svg.sky{position:absolute;inset:0;width:100%;height:100%;opacity:.8}
+.fin blockquote{position:relative;margin:0 auto 26px;max-width:760px;font:600 clamp(24px,6vw,40px)/1.22 var(--f-d)}
+.fin .btn{position:relative}
+footer{background:#08161F;color:#9FB5C0;padding:26px 0 calc(28px + var(--sab));font-size:14px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
+footer b{color:#fff;font-family:var(--f-d)}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  [data-reveal]{opacity:1;transform:none}
+}
+
+/* revue: garde-fou */ #app{overflow-x:clip}
+@media(min-width:900px){.story .scards{z-index:3}}
+</style>
+</head>
+<body data-design="d6">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<radialGradient id="pg0" cx=".36" cy=".32" r=".75"><stop offset="0" stop-color="#9BE5DF"/><stop offset=".55" stop-color="#36B3AE"/><stop offset="1" stop-color="#16706C"/></radialGradient>
+<radialGradient id="pg1" cx=".36" cy=".32" r=".75"><stop offset="0" stop-color="#FFF7E8"/><stop offset=".55" stop-color="#F0DDBC"/><stop offset="1" stop-color="#C9A974"/></radialGradient>
+<radialGradient id="pg2" cx=".36" cy=".32" r=".75"><stop offset="0" stop-color="#3C86A8"/><stop offset=".55" stop-color="#14506D"/><stop offset="1" stop-color="#06202E"/></radialGradient>
+<clipPath id="pclip"><circle cx="32" cy="32" r="21"/></clipPath>
+</defs></svg>
+<div id="app"></div>
+<script src="data.js"></script>
+<script src="wg.js"></script>
+<script>
+(() => {
+const { D, t, esc } = WG;
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isDesk = () => innerWidth >= 900;
+const P = (p, w = 600) => (WG.photo(p) ? WG.img(WG.photo(p), w) : null);
+const nm = (n) => WG.fmtNm(n);
+const short = (iso) => WG.date(iso, { day: 'numeric', month: 'short' });
+const LAST = WG.lastPoint();
+
+// Les chapitres, dans l'ordre du voyage, racontés comme les planètes du Petit Prince.
+const CH = [...D.chapters].sort((a, b) => a.date_start.localeCompare(b.date_start));
+const PLN = [
+  ['La planète de la première rencontre', 'The planet of first encounters'],
+  ['La planète des escales', 'The planet of ports of call'],
+  ['La planète du grand large', 'The open-ocean planet'],
+];
+const ROM = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+const chI = (id) => CH.findIndex((c) => c.id === id);
+const plName = (i) => t(...(PLN[i] || [CH[i]?.title, CH[i]?.title_en]));
+const planet = (i, s = 64) => {
+  const k = i % 3;
+  const body = [
+    `<circle cx="32" cy="32" r="21" fill="url(#pg0)"/><g clip-path="url(#pclip)" fill="#0E3B52" opacity=".18"><circle cx="24" cy="38" r="4"/><circle cx="38" cy="24" r="2.6"/><circle cx="40" cy="42" r="2"/></g><path d="M32 11V3.5l7 2.6-7 2.6" fill="#F2843A" stroke="#0F1E28" stroke-width="1.4" stroke-linejoin="round"/>`,
+    `<circle cx="32" cy="32" r="21" fill="url(#pg1)"/><g clip-path="url(#pclip)"><path d="M8 30c8-6 14 2 22-3s14-6 26 0v30H8z" fill="#36B3AE" opacity=".75"/><circle cx="25" cy="40" r="2.4" fill="#F2843A"/><circle cx="38" cy="45" r="1.8" fill="#F2843A"/><circle cx="44" cy="37" r="1.5" fill="#F2843A"/></g>`,
+    `<g transform="rotate(-16 32 32)"><ellipse cx="32" cy="32" rx="30" ry="8" fill="none" stroke="#F2843A" stroke-width="3" opacity=".55"/></g><circle cx="32" cy="32" r="21" fill="url(#pg2)"/><g clip-path="url(#pclip)" fill="none" stroke="#7FD3CF" stroke-width="1.3" opacity=".55"><path d="M10 28q6-3 12 0t12 0 12 0 12 0"/><path d="M10 36q6-3 12 0t12 0 12 0 12 0"/></g><g transform="rotate(-16 32 32)"><path d="M2 32a30 8 0 0 0 60 0" fill="none" stroke="#F2843A" stroke-width="3"/></g><path d="M50 10l1.3 2.7 2.7 1.3-2.7 1.3L50 18l-1.3-2.7L46 14l2.7-1.3z" fill="#FFD9A8"/>`,
+  ][k];
+  return `<svg class="pl" viewBox="0 0 64 64" width="${s}" height="${s}" aria-hidden="true">${body}</svg>`;
+};
+
+// ───────── le récit : un arrêt par publication située, groupées par planète ─────────
+const located = D.posts.filter((p) => p.lat != null && p.lon != null);
+const STOPS = [{ type: 'intro' }];
+CH.forEach((c, ci) => {
+  const ps = located.filter((p) => p.chapter_id === c.id).sort((a, b) => a.date.localeCompare(b.date));
+  if (!ps.length) return;
+  STOPS.push({ type: 'ch', ci, c, n: ps.length, pts: ps.map((p) => [p.lon, p.lat]) });
+  ps.forEach((p) => STOPS.push({ type: 'post', p, ci }));
+});
+STOPS.push({ type: 'end' });
+// La trace « se dessine » au fil du récit : pour chaque récit, le premier passage de la trace près de lui (sans revenir en arrière).
+(() => {
+  const tr = D.track; let prev = 0;
+  STOPS.forEach((s) => {
+    if (s.type === 'post') {
+      let best = -1, bd = 0.3;
+      for (let i = prev; i < tr.length; i++) {
+        const d = Math.hypot(tr[i][0] - s.p.lon, tr[i][1] - s.p.lat);
+        if (d < bd) { bd = d; best = i; } else if (best >= 0 && d > bd + 0.4) break;
+      }
+      if (best >= 0) prev = best;
+    }
+    s.idx = s.type === 'end' ? tr.length - 1 : prev;
+  });
+})();
+
+// ───────── état ─────────
+let mode = 'story', fCh = '', fEt = '', menu = false, active = 0, first = true;
+const counted = new Set();
+
+const delayTxt = () => t(`Position publiée avec ${D.delayHours} h de retard`, `Position shown ${D.delayHours} hours behind`);
+const lastAt = () => WG.date(D.lastPublicAt, { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+const icons = () => `<a href="#!" class="ic" aria-label="${t('J’aime', 'Like')}">❤️</a><a href="#!" class="ic" aria-label="${t('Commenter', 'Comment')}">💬</a>`;
+
+// La trace réelle, en petit, pour la tuile des milles.
+const trackSvg = (() => {
+  let s = null;
+  return () => {
+    if (s) return s;
+    const tr = D.track, k = Math.cos((40 * Math.PI) / 180);
+    const xs = tr.map((p) => p[0] * k), ys = tr.map((p) => -p[1]);
+    const x0 = Math.min(...xs), y0 = Math.min(...ys), w = Math.max(...xs) - x0, h = Math.max(...ys) - y0, sc = 100 / Math.max(w, h);
+    const d = WG.segments(tr).map((seg) => seg.map((p, i) => `${i ? 'L' : 'M'}${((p[0] * k - x0) * sc).toFixed(1)},${((-p[1] - y0) * sc).toFixed(1)}`).join('')).join('');
+    const [lx, ly] = [(LAST[0] * k - x0) * sc, (-LAST[1] - y0) * sc];
+    s = `<svg viewBox="-6 -6 ${(w * sc + 12).toFixed(0)} ${(h * sc + 12).toFixed(0)}" preserveAspectRatio="xMaxYMid meet" aria-hidden="true"><path d="${d}" fill="none" stroke="#F2843A" stroke-width=".9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="2.6" fill="#fff"/></svg>`;
+    return s;
+  };
+})();
+
+// ───────── rendu ─────────
+const header = () => `
+<header class="top"><div class="top-in">
+  <a class="brand" href="#top" aria-label="Wang’ap"><img src="/images/logo.webp" alt="" width="38" height="38"><b>wang<i>’</i>ap</b></a>
+  <nav class="nav" aria-label="${t('Menu principal', 'Main menu')}">${WG.NAV().map((n) => `<a href="${navHref(n.id)}">${esc(n.label)}</a>`).join('')}</nav>
+  <div class="lang" role="group" aria-label="Langue / Language"><button data-lang="fr" aria-pressed="${WG.lang === 'fr'}">FR</button><button data-lang="en" aria-pressed="${WG.lang === 'en'}">EN</button></div>
+  <a class="btn b-sun b-sm login" href="#!">${t('Connexion', 'Sign in')}</a>
+  <button class="burger" data-menu aria-label="${t('Ouvrir le menu', 'Open the menu')}" aria-expanded="${menu}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+</div></header>
+<div class="drawer${menu ? ' on' : ''}" ${menu ? '' : 'aria-hidden="true"'}>
+  <div class="drawer-h"><span class="brand"><img src="/images/logo.webp" alt="" width="38" height="38"><b>wang<i>’</i>ap</b></span>
+  <button class="burger" style="display:grid" data-menu aria-label="${t('Fermer le menu', 'Close the menu')}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <nav>${WG.NAV().map((n) => `<a href="${navHref(n.id)}" data-close><span>${n.icon}</span>${esc(n.label)}</a>`).join('')}</nav>
+  <div style="display:flex;gap:12px;align-items:center;margin-top:24px"><div class="lang" style="margin:0" role="group" aria-label="Langue / Language"><button data-lang="fr" aria-pressed="${WG.lang === 'fr'}">FR</button><button data-lang="en" aria-pressed="${WG.lang === 'en'}">EN</button></div>
+  <a class="btn b-sun" href="#!" style="margin:0">${t('Connexion', 'Sign in')}</a></div>
+</div>`;
+const navHref = (id) => ({ genese: '#genese', programme: '#programme', equipage: '#equipage', contact: '#contact' }[id] || '#!');
+
+const hero = () => `
+<section class="hero" id="top">
+  <div class="hmap" id="ou" aria-label="${t('Carte de la trace parcourue', 'Map of the track sailed so far')}">
+    <div class="hmap-top"><span class="chip dark"><span class="live"></span>${t('Où sommes-nous ?', 'Where are we?')}</span><span class="chip">⏱ ${esc(delayTxt())}</span></div>
+    <div class="hmap-bar">
+      <div class="pos"><small>${t('Dernière position publique', 'Latest public position')} · ${esc(lastAt())}</small><b>${esc(WG.fmtPos(LAST))}</b></div>
+      <div class="btns"><a class="btn b-ghost" href="#!">⤢ ${t('Plein écran', 'Full screen')}</a><a class="btn b-sun" href="#!">${t('Carte interactive', 'Interactive map')}</a></div>
+    </div>
+  </div>
+  <div class="hcopy">
+    <span class="badge">⛵ Outremer 52 · ${t('Tour du Monde', 'Round the World')} 2026–2029</span>
+    <h1>${t('Catherine & Bertrand larguent les amarres pour <em>3 ans</em> de navigation à la voile.', 'Catherine & Bertrand cast off for <em>3 years</em> of sailing.')}</h1>
+    <p class="hsub">${nm(36000)} ${t('milles nautiques · 30+ pays', 'nautical miles · 30+ countries')}</p>
+    <p class="hq">${esc(WG.quote('rose'))}</p>
+    <div class="ctas"><a class="btn b-sun" href="#!">📍 ${t('Où sommes-nous ?', 'Where are we?')}</a><a class="btn b-ghost" href="#carnet">${t('Lire le carnet', 'Read the log')} ↓</a></div>
+  </div>
+</section>
+<section class="figs" aria-label="${t('Le projet en chiffres', 'The project in numbers')}"><div class="wrap"><ul>
+  <li><span class="e">⭐</span><div><b>${nm(36000)}</b><span>${t('milles nautiques', 'nautical miles')}</span></div></li>
+  <li><span class="e">🌙</span><div><b>3</b><span>${t('ans autour du monde', 'years around the world')}</span></div></li>
+  <li><span class="e">🪐</span><div><b>30+</b><span>${t('planètes — pardon, pays', 'planets — sorry, countries')}</span></div></li>
+  <li><span class="e">🌹</span><div><b>18</b><span>${t('étapes', 'stages')}</span></div></li>
+</ul></div></section>`;
+
+const nmB = (v) => nm(v).replace(/[\u202f\u00a0]/g, '\u2009');
+const count = (k, v) => `<span data-count="${k}" data-v="${v}">${RM || counted.has(k) ? nmB(v) : '0'}</span>`;
+
+const calendar = () => {
+  const y = 2026, m = 9, off = (new Date(y, m, 1).getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate();
+  const marks = {};
+  D.posts.forEach((p) => { if (p.date.startsWith('2026-10')) (marks[+p.date.slice(8, 10)] ||= []).push(p); });
+  const today = D.snapshotAt.startsWith('2026-10') ? +D.snapshotAt.slice(8, 10) : 0;
+  const wd = t('LMMJVSD', 'MTWTFSS').split('').map((d) => `<span class="wd">${d}</span>`).join('');
+  let cells = '<span></span>'.repeat(off);
+  for (let d = 1; d <= days; d++) {
+    const cls = `d${d === today ? ' today' : ''}`;
+    cells += marks[d] ? `<a href="#!" class="${cls}" title="${esc(marks[d].map(WG.title).join(' · '))}" aria-label="${d} — ${esc(WG.title(marks[d][0]))}">${d}</a>` : `<span class="${cls}">${d}</span>`;
+  }
+  return `<div class="cal-h"><b>${esc(WG.date('2026-10-15T12:00:00Z', { month: 'long', year: 'numeric' }))}</b><span class="kick">${t('Calendrier', 'Calendar')}</span></div>
+    <div class="cal">${wd}${cells}</div>
+    <div class="cal-l"><span><i></i>${t('un récit ce jour-là', 'a story that day')}</span><span><i class="o"></i>${t('aujourd’hui', 'today')}</span></div>`;
+};
+
+const byAuthor = () => Object.entries(D.posts.reduce((a, p) => ((a[p.author] = (a[p.author] || 0) + 1), a), {})).sort((a, b) => b[1] - a[1]).map(([n, c]) => `<span>${esc(n)} <b>${c}</b></span>`).join('');
+const board = () => {
+  const s = D.stats, L = D.posts[0], cur = CH[CH.length - 1], ci = CH.length - 1, nx = WG.PHASES[3];
+  const curEt = L.etape_id ? WG.etape(L.etape_id) : '';
+  return `
+<section class="board sec" id="bord"><div class="wrap">
+  <div class="sec-h" data-reveal><div class="kick">${t('Le tableau de bord', 'The dashboard')}</div><h2>${t('Où en est le voyage aujourd’hui', 'Where the voyage stands today')}</h2></div>
+  <div class="bento">
+    <div class="tile t-nm" data-reveal><div class="kick">${t('Depuis le départ', 'Since setting off')}</div>${trackSvg()}<div class="n">${count('nm', s.nm)}<small>nm</small></div><div class="l">${t('milles nautiques parcourus', 'nautical miles sailed')}</div></div>
+    <div class="tile t-days" data-reveal><div class="kick">${t('Le temps', 'Time')}</div><div class="n">${count('days', s.days)}</div><div class="l">${t('jours', 'days')}</div></div>
+    <div class="tile t-etp" data-reveal><div class="kick">${t('Le chemin', 'The way')}</div><div class="n">${count('etp', s.etapes)}</div><div class="l">${t('étapes', 'stages')}</div></div>
+    <div class="tile t-posts" data-reveal><div class="kick">${t('Le carnet', 'The log')}</div><div class="n">${count('posts', s.posts)}</div><div class="l">${t('récits', 'stories')}</div><div class="by">${byAuthor()}</div></div>
+    <a class="tile t-next" href="#!" data-reveal><div class="kick">${t('Prochaine étape', 'Next stage')}</div><h3>${esc(nx.place)}</h3><p>${esc(nx.period())} · ${esc(nx.desc())}</p><div class="flag">${nx.flag}</div></a>
+    <a class="tile t-latest" href="#r-${esc(L.id)}" data-post="${esc(L.id)}" data-reveal>${P(L) ? `<img src="${esc(P(L, 1200))}" alt="" loading="lazy">` : ''}<div class="in"><div class="kick">${t('Dernier récit', 'Latest story')} · ${esc(short(L.date))}</div><h3>${esc(WG.title(L))}</h3><div class="m">${esc(L.author)} · ${t('Lire', 'Read')} →</div></div></a>
+    <div class="tile t-chap" data-reveal><div class="pl">${planet(ci, 92)}</div><div><div class="kick">${t('Chapitre en cours', 'Current chapter')} · ${t('Planète', 'Planet')} ${ROM[ci]}</div><h3>${esc(plName(ci))}</h3><p>${esc(WG.chapter(cur.id))} · ${esc(short(cur.date_start))} – ${esc(short(cur.date_end))}</p>${curEt ? `<div class="et">⛵ ${t('Étape en cours', 'Current stage')} : ${esc(curEt)}</div>` : ''}</div></div>
+    <div class="tile t-cal" data-reveal>${calendar()}</div>
+    <div class="tile t-pos" data-reveal><div><div class="kick">${t('Dernière position publique', 'Latest public position')}</div><div class="co">${esc(WG.fmtPos(LAST))}</div><div class="w">${esc(lastAt())} · ${esc(delayTxt())}</div></div>
+      <a class="cockpit" href="#!"><span class="ic">🧭</span><span><b>${t('Demander l’accès au cockpit en direct', 'Ask for live cockpit access')}</b><small>${t('Pour les amis marins : les instruments de bord en direct, sur invitation.', 'For sailing friends: the boat’s live instruments, by invitation.')}</small></span></a></div>
+  </div>
+</div></section>`;
+};
+
+const stopCard = (s, i) => {
+  const on = i === active ? ' on' : '';
+  if (s.type === 'intro') return `<div class="scard sintro${on}" data-i="${i}"><div class="kick">${t('Raconte-moi', 'Tell me')}</div><h3>${t(`${nm(D.stats.nm)} milles, trois planètes, ${located.length} récits`, `${nm(D.stats.nm)} miles, three planets, ${located.length} stories`)}</h3><p>${t('Faites défiler : la carte vous emmène d’un récit à l’autre, du plus ancien au plus récent.', 'Keep scrolling: the map takes you from one story to the next, oldest first.')}</p></div>`;
+  if (s.type === 'end') return `<div class="scard send${on}" data-i="${i}"><div class="kick">${t('À suivre…', 'To be continued…')}</div><h3>${t('Le voyage continue', 'The voyage goes on')}</h3><p>${t('Dernière position publique', 'Latest public position')} : <span class="mono">${esc(WG.fmtPos(LAST))}</span> · ${esc(lastAt())}</p><div class="ctas"><a class="btn b-sun" href="#!">▶ ${t('Rejouer le voyage', 'Replay the voyage')}</a><a class="btn b-ghost" href="#carnet">${t('Lire le carnet', 'Read the log')}</a></div></div>`;
+  if (s.type === 'ch') return `<div class="scard sch${on}" data-i="${i}">${planet(s.ci, 112)}<div class="kick">${t('Planète', 'Planet')} ${ROM[s.ci]}</div><h3>${esc(plName(s.ci))}</h3><p>${esc(WG.chapter(s.c.id))} · ${esc(short(s.c.date_start))} – ${esc(short(s.c.date_end))} · ${s.n} ${s.n > 1 ? t('récits', 'stories') : t('récit', 'story')}</p></div>`;
+  const p = s.p, ph = P(p);
+  return `<article class="scard${on}" data-i="${i}" data-post="${esc(p.id)}">
+    <div class="ph${ph ? '' : ' noph'}">${ph ? `<img src="${esc(ph)}" alt="${esc(WG.cap(p.photos[0]))}" loading="lazy">` : planet(s.ci, 80)}<span class="chip">📍 ${esc(WG.fmtPos([p.lon, p.lat]))}</span></div>
+    <div class="bd"><div class="meta">${esc(WG.date(p.date))} · ${esc(p.author)}</div><h3>${esc(WG.title(p))}</h3><p>${esc(WG.excerpt(p, 170))}</p>
+    <div class="foot">${p.etape_id ? `<span class="et">⛵ ${esc(WG.etape(p.etape_id))}</span>` : ''}${icons()}<span class="more">${t('Lire le récit', 'Read the story')} →</span></div></div></article>`;
+};
+
+const explorer = () => CH.map((c, ci) => {
+  const ps = D.posts.filter((p) => p.chapter_id === c.id).sort((a, b) => a.date.localeCompare(b.date));
+  if (!ps.length) return '';
+  return `<div class="xch">${planet(ci, 44)}<div><b>${esc(plName(ci))}</b><small>${esc(WG.chapter(c.id))}</small></div></div><ol>${ps.map((p) => `<li><a href="#r-${esc(p.id)}" data-post="${esc(p.id)}"><span class="dt">${esc(WG.date(p.date, { day: '2-digit', month: '2-digit' }))}</span><span class="tt">${esc(WG.title(p))}</span><span class="sb">${esc(p.author)}${p.etape_id ? ` · ${esc(WG.etape(p.etape_id))}` : ''}${p.lat != null ? '' : ` · ${t('sans position', 'no position')}`}</span></a></li>`).join('')}</ol>`;
+}).join('');
+
+const recit = () => {
+  const sp = D.posts.find((p) => p.id.startsWith('4a9fdf7b')) || D.posts[1];
+  return `
+<section class="recit" id="recit">
+  <div class="wrap"><div class="sec-h" style="margin-bottom:0" data-reveal><div class="kick">${t('Le récit guidé', 'The guided story')}</div><h2>${t('Raconte-moi le voyage', 'Tell me about the voyage')}</h2>
+    <p>${t('Chaque chapitre est une planète, comme celles que visite le petit prince. La carte vole de récit en récit pendant que vous lisez.', 'Each chapter is a planet, like the ones the little prince visits. The map flies from story to story as you read.')}</p>
+    <div class="mode" role="group" aria-label="${t('Mode de lecture', 'Reading mode')}"><button data-mode="story" aria-pressed="${mode === 'story'}">▶ ${t('Raconte-moi', 'Tell me')}</button><button data-mode="list" aria-pressed="${mode === 'list'}">☰ ${t('Explorer (liste)', 'Explore (list)')}</button></div></div></div>
+  ${mode === 'story' ? `<div class="story">
+    <div class="smap" aria-hidden="true"><div class="smap-gl"></div><div class="smap-wait">${t('La carte se prépare…', 'Getting the map ready…')}</div><div class="smap-ov"><span class="chip" data-ov-pl></span><span class="chip dark cnt" data-ov-n></span></div></div>
+    <div class="scards">${STOPS.map(stopCard).join('')}</div>
+  </div>` : `<div class="wrap xlist">${explorer()}</div>`}
+  <div class="wrap" style="padding-bottom:64px"><div class="sillage" data-reveal>${P(sp) ? `<img src="${esc(P(sp, 1200))}" alt="" loading="lazy">` : ''}<div class="in"><div class="kick">${t('Sillage', 'Wake')}</div><h3>${t('Le voyage rejoué — la route telle qu’elle a été naviguée', 'The voyage replayed — the route as it was sailed')}</h3><a class="btn b-sun" href="#!">▶ ${t('Rejouer le voyage', 'Replay the voyage')}</a></div></div></div>
+</section>`;
+};
+
+const postCard = (p, big) => {
+  const ph = P(p, big ? 1200 : 600);
+  const body = `<div class="meta">${esc(WG.date(p.date))} · ${esc(p.author)}</div><h3>${esc(WG.title(p))}</h3><p>${esc(WG.excerpt(p, big ? 260 : 130))}</p>
+    <div class="foot">${p.etape_id ? `<span class="et">⛵ ${esc(WG.etape(p.etape_id))}</span>` : ''}${icons()}<span class="more">${t('Lire la suite', 'Read more')} →</span></div>`;
+  const img = `<div class="ph${ph ? '' : ' noph'}">${ph ? `<img src="${esc(ph)}" alt="${esc(WG.cap(p.photos[0]))}" loading="lazy">` : planet(chI(p.chapter_id), 90)}</div>`;
+  return big ? `<article class="feat" data-post="${esc(p.id)}">${img}<div class="bd"><div class="kick">${t('À la une', 'Featured')}</div>${body}</div></article>`
+    : `<article class="pc" data-post="${esc(p.id)}">${img}<div class="bd">${body}</div></article>`;
+};
+const filtered = () => D.posts.filter((p) => (!fCh || p.chapter_id === fCh) && (!fEt || p.etape_id === fEt));
+const carnetList = () => {
+  const l = filtered();
+  if (!l.length) return `<div class="empty">${t('Aucun récit pour ce choix.', 'No story matches this choice.')}</div>`;
+  return `<div class="count">${l.length} ${l.length > 1 ? t('récits', 'stories') : t('récit', 'story')}${l.length > 7 ? ` · ${t('les 7 plus récents', 'the 7 most recent')}` : ''}</div>${postCard(l[0], true)}${l.length > 1 ? `<div class="grid">${l.slice(1, 7).map((p) => postCard(p)).join('')}</div>` : ''}`;
+};
+const etOpts = () => `<option value="">${t('Toutes les étapes', 'All stages')}</option>${D.etapes.filter((e) => !fCh || e.chapter_id === fCh).map((e) => `<option value="${esc(e.id)}"${e.id === fEt ? ' selected' : ''}>${esc(WG.etape(e.id))}</option>`).join('')}`;
+const carnet = () => `
+<section class="sec" id="carnet" style="background:var(--sand)"><div class="wrap">
+  <div class="sec-h" data-reveal><div class="kick">${t('Carnet de bord', 'Ship’s log')}</div><h2>${t('Les derniers récits', 'The latest stories')}</h2><p>${t(`${D.stats.posts} récits, ${D.stats.etapes} étapes, ${nm(D.stats.nm)} milles : choisissez une planète ou une étape.`, `${D.stats.posts} stories, ${D.stats.etapes} stages, ${nm(D.stats.nm)} miles: pick a planet or a stage.`)}</p></div>
+  <div class="filters">
+    <label><span>${t('Chapitre', 'Chapter')}</span><select class="sel" data-f="ch"><option value="">${t('Tous les chapitres', 'All chapters')}</option>${CH.map((c, i) => `<option value="${esc(c.id)}"${c.id === fCh ? ' selected' : ''}>${ROM[i]} · ${esc(WG.chapter(c.id))}</option>`).join('')}</select></label>
+    <label><span>${t('Étape', 'Stage')}</span><select class="sel" data-f="et">${etOpts()}</select></label>
+  </div>
+  <div id="clist" aria-live="polite">${carnetList()}</div>
+  <div class="links"><a class="btn b-ink" href="#!">📖 ${t('Voir tout le journal', 'See the whole journal')}</a><a class="btn b-line" href="#!">📷 ${t('La galerie', 'The gallery')}</a></div>
+</div></section>`;
+
+const programme = () => `
+<section class="sec prog" id="programme"><div class="wrap">
+  <div class="sec-h" data-reveal><div class="kick">${t('Le Programme', 'The plan')}</div><h2>${t('Le tour du monde, planète après planète', 'Around the world, planet by planet')}</h2><p class="pnums">~${nm(36000)} nm · 35 ${t('étapes', 'stages')} · 2026–2029</p></div>
+  <div class="wmap" id="wmap" role="img" aria-label="${t('La route prévue autour du monde', 'The planned route around the world')}"></div>
+  <ol class="phases" data-allow-overflow>${WG.PHASES.map((ph, i) => `<li class="${i === 3 ? 'nx' : ''}"><span class="no">${String(i + 1).padStart(2, '0')}${i === 3 ? ` · ${t('PROCHAINE', 'NEXT')}` : ''}</span><b>${ph.flag} ${esc(ph.place)}</b><span class="pp">${esc(ph.period())}</span><small>${esc(ph.desc())}</small></li>`).join('')}</ol>
+  <div class="legs"><div><b>${t('Départ', 'Departure')}</b><span>Saint-Cyr · ${t('sept.', 'Sep')} 2026</span></div><div><b>3 ${t('océans', 'oceans')}</b><span>${t('Atlantique · Pacifique · Indien', 'Atlantic · Pacific · Indian')}</span></div><div><b>${t('Retour', 'Home')}</b><span>Saint-Cyr · ${t('été', 'summer')} 2029</span></div></div>
+  <div class="links"><a class="btn b-sun" href="#!">▶ ${t('Voir l’animation', 'Watch the animation')}</a><a class="btn b-line" href="#!">${t('Voir le programme', 'See the full plan')} →</a></div>
+</div></section>`;
+
+const crew = () => `
+<section class="sec" id="equipage" style="background:var(--sand)"><div class="wrap">
+  <div class="sec-h" data-reveal><div class="kick">${t('L’Équipage', 'The crew')}</div><h2>${t('Deux marins et un astéroïde', 'Two sailors and an asteroid')}</h2></div>
+  <div class="crew">
+    <div class="cm" data-reveal><div class="av"><img src="/images/photo2.webp" alt="Catherine" loading="lazy"></div><div class="e">🌹</div><h3>Catherine</h3><div class="r">${t('La Rose', 'The Rose')}</div><small>${t('Co-skipper · Navigatrice', 'Co-skipper · Navigator')}</small></div>
+    <div class="cm" data-reveal><div class="av"><img src="/images/photo3.webp" alt="Bertrand" loading="lazy"></div><div class="e">🦊</div><h3>Bertrand</h3><div class="r">${t('Le Renard', 'The Fox')}</div><small>${t('Skipper · Capitaine', 'Skipper · Captain')}</small></div>
+    <div class="cm" data-reveal><div class="av boatp"><img src="/images/boat.webp" alt="${t('Le catamaran Wang’ap', 'The catamaran Wang’ap')}" loading="lazy"></div><div class="e">⭐</div><h3>Wang’ap</h3><div class="r">${t('L’Astéroïde', 'The Asteroid')}</div><small>Outremer 52 · Catamaran</small></div>
+  </div>
+  <p class="tame">${esc(WG.quote('tame'))}</p>
+</div></section>`;
+
+const genese = () => `
+<section class="sec gen" id="genese"><div class="wrap gen-in">
+  <div data-reveal><div class="hwan" lang="ko">환갑<small>Hwangap · ${t('60 ans, un nouveau cycle', '60 years, a new cycle')}</small></div><img src="art/prince.webp" alt="" loading="lazy" width="900" height="600"></div>
+  <div data-reveal><div class="sec-h" style="margin-bottom:14px"><div class="kick">${t('La Genèse', 'Genesis')}</div><h2>${t('Une décision, un bateau, quatre ans de préparation', 'One decision, one boat, four years of preparation')}</h2></div>
+  <p>${t('Wang’ap est né d’un mot coréen — 환갑 (Hwangap) — une tradition millénaire célébrant les 60 ans comme le début d’un nouveau cycle. Depuis 2022, Catherine et Bertrand préparent ce tour du monde : formations, construction du bateau, logistique.', 'Wang’ap was born from a Korean word — 환갑 (Hwangap) — an age-old tradition that celebrates turning 60 as the start of a new cycle. Since 2022, Catherine and Bertrand have been preparing this voyage around the world: training, building the boat, logistics.')}</p>
+  <a class="btn b-ink" href="#!">${t('Lire la genèse complète', 'Read the full story')} →</a></div>
+</div></section>`;
+
+const forms = () => `
+<section class="sec" id="contact"><div class="wrap forms">
+  <form class="card" data-reveal><h3>${t('Nous envoyer un message', 'Send us a message')}</h3><p>${t('Un mot, une question, une escale à partager : on lit tout, au mouillage.', 'A note, a question, a port to share: we read everything at anchor.')}</p>
+    <div class="two"><label class="f"><span>${t('Prénom', 'First name')} *</span><input name="n" required autocomplete="given-name"></label><label class="f"><span>Email</span><input type="email" name="e" autocomplete="email"></label></div>
+    <label class="f"><span>${t('Téléphone (WhatsApp)', 'Phone (WhatsApp)')}</span><input type="tel" name="p" autocomplete="tel"></label>
+    <p class="hint">${t('Indiquez un email ou un téléphone pour que nous puissions vous répondre.', 'Leave an email or a phone number so we can reply.')}</p>
+    <label class="f"><span>Message</span><textarea name="m"></textarea></label>
+    <button class="btn b-ink" type="submit">${t('Envoyer', 'Send')} ✉️</button></form>
+  <form class="card" data-reveal><h3>${t('Suivre le voyage par email', 'Follow the voyage by email')}</h3><p>${t('Choisissez ce que vous voulez recevoir.', 'Choose what you’d like to receive.')}</p>
+    <label class="ck"><input type="checkbox" checked>📰 ${t('La newsletter', 'The newsletter')}</label>
+    <label class="ck"><input type="checkbox" checked>📝 ${t('Les nouvelles publications', 'New stories')}</label>
+    <label class="ck"><input type="checkbox">🧭 ${t('Les nouvelles étapes', 'New stages')}</label>
+    <label class="f" style="margin-top:14px"><span>Email</span><input type="email" autocomplete="email" placeholder="${t('vous@exemple.fr', 'you@example.com')}"></label>
+    <button class="btn b-sun" type="submit">${t('S’inscrire', 'Sign up')}</button></form>
+</div></section>`;
+
+const sky = (() => { let s = ''; let r = 7; const rnd = () => ((r = (r * 9301 + 49297) % 233280) / 233280); for (let i = 0; i < 70; i++) s += `<circle cx="${(rnd() * 100).toFixed(1)}%" cy="${(rnd() * 100).toFixed(1)}%" r="${(rnd() * 1.4 + .4).toFixed(1)}" fill="#fff" opacity="${(rnd() * .6 + .25).toFixed(2)}"/>`; return `<svg class="sky" aria-hidden="true">${s}</svg>`; })();
+const fin = () => `
+<section class="fin">${sky}<div class="wrap"><blockquote>${esc(WG.quote('stars'))}</blockquote><a class="btn b-ghost" href="#!">${t('Espace skippers', 'Skippers’ area')} →</a></div></section>
+<footer><div class="wrap"><span><b>Wang’ap</b> · Outremer 52 · 2026–2029</span><span>${t('Démo de design — contenus réels, liens inactifs', 'Design demo — real content, inactive links')}</span></div></footer>`;
+
+// ───────── cartes ─────────
+function heroMap() {
+  const el = document.getElementById('ou'); if (!el) return;
+  const tr = D.track, xs = tr.map((p) => p[0]), ys = tr.map((p) => p[1]);
+  let b = [[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]];
+  if (isDesk()) { const w = b[1][0] - b[0][0], W = el.clientWidth, panel = 540; b = [[b[0][0] - (w * panel) / Math.max(400, W - panel), b[0][1] - 0.6], [b[1][0] + 0.5, b[1][1]]]; }
+  else b = [[b[0][0], b[0][1] - 1.6], [b[1][0], b[1][1] + 0.8]];
+  WG.staticMap(el, { tiles: 'ocean', bounds: b, pad: 28, line: { color: '#F2843A', width: 3.4, glow: '#ffffff', draw: true }, boat: { html: '<span class="boat"><i></i><i></i><b></b><em>Wang’ap</em></span>' } });
+}
+function worldMap() {
+  const el = document.getElementById('wmap'); if (!el) return;
+  WG.staticMap(el, {
+    tiles: 'ocean', track: WG.ROUTE, split: false, boat: false, pad: 14, maxZoom: 3,
+    line: { color: '#F2843A', width: 2.6, dash: '7 6', glow: '#0E3B52' },
+    dots: [...WG.PHASES.map((ph, i) => ({ lon: ph.lonlat[0], lat: ph.lonlat[1], html: `<span class="pdot${i === 3 ? ' nx' : ''}"></span>`, title: ph.place })),
+      { lon: LAST[0], lat: LAST[1], html: '<span class="boat" style="width:14px;height:14px"><i></i><b></b></span>', title: t('Wang’ap — dernière position publique', 'Wang’ap — latest public position') }],
+  });
+}
+
+// MapLibre, chargée seulement quand le récit approche.
+let gl = null, glNode = null, glState = 0;
+const ML = 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl';
+const loadML = () => new Promise((res, rej) => {
+  if (window.maplibregl) return res(window.maplibregl);
+  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = `${ML}.css`; document.head.appendChild(l);
+  const s = document.createElement('script'); s.src = `${ML}.js`; s.onload = () => res(window.maplibregl); s.onerror = rej; document.head.appendChild(s);
+});
+const mls = (pts) => ({ type: 'Feature', properties: {}, geometry: { type: 'MultiLineString', coordinates: pts.length > 1 ? WG.segments(pts) : [] } });
+const bbox = (pts) => [[Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1]))], [Math.max(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[1]))]];
+const pad = () => (isDesk() ? { top: 80, bottom: 60, left: Math.min(innerWidth * 0.45, 40 + Math.max(32, innerWidth / 2 - 600) + 420), right: 60 } : { top: 46, bottom: 22, left: 24, right: 24 });
+async function initGL() {
+  if (glState) return; glState = 1;
+  const el = document.querySelector('.smap-gl'); if (!el) { glState = 0; return; }
+  glNode = el;
+  let ml;
+  try { ml = await loadML(); } catch {
+    glState = 3; const box = document.querySelector('.smap'); box?.classList.add('ready');
+    WG.staticMap(el, { tiles: 'ocean', line: { color: '#F2843A', width: 3, glow: '#fff' }, boat: { html: '<span class="boat"><b></b></span>' }, dots: located.map((p) => ({ lon: p.lon, lat: p.lat, html: '<span class="pdot"></span>' })) });
+    return;
+  }
+  gl = new ml.Map({
+    container: el, interactive: false, attributionControl: { compact: true }, fadeDuration: 0,
+    bounds: bbox(D.track), fitBoundsOptions: { padding: pad() },
+    style: { version: 8, sources: { esri: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}'], tileSize: 256, maxzoom: 13, attribution: 'Esri' } },
+      layers: [{ id: 'bg', type: 'background', paint: { 'background-color': '#A9CDE0' } }, { id: 'esri', type: 'raster', source: 'esri' }] },
+  });
+  gl.on('load', () => {
+    const L = { 'line-cap': 'round', 'line-join': 'round' };
+    gl.addSource('all', { type: 'geojson', data: mls(D.track) });
+    gl.addSource('done', { type: 'geojson', data: mls([]) });
+    gl.addSource('stops', { type: 'geojson', data: { type: 'FeatureCollection', features: located.map((p) => ({ type: 'Feature', properties: { id: p.id }, geometry: { type: 'Point', coordinates: [p.lon, p.lat] } })) } });
+    gl.addLayer({ id: 'all', type: 'line', source: 'all', layout: L, paint: { 'line-color': '#0E3B52', 'line-width': 2, 'line-opacity': .45, 'line-dasharray': [1.5, 2] } });
+    gl.addLayer({ id: 'done-g', type: 'line', source: 'done', layout: L, paint: { 'line-color': '#fff', 'line-width': 8, 'line-opacity': .7 } });
+    gl.addLayer({ id: 'done', type: 'line', source: 'done', layout: L, paint: { 'line-color': '#F2843A', 'line-width': 3.6 } });
+    gl.addLayer({ id: 'stops', type: 'circle', source: 'stops', paint: { 'circle-radius': 4.5, 'circle-color': '#fff', 'circle-stroke-color': '#0E3B52', 'circle-stroke-width': 2 } });
+    gl.addLayer({ id: 'on', type: 'circle', source: 'stops', filter: ['==', ['get', 'id'], ''], paint: { 'circle-radius': 10, 'circle-color': '#F2843A', 'circle-stroke-color': '#fff', 'circle-stroke-width': 3.5 } });
+    const m = document.createElement('div'); m.innerHTML = '<span class="boat"><i></i><i></i><b></b></span>';
+    new ml.Marker({ element: m.firstChild }).setLngLat(LAST).addTo(gl);
+    glState = 2; document.querySelector('.smap')?.classList.add('ready');
+    go(active, true);
+  });
+}
+let lastIdx = -1;
+function go(i, jump) {
+  const s = STOPS[i]; if (!s) return;
+  const ov = document.querySelector('[data-ov-pl]'), on = document.querySelector('[data-ov-n]');
+  const ci = s.type === 'post' || s.type === 'ch' ? s.ci : s.type === 'end' ? CH.length - 1 : -1;
+  if (ov) ov.innerHTML = ci >= 0 ? `${planet(ci, 26)}${t('Planète', 'Planet')} ${ROM[ci]} · ${esc(plName(ci))}` : `${planet(2, 26)}${t('Le voyage entier', 'The whole voyage')}`;
+  const posts = STOPS.filter((x) => x.type === 'post'), k = s.type === 'post' ? posts.indexOf(s) + 1 : 0;
+  if (on) on.textContent = s.type === 'post' ? `${String(k).padStart(2, '0')} / ${posts.length} · ${short(s.p.date)}` : s.type === 'end' ? `${posts.length} / ${posts.length}` : `00 / ${posts.length}`;
+  if (glState !== 2) return;
+  if (s.idx !== lastIdx) { gl.getSource('done').setData(mls(D.track.slice(0, s.idx + 1))); lastIdx = s.idx; }
+  gl.setFilter('on', ['==', ['get', 'id'], s.type === 'post' ? s.p.id : '']);
+  const p = pad(), how = RM || jump ? 'jump' : 'fly';
+  if (s.type === 'post' || s.type === 'end') {
+    const center = s.type === 'post' ? [s.p.lon, s.p.lat] : LAST, zoom = s.type === 'post' ? 7.6 : 6.4;
+    if (how === 'jump') gl.jumpTo({ center, zoom, padding: p }); else gl.flyTo({ center, zoom, padding: p, speed: 0.9, curve: 1.5, maxDuration: 3200, essential: false });
+  } else {
+    const pts = s.type === 'ch' ? s.pts : D.track, b = bbox(pts);
+    const opts = { padding: p, maxZoom: 7, duration: how === 'jump' ? 0 : 2400, essential: false };
+    gl.fitBounds(b, opts);
+  }
+}
+
+// La carte sait où l'on en est : la carte dont le centre est le plus proche de la « ligne de lecture ».
+let raf = 0;
+function onScroll() {
+  if (raf) return;
+  raf = requestAnimationFrame(() => {
+    raf = 0;
+    const st = document.querySelector('.story'); if (!st) return;
+    const r = st.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+    const line = innerHeight * (isDesk() ? 0.5 : 0.74);
+    let best = -1, bd = 1e9;
+    document.querySelectorAll('.scard').forEach((c) => { const q = c.getBoundingClientRect(); const d = Math.abs((q.top + q.bottom) / 2 - line); if (d < bd) { bd = d; best = +c.dataset.i; } });
+    if (best >= 0 && best !== active) {
+      document.querySelector(`.scard[data-i="${active}"]`)?.classList.remove('on');
+      active = best; document.querySelector(`.scard[data-i="${active}"]`)?.classList.add('on');
+      go(active);
+    }
+  });
+}
+addEventListener('scroll', onScroll, { passive: true });
+addEventListener('resize', () => { if (gl) { gl.resize(); go(active, true); } });
+
+// ───────── assemblage ─────────
+function render() {
+  const keep = glNode; keep?.remove();
+  document.getElementById('app').innerHTML = header() + '<main>' + hero() + board() + recit() + carnet() + programme() + crew() + genese() + forms() + '</main>' + fin();
+  heroMap(); worldMap();
+  if (!first) document.querySelectorAll('[data-reveal]').forEach((e) => e.classList.add('is-in'));
+  WG.reveal();
+  countUps();
+  const slot = document.querySelector('.smap-gl');
+  if (slot && keep) { slot.replaceWith(keep); document.querySelector('.smap').classList.toggle('ready', glState >= 2); gl?.resize(); }
+  if (slot && !keep && glState === 0) watchStory();
+  go(active, true);
+  first = false;
+}
+function watchStory() {
+  const st = document.getElementById('recit');
+  if (!('IntersectionObserver' in window)) return initGL();
+  const io = new IntersectionObserver((e) => { if (e.some((x) => x.isIntersecting)) { io.disconnect(); initGL(); } }, { rootMargin: '1200px 0px' });
+  io.observe(st);
+}
+function countUps() {
+  const els = document.querySelectorAll('[data-count]');
+  if (RM || !('IntersectionObserver' in window)) { els.forEach((e) => { e.textContent = nmB(+e.dataset.v); counted.add(e.dataset.count); }); return; }
+  const io = new IntersectionObserver((ents) => ents.forEach((en) => {
+    if (!en.isIntersecting) return; io.unobserve(en.target);
+    const el = en.target, v = +el.dataset.v, k = el.dataset.count; if (counted.has(k)) return; counted.add(k);
+    const t0 = performance.now(), dur = 1400;
+    const step = (now) => { const x = Math.min(1, (now - t0) / dur); el.textContent = nmB(Math.round(v * (1 - Math.pow(1 - x, 3)))); if (x < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }), { threshold: 0.4 });
+  els.forEach((e) => { if (!counted.has(e.dataset.count)) io.observe(e); });
+}
+
+document.addEventListener('click', (e) => {
+  const lb = e.target.closest('[data-lang]'); if (lb) { WG.setLang(lb.dataset.lang); return; }
+  if (e.target.closest('[data-menu]')) { menu = !menu; const d = document.querySelector('.drawer'); d.classList.toggle('on', menu); menu ? d.removeAttribute('aria-hidden') : d.setAttribute('aria-hidden', 'true'); document.querySelectorAll('.top [data-menu]').forEach((b) => b.setAttribute('aria-expanded', menu)); return; }
+  if (e.target.closest('[data-close]') && menu) { menu = false; document.querySelector('.drawer').classList.remove('on'); document.querySelector('.drawer').setAttribute('aria-hidden', 'true'); }
+  const mb = e.target.closest('[data-mode]');
+  if (mb && mb.dataset.mode !== mode) {
+    mode = mb.dataset.mode; const y = scrollY;
+    render(); scrollTo({ top: y, behavior: 'instant' });
+  }
+});
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[href^="#"]'); const h = a?.getAttribute('href');
+  if (!h || h === '#!' || a.hasAttribute('data-post')) return;
+  const tg = h === '#top' ? document.body : document.querySelector(h); if (!tg) return;
+  e.preventDefault(); h === '#top' ? scrollTo({ top: 0, behavior: RM ? 'auto' : 'smooth' }) : tg.scrollIntoView({ behavior: RM ? 'auto' : 'smooth' });
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menu) { menu = false; document.querySelector('.drawer')?.classList.remove('on'); } });
+document.addEventListener('change', (e) => {
+  const s = e.target.closest('[data-f]'); if (!s) return;
+  if (s.dataset.f === 'ch') { fCh = s.value; if (fEt && !D.etapes.some((x) => x.id === fEt && (!fCh || x.chapter_id === fCh))) fEt = ''; document.querySelector('[data-f="et"]').innerHTML = etOpts(); }
+  else fEt = s.value;
+  document.getElementById('clist').innerHTML = carnetList();
+});
+addEventListener('wg:lang', () => { const y = scrollY; render(); scrollTo({ top: y, behavior: 'instant' }); });
+
+WG.inert();
+render();
+})();
+</script>
+<script src="survey.js"></script>
+</body>
+</html>

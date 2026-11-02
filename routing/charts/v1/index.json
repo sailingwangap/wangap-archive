@@ -1,0 +1,497 @@
+{
+ "v": 1,
+ "builtAt": "2026-10-27T21:22:13.358Z",
+ "tileDeg": 5,
+ "cellDeg": 0.01,
+ "sources": {
+  "coast": "OpenStreetMap simplified land polygons (2026-10-24)",
+  "depth": "ETOPO 2022 15″ (NOAA ERDDAP)",
+  "tss": "OpenSeaMap / Overpass (2026-10-27)"
+ },
+ "zones": {
+  "atlantique-est": [
+   -30,
+   10,
+   5,
+   45
+  ]
+ },
+ "ties": {
+  "lat": {
+   "10": 24000,
+   "11": 24240,
+   "12": 24480,
+   "13": 24720,
+   "14": 24960,
+   "15": 25200,
+   "16": 25440,
+   "17": 25680,
+   "18": 25920,
+   "19": 26160,
+   "20": 26400,
+   "21": 26640,
+   "22": 26880,
+   "23": 27120,
+   "24": 27360,
+   "25": 27600,
+   "26": 27840,
+   "27": 28080,
+   "28": 28320,
+   "29": 28560,
+   "30": 28799,
+   "31": 29040,
+   "32": 29280,
+   "33": 29520,
+   "34": 29760,
+   "35": 30000,
+   "36": 30240,
+   "37": 30480,
+   "38": 30720,
+   "39": 30960,
+   "40": 31200,
+   "41": 31440,
+   "42": 31680,
+   "43": 31920,
+   "44": 32160,
+   "45": 32400
+  },
+  "lon": {
+   "0": 43199,
+   "1": 43440,
+   "2": 43680,
+   "3": 43920,
+   "4": 44160,
+   "5": 44400,
+   "-30": 35999,
+   "-29": 36240,
+   "-28": 36480,
+   "-27": 36720,
+   "-26": 36960,
+   "-25": 37200,
+   "-24": 37440,
+   "-23": 37680,
+   "-22": 37920,
+   "-21": 38160,
+   "-20": 38400,
+   "-19": 38640,
+   "-18": 38880,
+   "-17": 39120,
+   "-16": 39359,
+   "-15": 39600,
+   "-14": 39840,
+   "-13": 40080,
+   "-12": 40320,
+   "-11": 40560,
+   "-10": 40800,
+   "-9": 41040,
+   "-8": 41280,
+   "-7": 41520,
+   "-6": 41760,
+   "-5": 42000,
+   "-4": 42240,
+   "-3": 42480,
+   "-2": 42720,
+   "-1": 42960
+  }
+ },
+ "tss": {
+  "file": "tss.json",
+  "bytes": 22747,
+  "sha": "f490e716c3ef6d36",
+  "elements": 108
+ },
+ "tiles": {
+  "-10_10": {
+   "file": "t_-10_10.wgt",
+   "bytes": 1628,
+   "sha": "79d2b10d0173bdb2",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "-10_15": {
+   "file": "t_-10_15.wgt",
+   "bytes": 1628,
+   "sha": "9676ca46a023ee9c",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "-10_20": {
+   "file": "t_-10_20.wgt",
+   "bytes": 1629,
+   "sha": "bc7d5937112a9e52",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "-10_25": {
+   "file": "t_-10_25.wgt",
+   "bytes": 3862,
+   "sha": "8aa91a46767f392b",
+   "edges": 22,
+   "land": true,
+   "shelf": true
+  },
+  "-10_30": {
+   "file": "t_-10_30.wgt",
+   "bytes": 51162,
+   "sha": "f0e457788413bafe",
+   "edges": 385,
+   "land": true,
+   "shelf": true
+  },
+  "-10_35": {
+   "file": "t_-10_35.wgt",
+   "bytes": 77881,
+   "sha": "d8e6b22a640b503f",
+   "edges": 1678,
+   "land": true,
+   "shelf": true
+  },
+  "-10_40": {
+   "file": "t_-10_40.wgt",
+   "bytes": 81084,
+   "sha": "38ac2c8b8772d265",
+   "edges": 2131,
+   "land": true,
+   "shelf": true
+  },
+  "-15_10": {
+   "file": "t_-15_10.wgt",
+   "bytes": 29848,
+   "sha": "e9a11479540c2963",
+   "edges": 1457,
+   "land": true,
+   "shelf": true
+  },
+  "-15_15": {
+   "file": "t_-15_15.wgt",
+   "bytes": 1629,
+   "sha": "ca9c43500da488bd",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "-15_20": {
+   "file": "t_-15_20.wgt",
+   "bytes": 3030,
+   "sha": "6c8904c1ec013d79",
+   "edges": 18,
+   "land": true,
+   "shelf": true
+  },
+  "-15_25": {
+   "file": "t_-15_25.wgt",
+   "bytes": 70230,
+   "sha": "44ccf2225ddbc45a",
+   "edges": 548,
+   "land": true,
+   "shelf": true
+  },
+  "-15_30": {
+   "file": "t_-15_30.wgt",
+   "bytes": 8981,
+   "sha": "9c988811baf85ac6",
+   "edges": 0,
+   "land": false,
+   "shelf": true
+  },
+  "-15_35": {
+   "file": "t_-15_35.wgt",
+   "bytes": 3180,
+   "sha": "ae8f7aa7a969b75a",
+   "edges": 0,
+   "land": false,
+   "shelf": true
+  },
+  "-15_40": {
+   "file": "t_-15_40.wgt",
+   "bytes": 1626,
+   "sha": "e317d2bad157b2ff",
+   "edges": 0,
+   "land": false,
+   "shelf": false
+  },
+  "-20_10": {
+   "file": "t_-20_10.wgt",
+   "bytes": 116992,
+   "sha": "e0e40880d8bd4435",
+   "edges": 2955,
+   "land": true,
+   "shelf": true
+  },
+  "-20_15": {
+   "file": "t_-20_15.wgt",
+   "bytes": 46473,
+   "sha": "e6b9be9cc93ea0af",
+   "edges": 255,
+   "land": true,
+   "shelf": true
+  },
+  "-20_20": {
+   "file": "t_-20_20.wgt",
+   "bytes": 55821,
+   "sha": "e7574693206c4400",
+   "edges": 419,
+   "land": true,
+   "shelf": true
+  },
+  "-20_25": {
+   "file": "t_-20_25.wgt",
+   "bytes": 30459,
+   "sha": "7922170bb5012367",
+   "edges": 630,
+   "land": true,
+   "shelf": true
+  },
+  "-20_30": {
+   "file": "t_-20_30.wgt",
+   "bytes": 10322,
+   "sha": "864f396238051665",
+   "edges": 191,
+   "land": true,
+   "shelf": true
+  },
+  "-20_35": {
+   "file": "t_-20_35.wgt",
+   "bytes": 1624,
+   "sha": "42c413d012f83338",
+   "edges": 0,
+   "land": false,
+   "shelf": false
+  },
+  "-20_40": {
+   "file": "t_-20_40.wgt",
+   "bytes": 1625,
+   "sha": "10240667b0934574",
+   "edges": 0,
+   "land": false,
+   "shelf": false
+  },
+  "-25_10": {
+   "file": "t_-25_10.wgt",
+   "bytes": 5073,
+   "sha": "df0799f29e8ab7d0",
+   "edges": 152,
+   "land": true,
+   "shelf": true
+  },
+  "-25_15": {
+   "file": "t_-25_15.wgt",
+   "bytes": 24929,
+   "sha": "c0c2f7272169f1ea",
+   "edges": 516,
+   "land": true,
+   "shelf": true
+  },
+  "-25_20": {
+   "file": "t_-25_20.wgt",
+   "bytes": 1625,
+   "sha": "664a5b2283499885",
+   "edges": 0,
+   "land": false,
+   "shelf": false
+  },
+  "-25_25": {
+   "file": "t_-25_25.wgt",
+   "bytes": 1624,
+   "sha": "02041d8f9ecc5849",
+   "edges": 0,
+   "land": false,
+   "shelf": false
+  },
+  "-25_30": {
+   "file": "t_-25_30.wgt",
+   "bytes": 1631,
+   "sha": "e8cfe538646ef998",
+   "edges": 0,
+   "land": false,
+   "shelf": false
+  },
+  "-25_35": {
+   "file": "t_-25_35.wgt",
+   "bytes": 2327,
+   "sha": "300f6bb440ff9935",
+   "edges": 19,
+   "land": false,
+   "shelf": true
+  },
+  "-25_40": {
+   "file": "t_-25_40.wgt",
+   "bytes": 1625,
+   "sha": "48b866d0ff9e770b",
+   "edges": 0,
+   "land": false,
+   "shelf": false
+  },
+  "-30_10": {
+   "file": "t_-30_10.wgt",
+   "bytes": 1631,
+   "sha": "8f3b1dfb76d6823d",
+   "edges": 0,
+   "land": false,
+   "shelf": false
+  },
+  "-30_15": {
+   "file": "t_-30_15.wgt",
+   "bytes": 5616,
+   "sha": "61b6ab06b4577b23",
+   "edges": 106,
+   "land": true,
+   "shelf": true
+  },
+  "-30_20": {
+   "file": "t_-30_20.wgt",
+   "bytes": 1631,
+   "sha": "0ca35df3b2170657",
+   "edges": 0,
+   "land": false,
+   "shelf": false
+  },
+  "-30_25": {
+   "file": "t_-30_25.wgt",
+   "bytes": 1627,
+   "sha": "93310d18f8ea31e2",
+   "edges": 0,
+   "land": false,
+   "shelf": false
+  },
+  "-30_30": {
+   "file": "t_-30_30.wgt",
+   "bytes": 1690,
+   "sha": "a46c9d2aebdbed3f",
+   "edges": 0,
+   "land": false,
+   "shelf": true
+  },
+  "-30_35": {
+   "file": "t_-30_35.wgt",
+   "bytes": 19015,
+   "sha": "5386e34c603de4dd",
+   "edges": 447,
+   "land": true,
+   "shelf": true
+  },
+  "-30_40": {
+   "file": "t_-30_40.wgt",
+   "bytes": 1629,
+   "sha": "bc327e965e057b5f",
+   "edges": 0,
+   "land": false,
+   "shelf": false
+  },
+  "-5_10": {
+   "file": "t_-5_10.wgt",
+   "bytes": 1627,
+   "sha": "5366d878120fa9ea",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "-5_15": {
+   "file": "t_-5_15.wgt",
+   "bytes": 1628,
+   "sha": "80214bb5cd5e484a",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "-5_20": {
+   "file": "t_-5_20.wgt",
+   "bytes": 1628,
+   "sha": "2f8f265e44a9afd1",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "-5_25": {
+   "file": "t_-5_25.wgt",
+   "bytes": 1624,
+   "sha": "3976c8c402026b30",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "-5_30": {
+   "file": "t_-5_30.wgt",
+   "bytes": 1632,
+   "sha": "d14c089f91da43c3",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "-5_35": {
+   "file": "t_-5_35.wgt",
+   "bytes": 65035,
+   "sha": "76dd97d8b2c3e01d",
+   "edges": 1452,
+   "land": true,
+   "shelf": true
+  },
+  "-5_40": {
+   "file": "t_-5_40.wgt",
+   "bytes": 41058,
+   "sha": "13125cbd23a8241d",
+   "edges": 936,
+   "land": true,
+   "shelf": true
+  },
+  "0_10": {
+   "file": "t_0_10.wgt",
+   "bytes": 1634,
+   "sha": "08af2962410de2c1",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "0_15": {
+   "file": "t_0_15.wgt",
+   "bytes": 1634,
+   "sha": "893d4e8b354990e3",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "0_20": {
+   "file": "t_0_20.wgt",
+   "bytes": 1634,
+   "sha": "a223d5f8996100d6",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "0_25": {
+   "file": "t_0_25.wgt",
+   "bytes": 1631,
+   "sha": "665dc67576d24cd9",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "0_30": {
+   "file": "t_0_30.wgt",
+   "bytes": 1635,
+   "sha": "16fd9b581209448d",
+   "edges": 0,
+   "land": true,
+   "shelf": false
+  },
+  "0_35": {
+   "file": "t_0_35.wgt",
+   "bytes": 69838,
+   "sha": "140aec7072353921",
+   "edges": 1579,
+   "land": true,
+   "shelf": true
+  },
+  "0_40": {
+   "file": "t_0_40.wgt",
+   "bytes": 58745,
+   "sha": "cecd75c597a1420a",
+   "edges": 1273,
+   "land": true,
+   "shelf": true
+  }
+ }
+}

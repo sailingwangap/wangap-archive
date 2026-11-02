@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Wang'ap — La Synthèse (à venir)</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="wg.css">
+<style>
+  /* Design 7 — PLACEHOLDER (Flavien, 18 oct.) : la future « combinaison » des six
+     propositions, construite à partir des avis de Catherine et Bertrand. Pas de
+     questionnaire ici tant qu'il n'y a rien à juger (la 119 n'accepte que d1–d6). */
+  :root {
+    --bg: #FBF7EF; --card: #FFFFFF; --ink: #1D2B44; --muted: #5E6B7A; --line: #E7E1D4;
+    --teal: #1B9AAA; --teal-d: #157C89; --gold: #E8B059;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--sans); }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+  header.top { position: sticky; top: 0; z-index: 50; background: rgba(251,247,239,.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
+  header.top .wrap { display: flex; align-items: center; gap: 10px; height: 58px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+  .brand img { width: 38px; height: 38px; border-radius: 10px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+  .brand b { font-size: 19px; font-weight: 800; }
+  .brand span { font-size: 13px; color: var(--muted); display: block; line-height: 1; margin-top: 2px; }
+  .flags { margin-left: auto; display: flex; gap: 4px; }
+  .flags button { width: 40px; height: 34px; border-radius: 9px; border: 1.5px solid transparent; background: transparent; font-size: 20px; cursor: pointer; }
+  .flags button[aria-pressed="true"] { border-color: var(--teal); background: #fff; }
+
+  .hero { padding-top: 34px; padding-bottom: 10px; display: grid; gap: 26px; align-items: center; }
+  @media (min-width: 820px) { .hero { grid-template-columns: 1.2fr 1fr; padding-top: 52px; } }
+  .kick { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--teal-d); margin-bottom: 10px; }
+  .kick i { font-style: normal; background: var(--ink); color: #fff; border-radius: 99px; padding: 3px 9px; letter-spacing: 0; }
+  h1 { font: 700 clamp(30px, 6vw, 46px)/1.1 var(--serif); margin: 0 0 14px; }
+  .lead { font-size: 17px; color: #354357; margin: 0 0 12px; }
+  .soon { display: inline-flex; align-items: center; gap: 8px; background: #FDF1D8; color: #8A5A12; font-weight: 700; font-size: 14px; border-radius: 99px; padding: 6px 12px; }
+
+  /* La maquette « en chantier » : un téléphone et un écran en pointillés. */
+  .mock { position: relative; height: 300px; }
+  .mock .desk, .mock .phone { position: absolute; border: 2px dashed #CBBFA6; background: repeating-linear-gradient(135deg, rgba(232,176,89,.07) 0 12px, transparent 12px 24px), #FFFDF8; display: grid; place-items: center; text-align: center; color: var(--muted); font-size: 14px; }
+  .mock .desk { left: 0; top: 18px; width: 78%; height: 230px; border-radius: 14px; }
+  .mock .phone { right: 0; top: 60px; width: 34%; max-width: 150px; height: 230px; border-radius: 22px; background-color: #fff; }
+  .mock .bars { width: 70%; display: grid; gap: 8px; }
+  .mock .bars span { display: block; height: 10px; border-radius: 6px; background: #EFE7D6; }
+  .mock .bars span:nth-child(1) { width: 60%; height: 14px; background: #E6DCC6; }
+  .mock .bars span:nth-child(3) { width: 80%; }
+  .mock .tag { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); white-space: nowrap; background: var(--ink); color: #fff; font-weight: 700; font-size: 13px; padding: 7px 14px; border-radius: 99px; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+  .mock img { position: absolute; left: -6px; bottom: -8px; width: 120px; filter: drop-shadow(0 8px 16px rgba(0,0,0,.12)); }
+
+  h2 { font: 700 24px/1.2 var(--serif); margin: 38px 0 12px; }
+  .steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; counter-reset: s; }
+  @media (min-width: 760px) { .steps { grid-template-columns: repeat(3, 1fr); } }
+  .steps li { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px 14px 56px; position: relative; font-size: 15px; }
+  .steps li::before { counter-increment: s; content: counter(s); position: absolute; left: 14px; top: 14px; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: #fff; font-weight: 700; display: grid; place-items: center; }
+  .steps strong { display: block; margin-bottom: 2px; }
+  .note { margin: 22px 0 0; background: #fff; border: 1px dashed #D8CDB6; border-radius: 16px; padding: 14px 16px; font-size: 15px; }
+  .acts { display: flex; gap: 10px; flex-wrap: wrap; margin: 26px 0 0; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 46px; padding: 10px 18px; border-radius: 14px; font-weight: 700; font-size: 15px; text-decoration: none; }
+  .btn.primary { background: var(--ink); color: #fff; }
+  .btn.ghost { background: #fff; color: var(--ink); border: 1.5px solid #CFC7B6; }
+  footer { padding: 34px 0 calc(40px + env(safe-area-inset-bottom, 0px)); text-align: center; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><img src="/images/logo.webp" alt=""><div><b>wang'ap</b><span id="sub"></span></div></a>
+  <div class="flags" role="group" aria-label="Langue / Language">
+    <button type="button" data-lang="fr" aria-label="Français">🇫🇷</button>
+    <button type="button" data-lang="en" aria-label="English">🇬🇧</button>
+  </div>
+</div></header>
+<main id="app"></main>
+<script src="data.js"></script>
+<script src="wg.js"></script>
+<script>
+(function () {
+  const { t } = WG;
+  const app = document.getElementById('app');
+  function render() {
+    document.getElementById('sub').textContent = t('Revue du design · page publique', 'Design review · public page');
+    document.querySelectorAll('[data-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === WG.lang)));
+    app.innerHTML = `
+    <section class="wrap hero">
+      <div>
+        <div class="kick"><i>7</i> ${t('La Synthèse', 'The Synthesis')}</div>
+        <h1>${t('La combinaison finale', 'The final combination')}</h1>
+        <p class="lead">${t('Ici prendra place la maquette qui réunit le meilleur des six propositions — les éléments que vous aurez choisis, ensemble.', 'This is where the mock-up bringing together the best of the six proposals will appear — the elements you will have chosen, together.')}</p>
+        <p class="lead">${t('Prenez tout votre temps pour en discuter : vos avis restent enregistrés, et vous pouvez les compléter ou les modifier à tout moment.', 'Take all the time you need to talk it over: your views stay saved, and you can add to them or change them at any time.')}</p>
+        <span class="soon">⏳ ${t('En préparation', 'In preparation')}</span>
+      </div>
+      <div class="mock" aria-hidden="true">
+        <div class="desk"><div class="bars"><span></span><span></span><span></span><span></span></div></div>
+        <div class="phone"><div class="bars"><span></span><span></span><span></span></div></div>
+        <img src="art/prince.webp" alt="">
+        <span class="tag">${t('Maquette à venir', 'Mock-up coming soon')}</span>
+      </div>
+    </section>
+    <section class="wrap">
+      <h2>${t('Comment elle sera construite', 'How it will be built')}</h2>
+      <ol class="steps">
+        <li><strong>${t('Vos avis', 'Your views')}</strong>${t('Ce que vous aimez, n’aimez pas et changeriez, design par design.', 'What you like, dislike and would change, design by design.')}</li>
+        <li><strong>${t('Votre discussion', 'Your discussion')}</strong>${t('Votre bilan : classement, mélange idéal, idées en plus.', 'Your wrap-up: ranking, ideal mix, extra ideas.')}</li>
+        <li><strong>${t('Une maquette', 'A mock-up')}</strong>${t('Les éléments retenus réunis sur une seule page — que vous pourrez à nouveau commenter.', 'The chosen elements brought together on one page — which you will be able to comment on again.')}</li>
+      </ol>
+      <p class="note">${t('Comme les six autres, ce sera une maquette : les vrais textes et les vraies photos, toutes les fonctions conservées, et aucun changement sur wangap.fr tant que vous ne l’aurez pas validée.', 'Like the other six, it will be a mock-up: the real texts and photos, every feature kept, and no change to wangap.fr until you have approved it.')}</p>
+      <div class="acts">
+        <a class="btn primary" href="index.html">← ${t('Revenir aux six designs', 'Back to the six designs')}</a>
+        <a class="btn ghost" href="index.html#bilan">✍️ ${t('Compléter mon bilan', 'Add to my wrap-up')}</a>
+      </div>
+    </section>
+    <footer class="wrap">${t('Page de travail, non référencée.', 'A working page, not indexed.')}</footer>`;
+  }
+  document.querySelectorAll('[data-lang]').forEach((b) => b.addEventListener('click', () => WG.setLang(b.dataset.lang)));
+  window.addEventListener('wg:lang', render);
+  render();
+})();
+</script>
+</body>
+</html>

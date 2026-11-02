@@ -1,0 +1,1 @@
+var e=`wangap:toast`,t=new Map,n={queued:2500};function r({kind:r=`info`,message:i,durationMs:a}){if(!i||typeof window>`u`)return;let o=n[r];if(o){let e=t.get(r)||0;if(Date.now()-e<o)return;t.set(r,Date.now())}try{window.dispatchEvent(new CustomEvent(e,{detail:{kind:r,message:i,durationMs:a}}))}catch{}}var i=e;export{r as n,i as t};
