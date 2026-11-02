@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Le routage pas à pas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap">
+<style>
+  /* Layout: one reading column on a sea-mist ground (same series as « Le conseiller de route de Wang'ap »);
+     a sticky strip of anchors; each step = its number, what the closed line says, a few lines, and the real screenshot beside it on wide screens. */
+  :root {
+    --bg: #edf2f1;
+    --paper: #fafcfb;
+    --sand: #ebe2cf;
+    --sand-ink: #6a532c;
+    --fg: #14293a;
+    --muted: #4c606d;
+    --line: #d2dcdb;
+    --accent: #0e636e;
+    --accent-soft: #d9ebeb;
+    --ok: #2e7a49;
+    --warn: #a8740f;
+    --bad: #b33f2e;
+    --num-bg: #1b2a44;
+    --num-fg: #fafcfb;
+    --shot-edge: #c3cfce;
+    --shadow: 0 1px 2px rgba(20, 41, 58, 0.08), 0 6px 18px rgba(20, 41, 58, 0.08);
+    --font-display: "Newsreader", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-data: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b1920;
+      --paper: #11232d;
+      --sand: #2a271f;
+      --sand-ink: #d8c394;
+      --fg: #dce6e8;
+      --muted: #9aaeb5;
+      --line: #22404b;
+      --accent: #6cc2c8;
+      --accent-soft: #15383f;
+      --ok: #6cbf89;
+      --warn: #e1b24c;
+      --bad: #ec8b75;
+      --num-bg: #dce6e8;
+      --num-fg: #0b1920;
+      --shot-edge: #2c4a55;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 18px rgba(0, 0, 0, 0.25);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b1920;
+    --paper: #11232d;
+    --sand: #2a271f;
+    --sand-ink: #d8c394;
+    --fg: #dce6e8;
+    --muted: #9aaeb5;
+    --line: #22404b;
+    --accent: #6cc2c8;
+    --accent-soft: #15383f;
+    --ok: #6cbf89;
+    --warn: #e1b24c;
+    --bad: #ec8b75;
+    --num-bg: #dce6e8;
+    --num-fg: #0b1920;
+    --shot-edge: #2c4a55;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 18px rgba(0, 0, 0, 0.25);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  img { max-width: 100%; height: auto; }
+  main {
+    max-width: 52rem;
+    margin-inline: auto;
+    padding-inline: 16px;
+    padding-block: 2rem 3.5rem;
+  }
+  p { margin: 0; }
+  strong, b { font-weight: 600; }
+  a { color: var(--accent); text-underline-offset: 0.18em; overflow-wrap: anywhere; }
+  a:focus-visible, .strip:focus-visible, nav.toc a:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px;
+  }
+  .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  kbd, .ui {
+    font-family: var(--font-body); font-size: 0.92em; font-weight: 600;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px;
+    padding: 0.02rem 0.35rem; white-space: nowrap;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead { display: grid; gap: 0.75rem; padding-block-end: 1.5rem; }
+  .kicker {
+    font-family: var(--font-data); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+  }
+  h1 {
+    font-family: var(--font-display); font-weight: 500; font-size: clamp(2.1rem, 8vw, 3rem);
+    line-height: 1.05; letter-spacing: -0.01em; margin: 0; text-wrap: balance;
+  }
+  .byline { font-family: var(--font-display); font-style: italic; font-size: 1.05rem; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .chip {
+    font-family: var(--font-data); font-size: 0.75rem; letter-spacing: 0.02em;
+    padding: 0.2rem 0.6rem; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); background: var(--paper);
+    white-space: nowrap;
+  }
+  .chip.live { color: var(--ok); border-color: currentColor; }
+  .lead { font-family: var(--font-display); font-size: 1.22rem; line-height: 1.5; }
+  .since { color: var(--muted); font-size: 0.92rem; }
+
+  /* ---------- Sticky anchors ---------- */
+  nav.toc {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    margin-inline: -16px; padding: 0.55rem 16px;
+    background: var(--bg); border-bottom: 1px solid var(--line); border-top: 1px solid var(--line);
+  }
+  nav.toc ul {
+    list-style: none; margin: 0; padding: 0 0 2px; display: flex; gap: 0.4rem;
+    overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin;
+  }
+  nav.toc li { flex: none; }
+  nav.toc a {
+    display: inline-block; font-size: 0.85rem; text-decoration: none; color: var(--fg); white-space: nowrap;
+    padding: 0.28rem 0.65rem; border-radius: 6px; background: var(--accent-soft);
+  }
+  nav.toc a:hover { text-decoration: underline; }
+  @media (min-width: 760px) { nav.toc ul { flex-wrap: wrap; overflow: visible; } }
+
+  /* ---------- Sections ---------- */
+  section { margin-block-start: 3rem; scroll-margin-top: 4.5rem; }
+  @media (min-width: 760px) { section { scroll-margin-top: 6.5rem; } }
+  .eyebrow {
+    font-family: var(--font-data); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--sand-ink); margin-block-end: 0.35rem;
+  }
+  h2 {
+    font-family: var(--font-display); font-weight: 500; font-size: clamp(1.6rem, 5.5vw, 2rem);
+    line-height: 1.15; margin: 0 0 1rem; text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--font-display); font-weight: 600; font-size: 1.28rem; line-height: 1.25; margin: 0; text-wrap: balance;
+  }
+  h4 { font-size: 1rem; margin: 0; }
+  .stack { display: grid; gap: 0.85rem; }
+  .stack > * { min-width: 0; }
+  .note { color: var(--muted); font-size: 0.9rem; }
+  ul.plain { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.4rem; }
+  ul.plain li::marker { color: var(--accent); }
+  ul.plain ul { margin-top: 0.3rem; padding-left: 1.1rem; display: grid; gap: 0.2rem; }
+
+  /* ---------- Text + screenshot ---------- */
+  .pair { display: grid; gap: 1.1rem; align-items: start; }
+  .pair > * { min-width: 0; }
+  @media (min-width: 720px) {
+    .pair { grid-template-columns: minmax(0, 1fr) 17.5rem; gap: 1.75rem; }
+    .pair.flip { grid-template-columns: 17.5rem minmax(0, 1fr); }
+    .pair.flip > figure { order: -1; }
+  }
+  figure.shot { margin: 0; display: grid; gap: 0.55rem; justify-items: center; }
+  figure.shot img {
+    display: block; width: 100%; max-width: 17.5rem; border-radius: 14px;
+    border: 1px solid var(--shot-edge); box-shadow: var(--shadow); background: var(--paper);
+  }
+  figure.shot.wide img { max-width: 100%; border-radius: 10px; }
+  figure.shot.tall-ipad img { max-width: 26rem; border-radius: 12px; }
+  figcaption { font-size: 0.86rem; color: var(--muted); line-height: 1.45; max-width: 17.5rem; }
+  figure.shot.wide figcaption, figure.shot.tall-ipad figcaption { max-width: 40rem; justify-self: start; }
+
+  .strip {
+    display: grid; grid-auto-flow: column; grid-auto-columns: min(16rem, 74%); gap: 1rem;
+    overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory;
+    padding: 0.25rem 0.1rem 0.75rem; scrollbar-width: thin;
+  }
+  .strip > figure { scroll-snap-align: start; justify-items: start; }
+  .strip figcaption { max-width: none; }
+  @media (min-width: 900px) { .strip { grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; overflow: visible; } }
+  .swipe { font-size: 0.8rem; color: var(--muted); }
+  @media (min-width: 900px) { .swipe { display: none; } }
+
+  /* ---------- Signs ---------- */
+  dl.signs { margin: 0; display: grid; grid-template-columns: 3.4rem minmax(0, 1fr); gap: 0.55rem 0.9rem; align-items: baseline; }
+  dl.signs dt {
+    font-family: var(--font-data); font-weight: 600; font-size: 1.05rem; text-align: center;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 0.15rem 0;
+  }
+  dl.signs dd { margin: 0; }
+  .g-ok { color: var(--ok); }
+  .g-warn { color: var(--warn); }
+  .g-bad { color: var(--bad); }
+
+  /* ---------- Steps (the real sequence of Préparer) ---------- */
+  ol.steps { list-style: none; margin: 1.25rem 0 0; padding: 0; display: grid; gap: 2.25rem; }
+  .step { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); column-gap: 0.85rem; }
+  .step > .n {
+    width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center;
+    background: var(--num-bg); color: var(--num-fg); font-family: var(--font-display); font-weight: 600; font-size: 1.15rem;
+  }
+  .step > .body { display: grid; gap: 0.8rem; min-width: 0; padding-top: 0.15rem; }
+  .closed {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 0.6rem; font-size: 0.9rem; color: var(--muted);
+  }
+  .closed span:first-child { font-family: var(--font-data); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  .closed q {
+    quotes: none; color: var(--fg); background: var(--paper); border: 1px solid var(--line); border-radius: 6px;
+    padding: 0.05rem 0.45rem; font-variant-numeric: tabular-nums;
+  }
+  .skipper {
+    font-family: var(--font-data); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--sand-ink); background: var(--sand); padding: 0.1rem 0.45rem; border-radius: 4px; vertical-align: 0.2em; margin-left: 0.35rem;
+  }
+
+  /* ---------- Tables ---------- */
+  .tbl { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.93rem; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; vertical-align: top; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--line); }
+  tr:last-child > th, tr:last-child > td { border-bottom: 0; }
+  thead th {
+    background: var(--sand); color: var(--sand-ink); font-family: var(--font-data); font-weight: 500;
+    font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.35;
+  }
+  tbody th { font-weight: 600; }
+  table.test { min-width: 40rem; }
+  table.test td:first-child, table.test td:nth-child(2) { white-space: nowrap; }
+  table.test td:first-child { font-family: var(--font-data); font-weight: 600; color: var(--accent); }
+  /* On a phone, each line of the test becomes a small card: « B3 · 2–3 min », then À faire, À regarder, 📸. */
+  @media (max-width: 599px) {
+    table.test { min-width: 0; }
+    table.test thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    table.test, table.test tbody, table.test tr { display: block; }
+    table.test tr { padding: 0.7rem 0.8rem 0.75rem; border-bottom: 1px solid var(--line); }
+    table.test tr:last-child { border-bottom: 0; }
+    table.test td { display: block; border: 0; padding: 0.12rem 0; }
+    table.test td:first-child, table.test td:nth-child(2) { display: inline; }
+    table.test td:nth-child(2) { color: var(--muted); font-size: 0.88rem; }
+    table.test td:nth-child(2)::before { content: " · "; }
+    table.test td[data-label]::before {
+      content: attr(data-label) " "; font-family: var(--font-data); font-size: 0.68rem; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--sand-ink);
+    }
+    table.test td:empty { display: none; }
+  }
+
+  /* ---------- Panels ---------- */
+  .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1rem 1.1rem; display: grid; gap: 0.6rem; align-content: start; }
+  .panel h3 { font-size: 1.12rem; }
+  .sandbox { background: var(--sand); border-radius: 10px; padding: 1.25rem 1rem 1.4rem; display: grid; gap: 0.8rem; }
+  .sandbox .eyebrow { color: var(--sand-ink); }
+  .msg {
+    font-family: var(--font-data); font-size: 0.88rem; background: var(--paper); border: 1px solid var(--line);
+    border-radius: 10px 10px 10px 2px; padding: 0.55rem 0.75rem; justify-self: start; max-width: 100%;
+  }
+  ol.qs { margin: 0; padding-left: 1.4rem; display: grid; gap: 0.4rem; font-family: var(--font-display); font-size: 1.12rem; }
+  ol.qs li::marker { color: var(--accent); font-family: var(--font-data); font-size: 0.9rem; }
+  .grid2 { display: grid; gap: 1rem; }
+  .grid2 > * { min-width: 0; }
+  @media (min-width: 720px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+
+  footer {
+    margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--line);
+    font-family: var(--font-display); font-style: italic; color: var(--muted); text-align: center;
+  }
+
+  @media (min-width: 640px) {
+    main { padding-block: 3rem 4.5rem; }
+    .sandbox { padding: 1.5rem 1.6rem 1.7rem; }
+    .panel { padding: 1.1rem 1.3rem 1.2rem; }
+  }
+</style>
+</head>
+<body>
+<p style="max-width:52rem;margin:0 auto;padding:calc(env(safe-area-inset-top, 0px) + 12px) 16px 0;font:600 14px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"><a href="/aide" style="color:var(--accent);text-decoration:none">‹ Aide de Wang’ap</a></p>
+
+
+<main>
+
+  <header class="masthead">
+    <p class="kicker">Wang’ap · Outremer 52 · Routage</p>
+    <h1>Le routage pas à pas</h1>
+    <p class="byline">Pour Bertrand et Catherine · Flavien</p>
+    <div class="chips" aria-label="En bref">
+      <span class="chip live">Nouveau · v3.44</span>
+      <span class="chip">Onglet 🧭 Routage</span>
+      <span class="chip">Test : 10 min</span>
+    </div>
+    <p class="lead">L’écran du routage a été réorganisé. <strong>Rien n’a disparu</strong> : chaque bouton a gardé une place. Cette page le montre étape par étape, avec de vraies captures de l’app.</p>
+    <p class="since">Les captures viennent d’un essai Gibraltar → Puerto de Mogán / Las Palmas avec des données de test : ni la position, ni les heures, ni les chiffres ne sont ceux de Wang’ap.</p>
+  </header>
+
+  <nav class="toc" aria-label="Sommaire">
+    <ul>
+      <li><a href="#bref">En bref</a></li>
+      <li><a href="#avant">Avant de commencer</a></li>
+      <li><a href="#signes">Les signes</a></li>
+      <li><a href="#preparer">① Préparer</a></li>
+      <li><a href="#couts">Les coûts</a></li>
+      <li><a href="#resultat">② Résultat</a></li>
+      <li><a href="#carte">La carte</a></li>
+      <li><a href="#ajouter">＋ Ajouter</a></li>
+      <li><a href="#calculs">③ Calculs</a></li>
+      <li><a href="#reglages">⚙ Réglages</a></li>
+      <li><a href="#en-mer">En mer</a></li>
+      <li><a href="#nuit">La nuit</a></li>
+      <li><a href="#ipad">iPad</a></li>
+      <li><a href="#test">Le test</a></li>
+    </ul>
+  </nav>
+
+  <!-- ======================= En bref ======================= -->
+  <section id="bref" aria-labelledby="h-bref">
+    <p class="eyebrow">Ce qui change</p>
+    <h2 id="h-bref">En bref</h2>
+    <div class="pair">
+      <div class="stack">
+        <ul class="plain">
+          <li><strong>Quatre modes, toujours en haut</strong> : ① Préparer · ② Résultat · ③ Calculs · ⚙ Réglages. Sur l’iPad couché, ils forment un rail à gauche. « Résultat » reste grisé tant qu’aucun calcul n’existe.</li>
+          <li><strong>Huit étapes déjà remplies</strong> avec vos valeurs. « Lancer » marche tout de suite : on n’ouvre que ce qu’on veut changer.</li>
+          <li><strong>Le coût avant de lancer</strong> : une bande au-dessus de « Lancer » dit le temps et la part de la météo du jour.</li>
+          <li><strong>Vos réglages du routage sont dans le routage</strong> (⚙). Dans les Réglages de l’app, la carte 🧭 Routage ne fait plus qu’ouvrir ceux-ci.</li>
+          <li><strong>Rien n’a disparu.</strong> ✎ Modifier et ↻ Relancer sont dans « ＋ Ajouter un calcul ». « 🕘 Mes calculs » est devenu le mode ③ Calculs.</li>
+        </ul>
+        <p class="note">Pour y aller : l’onglet 🧭 du menu du bas, ou le menu de votre avatar → Routage. Dès que vous travaillez dans le routage, le menu du bas se range dans un bouton rond <span class="ui">☰</span> en bas à droite : touchez-le pour le retrouver. Le panneau se monte et se descend par sa bande du haut (━, ⌃ / ⌄).</p>
+      </div>
+      <figure class="shot">
+        <img src="img/iphone-preparer.jpg" width="780" height="1688" alt="L’iPhone à l’ouverture du routage : la carte en haut ; dans le panneau, les quatre modes Préparer, Résultat (grisé), Calculs, Réglages ; les étapes 1 à 3 ; la bande des coûts ≈ 2 min, 15 % du jour, 0 Claude, 0 aujourd’hui ; le bouton Lancer · ≈ 2 min.">
+        <figcaption>Préparer, à l’ouverture. Résultat est grisé : pas encore de calcul. En bas, la bande des coûts et « Lancer ».</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ======================= Avant de commencer ======================= -->
+  <section id="avant" aria-labelledby="h-avant">
+    <p class="eyebrow">Une minute</p>
+    <h2 id="h-avant">Avant de commencer</h2>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Le bon moment</h3>
+        <ul class="plain">
+          <li>Au port ou au mouillage, Starlink allumé.</li>
+          <li>Pas la veille d’un départ. Jamais pendant une traversée.</li>
+          <li>Vérifiez la version : Réglages → 🔧 Maintenance technique. Il doit être écrit <strong>« Wang’ap v3.44.0 »</strong>.</li>
+          <li>Si l’app semble ancienne : au même endroit, le bouton <span class="ui">Forcer la mise à jour</span>. Ou ouvrez <a href="https://www.wangap.fr/?reset=1">www.wangap.fr/?reset=1</a>.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Économiser les crédits météo</h3>
+        <ul class="plain">
+          <li>Open-Meteo, la météo gratuite du calcul, donne <span class="num">≈ 10 000</span> crédits par jour, pour tous les calculs.</li>
+          <li>Une zone neuve coûte <span class="num">≈ 1 450</span> crédits : <strong><span class="num">≈ 15 %</span> du jour</strong>.</li>
+          <li>Une destination déjà calculée dans les 3 dernières heures : <strong>0 crédit</strong>.</li>
+          <li>Pour cliquer partout sans compter : à l’étape 6, <strong>🧪 Fictive (test)</strong>. Réservé au skipper. Le résultat dit « TEST » partout et ne peut jamais être montré à la famille (📌).</li>
+          <li>Un test = un seul vrai calcul.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= Les signes ======================= -->
+  <section id="signes" aria-labelledby="h-signes">
+    <p class="eyebrow">Une seule convention, partout</p>
+    <h2 id="h-signes">Les signes</h2>
+    <dl class="signs">
+      <dt class="g-ok">✓</dt><dd>valeur par défaut : vos réglages.</dd>
+      <dt class="g-warn">✎</dt><dd>changé pour ce calcul seulement. Vos réglages ne bougent pas.</dd>
+      <dt class="g-bad">⚠</dt><dd>manquant, à voir (par exemple : pas encore d’arrivée).</dd>
+      <dt>▸ ▾</dt><dd>se déplie. Toute la ligne se touche, pas seulement la petite flèche.</dd>
+      <dt>›</dt><dd>ouvre ailleurs : un autre panneau, une autre page.</dd>
+      <dt>?</dt><dd>explique, dans une petite bulle. Touchez dehors ou ✕ pour la fermer.</dd>
+    </dl>
+    <p class="note" style="margin-top:0.9rem">Sur l’iPhone, une seule étape (ou carte, ou groupe) est ouverte à la fois : en ouvrir une referme l’autre. Sur l’iPad, plusieurs.</p>
+  </section>
+
+  <!-- ======================= Préparer ======================= -->
+  <section id="preparer" aria-labelledby="h-preparer">
+    <p class="eyebrow">① Préparer</p>
+    <h2 id="h-preparer">Préparer, étape par étape</h2>
+    <p>Chaque ligne fermée dit sa valeur. Ouvrez seulement ce que vous voulez changer. Ce que vous changez ici vaut <strong>pour ce calcul seulement</strong> (✎).</p>
+
+    <ol class="steps">
+
+      <!-- 1 -->
+      <li class="step" id="etape-1">
+        <span class="n" aria-hidden="true">1</span>
+        <div class="body">
+          <h3>De → À</h3>
+          <p class="closed"><span>Fermée</span><q>Bateau → WPT 07</q></p>
+          <div class="pair">
+            <ul class="plain">
+              <li><strong>De</strong> : le bateau, sa dernière position et son âge (« il y a 2 h »). Après « ＋ Ajouter un calcul », ce peut être le départ du calcul d’origine ; « ⛵ partir du bateau » ramène au bateau.</li>
+              <li><strong>À</strong> : déjà remplie avec le waypoint actif du B&amp;G, sinon votre dernière arrivée. <span class="ui">✕</span> pour en choisir une autre :
+                <ul>
+                  <li>« Waypoint actif du B&amp;G » ;</li>
+                  <li>un nom (la marina d’abord) ou des coordonnées, dans « Port, marina… ou 28.39, -16.35 » ;</li>
+                  <li>« Une épingle sur la carte », ou un appui long sur la carte : glissez l’épingle, puis <span class="ui">Confirmer</span> ;</li>
+                  <li>« Destinations récentes ».</li>
+                </ul>
+              </li>
+              <li>« ≈ 700 milles à vol d’oiseau · cap initial 230° — pas une route » : un ordre d’idée, pas la route.</li>
+            </ul>
+            <figure class="shot">
+              <img src="img/iphone-etape1.jpg" width="780" height="1226" loading="lazy" decoding="async" alt="L’étape 1 ouverte : De, Bateau 36,12 N 5,35 O il y a 2 h ; À, WPT 07, 28,14 N 15,41 O, environ 700 milles à vol d’oiseau, cap initial 230°, préremplie : le waypoint du B&amp;G ou ton dernier calcul, avec une croix pour changer.">
+              <figcaption>L’arrivée préremplie par le waypoint du B&amp;G. La croix ✕ ouvre les autres choix.</figcaption>
+            </figure>
+          </div>
+        </div>
+      </li>
+
+      <!-- 2 -->
+      <li class="step" id="etape-2">
+        <span class="n" aria-hidden="true">2</span>
+        <div class="body">
+          <h3>Quand</h3>
+          <p class="closed"><span>Fermée</span><q>maintenant (mer. 28 · 21:00)</q></p>
+          <div class="pair">
+            <ul class="plain">
+              <li><strong>Maintenant</strong> : le départ à la prochaine heure pleine, à l’heure du téléphone.</li>
+              <li><strong>À une date</strong> : « demain 08:00 », « +12 h », « +24 h », ou la date de votre choix.</li>
+              <li><strong>★ Optimisé</strong> <span class="skipper">skipper</span> : le meilleur départ autour de maintenant ou d’une date, sur ±12 h, ±1 j ou ±2 j. Un départ toutes les 3 h : « 17 départs, de mer. 28 · 21:00 à ven. 30 · 21:00 ».</li>
+              <li>Le prix : <span class="num">≈ 4 min</span> de plus, <strong>0 crédit</strong> (il relit la météo déjà téléchargée).</li>
+              <li>Le résultat s’ouvre alors sur « Quand ? » : une ligne par objectif, une colonne par départ, ★ le meilleur départ de chaque ligne. Touchez une case pour voir sa route.</li>
+            </ul>
+            <figure class="shot">
+              <img src="img/iphone-etape2.jpg" width="780" height="1226" loading="lazy" decoding="async" alt="L’étape 2 ouverte : Maintenant, À une date, ★ Optimisé choisi ; autour de maintenant ; ±12 h, ±1 j choisi, ±2 j ; 17 départs, de mer. 28 · 21:00 à ven. 30 · 21:00, toutes les 3 h. La ligne porte +4 min et le signe ✎.">
+              <figcaption>★ Optimisé ±1 j. Le ✎ dit « changé pour ce calcul » ; « +4 min » est le prix en temps.</figcaption>
+            </figure>
+          </div>
+        </div>
+      </li>
+
+      <!-- 3 -->
+      <li class="step" id="etape-3">
+        <span class="n" aria-hidden="true">3</span>
+        <div class="body">
+          <h3>Objectif</h3>
+          <p class="closed"><span>Fermée</span><q>🛡 Prudent · limites à 80 %</q></p>
+          <div class="pair">
+            <div class="stack">
+              <div class="tbl">
+                <table>
+                  <tbody>
+                    <tr><th scope="row">🛡 Prudent</th><td><strong>Votre défaut.</strong> Reste sous 80 % de vos limites, arrive de jour, puis le confort, puis la vitesse. Accepte d’aller plus lentement aujourd’hui pour éviter le gros temps demain.</td></tr>
+                    <tr><th scope="row">🛋 Confort</th><td>Moins de près et de mer de travers.</td></tr>
+                    <tr><th scope="row">⚡ Rapide</th><td>L’arrivée la plus tôt, dans vos limites. Toujours calculée aussi : c’est la route de référence.</td></tr>
+                    <tr><th scope="row">⛵ Voile</th><td>Le moins de moteur, sans être plus de 15 % plus lente que Rapide.</td></tr>
+                    <tr><th scope="row">✏️ Personnalisé</th><td>Votre ordre de priorités et vos valeurs. Le bouton apparaît une fois enregistré dans ⚙ Réglages → Objectif.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="note">« L’ordre des priorités et les valeurs › » pour aller plus loin.</p>
+            </div>
+            <figure class="shot">
+              <img src="img/iphone-etape3.jpg" width="780" height="1226" loading="lazy" decoding="async" alt="L’étape 3 ouverte : les boutons Prudent (choisi), Confort, Rapide, Voile ; Prudent — limites à 80 %, de jour, confort, vitesse ; L’ordre des priorités et les valeurs ; Pour ce calcul seulement : les Réglages de B&amp;C ne bougent pas.">
+              <figcaption>Les objectifs. « Pour ce calcul seulement : les Réglages de B&amp;C ne bougent pas. »</figcaption>
+            </figure>
+          </div>
+        </div>
+      </li>
+
+      <!-- 4 -->
+      <li class="step" id="etape-4">
+        <span class="n" aria-hidden="true">4</span>
+        <div class="body">
+          <h3>Contraintes</h3>
+          <p class="closed"><span>Fermée</span><q>≤ 26 nds · raf. 34 · 3 m · près 50° · côte 3 M</q></p>
+          <ul class="plain">
+            <li>Ce qui limite la route, avec <span class="ui">–</span> et <span class="ui">+</span> : vent max 26 nds, rafales 34 nds, vagues 3 m, près pas sous 50°, la côte à 3 milles, les petits fonds.</li>
+            <li>Plus bas dans l’étape : les dangers (🐋 orques, le large du Sahara) — signalés, évités, à quelle distance.</li>
+            <li>Changées ici : pour ce calcul seulement (✎). « Revenir à mes valeurs par défaut » remet ces limites.</li>
+            <li>Le moteur et le gazole ne sont pas ici : ce sont des réglages du bateau, dans ⚙ Réglages → ⛽ Moteur et gazole. Chaque calcul les prend tels quels.</li>
+            <li>Pour changer vos valeurs pour de bon : ⚙ Réglages (<a href="#reglages">plus bas</a>).</li>
+          </ul>
+        </div>
+      </li>
+
+      <!-- 5 -->
+      <li class="step" id="etape-5">
+        <span class="n" aria-hidden="true">5</span>
+        <div class="body">
+          <h3>Sensibilités</h3>
+          <p class="closed"><span>Fermée</span><q>polaire selon les cases · 2 à bord · aucune</q></p>
+          <div class="pair">
+            <div class="stack">
+              <h4>D’abord, les hypothèses du calcul</h4>
+              <ul class="plain">
+                <li><strong>⛵ Polaire</strong> : son incertitude. <span class="ui">Aucune</span> · <span class="ui">Prudente</span> (toutes les cases −10 %) · <span class="ui">Fourchette</span> (85 à 110 %) · <span class="ui">Par case</span> (selon la confiance de chaque case : votre défaut).</li>
+                <li><strong>😴 Équipage</strong> : 2 à bord, 6 heures dures d’affilée au plus, une nuit en mer « coûte » 3 h, 2 % de rendement perdu par jour après 48 h, préférer arriver reposés.</li>
+                <li>Changées ici : pour ce calcul seulement (✎) ; la famille peut les changer aussi. Les valeurs par défaut : ⚙ Réglages → ⛵ Polaires et 😴 Équipage.</li>
+              </ul>
+              <h4>Puis, des calculs en plus <span class="skipper">skipper</span></h4>
+              <p>Pour savoir si la réponse tient quand on change une hypothèse. ⛵ et 😴 se calculent aussi hors ligne, sur l’appareil ou au PC du bord (quelques secondes de plus) ; 🎲 reste au nuage — l’app le dit.</p>
+              <div class="tbl">
+                <table>
+                  <thead><tr><th scope="col">Case</th><th scope="col">Ce qu’elle fait</th><th scope="col">Prix</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">🎲 Ensembles météo</th><td>173 variantes de la prévision : l’arrivée au plus tôt, la plus probable, au plus tard, et la part de jour. <strong>Au nuage seulement</strong> (trop lourds pour l’appareil).</td><td class="num">≈ 5 min<br>≈ 800 crédits*</td></tr>
+                    <tr><th scope="row">⛵ Incertitude des polaires</th><td>La route refaite avec le bateau à 85 % (carène sale, chargé) et à 110 % (bien réglé). Aussi hors ligne.</td><td class="num">≈ 15 s<br>0 crédit<br><small>ici : ≈ +5 à 10 s</small></td></tr>
+                    <tr><th scope="row">😴 Équipage / perf.</th><td>La route refaite « reposés », puis « fatigués ». Aussi hors ligne.</td><td class="num">≈ 15 s<br>0 crédit<br><small>ici : ≈ +5 à 10 s</small></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="note">* 0 si la même zone a été calculée il y a moins de 3 h.</p>
+            </div>
+            <figure class="shot">
+              <img src="img/iphone-etape5.jpg" width="780" height="1108" loading="lazy" decoding="async" alt="L’étape 5 ouverte : la ligne dit polaire selon les cases · 2 à bord · ensembles météo, avec +800 crédits, +5 min et le signe ✎ ; dessous, Polaire : Incertitude des polaires, Aucune, Prudente, Fourchette, Par case (choisi) ; Équipage : Personnes à bord 2 ; la bande des coûts dit ≈ 7 min et 23 % du jour.">
+              <figcaption>Les hypothèses d’abord (⛵ polaire, 😴 équipage) ; les trois cases sont plus bas. 🎲 coché : la bande passe de ≈ 2 min · 15 % à ≈ 7 min · 23 % du jour.</figcaption>
+            </figure>
+          </div>
+        </div>
+      </li>
+
+      <!-- 6 -->
+      <li class="step" id="etape-6">
+        <span class="n" aria-hidden="true">6</span>
+        <div class="body">
+          <h3>Météo</h3>
+          <p class="closed"><span>Fermée</span><q>🌐 En direct · 6 modèles</q></p>
+          <div class="pair">
+            <ul class="plain">
+              <li><strong>🌐 En direct</strong> : la prévision du moment, six modèles et les vagues. <span class="num">≈ 1 450</span> crédits pour une zone neuve, 0 si elle est déjà là.</li>
+              <li><strong>🗄 Précédente</strong> : rien n’est téléchargé. Le calcul reprend la dernière météo gardée pour la zone, quel que soit son âge. Le résultat dit cet âge et la confiance baisse. 0 crédit.</li>
+              <li><strong>🧪 Fictive (test)</strong> : une météo inventée, pour essayer sans rien dépenser. « TEST » partout ; jamais montrée à la famille. 0 crédit.</li>
+              <li>Les six modèles : ECMWF IFS (la référence), GFS, ICON, ECMWF AIFS, UK Met Office, Météo-France.</li>
+              <li>La source se règle au skipper ; la famille calcule toujours en direct.</li>
+            </ul>
+            <figure class="shot">
+              <img src="img/iphone-etape6.jpg" width="780" height="1108" loading="lazy" decoding="async" alt="L’étape 6 ouverte : En direct (choisi), Précédente, Fictive (test) ; Zone neuve : environ 1 450 crédits météo ; la liste des modèles, ECMWF IFS en référence.">
+              <figcaption>« Zone neuve : ≈ 1 450 crédits météo ». La ligne fermée porte « +1 450 · +2 min ».</figcaption>
+            </figure>
+          </div>
+        </div>
+      </li>
+
+      <!-- 7 -->
+      <li class="step" id="etape-7">
+        <span class="n" aria-hidden="true">7</span>
+        <div class="body">
+          <h3>Calcul : où calculer</h3>
+          <p class="closed"><span>Fermée</span><q>☁️ Nuage</q></p>
+          <div class="pair">
+            <ul class="plain">
+              <li><strong>☁️ Nuage</strong> : par défaut. Le calcul se fait à terre ; il faut du réseau. Vous pouvez quitter la page : le résultat vous attendra.</li>
+              <li><strong>📱 Cet appareil</strong> : le même calcul sur l’iPhone ou l’iPad, sans réseau, avec une météo rangée d’avance (voir <a href="#hors-ligne">Hors ligne</a>). <span class="num">≈ 15 s</span>, 0 crédit ; ⛵ et 😴 aussi (quelques secondes de plus) ; ★ Optimisé : une grille légère sur l’iPad (<span class="num">≈ 1 min</span>), pas sur l’iPhone ; 🎲 au nuage seulement. Le bouton devient « 📱 Calculer sur cet appareil ».</li>
+              <li><strong>🖥️ PC du bord</strong> : pas encore installé chez vous. Flavien vous enverra de quoi le faire. D’ici là, laissez-le de côté.</li>
+            </ul>
+            <figure class="shot">
+              <img src="img/iphone-etape7.jpg" width="780" height="1108" loading="lazy" decoding="async" alt="L’étape 7 ouverte avec Cet appareil choisi : Pas encore de météo sur cet appareil, télécharge-la (en ligne) ou importe un GRIB ; Météo hors ligne (0) ; la bande dit ≈ 15 s, 0 %, hors quota ; le bouton Calculer sur cet appareil.">
+              <figcaption>📱 choisi. En rouge : pas encore de météo rangée ici. La bande dit « hors quota ».</figcaption>
+            </figure>
+          </div>
+        </div>
+      </li>
+
+      <!-- 8 -->
+      <li class="step" id="etape-8">
+        <span class="n" aria-hidden="true">8</span>
+        <div class="body">
+          <h3>Lancer</h3>
+          <p class="closed"><span>Fermée</span><q>≈ 2 min · 15 % du jour · 0 jeton</q></p>
+          <div class="pair">
+            <div class="stack">
+              <ul class="plain">
+                <li>Une phrase redit tout : « Gibraltar → Puerto de Mogán, départ le meilleur ±1 j, 🛡 Prudent, météo 🌐 en direct, au nuage. »</li>
+                <li>Le détail du coût, ligne par ligne, puis « En tout ».</li>
+                <li>Une barre : les crédits du jour déjà pris par vos calculs, celui-ci, ce qui restera.</li>
+                <li>Puis <span class="ui">Lancer · ≈ 2 min</span>. Vous pouvez quitter la page pendant le calcul.</li>
+              </ul>
+              <div class="panel">
+                <h3>🤖 Un briefing écrit par Claude</h3>
+                <p><strong>Décoché par défaut.</strong> Cochez-le si vous voulez, en plus, un court texte en mots simples. Claude, une intelligence artificielle, l’écrit à partir des chiffres du calcul lui-même : en bref, pourquoi cette route, le passage, ce qu’il faut surveiller, ce qu’il faut télécharger avant de partir.</p>
+                <ul class="plain">
+                  <li>Chaque chiffre vient du calcul. Claude n’en invente aucun ; le texte est marqué « ✨ écrit par Claude d’après les chiffres du calcul ».</li>
+                  <li>Le prix : <span class="num">2 à 3 centimes</span> (l’app dit « ≈ 4 000 jetons » : la longueur du texte lu et écrit).</li>
+                  <li>Il peut manquer : jamais sur une météo 🧪 fictive, ni pour un calcul 📱 ou 🖥️. Si Claude ne répond pas, vous avez les raisons du calcul, sans les phrases.</li>
+                  <li>Après coup : la carte « ✨ Briefing » en tête du Résultat le demande aussi.</li>
+                </ul>
+              </div>
+            </div>
+            <figure class="shot">
+              <img src="img/iphone-etape8.jpg" width="780" height="1324" loading="lazy" decoding="async" alt="L’étape 8 ouverte : En tout ≈ 7 min et ≈ 1 450 crédits ; la barre des crédits du jour, environ 2 256 déjà utilisés, celui-ci 1 450 (15 %), il en restera environ 6 300 ; la case Un briefing écrit par Claude, cochée, environ 4 000 jetons, environ 2 cts ; 3 calculs aujourd’hui ; la bande dit ≈ 4 000 dans la case Claude.">
+              <figcaption>Ici le briefing est coché pour l’exemple : la case Claude de la bande passe à « ≈ 4 000 ».</figcaption>
+            </figure>
+          </div>
+        </div>
+      </li>
+
+    </ol>
+  </section>
+
+  <!-- ======================= La bande des coûts ======================= -->
+  <section id="couts" aria-labelledby="h-couts">
+    <p class="eyebrow">Au-dessus de « Lancer »</p>
+    <h2 id="h-couts">La bande des coûts</h2>
+    <p style="margin-bottom:0.9rem">Quatre cases, mises à jour à chaque changement. Un toucher sur la bande ouvre le détail (l’étape 8).</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th scope="col">Case</th><th scope="col">Exemple</th><th scope="col">Ce qu’elle dit</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">⏱ temps</th><td class="num">≈ 6 min</td><td>Le temps du calcul, estimé, arrondi vers le haut.</td></tr>
+          <tr><th scope="row">🌐 du jour</th><td class="num">15 %</td><td>La part des crédits météo du jour que ce calcul prendra.</td></tr>
+          <tr><th scope="row">🤖 Claude</th><td class="num">0</td><td>Le briefing : 0, ou ≈ 4 000 jetons s’il est coché.</td></tr>
+          <tr><th scope="row">aujourd’hui</th><td class="num">3</td><td>Vos calculs au nuage des dernières 24 h. Pas de plafond pour le skipper. La famille voit « 3 / 10 aujourd’hui » : 10 par jour.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top:0.7rem">Sur 📱 Cet appareil : 0 % et « hors quota ».</p>
+  </section>
+
+  <!-- ======================= Le résultat ======================= -->
+  <section id="resultat" aria-labelledby="h-resultat">
+    <p class="eyebrow">② Résultat</p>
+    <h2 id="h-resultat">Le résultat</h2>
+    <div class="stack">
+      <ul class="plain">
+        <li><strong>La réponse d’abord</strong>, en une phrase : « Arrivée sam. 31 vers 15 h, de jour — confiance moyenne ▮▮▯ », et l’heure du port « (13:45 heure locale) ».</li>
+        <li><strong>Trois chiffres</strong> : la durée (5 j 2 h) · le vent max (≤ 16 nds, raf. 21) · ⛽ les heures de moteur (111 h, ≈ 292 L). Dessous, la fourchette des modèles et les dangers croisés (🐋 Orques ibériques).</li>
+        <li>Ces chiffres sont ceux de la <strong>route ★</strong> : votre objectif (🛡 Prudent), ou le départ touché dans la grille.</li>
+        <li>La confiance dit si les six modèles sont d’accord. Elle ne dit pas si la route est sûre : ce qui approche vos limites est dans « À surveiller ».</li>
+        <li><strong>Trois onglets</strong>, toujours dans le même ordre : <span class="ui">Quand ?</span> les départs · <span class="ui">Route</span> les routes, 📌, la carte, la feuille de route · <span class="ui">Certitude</span> pourquoi, les modèles, les sensibilités.</li>
+        <li><strong>Puis des cartes repliées</strong>. Fermées, elles disent l’essentiel en une ligne : Ce qui a changé · À surveiller ⚠ 5 · Profil · Météo sur la carte ▶ · Comparer · Feuille de route (B&amp;G) · Les autres départs · Pourquoi « moyenne » ? · Les modèles · Sensibilités · 📋 Briefing.</li>
+        <li>Sur l’iPhone, une carte ouverte à la fois ; elle remonte le panneau à mi-hauteur. Tout en bas : « ＋ Ajouter un calcul ».</li>
+      </ul>
+      <p class="swipe" aria-hidden="true">Glissez pour voir les trois captures →</p>
+      <div class="strip" tabindex="0" role="group" aria-label="Captures du résultat">
+        <figure class="shot">
+          <img src="img/iphone-resultat.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="Le Résultat sur l’iPhone : la route verte sur la carte, avec les orques ; Arrivée sam. 31 vers 15 h, de jour — confiance moyenne ; 5 j 2 h durée, ≤ 16 nds vent max raf. 21, 111 h moteur environ 292 L ; les modèles : sam. 31, 15 h – 16 h (4) ; Orques ibériques ; Ajouter un calcul.">
+          <figcaption>La phrase et les trois chiffres.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="img/iphone-surveiller.jpg" width="780" height="1158" loading="lazy" decoding="async" alt="La carte À surveiller ouverte, avec ⚠ 5 : Beaucoup de moteur, Orques ibériques, Dans ta marge (80 % de tes limites), Gazole, Longue traversée ; chaque ligne a son point d’interrogation.">
+          <figcaption>« À surveiller ⚠ 5 » ouverte. Chaque ligne a son « ? ».</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="img/iphone-briefing.jpg" width="780" height="1158" loading="lazy" decoding="async" alt="La carte Briefing ouverte : écrit par Claude d’après les chiffres du calcul ; En bref : Départ lun. 26 · 13:00, arrivée sam. 31 · 14:45 (13:45 heure locale) — 5 j 2 h, 749 milles. Vent max 16 nds, rafales 21 nds, vagues 2,3 m, moteur 111 h ; puis Pourquoi ?">
+          <figcaption>📋 Briefing, quand il a été demandé : « En bref », puis « Pourquoi ? ».</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= La carte ======================= -->
+  <section id="carte" aria-labelledby="h-carte">
+    <p class="eyebrow">Au-dessus du panneau</p>
+    <h2 id="h-carte">La carte</h2>
+    <div class="pair">
+      <ul class="plain">
+        <li>Trois boutons à droite : <span class="ui">⋯</span> (l’aide, « une aide, pas une vérité », la disposition de l’iPad) · <span class="ui">🗂 Calques</span> · la <strong>vue</strong>, dont l’icône change (voilier, viseur, drapeau) : départ, point choisi, arrivée, toute la route.</li>
+        <li><strong>🗂 Calques</strong> : un panneau qui prend la place du routage ; la carte reste visible. La météo : Aucune · Vent · Rafales · Vagues. Le vent en <strong>Barbules</strong> (force et direction exactes) ou <strong>Particules</strong> (comme 🗺 Carte). Le modèle. « Le long de la route » : le vent que le bateau rencontrera, là où il sera. <span class="ui">✕</span> ferme.</li>
+        <li><strong>⚠️ Dangers</strong> (dans Calques) : une case par zone (🐋 orques, Sahara occidental · Mauritanie), allumées par défaut. Les masquer ne change ni le calcul ni « À surveiller ».</li>
+        <li><strong>▶</strong>, le bouton rond en bas à droite (en Résultat) : rejoue le passage, avec ou sans météo. Le point du bateau avance heure par heure (×1, ×4, ×16 ; −3 h / +3 h) ; ⌄ le replie. Aussi dans la carte « Météo sur la carte ▶ ».</li>
+        <li><strong>L’épingle</strong> : un appui long sur la carte → « Arriver ici ? » ; glissez-la, puis <span class="ui">Confirmer</span> (✕ pour renoncer).</li>
+      </ul>
+      <figure class="shot">
+        <img src="img/iphone-calques.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="Le panneau Calques ouvert sous la carte : Météo Aucune, Vent, Rafales, Vagues ; Le vent : Barbules ou Particules ; Opacité du champ 45 % ; Modèle IFS, GFS, ICON, AIFS, UKMO, MF ; Sur la route : Le long de la route (coché), Les routes des modèles ; Dangers.">
+        <figcaption>🗂 Calques. La carte reste visible au-dessus.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ======================= Ajouter un calcul ======================= -->
+  <section id="ajouter" aria-labelledby="h-ajouter">
+    <p class="eyebrow">Sous le résultat</p>
+    <h2 id="h-ajouter">＋ Ajouter un calcul</h2>
+    <div class="pair">
+      <div class="stack">
+        <p>Un toucher ouvre le menu :</p>
+        <ul class="plain">
+          <li>✎ <strong>Modifier l’arrivée ou le départ</strong> : un autre port, une autre heure ;</li>
+          <li>★ <strong>Optimiser la date ±1 j</strong> : un départ toutes les 3 h autour de celui-ci ;</li>
+          <li>🎲 <strong>Ajouter les sensibilités</strong> : ensembles, polaires, équipage ;</li>
+          <li>↻ <strong>Relancer le même calcul</strong> : avec la météo la plus récente ;</li>
+          <li>＋ <strong>Nouveau calcul, sans lien</strong> : repart de vos valeurs.</li>
+        </ul>
+        <p>Préparer revient <strong>prérempli</strong>, avec ✎ sur l’étape changée. La ligne du haut commence par « ↳ » : le nouveau calcul est lié au premier (« À partir de : … » ; ✕ « Indépendant » coupe le lien).</p>
+        <p><strong>0 crédit</strong> quand la zone a été calculée il y a moins de 3 h.</p>
+        <p>Dans le nouveau résultat, « Δ Depuis le calcul d’origine » dit ce qui a bougé : l’arrivée, le vent, les vagues, la route, la certitude, la météo.</p>
+      </div>
+      <figure class="shot">
+        <img src="img/iphone-ajouter.jpg" width="780" height="1158" loading="lazy" decoding="async" alt="Le menu Ajouter un calcul : Modifier l’arrivée ou le départ ; Optimiser la date ±1 j ; Ajouter les sensibilités ; Relancer le même calcul, la météo la plus récente ; Nouveau calcul, sans lien, repart des valeurs de B&amp;C. Chaque ligne dit son temps et ses crédits.">
+        <figcaption>Le menu. Dans cet essai, la météo de la zone avait plus de 3 h, d’où ≈ 1 450 crédits ; juste après un calcul, c’est 0.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ======================= Calculs ======================= -->
+  <section id="calculs" aria-labelledby="h-calculs">
+    <p class="eyebrow">③ Calculs</p>
+    <h2 id="h-calculs">Vos calculs</h2>
+    <div class="pair">
+      <ul class="plain">
+        <li>Vos derniers calculs : faits, ratés ou annulés. Chaque ligne dit ce qui a été calculé, avant qu’on l’ouvre : l’arrivée, quand, l’objectif, l’arrivée prévue, et où (☁️ 📱 🖥️).</li>
+        <li>Les calculs nés d’un autre sont rangés dessous (↳ ✎, ↳ ★). « affiché » marque celui qui est à l’écran.</li>
+        <li><span class="ui">☆</span> sur la ligne : marquer ★.</li>
+        <li><span class="ui">⋯</span> : le détail, 🗄 Archiver, 🗑 Supprimer. Supprimer demande confirmation dans la page : « Supprimer ce calcul ? » → <span class="ui">Supprimer</span> / <span class="ui">Garder</span>.</li>
+        <li>La route montrée à la famille (📌) ne se supprime pas : retirez d’abord le 📌. Un calcul en cours non plus.</li>
+        <li>Les filtres : Tous · ★ · Archivés. « Tous » cache les archivés.</li>
+        <li>Un calcul raté dit pourquoi, en clair (« Le service météo gratuit a refusé… »).</li>
+        <li>En bas : « ＋ Nouveau calcul ».</li>
+      </ul>
+      <figure class="shot">
+        <img src="img/iphone-calculs.jpg" width="780" height="1324" loading="lazy" decoding="async" alt="Le mode Calculs : 5 calculs, 1 ★, 1 archivés ; filtres Tous 5, ★ 1, Archivés 1 ; Las Palmas ; dessous, rangés avec ↳, Puerto de Mogán puis Puerto de Mogán optimisé ±1 j (affiché, le calcul n’a pas abouti) ; Las Palmas raté, le service météo gratuit a refusé ; Las Palmas avec 📌 et ★ ; chaque ligne a ☆ et ⋯ ; Nouveau calcul.">
+        <figcaption>Les chaînes ↳, les ☆, les ⋯ et les filtres.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ======================= Réglages ======================= -->
+  <section id="reglages" aria-labelledby="h-reglages">
+    <p class="eyebrow">⚙ Réglages, dans le routage</p>
+    <h2 id="h-reglages">Vos valeurs par défaut</h2>
+    <div class="pair">
+      <div class="stack">
+        <ul class="plain">
+          <li>Les valeurs de départ de chaque calcul, groupe par groupe : Objectif · Contraintes · Dangers · Moteur et gazole · Polaires · Équipage · Source météo · Où calculer · Feuille de route.</li>
+          <li>Le moteur et le gazole ne se règlent qu’ici : Préparer ne les montre pas, chaque calcul les prend tels quels.</li>
+          <li>Fermé, chaque groupe dit ses valeurs en une ligne.</li>
+          <li>Dès qu’une valeur change, le bas du panneau montre <span class="ui">Annuler</span> et <span class="ui">Enregistrer · 1 changement</span>. Rien n’est gardé avant « Enregistrer ».</li>
+          <li>La famille voit ces valeurs en lecture seule.</li>
+        </ul>
+        <div class="tbl">
+          <table>
+            <caption class="note" style="caption-side: top; text-align: left; padding: 0.55rem 0.7rem 0;">Vos valeurs aujourd’hui (vos réponses)</caption>
+            <tbody>
+              <tr><th scope="row">Objectif</th><td>🛡 Prudent · marge 80 %</td></tr>
+              <tr><th scope="row">Vent · rafales</th><td class="num">26 nds · 34 nds</td></tr>
+              <tr><th scope="row">Vagues</th><td class="num">3 m</td></tr>
+              <tr><th scope="row">Près</th><td>pas sous 50°</td></tr>
+              <tr><th scope="row">Côte</th><td>3 milles</td></tr>
+              <tr><th scope="row">Gazole</th><td>550 L · réserve 20 %</td></tr>
+              <tr><th scope="row">Moteurs</th><td class="num">2,54 et 2,72 L/h</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <figure class="shot">
+        <img src="img/iphone-reglages.jpg" width="780" height="1036" loading="lazy" decoding="async" alt="Réglages, les valeurs par défaut de B&amp;C : le groupe Contraintes ouvert, Vent max 27 nds (par défaut : 26 nds), Rafales max 34 nds, Vagues max 3,0 m, Près pas sous 50°, chacun avec – et + ; en bas, Annuler et Enregistrer · 1 changement.">
+        <figcaption>Vent max passé à 27 nds pour l’exemple : « Enregistrer · 1 changement » apparaît. « Annuler » remet 26.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ======================= En mer ======================= -->
+  <section id="en-mer" aria-labelledby="h-en-mer">
+    <p class="eyebrow">Une fois la route choisie</p>
+    <h2 id="h-en-mer">En mer</h2>
+    <div class="stack">
+      <div class="grid2">
+        <div class="panel">
+          <h3>📌 Retenir la route</h3>
+          <p>Résultat → Route, sous « Les routes » : <span class="ui">📌 Montrer à la famille</span>. Cette route ★ devient la route retenue : la famille la voit, la tuile du Cockpit et « En route » la suivent. Une route 🧪 fictive ne se retient jamais.</p>
+        </div>
+        <div class="panel">
+          <h3>⛵ En route</h3>
+          <p>Partis avec la route retenue, l’onglet « En route » prend la place de « Quand ? ». Il s’ouvre seul à plus de 5 milles du départ : l’avance ou le retard, l’écart et son côté (« 2,1 M au sud-est »), l’arrivée estimée, le prochain point (cap et milles depuis le bateau), le prochain changement de cap et la manœuvre probable (empanner, virer), les 12 prochaines heures. « ↻ Recalculer depuis ici » repart de votre dernière position.</p>
+        </div>
+        <div class="panel">
+          <h3>🧭 La tuile Route du Cockpit</h3>
+          <p>En haut du Cockpit, avant la voilure : « Route · Las Palmas », l’arrivée estimée en grand, l’avance, l’écart, le cap conseillé, et le « Prochain changement ». Un toucher ouvre « En route ».</p>
+        </div>
+        <div class="panel" id="hors-ligne">
+          <h3>📱 Hors ligne</h3>
+          <p>Avant de perdre le réseau, avec Starlink : étape 7 → 📱 Cet appareil → « 🌦 Météo hors ligne › » → <span class="ui">⬇ Télécharger la météo</span> (ce passage ou autour du bateau, 3 à 10 jours ; le prix en crédits s’affiche avant). Ou « 📦 Importer un GRIB » de NavimetriX.</p>
+          <p>Ensuite, sans réseau : « 📱 Calculer sur cet appareil ». L’iPhone prend 3 modèles et 2 routes, l’iPad les 6 modèles. Le calcul reste sur l’appareil et rejoint ③ Calculs au retour du réseau.</p>
+          <div class="tbl">
+            <table>
+              <thead><tr><th scope="col">Hors ligne</th><th scope="col">iPhone</th><th scope="col">iPad</th><th scope="col">PC du bord</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Le conseil</th><td class="num">≈ 20 s</td><td class="num">≈ 16 s</td><td class="num">≈ 10 s</td></tr>
+                <tr><th scope="row">⛵ 😴</th><td class="num">+ 20 s</td><td class="num">+ 12 s</td><td class="num">+ 6 s</td></tr>
+                <tr><th scope="row">★ Optimisé</th><td>non (la mémoire)</td><td class="num">grille légère ≈ 1 min</td><td class="num">grille complète ≈ 3 à 4 min</td></tr>
+                <tr><th scope="row">🎲 Ensembles</th><td colspan="3">au nuage seulement — l’app le dit</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="note">Grille légère : ±12 h, 9 départs, votre objectif + ⚡ Rapide. Mesuré sur un Mac le 29 oct. (l’iPhone et l’iPad simulés) : à confirmer sur les vôtres.</p>
+        </div>
+      </div>
+      <div class="pair flip" style="margin-top:0.6rem">
+        <figure class="shot">
+          <img src="img/iphone-feuille.jpg" width="780" height="1158" loading="lazy" decoding="async" alt="La feuille de route : WP0 départ 36°07,2’N 005°22,8’W lun. 26 13:00, 207°, 3,2 M ; WP1 36°04,4’N 005°24,6’W 13:32, 227°, 3,2 M ; WP2, WP3, WP4, WP5, WP6 avec position, heure de passage, cap vrai et milles vers le suivant.">
+          <figcaption>La feuille de route : position, heure de passage, cap vrai et milles vers le point suivant.</figcaption>
+        </figure>
+        <div class="stack">
+          <h3>📄 La feuille de route pour le B&amp;G</h3>
+          <ul class="plain">
+            <li>Résultat → Route → « Feuille de route (B&amp;G) ».</li>
+            <li>6, 8 ou 12 points, ou tous. Positions en DM (<span class="num">36°03,2'N 005°24,6'W</span>), DMS ou décimal ; toujours N / S / E / W. Caps vrais. Heures de passage à l’heure du téléphone.</li>
+            <li><span class="ui">⬇ GPX pour le B&amp;G</span> : un GPX léger de ces points seulement. Copier · Partager · Imprimer.</li>
+            <li>Aucune branche ne coupe la terre : c’est vérifié sur la côte exacte.</li>
+            <li>Rien n’est envoyé au pilote. Vous chargez le GPX vous-mêmes (carte SD ou appli B&amp;G) et vérifiez chaque branche sur la carte du bord.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= La nuit ======================= -->
+  <section id="nuit" aria-labelledby="h-nuit">
+    <p class="eyebrow">Le quart de nuit</p>
+    <h2 id="h-nuit">La nuit</h2>
+    <div class="pair">
+      <ul class="plain">
+        <li>Votre avatar, en haut à droite → « En mer » → <span class="ui">Mode nuit rouge</span>.</li>
+        <li>Tout passe au rouge sombre, sans éblouir.</li>
+        <li>La météo se lit en bandes de rouge. La route mise en avant reste un trait épais plein, les autres des tirets fins.</li>
+        <li>« Lancer » et « Enregistrer » deviennent un contour rouge.</li>
+        <li>Même chemin pour revenir au jour.</li>
+      </ul>
+      <figure class="shot">
+        <img src="img/iphone-nuit.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="Le Résultat en mode nuit rouge : tout est en rouge sombre sur fond noir, la route, la phrase Arrivée sam. 31 vers 15 h, de jour — confiance moyenne, les trois chiffres et le bouton Ajouter un calcul.">
+        <figcaption>Le même résultat, en nuit rouge.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ======================= iPad ======================= -->
+  <section id="ipad" aria-labelledby="h-ipad">
+    <p class="eyebrow">Plus de place</p>
+    <h2 id="h-ipad">Sur l’iPad</h2>
+    <div class="stack">
+      <ul class="plain">
+        <li><strong>Couché</strong> : les quatre modes forment un rail à gauche ; la barre de l’app se replie en icônes le temps du routage. Le profil le long de la route s’affiche sous la carte. Le panneau s’élargit pour les tableaux.</li>
+        <li><strong>Debout</strong> : la carte en haut (55 %), le panneau en bas (45 %). <span class="ui">⋯</span> → « Carte 55 % · panneau 45 % » passe à l’empilé (carte, profil, panneau) ; l’iPad s’en souvient. Dites-nous lequel vous préférez.</li>
+        <li>Plusieurs étapes ou cartes peuvent rester ouvertes en même temps.</li>
+      </ul>
+      <figure class="shot wide">
+        <img src="img/ipad-couche.jpg" width="1400" height="1049" loading="lazy" decoding="async" alt="L’iPad couché : à gauche la barre de l’app en icônes puis le rail Préparer, Résultat, Calculs, Réglages ; le panneau du Résultat avec la phrase, les trois chiffres, Ce qui a changé, Briefing, Quand ? Route ? Certitude ?, Les routes Rapide et Prudent ★, Montrer à la famille, Ce qui a changé, À surveiller ⚠ 5, Météo sur la carte, Comparer, Feuille de route (B&amp;G) 8 points ; à droite la carte et, dessous, le profil du vent et des vagues le long de la route.">
+        <figcaption>iPad couché : le rail à gauche, le panneau, la carte et le profil dessous.</figcaption>
+      </figure>
+      <figure class="shot tall-ipad">
+        <img src="img/ipad-debout.jpg" width="1024" height="1366" loading="lazy" decoding="async" alt="L’iPad debout : la carte sur la moitié haute ; dessous la barre des modes Préparer, Résultat, Calculs, Réglages, puis le Résultat : Arrivée sam. 31 vers 15 h, de jour — confiance moyenne, les trois chiffres, Ce qui a changé, Briefing, Quand ? Route ? Certitude ?, Les routes, et Ajouter un calcul.">
+        <figcaption>iPad debout : carte 55 %, panneau 45 %.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ======================= Le test ======================= -->
+  <section id="test" aria-labelledby="h-test">
+    <p class="eyebrow">Au port, avec Starlink</p>
+    <h2 id="h-test">Le test de 10 minutes</h2>
+    <div class="stack">
+      <p>Sur l’iPhone, puis la même chose sur l’iPad. <strong>Un seul vrai calcul.</strong> Une capture 📸 aux lignes marquées. Avant : <a href="#avant">la version et les crédits</a>.</p>
+      <div class="tbl">
+        <table class="test">
+          <thead>
+            <tr><th scope="col">#</th><th scope="col">Minute</th><th scope="col">À faire</th><th scope="col">À regarder</th><th scope="col">📸</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>B1</td><td>0–1 min</td><td data-label="À faire">🧭 Routage</td><td data-label="À regarder">Les quatre modes en haut (iPad couché : le rail à gauche). « Résultat » grisé tant qu’aucun calcul n’existe ; s’il y en a, l’app s’ouvre sur Résultat : touchez ① Préparer.</td><td>📸 l’arrivée</td></tr>
+            <tr><td>B2</td><td>1–2 min</td><td data-label="À faire"><strong>Sans rien ouvrir</strong>, lire les 8 lignes de Préparer</td><td data-label="À regarder">Chaque ligne se comprend-elle seule ? Que veulent dire ✓ / ✎ / ⚠ ?</td><td></td></tr>
+            <tr><td>B3</td><td>2–3 min</td><td data-label="À faire">Ouvrir 1 → l’arrivée. Ouvrir 5 → cocher 🎲, puis décocher</td><td data-label="À regarder">La bande des coûts bouge (temps, % du jour). Est-ce clair ?</td><td>📸 la bande</td></tr>
+            <tr><td>B4</td><td>3–4 min</td><td data-label="À faire">Toucher la bande des coûts</td><td data-label="À regarder">Le détail (étape 8) : utile, ou trop ?</td><td></td></tr>
+            <tr><td>B5</td><td>4–6 min</td><td data-label="À faire"><strong>Lancer</strong> (le seul vrai calcul)</td><td data-label="À regarder">La progression, puis le Résultat : la phrase, les 3 chiffres, « À surveiller ⚠ N »</td><td>📸 le résultat</td></tr>
+            <tr><td>B6</td><td>6–7 min</td><td data-label="À faire">Déplier « À surveiller », puis ▶ sur la carte</td><td data-label="À regarder">▸ / ▾ : la ligne entière se touche ?</td><td></td></tr>
+            <tr><td>B7</td><td>7–8 min</td><td data-label="À faire">＋ Ajouter un calcul → ★ Optimiser la date ±1 j (<strong>ne pas lancer</strong>)</td><td data-label="À regarder">Préparer revient prérempli, ✎ sur l’étape 2 et 0 crédit</td><td>📸</td></tr>
+            <tr><td>B8</td><td>8–9 min</td><td data-label="À faire">③ Calculs : retrouver le calcul, ☆, ⋯</td><td data-label="À regarder">Retrouve-t-on ce qu’on a fait ?</td><td></td></tr>
+            <tr><td>B9</td><td>9–10 min</td><td data-label="À faire">⚙ Réglages : déplier « Contraintes », <strong>sans enregistrer</strong></td><td data-label="À regarder">Vos valeurs : 26 nds · raf. 34 · 3 m · près 50° · côte 3 M (la marge 80 % est dans « Objectif »)</td><td></td></tr>
+            <tr><td>B10</td><td>le soir</td><td data-label="À faire">Mode nuit rouge (menu de l’avatar) : une capture</td><td data-label="À regarder">Tout est lisible sans éblouir ? Les deux routes se distinguent ?</td><td>📸</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sandbox">
+        <p class="eyebrow">À la fin</p>
+        <h3>Les trois questions</h3>
+        <p class="note">Une réponse courte suffit.</p>
+        <ol class="qs">
+          <li>Qu’est-ce qui vous a fait hésiter ?</li>
+          <li>Qu’est-ce qui manque pour décider de partir ?</li>
+          <li>Un chiffre vous a-t-il paru faux ?</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <h3>Vos retours, sur WhatsApp</h3>
+        <ul class="plain">
+          <li>Un message par remarque. Il commence par « ROUTAGE » et le numéro de la ligne du test :</li>
+        </ul>
+        <p class="msg">ROUTAGE B5 — l’heure d’arrivée ne correspond pas à…</p>
+        <ul class="plain">
+          <li>Une capture et une phrase. Un message vocal va très bien aussi.</li>
+          <li>Dites : iPhone ou iPad, en ligne ou hors ligne. Pour un calcul, la capture de son détail (③ Calculs → ⋯).</li>
+          <li>Hors ligne : gardez les captures et envoyez-les d’un coup au retour de Starlink.</li>
+          <li>Même un « RAS » aide !</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Une aide à la décision — le chef de bord décide.</p>
+    <p>Bon vent à Wang’ap · Flavien</p>
+  </footer>
+
+</main>
+
+</body>
+</html>

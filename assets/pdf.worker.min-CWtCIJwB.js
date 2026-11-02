@@ -1,0 +1,1 @@
+function e(e){return new Worker(`/assets/pdf.worker.min-Cnprj_M2.js`,{type:`module`,name:e?.name})}export{e as default};

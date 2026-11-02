@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Les polaires de Wang'ap</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap">
+<style>
+  /* Layout: one reading column on a sea-mist ground, the same series as « Le conseiller de route » ; charts sit on paper plates, numbers in a mono face. */
+  :root {
+    --bg: #edf2f1;
+    --paper: #fafcfb;
+    --sand: #ebe2cf;
+    --sand-ink: #6a532c;
+    --fg: #14293a;
+    --muted: #4c606d;
+    --line: #d2dcdb;
+    --accent: #0e636e;
+    --accent-soft: #d9ebeb;
+    --ok: #2e7a49;
+    --warn: #a8740f;
+    --bad: #b33f2e;
+    --none: #98a2a5;
+    --c-wang: #2a78d6;
+    --c-esc: #eb6834;
+    --c-old: #1baf7a;
+    --s-genois: #4a3aa7;
+    --s-genn: #eda100;
+    --s-spi: #e87ba4;
+    --s-trinq: #4c606d;
+    --seq-lo: #e8f2f2;
+    --seq-hi: #0e636e;
+    --seq-ink-hi: #ffffff;
+    --font-display: "Newsreader", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-data: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b1920;
+      --paper: #11232d;
+      --sand: #2a271f;
+      --sand-ink: #d8c394;
+      --fg: #dce6e8;
+      --muted: #9aaeb5;
+      --line: #22404b;
+      --accent: #6cc2c8;
+      --accent-soft: #15383f;
+      --ok: #6cbf89;
+      --warn: #e1b24c;
+      --bad: #ec8b75;
+      --none: #7b888d;
+      --c-wang: #3987e5;
+      --c-esc: #d95926;
+      --c-old: #199e70;
+      --s-genois: #9085e9;
+      --s-genn: #c98500;
+      --s-spi: #d55181;
+      --s-trinq: #9aaeb5;
+      --seq-lo: #12303a;
+      --seq-hi: #7fd0d6;
+      --seq-ink-hi: #0b1920;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b1920;
+    --paper: #11232d;
+    --sand: #2a271f;
+    --sand-ink: #d8c394;
+    --fg: #dce6e8;
+    --muted: #9aaeb5;
+    --line: #22404b;
+    --accent: #6cc2c8;
+    --accent-soft: #15383f;
+    --ok: #6cbf89;
+    --warn: #e1b24c;
+    --bad: #ec8b75;
+    --none: #7b888d;
+    --c-wang: #3987e5;
+    --c-esc: #d95926;
+    --c-old: #199e70;
+    --s-genois: #9085e9;
+    --s-genn: #c98500;
+    --s-spi: #d55181;
+    --s-trinq: #9aaeb5;
+    --seq-lo: #12303a;
+    --seq-hi: #7fd0d6;
+    --seq-ink-hi: #0b1920;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 1rem; line-height: 1.6; }
+  main { max-width: 46rem; margin-inline: auto; padding-inline: 16px; padding-block: 2rem 3.5rem; }
+  p { margin: 0; }
+  strong { font-weight: 600; }
+  a { color: var(--accent); text-underline-offset: 0.18em; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+  .num, td, th, .tabnum { font-variant-numeric: tabular-nums; }
+
+  /* ---------- Masthead ---------- */
+  .masthead { display: grid; gap: 0.75rem; padding-block-end: 1.75rem; border-bottom: 1px solid var(--line); }
+  .kicker { font-family: var(--font-data); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-family: var(--font-display); font-weight: 500; font-size: clamp(2rem, 7vw, 2.75rem); line-height: 1.08; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+  h1 em { font-style: italic; font-weight: 400; color: var(--muted); }
+  .byline { font-family: var(--font-display); font-style: italic; font-size: 1.05rem; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .chip { font-family: var(--font-data); font-size: 0.75rem; letter-spacing: 0.02em; padding: 0.2rem 0.6rem; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); background: var(--paper); white-space: nowrap; }
+  .chip.live { color: var(--ok); border-color: currentColor; white-space: normal; }
+  .masthead > * { min-width: 0; }
+
+  nav.toc { margin-block: 1.75rem 0.5rem; }
+  nav.toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem 0.5rem; }
+  nav.toc a { display: inline-block; font-size: 0.85rem; text-decoration: none; color: var(--fg); padding: 0.3rem 0.7rem; border-radius: 6px; background: var(--accent-soft); }
+  nav.toc a:hover { text-decoration: underline; }
+
+  /* ---------- Sections ---------- */
+  section { margin-block-start: 3rem; scroll-margin-top: 1rem; }
+  .eyebrow { font-family: var(--font-data); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sand-ink); margin-block-end: 0.35rem; }
+  h2 { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.55rem, 5vw, 1.9rem); line-height: 1.15; margin: 0 0 1rem; text-wrap: balance; }
+  h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.22rem; line-height: 1.25; margin: 0.6rem 0 0; text-wrap: balance; }
+  .stack { display: grid; gap: 0.85rem; }
+  .stack > * { min-width: 0; }
+  .note { color: var(--muted); font-size: 0.9rem; }
+  .quote { font-family: var(--font-display); font-style: italic; }
+  ul.plain { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.35rem; }
+  ul.plain li::marker { color: var(--accent); }
+
+  /* En bref : five numbered lines, the page in one breath */
+  ol.brief { list-style: none; counter-reset: b; margin: 1.4rem 0 0; padding: 0; display: grid; gap: 0.7rem; }
+  ol.brief li { counter-increment: b; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: 0.6rem; font-family: var(--font-display); font-size: 1.14rem; line-height: 1.45; }
+  ol.brief li::before { content: counter(b); font-family: var(--font-data); font-size: 0.78rem; color: var(--accent); padding-top: 0.25rem; }
+
+  .update { border: 1px solid var(--line); border-radius: 10px; background: var(--paper); padding: 1rem 1rem 1.1rem; display: grid; gap: 0.75rem; margin-top: 1.6rem; }
+  .update h3 { margin: 0; }
+
+  /* ---------- Tables ---------- */
+  .tbl { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+  th, td { text-align: left; vertical-align: top; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--line); }
+  tr:last-child > th, tr:last-child > td { border-bottom: 0; }
+  thead th { background: var(--sand); color: var(--sand-ink); font-family: var(--font-data); font-weight: 500; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.35; }
+  tbody th { font-weight: 600; }
+  td.r, th.r { text-align: right; white-space: nowrap; }
+  td.c, th.c { text-align: center; white-space: nowrap; }
+  .was { color: var(--muted); font-size: 0.82rem; display: block; }
+  table.compact td, table.compact th { padding: 0.45rem 0.6rem; }
+  table.wide { min-width: 34rem; }
+  tr.sel > * { background: var(--accent-soft); }
+
+  /* ---------- Figures ---------- */
+  figure { margin: 0; }
+  .plate { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 0.75rem; }
+  figcaption { font-size: 0.86rem; color: var(--muted); margin-top: 0.6rem; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: var(--font-body); fill: var(--fg); }
+  svg .tick { font-family: var(--font-data); font-size: 10px; fill: var(--muted); }
+  svg .gridl { stroke: var(--line); fill: none; stroke-width: 1; }
+  svg .axisl { stroke: var(--muted); fill: none; stroke-width: 1; }
+  .legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; font-size: 0.88rem; }
+  .legend li { display: flex; align-items: center; gap: 0.4rem; }
+  .key { width: 1.6rem; height: 0; border-top: 2.5px solid; flex: none; }
+  .key.dash { border-top-style: dashed; border-top-width: 2px; }
+  .key.dot { border-top-style: dotted; border-top-width: 3px; }
+  .mk { width: 0.7rem; height: 0.7rem; border-radius: 50%; flex: none; border: 2px solid var(--c-wang); }
+  .mk.full { background: var(--c-wang); }
+  .sw { width: 0.95rem; height: 0.95rem; border-radius: 3px; flex: none; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; }
+  .controls .lab { font-size: 0.85rem; color: var(--muted); margin-right: 0.2rem; }
+  button.pill { font: inherit; font-family: var(--font-data); font-size: 0.85rem; min-height: 2.2rem; min-width: 2.6rem; padding: 0.25rem 0.75rem; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); color: var(--fg); cursor: pointer; touch-action: manipulation; }
+  button.pill[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+  label.toggle { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.88rem; min-height: 2.2rem; cursor: pointer; }
+  label.toggle input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+
+  .polar-wrap { display: grid; gap: 0.9rem; }
+  .polar-wrap > * { min-width: 0; }
+  .polar-svg { max-width: 27rem; margin-inline: auto; }
+  .readout { font-size: 0.9rem; min-height: 1.5rem; }
+  @media (min-width: 720px) {
+    .polar-wrap { grid-template-columns: minmax(0, 1fr) 19.5rem; align-items: start; }
+  }
+
+  /* Ratio map */
+  table.map { min-width: 36rem; font-family: var(--font-data); font-size: 0.8rem; }
+  table.map th, table.map td { padding: 0.35rem 0.3rem; text-align: center; border-bottom: 1px solid var(--paper); }
+  table.map thead th { font-size: 0.68rem; letter-spacing: 0.04em; }
+  table.map tbody th { font-family: var(--font-data); font-weight: 600; white-space: nowrap; background: var(--paper); position: sticky; left: 0; z-index: 1; }
+  table.map td { border-left: 1px solid var(--paper); white-space: nowrap; color: var(--fg); }
+  table.map td.hi { color: var(--seq-ink-hi); }
+  table.map td.esc { font-style: italic; }
+  table.map td .m { font-size: 0.6rem; margin-left: 1px; vertical-align: 1px; }
+
+  /* Bars (arrival times) */
+  .bars { display: grid; gap: 0.55rem; }
+  .bar-row { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) 3.6rem; gap: 0.6rem; align-items: center; font-size: 0.88rem; }
+  .bar-row .lab { line-height: 1.25; }
+  .bar-row .val { font-family: var(--font-data); text-align: right; white-space: nowrap; }
+  .track { position: relative; height: 0.9rem; border-radius: 3px; background: repeating-linear-gradient(90deg, transparent 0 calc(20% - 1px), var(--line) calc(20% - 1px) 20%); }
+  .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 0 3px 3px 0; }
+  .fill.esc { background: var(--c-esc); }
+  .fill.wang { background: var(--c-wang); }
+  .fill.old { background: var(--c-old); }
+  .fill.range { background: color-mix(in oklab, var(--c-wang) 35%, transparent); border: 1.5px solid var(--c-wang); border-radius: 3px; }
+  .bar-axis { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) 3.6rem; gap: 0.6rem; font-family: var(--font-data); font-size: 0.72rem; color: var(--muted); }
+  .bar-axis .ticks { display: flex; justify-content: space-between; }
+  @media (max-width: 480px) {
+    .bar-row, .bar-axis { grid-template-columns: minmax(0, 7.6rem) minmax(0, 1fr) 3.2rem; gap: 0.45rem; }
+  }
+
+  /* Confidence strip */
+  .strip { display: flex; height: 2.1rem; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); font-family: var(--font-data); font-size: 0.82rem; }
+  .strip > div { display: flex; align-items: center; justify-content: center; white-space: nowrap; min-width: 0; }
+  .strip .s-m { background: var(--c-wang); color: var(--paper); }
+  .strip .s-b { background: color-mix(in oklab, var(--c-wang) 30%, var(--paper)); color: var(--fg); }
+  .strip .s-e { background: repeating-linear-gradient(135deg, var(--paper) 0 4px, color-mix(in oklab, var(--c-esc) 30%, var(--paper)) 4px 8px); color: var(--fg); }
+
+  .caveat { border-left: 3px solid var(--warn); padding: 0.1rem 0 0.1rem 0.85rem; }
+  .callout { background: var(--accent-soft); border-radius: 8px; padding: 0.8rem 0.9rem; }
+
+  /* Asks */
+  .asks-panel { background: var(--sand); border-radius: 10px; padding: 1.25rem 1rem 1.4rem; }
+  ol.asks { list-style: none; counter-reset: ask; margin: 0; padding: 0; display: grid; gap: 0.85rem; }
+  ol.asks li { counter-increment: ask; display: grid; grid-template-columns: 1.7rem minmax(0, 1fr); gap: 0.7rem; }
+  ol.asks li::before { content: counter(ask); font-family: var(--font-data); font-size: 0.8rem; font-weight: 600; width: 1.7rem; height: 1.7rem; border-radius: 50%; display: grid; place-items: center; background: var(--paper); color: var(--accent); border: 1px solid var(--line); }
+  ul.todo { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+  ul.todo li { display: grid; grid-template-columns: 0.6rem minmax(0, 1fr); gap: 0.8rem; }
+  ul.todo li::before { content: ""; width: 0.6rem; height: 0.6rem; margin-top: 0.5rem; border-radius: 50%; border: 2px solid var(--accent); }
+
+  footer { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); font-family: var(--font-display); font-style: italic; color: var(--muted); text-align: center; display: grid; gap: 0.3rem; }
+  footer .small { font-family: var(--font-body); font-style: normal; font-size: 0.8rem; }
+
+  @media (min-width: 640px) {
+    main { padding-block: 3rem 4.5rem; }
+    .asks-panel { padding: 1.5rem 1.6rem 1.7rem; }
+  }
+</style>
+</head>
+<body>
+<p style="max-width:52rem;margin:0 auto;padding:calc(env(safe-area-inset-top, 0px) + 12px) 16px 0;font:600 14px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"><a href="/aide" style="color:var(--accent);text-decoration:none">‹ Aide de Wang’ap</a></p>
+
+
+<main>
+
+  <header class="masthead">
+    <p class="kicker">Wang’ap · Outremer 52 · Polaires</p>
+    <h1>Les polaires de Wang’ap <em>— d’où viennent les vitesses du routage</em></h1>
+    <p class="byline">Pour Bertrand et Catherine · 28 octobre 2026 · Flavien</p>
+    <div class="chips" aria-label="État">
+      <span class="chip live">Mise à jour le 28 oct. : voiles et loch nettoyé</span>
+      <span class="chip">8 581 relevés à la voile</span>
+      <span class="chip">Suite de « Le conseiller de route »</span>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Sommaire">
+    <ul>
+      <li><a href="#bref">En bref</a></li>
+      <li><a href="#quoi">Une polaire</a></li>
+      <li><a href="#origine">Les chiffres</a></li>
+      <li><a href="#face">Face à Escale</a></li>
+      <li><a href="#vmg">Meilleurs angles</a></li>
+      <li><a href="#voilure">Par voilure</a></li>
+      <li><a href="#loch">Le loch</a></li>
+      <li><a href="#routage">Le routage</a></li>
+      <li><a href="#progresser">À faire</a></li>
+      <li><a href="#questions">Questions</a></li>
+    </ul>
+  </nav>
+
+  <!-- ======================= 1. En bref ======================= -->
+  <section id="bref" aria-labelledby="h-bref">
+    <p class="eyebrow">En bref</p>
+    <h2 id="h-bref">Cinq lignes</h2>
+    <ol class="brief">
+      <li><span>La polaire dit à quelle vitesse Wang’ap avance selon la force et l’angle du vent. Le conseiller de route en tire vos heures d’arrivée.</span></li>
+      <li><span>Elle part d’Escale, l’Outremer 52 du fichier de Bertrand, et la corrige case par case avec 8 581 relevés de Wang’ap sous voiles depuis juin.</span></li>
+      <li><span>Wang’ap y fait environ 81 % d’Escale au près et au travers par vent moyen, et 67 à 71 % au largue.</span></li>
+      <li><span>Depuis le 28 octobre, le loch d’octobre (encrassé, 8 % trop bas) est recalé sur le GPS jusqu’à votre nettoyage du 27, et vos voiles entrent dans le calcul. Sur un passage type de 700 milles au portant, l’arrivée prévue avance de 5 à 6 heures.</span></li>
+      <li><span>Ce qui la ferait le plus progresser : noter vos voiles et vos ris dans « ⛵ Mes voiles », surtout au portant.</span></li>
+    </ol>
+
+    <div class="update">
+      <h3>Ce qui a changé le 28 octobre</h3>
+      <div class="tbl">
+        <table class="compact">
+          <thead><tr><th scope="col"></th><th scope="col" class="r">Avant (26 oct.)</th><th scope="col" class="r">Depuis le 28 oct.</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Relevés à la voile</th><td class="r">8 373</td><td class="r">8 581</td></tr>
+            <tr><th scope="row">Cases mesurées · mélangées · Escale</th><td class="r">44 · 30 · 36</td><td class="r">41 · 33 · 36</td></tr>
+            <tr><th scope="row">Loch d’octobre</th><td class="r">lu tel quel</td><td class="r">× 1,082</td></tr>
+            <tr><th scope="row">Voiles</th><td class="r">aucune</td><td class="r">252 estimées, 3 notées</td></tr>
+            <tr><th scope="row">Wang’ap ÷ Escale au largue, vent moyen</th><td class="r">0,62</td><td class="r">0,67</td></tr>
+            <tr><th scope="row">Passage type de 700 milles (réglage par défaut)</th><td class="r">101 h</td><td class="r">95 h</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Trois cases passent de « mesurée » à « mélangée » sans rien perdre : leurs relevés ont vieilli de deux jours et pèsent maintenant juste sous le seuil. Le rapport moyen Wang’ap ÷ Escale reste 0,76.</p>
+    </div>
+  </section>
+
+  <!-- ======================= 2. Une polaire ======================= -->
+  <section id="quoi" aria-labelledby="h-quoi">
+    <p class="eyebrow">Le principe</p>
+    <h2 id="h-quoi">Une polaire, c’est quoi</h2>
+    <div class="stack">
+      <p>Pour une force de vent, la polaire donne une courbe : la vitesse du bateau sur l’eau (celle du loch) à chaque angle du vent réel. Le bateau est au centre, le vent vient du haut. Plus la courbe s’éloigne du centre, plus le bateau va vite.</p>
+      <figure>
+        <div class="plate"><svg id="fig-explain" class="polar-svg" viewBox="0 0 360 520" role="img" aria-label="Polaire de Wang’ap à 12 nœuds de vent réel : 6,9 nœuds au près à 48°, 9,3 nœuds à 110°, 5,8 nœuds à 150°. La flèche du meilleur VMG au près montre 4,6 nœuds gagnés vers le vent."></svg></div>
+        <figcaption>Wang’ap dans 12 nds de vent réel. Le point bleu : à 110° du vent, 9,3 nds. Le trait pointillé : le meilleur cap au près, 48°, donne 6,9 nds sur l’eau mais 4,6 nds de <strong>VMG</strong> (la vitesse gagnée vers le vent).</figcaption>
+      </figure>
+      <p>La polaire de Wang’ap est un tableau de <strong>110 cases</strong> : 10 forces de vent (4 à 30 nds) × 11 angles (40 à 180°). Entre deux cases, le routeur prend la valeur intermédiaire.</p>
+      <p>Chaque case donne une <strong>bonne vitesse de croisière</strong> : celle que Wang’ap atteint ou dépasse 20 % du temps dans ces conditions. Ce n’est ni un record, ni une moyenne qui compterait les moments où personne ne règle.</p>
+      <p>Le <strong>VMG</strong> sert quand la destination est dans le lit du vent : il dit quel angle tenir pour y arriver le plus vite, au près comme au portant.</p>
+    </div>
+  </section>
+
+  <!-- ======================= 3. D'où viennent les chiffres ======================= -->
+  <section id="origine" aria-labelledby="h-origine">
+    <p class="eyebrow">Escale, puis Wang’ap</p>
+    <h2 id="h-origine">D’où viennent les chiffres</h2>
+    <div class="stack">
+      <h3>La base : Escale</h3>
+      <p>Le fichier ESCAL8 de Bertrand vient d’Escale, un Outremer 52 qui a fait le tour du monde en deux ans, sans spi symétrique. Il couvre 28 angles (18 à 180°) et 8 forces (4 à 35 nds). C’est une polaire relevée en navigation, pas une polaire d’architecte : elle a son bruit. Nous l’avons nettoyée.</p>
+      <ul class="plain">
+        <li>La colonne <strong>35 nds</strong> est écartée : 15 cases sur 25 à zéro, vide dès 90°.</li>
+        <li>Les angles <strong>18, 21 et 30°</strong> sont écartés. Sous 35° du vent réel, aucun catamaran n’avance à la voile : 4 nds à 18° dans 4 nds de vent, c’est le moteur ou le bruit. De 35 à 45°, les cases sont gardées mais notées « fragiles ».</li>
+        <li>La colonne <strong>4 nds</strong> est refaite à partir de 8 nds : elle allait plus vite que le vent au portant (5,5 nds à 180° dans 4 nds).</li>
+        <li>Un <strong>lissage</strong> d’un angle à l’autre efface les creux (80 à 100°) et les doublons (160 à 164°).</li>
+        <li>Plus de vent ne fait jamais aller moins vite jusqu’à 20 nds ; au-delà, au plus 8 % de moins d’une force à la suivante (la toile réduite).</li>
+      </ul>
+      <p class="caveat"><strong>Escale a sans doute noté ses meilleurs moments.</strong> À 50° dans 20 nds, Escale nettoyée donne 10,5 nds ; la polaire du chantier pour l’Outremer 55 en donne 8,5 ; la polaire de Wang’ap, 8,8.</p>
+
+      <h3>Les mesures de Wang’ap</h3>
+      <p>Les instruments envoient un relevé par minute environ (vent réel, angle, vitesse surface, régime des deux moteurs) ; les plus anciens sont regroupés par quart d’heure. <strong>8 581 relevés à la voile</strong> sont gardés. Le reste est écarté :</p>
+      <div class="tbl">
+        <table class="compact">
+          <tbody>
+            <tr><th scope="row">Hors plage</th><td class="r">3 705</td><td>vent sous 3 ou au-dessus de 35 nds, angle sous 35°, bateau sous 0,5 nd (mouillage, port)</td></tr>
+            <tr><th scope="row">Moteur</th><td class="r">1 521</td><td>l’un des deux moteurs au-dessus de 300 tr/min</td></tr>
+            <tr><th scope="row">Moteur par petit temps</th><td class="r">511</td><td>sous 10 nds de vent, plus vite que 0,85 fois le vent, sans régime enregistré : c’est le moteur</td></tr>
+            <tr><th scope="row">Moteur au près</th><td class="r">97</td><td>vent apparent sous 28° : aucun catamaran ne remonte là à la voile</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Cela fait environ <strong>290 heures sous voiles</strong> : 51 h au près, 110 h au travers, 117 h au largue, 14 h vent arrière. Seulement 27 h au-dessus de 18 nds.</p>
+
+      <h3>Les cases et leur confiance</h3>
+      <div class="strip" role="img" aria-label="Sur 110 cases : 41 mesurées, 33 mélangées, 36 venues d’Escale.">
+        <div class="s-m" style="flex: 41">41 mesurées</div>
+        <div class="s-b" style="flex: 33">33 mélangées</div>
+        <div class="s-e" style="flex: 36">36 Escale</div>
+      </div>
+      <ul class="plain">
+        <li><strong>Mesurée</strong> : assez de relevés, la vitesse vient de Wang’ap seul. Il faut l’équivalent de 25 minutes récentes (ou 50 minutes vieilles de deux mois). Une case mesurée reste entre 50 et 150 % de sa base, contre un relevé aberrant.</li>
+        <li><strong>Mélangée</strong> : un peu de relevés (de 5 à 25 minutes récentes). La vitesse glisse d’Escale vers la mesure à mesure qu’ils s’ajoutent.</li>
+        <li><strong>Escale</strong> : presque rien. Escale nettoyée × le rapport Wang’ap ÷ Escale de l’allure et de la force (le tableau plus bas).</li>
+      </ul>
+      <p>Les relevés récents pèsent plus : un relevé compte moitié moins après 60 jours, quatre fois moins après 120. La polaire suit le bateau d’aujourd’hui, sa charge, sa carène et ses voiles.</p>
+    </div>
+  </section>
+
+  <!-- ======================= 4. Face à Escale ======================= -->
+  <section id="face" aria-labelledby="h-face">
+    <p class="eyebrow">Comparaison</p>
+    <h2 id="h-face">Wang’ap face à Escale</h2>
+    <div class="stack">
+      <p>Choisissez une force de vent. Trait plein : Wang’ap ; tirets : Escale nettoyée. Touchez un point pour lire la case.</p>
+      <div class="controls" role="group" aria-label="Force du vent réel">
+        <span class="lab">Vent réel</span>
+        <button type="button" class="pill" data-tws="6" aria-pressed="false">6</button>
+        <button type="button" class="pill" data-tws="8" aria-pressed="false">8</button>
+        <button type="button" class="pill" data-tws="10" aria-pressed="false">10</button>
+        <button type="button" class="pill" data-tws="12" aria-pressed="true">12</button>
+        <button type="button" class="pill" data-tws="16" aria-pressed="false">16</button>
+        <button type="button" class="pill" data-tws="20" aria-pressed="false">20</button>
+        <button type="button" class="pill" data-tws="25" aria-pressed="false">25 nds</button>
+      </div>
+      <label class="toggle" for="show-old"><input type="checkbox" id="show-old"> Montrer la polaire d’avant (26 oct.)</label>
+      <div class="polar-wrap">
+        <figure>
+          <div class="plate">
+            <svg id="fig-polar" class="polar-svg" viewBox="0 0 360 520" role="img" aria-label="Diagramme polaire de Wang’ap et d’Escale pour la force de vent choisie ; le tableau à côté donne les mêmes valeurs."></svg>
+          </div>
+          <ul class="legend" style="margin-top:0.6rem">
+            <li><span class="key" style="border-color:var(--c-wang)"></span>Wang’ap</li>
+            <li><span class="key dash" style="border-color:var(--c-esc)"></span>Escale nettoyée</li>
+            <li id="leg-old" hidden><span class="key dot" style="border-color:var(--c-old)"></span>Wang’ap, 26 oct.</li>
+            <li><span class="mk full"></span>case mesurée</li>
+            <li><span class="mk"></span>mélangée</li>
+            <li>sans point : venue d’Escale</li>
+          </ul>
+          <p class="readout note" id="readout" aria-live="polite">Touchez un point.</p>
+        </figure>
+        <div class="tbl">
+          <table class="compact" id="angle-table">
+            <caption class="note" style="caption-side:top;text-align:left;padding:0.5rem 0.6rem" id="angle-caption"></caption>
+            <thead><tr><th scope="col">Angle</th><th scope="col" class="r">Wang’ap</th><th scope="col" class="r">Escale</th><th scope="col" class="r">÷</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <h3>La carte des rapports, case par case</h3>
+      <p>Chaque case donne Wang’ap ÷ Escale nettoyée. Plus la case est foncée, plus Wang’ap s’approche d’Escale. Le signe dit d’où vient le chiffre de Wang’ap.</p>
+      <ul class="legend">
+        <li><strong>●</strong> mesurée</li>
+        <li><strong>◐</strong> mélangée</li>
+        <li><em>en italique</em> : venue d’Escale (elle répète le rapport de son secteur)</li>
+      </ul>
+      <div class="tbl"><table class="map" id="ratio-map" aria-label="Rapport Wang’ap ÷ Escale par force de vent (lignes) et angle du vent réel (colonnes)"></table></div>
+      <p class="note">Dans les cases mesurées, le rapport va de 0,62 (12 nds à 150°) à 0,99 (8 nds à 165°). La moitié des 110 cases est sous 0,75.</p>
+
+      <h3>Par secteur</h3>
+      <p>Le rapport retenu pour chaque allure et chaque tranche de vent : la valeur du milieu des cases mesurées. C’est lui qui met Escale à l’échelle de Wang’ap là où vous avez peu navigué.</p>
+      <div class="tbl">
+        <table class="compact">
+          <thead><tr><th scope="col">Allure</th><th scope="col" class="r">Petit temps<br>4–8 nds</th><th scope="col" class="r">Vent moyen<br>10–16 nds</th><th scope="col" class="r">Fort<br>20–30 nds*</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Près (40–60°)</th><td class="r">0,67</td><td class="r">0,81<span class="was">avant 0,80</span></td><td class="r">0,80</td></tr>
+            <tr><th scope="row">Travers (75–120°)</th><td class="r">0,69</td><td class="r">0,82<span class="was">avant 0,81</span></td><td class="r">0,71</td></tr>
+            <tr><th scope="row">Largue (135–150°)</th><td class="r">0,71<span class="was">avant 0,66</span></td><td class="r">0,67<span class="was">avant 0,62</span></td><td class="r">0,67<span class="was">avant 0,64</span></td></tr>
+            <tr><th scope="row">Vent arrière (165–180°)</th><td class="r">0,67<span class="was">avant 0,64</span></td><td class="r">0,67<span class="was">avant 0,64</span></td><td class="r">0,67<span class="was">avant 0,64</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">* Presque pas de mesures par vent fort : on reprend le rapport de l’allure. Au vent arrière, jamais le sien : celui du largue, parce qu’Escale n’avait pas de spi et qu’il serait faux d’importer sa faiblesse.</p>
+      <p><strong>Le spi S4.</strong> Escale n’en avait pas ; Wang’ap l’a. Là où il n’y a pas de mesure, la vitesse retenue ne descend pas sous 90 % de celle de 150° à 165°, ni sous 85 % à 180°. Vos mesures à 165° valent 90 à 110 % de celles de 150° (8 à 16 nds) ; à 180°, 80 % (16 nds), un peu sous l’hypothèse. On ne sait pas encore si le S4 était envoyé.</p>
+
+      <h3>Face aux essais publiés</h3>
+      <div class="tbl">
+        <table class="compact wide">
+          <thead><tr><th scope="col">Allure (vent réel)</th><th scope="col">Référence publiée</th><th scope="col" class="r">Escale</th><th scope="col" class="r">Wang’ap</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">50°, 20 nds</th><td>8,5 nds (Outremer 55, polaire du chantier)</td><td class="r">10,5</td><td class="r">8,8<span class="was">mélangée</span></td></tr>
+            <tr><th scope="row">120°, 15 nds, GV + génois</th><td>« plus de 9 nds » (Yachting World)</td><td class="r">11,4–12,5</td><td class="r">9,8–10,5</td></tr>
+            <tr><th scope="row">110°, 15 nds, gennaker</th><td>12–12,5 nds (Yachting World)</td><td class="r">11,5–12,9</td><td class="r">9,8–10,5<span class="was">mélangées</span></td></tr>
+            <tr><th scope="row">150°, 12 nds</th><td>8–9,5 nds, gennaker ou A2 (Yachting World)</td><td class="r">9,4</td><td class="r">5,8<span class="was">mesurée</span></td></tr>
+            <tr><th scope="row">135–165°, 16–20 nds</th><td>11–12 nds, surfs à 17–20 (Yachting World)</td><td class="r">10,0–13,0</td><td class="r">7,1–10,1</td></tr>
+            <tr><th scope="row">Au moteur</th><td>7,4 nds à 2 000 tr/min, un moteur</td><td class="r">—</td><td class="r">5,5<span class="was">à ≈ 1 750 tr/min</span></td></tr>
+            <tr><th scope="row">Traversée de l’ARC</th><td>8,7 nds de moyenne, ≈ 200 M par jour (Outremer 52 « Cattiba »)</td><td class="r">—</td><td class="r">132 M<span class="was">meilleure journée, côtière</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>Où se situe Wang’ap.</strong> Au près et au travers, il navigue comme le bateau d’essai sous voiles blanches. Au portant, il en est loin : 5,8 nds à 150° dans 12 nds, là où l’essai annonce 8 à 9,5.</p>
+      <p class="note">Le bateau de l’essai de 200 milles de Yachting World était lège, avec des voiles à filaments et un équipage de course. Wang’ap part pour trois ans, avec dessalinisateur, annexe, vivres et pièces : 12,5 t lège, 15,7 t en charge selon le chantier. Il faut ajouter l’état de la mer (vos mesures sont surtout méditerranéennes, côtières, par vent faible), la hauteur et l’étalonnage de la girouette-anémomètre (un vent lu trop fort range le bateau dans une case plus ventée, où il paraît plus lent), et les « meilleurs moments » d’Escale.</p>
+    </div>
+  </section>
+
+  <!-- ======================= 5. VMG ======================= -->
+  <section id="vmg" aria-labelledby="h-vmg">
+    <p class="eyebrow">Au près, au portant</p>
+    <h2 id="h-vmg">Les meilleurs angles</h2>
+    <div class="stack">
+      <p>Quand la destination est au vent ou sous le vent, le routeur cherche l’angle qui donne le meilleur VMG. À 12 nds, le meilleur cap au près est vers <strong>48°</strong> pour <strong>4,6 nds</strong> de VMG (6,9 nds sur l’eau) ; Escale, vers 47° pour 5,6 nds. Au portant, Wang’ap a son meilleur VMG presque vent arrière, vers <strong>166°</strong> pour <strong>5,5 nds</strong> ; Escale empanne vers 150° pour 8,1 nds.</p>
+      <div class="tbl">
+        <table class="compact wide" id="vmg-table">
+          <thead>
+            <tr><th scope="col" rowspan="2">Vent réel</th><th scope="colgroup" colspan="2" class="c">Au près</th><th scope="colgroup" colspan="2" class="c">Au portant</th></tr>
+            <tr><th scope="col" class="r">Wang’ap</th><th scope="col" class="r">Escale</th><th scope="col" class="r">Wang’ap</th><th scope="col" class="r">Escale</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="note">Chaque case : l’angle du vent réel, puis le VMG en nœuds, et entre parenthèses la vitesse sur l’eau. Calculé sur la polaire telle que le routeur la lit, au degré près.</p>
+      <ul class="plain">
+        <li><strong>Au près</strong>, la meilleure valeur tombe entre 43 et 50°, là où les cases de 40° sont faibles (surtout Escale ou mélangées) : l’angle exact est incertain à 5° près. Le routeur ne descend de toute façon pas sous 50° (60° dans plus de 2 m de mer), vos limites. En pratique, vous remontez à 57–58° du vent réel (la médiane de vos relevés au près, de 9 à 17 nds).</li>
+        <li><strong>Au portant</strong>, vos mesures à 165° valent presque celles de 150°. Le routeur gagne donc à descendre plus bas qu’Escale, qui empannait vers 150° faute de spi. C’est ce que le S4 devrait permettre ; c’est aussi ce que les voiles notées confirmeront ou non.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ======================= 6. Par voilure ======================= -->
+  <section id="voilure" aria-labelledby="h-voilure">
+    <p class="eyebrow">Voilure estimée, pas encore notée par vous</p>
+    <h2 id="h-voilure">Par voilure</h2>
+    <div class="stack">
+      <p class="caveat"><strong>Attention : voilure ESTIMÉE.</strong> Depuis juin, la voilure des mois passés est déduite de vos fiches Incidence (252 relevés en gris « ≈ » dans l’app) : on la devine à partir du vent et de l’angle. Les vitesses par voile ci-dessous sont donc en partie circulaires. Une voilure estimée compte quatre fois moins qu’une voilure notée. Vos trois premiers relevés notés (28 oct., GV pleine + gennaker) sont les seuls vrais.</p>
+
+      <h3>Quelle voile où, d’après les fiches</h3>
+      <div class="controls" role="group" aria-label="Jour ou nuit">
+        <span class="lab">Voir</span>
+        <button type="button" class="pill" data-sails="day" aria-pressed="true">De jour</button>
+        <button type="button" class="pill" data-sails="night" aria-pressed="false">De nuit</button>
+      </div>
+      <figure>
+        <div class="plate"><svg id="fig-sails" viewBox="0 0 360 330" role="img" aria-label="Carte des voiles selon l’angle du vent réel (40 à 180°) et sa force (0 à 35 nœuds), d’après les fiches Incidence, avec les vitesses mesurées par voile là où il y a assez de minutes."></svg></div>
+        <ul class="legend" style="margin-top:0.6rem">
+          <li><span class="sw" style="background:var(--s-genois)"></span>Génois</li>
+          <li><span class="sw" style="background:repeating-linear-gradient(135deg, var(--s-trinq) 0 2px, transparent 2px 5px);border:1px solid var(--s-trinq)"></span>Trinquette</li>
+          <li><span class="sw" style="background:var(--s-genn)"></span>Gennaker</li>
+          <li><span class="sw" style="background:var(--s-spi)"></span>Spi S4</li>
+          <li>tirets : ris de la grand-voile</li>
+        </ul>
+        <figcaption id="sails-caption">Les chiffres : la bonne vitesse de croisière mesurée sous la voile de la zone (voilure estimée, ≈). Encadrés : sous gennaker noté par vous le 28 oct.</figcaption>
+      </figure>
+
+      <div class="tbl">
+        <table class="compact wide">
+          <thead><tr><th scope="col">Voilure</th><th scope="col">Plage des fiches</th><th scope="col" class="r">Heures</th><th scope="col">Ce que montrent les mesures</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">GV + génois</th><td>génois jusqu’à 16 nds au près serré, 20 au travers, 26 vent arrière</td><td class="r">≈ 168 h<span class="was">101 de jour, 67 de nuit</span></td><td>toute la polaire du près et du travers ; 27 cases ont assez de minutes</td></tr>
+            <tr><th scope="row">GV + gennaker</th><td>80 à 150° ; jusqu’à 7 nds à 80°, 12 au travers, 15 à 110°, 18 à 150°</td><td class="r">≈ 62 h<span class="was">+ 3 h ½ notées</span></td><td>11 cases ; sous gennaker noté : 4,6 à 5,7 nds à 135–150° dans 8–10 nds, à 5 % près la polaire</td></tr>
+            <tr><th scope="row">GV + spi S4</th><td>130 à 180°, 10 à 23 nds ; jusqu’à 16 nds à 140°, 20 à 150°</td><td class="r">≈ 29 h</td><td>6 cases : 5,9 à 7,9 nds à 150–180° (12–16 nds) ; on ne sait pas s’il était envoyé</td></tr>
+            <tr><th scope="row">1 ris + génois</th><td>GV 1 ris de 17 à 26 nds</td><td class="r">≈ 11 h</td><td>trop peu : aucune case</td></tr>
+            <tr><th scope="row">1 ris + trinquette</th><td>trinquette dès 16 nds au près serré</td><td class="r">≈ 3 h</td><td>trop peu</td></tr>
+            <tr><th scope="row">GV + trinquette, 2 ris + trinquette</th><td>2 ris de 23 à 32 nds</td><td class="r">≈ 1 h chacune</td><td>trop peu</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>De jour, de nuit</h3>
+      <p>Bertrand l’a dit : la nuit, gennaker roulé et spi rentré. Comparer les mêmes cases de jour et de nuit ne dépend pas de l’estimation. Si le gennaker sortait de jour, le jour devrait aller plus vite.</p>
+      <div class="tbl">
+        <table class="compact">
+          <thead><tr><th scope="col">Case</th><th scope="col" class="r">De jour</th><th scope="col" class="r">De nuit</th><th scope="col" class="r">Écart</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">120°, 12 nds</th><td class="r">9,3</td><td class="r">8,6</td><td class="r">+9 %</td></tr>
+            <tr><th scope="row">120°, 14 nds</th><td class="r">9,8</td><td class="r">8,7</td><td class="r">+12 %</td></tr>
+            <tr><th scope="row">120°, 16 nds</th><td class="r">10,7</td><td class="r">9,7</td><td class="r">+9 %</td></tr>
+            <tr><th scope="row">135°, 10 / 12 / 14 nds</th><td class="r">5,6 · 6,6 · 7,7</td><td class="r">5,2 · 7,0 · 8,1</td><td class="r">+8 · −6 · −5 %</td></tr>
+            <tr><th scope="row">150°, 10 / 12 / 14 / 16 nds</th><td class="r">5,1 · 5,8 · 6,8 · 7,9</td><td class="r">4,9 · 5,5 · 7,0 · 8,1</td><td class="r">+4 · +6 · −3 · −3 %</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>À 120°, un peu plus vite de jour (+9 à +12 %). À 135–150°, pas de différence nette. Au près, où rien ne change entre le jour et la nuit, l’écart va déjà de −9 à +6 % : <strong>on ne peut pas conclure</strong>. Peut-être le gennaker sortait-il surtout au travers ; peut-être le portant se faisait-il au génois. C’est la question n° 1 en bas de page.</p>
+
+      <h3>Ce qu’on ne sait pas encore</h3>
+      <ul class="plain">
+        <li>Génois, gennaker ou S4 à la même allure de jour : l’estimation suit une règle, elle ne peut pas les départager.</li>
+        <li>Vos seuils de ris : 27 heures seulement au-dessus de 18 nds.</li>
+        <li>L’hypothèse du S4 au vent arrière (90 et 85 % de la vitesse à 150°) : à remplacer par vos mesures sous S4 noté.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ======================= 7. Le loch ======================= -->
+  <section id="loch" aria-labelledby="h-loch">
+    <p class="eyebrow">Vitesse surface</p>
+    <h2 id="h-loch">Le loch nettoyé le 27 octobre</h2>
+    <div class="stack">
+      <p>La polaire apprend de la <strong>vitesse surface</strong>, celle du loch. Un loch qui lit bas fait une polaire trop lente. Pour le surveiller, on compare le loch au GPS : la vitesse surface ÷ la vitesse fond, en route (plus de 3 nds sur le fond). Sur des semaines dans tous les sens, le courant s’annule à peu près et le rapport doit valoir 1,00.</p>
+      <figure>
+        <div class="plate"><svg id="fig-loch" viewBox="0 0 360 230" role="img" aria-label="Rapport loch ÷ GPS par jour de navigation : de 0,93 à 1,05 du 1er au 6 septembre, de 0,91 à 0,96 du 11 au 24 octobre, 0,98 le 27 et 1,02 le 28 octobre après le nettoyage."></svg></div>
+        <figcaption>Loch ÷ GPS par jour de navigation (jours d’au moins 100 relevés en route). Sous 1,00, le loch lit moins que le GPS. Un seul jour mêle encore le courant : en septembre, 0,93 à 1,05 d’un jour à l’autre.</figcaption>
+      </figure>
+      <div class="tbl">
+        <table class="compact">
+          <thead><tr><th scope="col">Mois</th><th scope="col" class="r">Juin</th><th scope="col" class="r">Juil.</th><th scope="col" class="r">Août</th><th scope="col" class="r">Sept.</th><th scope="col" class="r">Oct.</th></tr></thead>
+          <tbody><tr><th scope="row">Loch ÷ GPS</th><td class="r">0,963</td><td class="r">0,991</td><td class="r">1,005</td><td class="r">1,017</td><td class="r">0,926</td></tr></tbody>
+        </table>
+      </div>
+      <h3>Ce que disent les mesures</h3>
+      <ul class="plain">
+        <li>Début septembre, le loch était juste (1,017). Entre le 6 septembre et le 11 octobre, aucune navigation enregistrée. Le 11 octobre, il lisait déjà 8 % bas. L’hélice du loch s’est très probablement encrassée pendant l’arrêt.</li>
+        <li>En octobre, le rapport est le même cap au sud (0,93) ou à l’ouest (0,92), et le même au près, au travers et au portant. Un courant ne fait pas ça ; un loch encrassé, si.</li>
+        <li>Le 27, jour du nettoyage, les mesures hésitent (0,93 à 1,07 selon l’heure). Le 28, après le nettoyage : <strong>1,02</strong>. C’est ce qu’on attend d’un loch propre, mais 7 heures sur un seul bord ne suffisent pas pour juger l’étalonnage à mieux que 5 % près.</li>
+      </ul>
+      <h3>Ce qui change pour la polaire</h3>
+      <p>Depuis le 28, la polaire recale la vitesse surface sur le GPS, mois par mois, en coupant au nettoyage. Un mois n’est corrigé que s’il a au moins 6 heures en route sur les deux amures, et seulement au-delà de 3 % d’écart (en deçà, c’est le courant). Résultat : <strong>seul octobre est corrigé, × 1,082</strong>, du 1er au 27 à midi. Juin (0,963, presque tout sur une amure), juillet, août, septembre et l’après-nettoyage restent tels quels.</p>
+      <p>En octobre, vous avez surtout navigué au portant (53 heures sur 72). Ce sont donc les cases de 135 à 180° qui bougent : <strong>+5 %</strong> en médiane, +10 % au plus (10 nds à 135° : 5,1 → 5,6 nds). Au près et au travers, presque rien (0 et 0,4 % en médiane). Le rapport Wang’ap ÷ Escale du largue passe de 0,62 à 0,67. La moyenne générale (0,76) ne bouge pas : elle tient aux cases du près et du travers, mesurées en août et septembre avec un loch propre.</p>
+      <p class="note">Deux limites. Le B&amp;G calcule le vent réel avec la vitesse surface : un loch qui lisait bas déplace un peu le vent réel d’octobre (quelques dixièmes de nœud), et ce n’est pas encore corrigé. Et même propre, le loch lisait 0,94 à 0,95 au portant en juin, juillet et septembre, contre 0,96 à 1,04 au près ; le courant peut l’expliquer, on le surveille.</p>
+    </div>
+  </section>
+
+  <!-- ======================= 8. Le routage ======================= -->
+  <section id="routage" aria-labelledby="h-routage">
+    <p class="eyebrow">Heures d’arrivée</p>
+    <h2 id="h-routage">Ce que ça change pour le routage</h2>
+    <div class="stack">
+      <p>Un passage type, façon Gibraltar → Las Palmas, de <strong>700 milles</strong> : 150 M au travers (110°, 14 nds), 400 M au grand largue (140°, 18 nds), 150 M au portant (150°, 12 nds). Le calcul est simple : vent constant par tronçon, sans empannage, la même route pour tous. Le routeur retire toujours 5 % de rendement, et passe au moteur sous 4,5 nds à la voile.</p>
+      <div class="bars" role="img" aria-label="Durée du passage type selon la polaire et le réglage d’incertitude : Escale telle quelle 65 heures ; Wang’ap sans incertitude 89 heures ; selon la confiance des cases 95 heures ; prudente 98 heures ; fourchette 81 à 104 heures ; la polaire du 26 octobre donnait 94 et 101 heures.">
+        <div class="bar-row"><span class="lab">Escale telle quelle</span><div class="track"><div class="fill esc" style="width:54.2%"></div></div><span class="val">65 h</span></div>
+        <p class="note" style="margin-top:0.3rem">Wang’ap, selon le réglage d’incertitude :</p>
+        <div class="bar-row"><span class="lab">Aucune</span><div class="track"><div class="fill wang" style="width:74.2%"></div></div><span class="val">89 h</span></div>
+        <div class="bar-row"><span class="lab">Selon les cases (défaut)</span><div class="track"><div class="fill wang" style="width:79.2%"></div></div><span class="val">95 h</span></div>
+        <div class="bar-row"><span class="lab">Prudente</span><div class="track"><div class="fill wang" style="width:81.7%"></div></div><span class="val">98 h</span></div>
+        <div class="bar-row"><span class="lab">Fourchette</span><div class="track"><div class="fill range" style="left:67.5%;width:19.2%"></div></div><span class="val">81–104</span></div>
+        <div class="bar-row"><span class="lab">Avant le 28 (défaut)</span><div class="track"><div class="fill old" style="width:84.2%"></div></div><span class="val">101 h</span></div>
+        <div class="bar-axis" aria-hidden="true"><span></span><div class="ticks"><span>0</span><span>1 j</span><span>2 j</span><span>3 j</span><span>4 j</span><span>5 j</span></div><span></span></div>
+      </div>
+      <p>Avec la polaire d’Escale telle quelle, ce passage prendrait <strong>65 heures</strong> : 24 heures de moins qu’avec celle de Wang’ap, 30 de moins avec le réglage par défaut. C’est pourquoi on calibre : une polaire trop optimiste promet une arrivée trop tôt, parfois de nuit.</p>
+
+      <h3>Les quatre réglages d’incertitude</h3>
+      <div class="tbl">
+        <table class="compact wide">
+          <thead><tr><th scope="col">Réglage</th><th scope="col">Ce qu’il fait</th><th scope="col" class="r">Passage type</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Aucune</th><td>la polaire telle quelle</td><td class="r">89 h</td></tr>
+            <tr><th scope="row">Prudente</th><td>toutes les cases 10 % plus lentes</td><td class="r">98 h</td></tr>
+            <tr><th scope="row">Fourchette</th><td>la route sur la polaire telle quelle ; en option, la même refaite à 85 % et à 110 %</td><td class="r">89 h<span class="was">81 à 104 h</span></td></tr>
+            <tr><th scope="row">Selon la confiance des cases<br><span class="was">par défaut</span></th><td>−5 % sur les cases mesurées, −10 % sur les mélangées, −20 % là où seule Escale sert ; le conseil dit combien d’heures de la route reposent sur des cases « Escale »</td><td class="r">95 h</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>À vent constant, sur 700 milles</h3>
+      <div class="tbl">
+        <table class="compact">
+          <thead><tr><th scope="col">Allure</th><th scope="col" class="r">Escale</th><th scope="col" class="r">Wang’ap</th><th scope="col" class="r">Avant</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">60°, 12 nds</th><td class="r">76 h</td><td class="r">95 h</td><td class="r">95 h</td></tr>
+            <tr><th scope="row">110°, 12 nds</th><td class="r">73 h</td><td class="r">79 h</td><td class="r">79 h</td></tr>
+            <tr><th scope="row">135°, 16 nds</th><td class="r">63 h</td><td class="r">79 h</td><td class="r">85 h</td></tr>
+            <tr><th scope="row">150°, 16 nds</th><td class="r">64 h</td><td class="r">93 h</td><td class="r">101 h</td></tr>
+            <tr><th scope="row">Vent arrière 16 nds, en empannant</th><td class="r">74 h</td><td class="r">106 h</td><td class="r">112 h</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Réglage « Aucune ». L’écart avec Escale se joue au portant. Au travers, Wang’ap est presque à égalité.</p>
+
+      <h3>Avec le vrai calcul de route</h3>
+      <p>Le conseiller complet (six modèles, vos limites, le réglage par défaut), de Gibraltar à Las Palmas, avec l’ancienne et la nouvelle polaire :</p>
+      <ul class="plain">
+        <li>Sur la vraie météo du 26 octobre, une semaine presque sans vent (90 à 118 heures de moteur sur 117), rien ne change : moins d’une heure d’écart.</li>
+        <li>Sur une météo d’essai faite d’alizés, l’arrivée avance de <strong>2 à 4 heures</strong> sur environ 110 heures.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ======================= 9. À faire ======================= -->
+  <section id="progresser" aria-labelledby="h-progresser">
+    <p class="eyebrow">À bord</p>
+    <h2 id="h-progresser">Ce qui ferait progresser la polaire</h2>
+    <ul class="todo">
+      <li><p><strong>Noter vos voiles dans « ⛵ Mes voiles ».</strong> Un toucher à chaque changement, même après coup : surtout gennaker, spi et génois au portant, et le moment où vous roulez le gennaker le soir. Une voile notée compte quatre fois plus qu’une estimée. Vos trois relevés du 28 servent déjà : sous gennaker, 4,6 à 5,7 nds dans 8 à 10 nds à 135–150°.</p></li>
+      <li><p><strong>Noter vos ris.</strong> « 1 ris · Génois », « 2 ris · Trinquette »… Il n’y a que 27 heures de mesures au-dessus de 18 nds.</p></li>
+      <li><p><strong>Le loch.</strong> Merci pour le nettoyage. À refaire après chaque long arrêt (plus de deux ou trois semaines dans l’eau tiède). Dites-nous quand : chaque nettoyage ouvre une nouvelle période de calcul. L’app suit le rapport loch ÷ GPS chaque mois.</p></li>
+      <li><p><strong>Vérifier l’étalonnage du loch</strong>, un jour de mer plate : un aller et un retour sur la même ligne, au moteur à régime fixe. La moyenne des deux vitesses fond doit égaler la vitesse surface.</p></li>
+      <li><p><strong>La girouette-anémomètre.</strong> Bâbord et tribord donnent les mêmes vitesses à 5 % près, au près, au travers et au largue : rien n’indique une girouette décalée. Reste la hauteur (en tête de mât, à environ 23 m ?) et la date du dernier étalonnage.</p></li>
+      <li><p><strong>Naviguer.</strong> Chaque passage complète la polaire. La traversée Canaries → Antilles sera le vrai banc d’essai au portant.</p></li>
+    </ul>
+  </section>
+
+  <!-- ======================= 10. Questions ======================= -->
+  <section id="questions" class="asks-panel" aria-labelledby="h-questions">
+    <p class="eyebrow">À vous</p>
+    <h2 id="h-questions">Vos réponses nous aideraient</h2>
+    <ol class="asks">
+      <li><p><strong>Au portant en octobre</strong> (135–150°, 10 à 16 nds), quelle voile d’avant portiez-vous le plus souvent : génois seul, gennaker ou spi S4 ? Vos mesures y donnent 5,8 nds à 150° dans 12 nds ; Escale 9,4.</p></li>
+      <li><p><strong>Vos ris.</strong> À quel vent prenez-vous le 1<sup>er</sup>, le 2<sup>e</sup> ? Les fiches disent 20 et 26 nds, un nœud plus tôt au près.</p></li>
+      <li><p><strong>Le loch.</strong> À quelle heure l’avez-vous nettoyé le 27, et qu’y avait-il dessus ? L’étalonnage du B&amp;G a-t-il été touché depuis la livraison ?</p></li>
+      <li><p><strong>Escale.</strong> Sait-on comment son fichier a été fait : meilleurs moments ou moyennes, quelle voile au portant, bateau chargé ou non ?</p></li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>Une aide, pas une vérité : le chef de bord reste seul responsable.</p>
+    <p class="small">Polaire mise à jour le 28 oct. 2026 à 19 h 11 UTC. Les mesures sont celles des instruments du bord ; les essais publiés, ceux notés le 24 octobre.</p>
+  </footer>
+
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const T = [4, 6, 8, 10, 12, 14, 16, 20, 25, 30];
+  const A = [40, 50, 60, 75, 90, 110, 120, 135, 150, 165, 180];
+  // La polaire du 28 oct. (celle du routeur), sa confiance par case, celle du 26 oct., Escale nettoyée.
+  const W = [[2.17,2.47,3.23,3.18,2.77,2.91,2.93,2.62,2.19,1.86,1.75],[3.26,3.88,4.65,4.55,4.95,4.34,4.76,4.43,4.13,3.82,2.82],[4.34,5.78,5.68,5.88,5.46,5.98,5.95,5.2,4.83,5.3,4.39],[5.52,6.73,6.93,6.73,6.8,8.07,6.79,5.6,5.19,5.37,4.43],[5.77,7.13,7.78,8.2,7.92,9.28,8.99,6.65,5.84,5.71,5.35],[6.47,7.6,8.4,8.85,8.35,9.83,9.81,7.91,6.71,6.49,6.27],[6.69,8.6,9,9.6,8.98,10.49,10.45,9.31,7.9,7.14,6.35],[6.69,8.77,9.51,9.6,8.98,10.49,10.45,10.09,8.87,8.54,7.04],[6.26,8.38,9.64,8.89,8.78,9.65,10,9.97,9.67,8.73,8.24],[5.76,7.71,8.87,8.18,8.08,8.89,9.2,10.18,9.8,9.06,8.47]];
+  const C = ['ebbbbeeeeee','ebmmmbbbbbb','bmmmmmmmmmb','emmmmmmmmbe','bmmmbbbmmme','bmmmbbmmmmb','bmmbbbmmmmm','bbbeeebbmbe','eeeeeeeebee','eeeeeeeeeee'];
+  const O = [[2.17,2.47,3.23,3.18,2.75,2.91,2.93,2.44,2.03,1.77,1.68],[3.26,3.88,4.63,4.55,4.83,4.33,4.69,4.14,4.09,3.9,2.73],[4.34,5.78,5.68,5.88,5.41,5.98,5.85,4.83,4.6,5,4.22],[5.45,6.73,6.9,6.7,6.58,8.07,6.6,5.1,4.8,5,4.23],[5.71,7.1,7.73,8.18,7.77,9.28,8.57,6.42,5.4,5.3,5.11],[6.41,7.58,8.4,8.85,8.21,9.8,9.77,7.4,6.3,6.13,6.25],[6.62,8.58,8.8,9.54,8.91,10.31,10.4,8.7,7.3,6.83,6.35],[6.62,8.58,9.38,9.54,8.91,10.31,10.4,9.37,8.37,7.9,6.72],[6.26,8.38,9.64,8.89,8.78,9.49,10,9.52,9.28,8.33,7.87],[5.76,7.71,8.87,8.18,8.08,8.89,9.2,9.73,9.36,8.65,8.09]];
+  const E = [[3.24,3.69,4.24,4.44,3.95,4.22,4.24,3.69,3.08,2.68,2.5],[4.86,5.54,6.35,6.66,5.92,6.33,6.36,5.53,4.61,4.02,3.74],[6.48,7.39,8.47,8.87,7.89,8.44,8.48,7.37,6.14,5.35,4.99],[6.81,8.05,9.09,9.46,8.7,9.24,9.4,8.66,7.77,6.68,6.22],[7.15,8.72,9.72,10.06,9.51,10.05,10.31,9.96,9.39,8,7.44],[7.66,9.27,10.41,10.77,10.16,11.47,11.4,10.85,10.41,9,8.39],[8.18,9.81,11.09,11.48,10.81,12.9,12.48,11.74,11.43,9.99,9.34],[8.18,10.47,11.88,12.07,11.17,14.06,13.8,13.04,12.36,10.46,9.72],[7.83,10.48,12.05,12.52,12.37,13.2,14.08,14.88,14.47,11.84,10.98],[7.2,9.64,11.09,11.52,11.38,12.52,12.96,15.2,14.63,13.52,12.64]];
+  const CONF = { m: 'mesurée', b: 'mélangée', e: 'Escale' };
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const s = (tag, attrs, parent, text) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+  const fr = (x, d = 1) => x.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const deg = (a) => `${a}°`;
+
+  // La vitesse que le routeur lit (interpolation bilinéaire, comme boatSpeed).
+  function speed(table, tws, twa) {
+    const a = Math.min(180, Math.max(0, Math.abs(twa)));
+    if (a < A[0] - 5) return 0;
+    const w = Math.min(T[T.length - 1], Math.max(0, tws));
+    const seg = (bins, v) => {
+      if (v <= bins[0]) return [0, 0, 0];
+      for (let i = 0; i < bins.length - 1; i++) if (v <= bins[i + 1]) return [i, i + 1, (v - bins[i]) / (bins[i + 1] - bins[i])];
+      return [bins.length - 1, bins.length - 1, 0];
+    };
+    const [i0, i1, ti] = seg(T, w); const [j0, j1, tj] = seg(A, Math.max(a, A[0]));
+    let v = (table[i0][j0] * (1 - tj) + table[i0][j1] * tj) * (1 - ti) + (table[i1][j0] * (1 - tj) + table[i1][j1] * tj) * ti;
+    if (w < T[0]) v *= w / T[0];
+    return v;
+  }
+  function vmg(table, tws) {
+    let up = { v: 0, a: 0, s: 0 }; let dn = { v: 0, a: 0, s: 0 };
+    for (let a = 40; a <= 180; a++) {
+      const sp = speed(table, tws, a); const u = sp * Math.cos(a * Math.PI / 180);
+      if (u > up.v) up = { v: u, a, s: sp };
+      if (-u > dn.v) dn = { v: -u, a, s: sp };
+    }
+    return { up, dn };
+  }
+
+  // ── Le dessin d'une polaire (demi-cercle, étrave en haut) ──
+  const G = { cx: 40, cy: 262, R: 228 };
+  function polarFrame(svg, vmax, step) {
+    const r = (v) => (v / vmax) * G.R;
+    for (let v = step; v <= vmax + 1e-9; v += step) {
+      const rr = r(v);
+      s('path', { d: `M${G.cx},${G.cy - rr} A${rr},${rr} 0 0 1 ${G.cx},${G.cy + rr}`, class: 'gridl' }, svg);
+      s('text', { x: G.cx - 5, y: G.cy - rr + 3.5, 'text-anchor': 'end', class: 'tick' }, svg, String(v));
+    }
+    s('text', { x: G.cx - 5, y: G.cy - G.R - 12, 'text-anchor': 'end', class: 'tick' }, svg, 'nds');
+    s('line', { x1: G.cx, y1: G.cy - G.R, x2: G.cx, y2: G.cy + G.R, class: 'axisl' }, svg);
+    for (const a of [30, 60, 90, 120, 150]) {
+      const [x, y] = pt(a, vmax, vmax);
+      s('line', { x1: G.cx, y1: G.cy, x2: x, y2: y, class: 'gridl' }, svg);
+      const [lx, ly] = pt(a, vmax * 1.06, vmax);
+      s('text', { x: lx, y: ly + 3.5, 'text-anchor': a === 90 ? 'start' : 'start', class: 'tick' }, svg, deg(a));
+    }
+    s('text', { x: G.cx + 6, y: G.cy + G.R + 13, class: 'tick' }, svg, '180°');
+    // Le vent vient du haut.
+    s('line', { x1: G.cx + 34, y1: 4, x2: G.cx + 34, y2: 22, stroke: 'var(--muted)', 'stroke-width': 1.5 }, svg);
+    s('path', { d: `M${G.cx + 30},17 L${G.cx + 34},24 L${G.cx + 38},17 Z`, fill: 'var(--muted)' }, svg);
+  }
+  function pt(twa, v, vmax) {
+    const a = (twa * Math.PI) / 180; const rr = (v / vmax) * G.R;
+    return [G.cx + rr * Math.sin(a), G.cy - rr * Math.cos(a)];
+  }
+  function curve(table, tws, vmax) {
+    let d = '';
+    for (let a = 40; a <= 180; a++) { const [x, y] = pt(a, speed(table, tws, a), vmax); d += `${a === 40 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`; }
+    return d;
+  }
+  const niceMax = (v) => Math.max(4, Math.ceil((v + 0.4) / 2) * 2);
+
+  // ── 2. Le schéma d'explication : 12 nds ──
+  (function explain() {
+    const svg = document.getElementById('fig-explain');
+    const tws = 12; const i = T.indexOf(tws);
+    const vmax = niceMax(Math.max(...W[i]));
+    polarFrame(svg, vmax, 2);
+    s('text', { x: G.cx + 44, y: 17, class: 'tick' }, svg, 'vent réel 12 nds');
+    s('path', { d: curve(W, tws, vmax), fill: 'none', stroke: 'var(--c-wang)', 'stroke-width': 2.5, 'stroke-linejoin': 'round' }, svg);
+    // Les allures.
+    const lab = [[36, 'au près'], [97, 'travers'], [142, 'largue'], [172, 'vent arrière']];
+    for (const [a, t] of lab) { const [x, y] = pt(a, speed(W, tws, a) + 1.3, vmax); s('text', { x, y, 'font-size': 11, fill: 'var(--muted)', 'font-style': 'italic' }, svg, t); }
+    // Un point : 110°.
+    const v110 = speed(W, tws, 110); const [px, py] = pt(110, v110, vmax);
+    s('line', { x1: G.cx, y1: G.cy, x2: px, y2: py, stroke: 'var(--c-wang)', 'stroke-width': 1, 'stroke-dasharray': '2 3' }, svg);
+    s('circle', { cx: px, cy: py, r: 5.5, fill: 'var(--c-wang)', stroke: 'var(--paper)', 'stroke-width': 2 }, svg);
+    s('text', { x: px - 8, y: py + 22, 'text-anchor': 'end', 'font-size': 12, 'font-weight': 600 }, svg, `110° : ${fr(v110)} nds`);
+    // Le meilleur VMG au près.
+    const best = vmg(W, tws).up; const [bx, by] = pt(best.a, best.s, vmax);
+    s('line', { x1: G.cx, y1: G.cy, x2: bx, y2: by, stroke: 'var(--fg)', 'stroke-width': 1, 'stroke-dasharray': '4 3' }, svg);
+    s('line', { x1: bx, y1: by, x2: G.cx, y2: by, stroke: 'var(--accent)', 'stroke-width': 1.5, 'stroke-dasharray': '2 2' }, svg);
+    s('path', { d: `M${G.cx},${G.cy} L${G.cx},${by}`, stroke: 'var(--accent)', 'stroke-width': 3, fill: 'none' }, svg);
+    s('circle', { cx: bx, cy: by, r: 4.5, fill: 'var(--paper)', stroke: 'var(--fg)', 'stroke-width': 2 }, svg);
+    s('text', { x: bx + 8, y: by - 6, 'font-size': 11.5 }, svg, `${best.a}° : ${fr(best.s)} nds`);
+    s('text', { x: G.cx + 7, y: by - 7, 'font-size': 11.5, fill: 'var(--accent)', 'font-weight': 600 }, svg, `VMG ${fr(best.v)} nds`);
+  })();
+
+  // ── 4. Le diagramme interactif ──
+  const polarSvg = document.getElementById('fig-polar');
+  const tbody = document.querySelector('#angle-table tbody');
+  const caption = document.getElementById('angle-caption');
+  const readout = document.getElementById('readout');
+  const showOld = document.getElementById('show-old');
+  const legOld = document.getElementById('leg-old');
+  let curTws = 12; let selJ = null;
+
+  function describe(i, j) {
+    const w = W[i][j]; const e = E[i][j];
+    return `${T[i]} nds à ${A[j]}° : Wang’ap ${fr(w)} nds (case ${CONF[C[i][j]]}), Escale ${fr(e)} nds, rapport ${fr(w / e, 2)}${showOld.checked ? ` · le 26 oct. : ${fr(O[i][j])} nds` : ''}.`;
+  }
+  function select(j) {
+    selJ = j; const i = T.indexOf(curTws);
+    readout.textContent = describe(i, j);
+    [...tbody.rows].forEach((r, k) => r.classList.toggle('sel', k === j));
+    polarSvg.querySelectorAll('[data-j]').forEach((el) => el.setAttribute('stroke-width', Number(el.dataset.j) === j ? 3.5 : 2));
+  }
+  function drawPolar() {
+    const i = T.indexOf(curTws);
+    polarSvg.textContent = '';
+    const tables = [W[i], E[i], ...(showOld.checked ? [O[i]] : [])];
+    const vmax = niceMax(Math.max(...tables.flat()));
+    polarFrame(polarSvg, vmax, vmax > 8 ? 2 : 1);
+    s('text', { x: G.cx + 44, y: 17, class: 'tick' }, polarSvg, `vent réel ${curTws} nds`);
+    s('path', { d: curve(E, curTws, vmax), fill: 'none', stroke: 'var(--c-esc)', 'stroke-width': 2, 'stroke-dasharray': '7 5' }, polarSvg);
+    if (showOld.checked) s('path', { d: curve(O, curTws, vmax), fill: 'none', stroke: 'var(--c-old)', 'stroke-width': 2.5, 'stroke-dasharray': '1.5 4', 'stroke-linecap': 'round' }, polarSvg);
+    s('path', { d: curve(W, curTws, vmax), fill: 'none', stroke: 'var(--c-wang)', 'stroke-width': 2.5, 'stroke-linejoin': 'round' }, polarSvg);
+    // Étiquettes directes, à 90°.
+    const [ex] = pt(90, E[i][4], vmax); const [wx] = pt(90, W[i][4], vmax);
+    s('text', { x: ex + 6, y: G.cy - 6, 'font-size': 11, fill: 'var(--fg)' }, polarSvg, 'Escale');
+    s('text', { x: wx - 6, y: G.cy + 14, 'text-anchor': 'end', 'font-size': 11, 'font-weight': 600, fill: 'var(--fg)' }, polarSvg, 'Wang’ap');
+    A.forEach((a, j) => {
+      const [x, y] = pt(a, W[i][j], vmax); const c = C[i][j];
+      if (c !== 'e') s('circle', { cx: x, cy: y, r: 4.5, fill: c === 'm' ? 'var(--c-wang)' : 'var(--paper)', stroke: 'var(--c-wang)', 'stroke-width': 2, 'data-j': j }, polarSvg);
+      const hit = s('circle', { cx: x, cy: y, r: 13, fill: 'transparent', tabindex: 0, role: 'button', 'aria-label': describe(i, j), style: 'cursor:pointer' }, polarSvg);
+      hit.addEventListener('click', () => select(j));
+      hit.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); select(j); } });
+    });
+    caption.textContent = `Vent réel ${curTws} nds · nœuds sur l’eau`;
+    tbody.textContent = '';
+    A.forEach((a, j) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<th scope="row">${a}°</th><td class="r">${fr(W[i][j])}<span class="was">${CONF[C[i][j]]}${showOld.checked ? ` · avant ${fr(O[i][j])}` : ''}</span></td><td class="r">${fr(E[i][j])}</td><td class="r">${fr(W[i][j] / E[i][j], 2)}</td>`;
+      tr.addEventListener('click', () => select(j));
+      tbody.appendChild(tr);
+    });
+    if (selJ != null) select(selJ); else readout.textContent = 'Touchez un point, ou une ligne du tableau.';
+  }
+  document.querySelectorAll('button[data-tws]').forEach((b) => b.addEventListener('click', () => {
+    curTws = Number(b.dataset.tws);
+    document.querySelectorAll('button[data-tws]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    drawPolar();
+  }));
+  showOld.addEventListener('change', () => { legOld.hidden = !showOld.checked; drawPolar(); });
+  drawPolar();
+
+  // ── La carte des rapports ──
+  (function ratioMap() {
+    const t = document.getElementById('ratio-map');
+    let h = '<thead><tr><th scope="col">nds \\ °</th>' + A.map((a) => `<th scope="col">${a}°</th>`).join('') + '</tr></thead><tbody>';
+    T.forEach((w, i) => {
+      h += `<tr><th scope="row">${w}</th>`;
+      A.forEach((a, j) => {
+        const r = W[i][j] / E[i][j]; const pct = Math.round(Math.min(1, Math.max(0, (r - 0.55) / 0.45)) * 100);
+        const c = C[i][j]; const mark = c === 'm' ? '●' : c === 'b' ? '◐' : '';
+        h += `<td class="${pct > 55 ? 'hi' : ''}${c === 'e' ? ' esc' : ''}" style="background:color-mix(in oklab, var(--seq-hi) ${pct}%, var(--seq-lo))" title="${w} nds à ${a}° : ${fr(W[i][j])} ÷ ${fr(E[i][j])} (${CONF[c]})">${fr(r, 2)}${mark ? `<span class="m">${mark}</span>` : ''}</td>`;
+      });
+      h += '</tr>';
+    });
+    t.innerHTML = h + '</tbody>';
+  })();
+
+  // ── 5. Le tableau des VMG ──
+  (function vmgTable() {
+    const tb = document.querySelector('#vmg-table tbody');
+    const cell = (x) => `${x.a}° · ${fr(x.v)}<span class="was">(${fr(x.s)})</span>`;
+    for (const w of [6, 8, 10, 12, 14, 16, 20, 25]) {
+      const a = vmg(W, w); const e = vmg(E, w);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<th scope="row">${w} nds</th><td class="r">${cell(a.up)}</td><td class="r">${cell(e.up)}</td><td class="r">${cell(a.dn)}</td><td class="r">${cell(e.dn)}</td>`;
+      tb.appendChild(tr);
+    }
+  })();
+
+  // ── 6. La carte des voiles (les fiches Incidence) ──
+  const SAIL = {
+    reefTop: [20, 26, 32],
+    genoisTop: [[50, 16], [90, 20], [180, 26]],
+    genn: { twa: [80, 150], top: [[80, 7], [90, 12], [110, 15], [150, 18]] },
+    spi: { twa: [130, 180], min: 10, top: [[140, 16], [150, 20], [180, 23]] },
+  };
+  const curveAt = (pts, a) => {
+    if (a <= pts[0][0]) return pts[0][1];
+    for (let k = 0; k < pts.length - 1; k++) if (a <= pts[k + 1][0]) return pts[k][1] + ((pts[k + 1][1] - pts[k][1]) * (a - pts[k][0])) / (pts[k + 1][0] - pts[k][0]);
+    return pts[pts.length - 1][1];
+  };
+  function headAt(tws, a, night) {
+    let head = tws <= curveAt(SAIL.genoisTop, a) ? 'genois' : 'trinquette';
+    if (!night) {
+      const sp = a >= SAIL.spi.twa[0] && tws >= SAIL.spi.min && tws <= curveAt(SAIL.spi.top, a);
+      const gn = a >= SAIL.genn.twa[0] && a <= SAIL.genn.twa[1] && tws <= curveAt(SAIL.genn.top, a);
+      if (sp && a >= 150) head = 'spi'; else if (gn) head = 'gennaker'; else if (sp) head = 'spi';
+    }
+    return head;
+  }
+  // Les vitesses mesurées par voile (80 % du temps atteintes), là où il y a assez de minutes — voilure ESTIMÉE.
+  const MEAS = {
+    gennaker: [[6,90,4.5],[8,90,5.42],[8,110,5.98],[8,120,6.13],[8,135,5.25],[8,150,4.54],[10,110,8.15],[10,135,5.74],[10,150,5.3],[12,135,6.5],[12,150,6.1]],
+    genois: [[4,60,3.2],[6,60,4.65],[6,75,4.55],[8,50,5.93],[8,60,5.7],[8,75,5.88],[10,50,6.73],[10,60,6.93],[10,75,6.73],[10,150,4.76],[12,50,7.13],[12,60,7.78],[12,75,8.22],[12,150,5.41],[14,50,7.6],[14,60,8.4],[14,75,8.85],[14,135,8.12],[14,150,6.13],[16,50,8.48],[16,60,8.87],[16,120,10.6],[16,135,9.31],[16,150,7.9],[16,180,5.73],[20,135,10.23],[20,150,8.66]],
+    spi: [[12,150,5.95],[14,150,6.93],[14,165,6.78],[16,150,7.9],[16,165,7.36],[16,180,6.6]],
+  };
+  const NOTED = [[8,135,5.3],[8,150,4.6],[10,135,5.7],[10,150,5.0]];   // gennaker noté par B&C le 28 oct.
+  const sailsSvg = document.getElementById('fig-sails');
+  const SX = { x0: 40, x1: 350, y0: 300, y1: 14, a0: 40, a1: 180, w0: 0, w1: 35 };
+  const sx = (a) => SX.x0 + ((a - SX.a0) / (SX.a1 - SX.a0)) * (SX.x1 - SX.x0);
+  const sy = (w) => SX.y0 - ((w - SX.w0) / (SX.w1 - SX.w0)) * (SX.y0 - SX.y1);
+  const FILL = { genois: 'var(--s-genois)', gennaker: 'var(--s-genn)', spi: 'var(--s-spi)' };
+  function drawSails(night) {
+    sailsSvg.textContent = '';
+    const defs = s('defs', {}, sailsSvg);
+    const pat = s('pattern', { id: 'hatch', width: 6, height: 6, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(135)' }, defs);
+    s('line', { x1: 0, y1: 0, x2: 0, y2: 6, stroke: 'var(--s-trinq)', 'stroke-width': 1.6 }, pat);
+    const regions = s('g', {}, sailsSvg);
+    const dW = 0.5; const dA = 1;
+    for (let w = 0; w < SX.w1; w += dW) {
+      let run = null;
+      const flush = (aEnd) => {
+        if (!run) return;
+        const attrs = { x: sx(run.a).toFixed(2), y: sy(w + dW).toFixed(2), width: (sx(aEnd) - sx(run.a) + 0.4).toFixed(2), height: (sy(w) - sy(w + dW) + 0.4).toFixed(2) };
+        if (run.h === 'trinquette') s('rect', { ...attrs, fill: 'url(#hatch)' }, regions);
+        else s('rect', { ...attrs, style: `fill: color-mix(in oklab, ${FILL[run.h]} 36%, var(--paper))` }, regions);
+      };
+      for (let a = SX.a0; a < SX.a1; a += dA) {
+        const h = headAt(w + dW / 2, a + dA / 2, night);
+        if (!run || run.h !== h) { flush(a); run = { h, a }; }
+      }
+      flush(SX.a1);
+    }
+    // Axes.
+    for (const w of [0, 10, 20, 30]) { s('line', { x1: SX.x0, y1: sy(w), x2: SX.x1, y2: sy(w), class: 'gridl', 'stroke-opacity': 0.6 }, sailsSvg); s('text', { x: SX.x0 - 6, y: sy(w) + 3.5, 'text-anchor': 'end', class: 'tick' }, sailsSvg, String(w)); }
+    for (const a of [40, 60, 90, 120, 150, 180]) s('text', { x: sx(a), y: SX.y0 + 14, 'text-anchor': a === 180 ? 'end' : a === 40 ? 'start' : 'middle', class: 'tick' }, sailsSvg, `${a}°`);
+    s('text', { x: SX.x0 - 6, y: SX.y1 - 2, 'text-anchor': 'end', class: 'tick' }, sailsSvg, 'nds');
+    s('text', { x: (SX.x0 + SX.x1) / 2, y: SX.y0 + 28, 'text-anchor': 'middle', class: 'tick' }, sailsSvg, 'angle du vent réel');
+    s('rect', { x: SX.x0, y: SX.y1, width: SX.x1 - SX.x0, height: SX.y0 - SX.y1, fill: 'none', class: 'axisl' }, sailsSvg);
+    // Les ris : un nœud plus tôt au près (sous 90°).
+    const reefNames = ['1 ris', '2 ris', '3 ris'];
+    SAIL.reefTop.forEach((top, k) => {
+      s('path', { d: `M${sx(40)},${sy(top - 1)} L${sx(90)},${sy(top - 1)} L${sx(90)},${sy(top)} L${sx(180)},${sy(top)}`, fill: 'none', stroke: 'var(--fg)', 'stroke-width': 1.2, 'stroke-dasharray': '5 3', 'stroke-opacity': 0.75 }, sailsSvg);
+      s('text', { x: sx(178), y: sy(top) - 4, 'text-anchor': 'end', 'font-size': 10, fill: 'var(--fg)', 'paint-order': 'stroke', stroke: 'var(--paper)', 'stroke-width': 3 }, sailsSvg, reefNames[k]);
+    });
+    s('text', { x: sx(178), y: sy(20) + 12, 'text-anchor': 'end', 'font-size': 10, fill: 'var(--fg)', 'paint-order': 'stroke', stroke: 'var(--paper)', 'stroke-width': 3 }, sailsSvg, 'GV pleine');
+    // Le nom de chaque zone.
+    const names = night ? [['Génois', 115, 1.5], ['Trinquette', 115, 29]] : [['Génois', 50, 1.2], ['Génois', 100, 18], ['Trinquette', 64, 29], ['Gennaker', 112, 2.5], ['Spi S4', 171, 11.3], ['Génois', 160, 24]];
+    for (const [t, a, w] of names) s('text', { x: sx(a), y: sy(w), 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 600, fill: 'var(--fg)', 'paint-order': 'stroke', stroke: 'var(--paper)', 'stroke-width': 3.5 }, sailsSvg, t);
+    // Les vitesses mesurées sous la voile de la zone.
+    const noted = new Set(night ? [] : NOTED.map(([w, a]) => `${w}|${a}`));
+    const label = (w, a, v, boxed) => {
+      const x = sx(a); const y = sy(w) + 3.5;
+      if (boxed) s('rect', { x: x - 13, y: y - 10.5, width: 26, height: 14, rx: 3, fill: 'var(--paper)', stroke: 'var(--fg)', 'stroke-width': 1.3 }, sailsSvg);
+      s('text', { x, y, 'text-anchor': 'middle', 'font-size': 9.5, 'font-family': 'var(--font-data)', fill: 'var(--fg)', 'font-weight': boxed ? 700 : 400, 'paint-order': 'stroke', stroke: boxed ? 'none' : 'var(--paper)', 'stroke-width': 2.5 }, sailsSvg, fr(v));
+    };
+    for (const [head, list] of Object.entries(MEAS)) {
+      for (const [w, a, v] of list) {
+        if (noted.has(`${w}|${a}`)) continue;
+        const h = headAt(w, a, night);
+        if (h === head || (night && head === 'genois' && h === 'genois')) label(w, a, v, false);
+      }
+    }
+    if (!night) for (const [w, a, v] of NOTED) label(w, a, v, true);
+    document.getElementById('sails-caption').textContent = night
+      ? 'De nuit, d’après Bertrand : ni gennaker ni spi. Les chiffres : la bonne vitesse de croisière mesurée sous GV + génois (voilure estimée, ≈), jour et nuit confondus.'
+      : 'Les chiffres : la bonne vitesse de croisière mesurée sous la voile de la zone (voilure estimée, ≈). Encadrés : sous gennaker noté par vous le 28 oct.';
+  }
+  document.querySelectorAll('button[data-sails]').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('button[data-sails]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    drawSails(b.dataset.sails === 'night');
+  }));
+  drawSails(false);
+
+  // ── 7. Le loch, jour par jour ──
+  (function loch() {
+    const svg = document.getElementById('fig-loch');
+    const D = [['1', 0.979, 's'], ['2', 0.929, 's'], ['3', 1.018, 's'], ['4', 1.052, 's'], ['5', 0.963, 's'], ['6', 1.03, 's'],
+      ['11', 0.922, 'o'], ['12', 0.911, 'o'], ['21', 0.961, 'o'], ['22', 0.914, 'o'], ['23', 0.915, 'o'], ['24', 0.928, 'o'], ['27', 0.976, 'c'], ['28', 1.022, 'n']];
+    const L = { x0: 40, x1: 350, y0: 180, y1: 14, lo: 0.88, hi: 1.08 };
+    const y = (v) => L.y0 - ((v - L.lo) / (L.hi - L.lo)) * (L.y0 - L.y1);
+    const gap = 1.2; const n = D.length + gap; const step = (L.x1 - L.x0) / n;
+    const xAt = (k) => L.x0 + step * (k + 0.5 + (k >= 6 ? gap : 0));
+    for (const v of [0.9, 0.95, 1.0, 1.05]) {
+      s('line', { x1: L.x0, y1: y(v), x2: L.x1, y2: y(v), class: v === 1 ? 'axisl' : 'gridl' }, svg);
+      s('text', { x: L.x0 - 6, y: y(v) + 3.5, 'text-anchor': 'end', class: 'tick' }, svg, fr(v, 2));
+    }
+    const COL = { s: 'var(--muted)', o: 'var(--warn)', c: 'var(--warn)', n: 'var(--accent)' };
+    D.forEach(([d, v, g], k) => {
+      const x = xAt(k);
+      s('line', { x1: x, y1: y(1), x2: x, y2: y(v), stroke: COL[g], 'stroke-width': 2 }, svg);
+      const c = s('circle', { cx: x, cy: y(v), r: 5, fill: COL[g], stroke: 'var(--paper)', 'stroke-width': 1.5 }, svg);
+      s('title', {}, c, `${d} ${k < 6 ? 'sept.' : 'oct.'} : ${fr(v, 3)}`);
+      s('text', { x, y: L.y0 + 14, 'text-anchor': 'middle', class: 'tick' }, svg, d);
+    });
+    s('text', { x: (xAt(0) + xAt(5)) / 2, y: L.y0 + 30, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--muted)' }, svg, 'septembre');
+    s('text', { x: (xAt(6) + xAt(13)) / 2, y: L.y0 + 30, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--muted)' }, svg, 'octobre');
+    const xc = (xAt(12) + xAt(13)) / 2;
+    s('line', { x1: xc, y1: L.y1, x2: xc, y2: L.y0, stroke: 'var(--accent)', 'stroke-width': 1.2, 'stroke-dasharray': '3 3' }, svg);
+    s('text', { x: xc - 4, y: L.y1 + 10, 'text-anchor': 'end', 'font-size': 10.5, fill: 'var(--accent)', 'font-weight': 600 }, svg, 'nettoyé le 27');
+    s('text', { x: xAt(7), y: y(0.911) + 16, 'text-anchor': 'middle', 'font-size': 10, fill: 'var(--fg)' }, svg, '0,91');
+    s('text', { x: xAt(13) + 2, y: y(1.022) - 9, 'text-anchor': 'middle', 'font-size': 10, fill: 'var(--fg)' }, svg, '1,02');
+    s('text', { x: (xAt(8) + xAt(11)) / 2, y: y(1.035), 'text-anchor': 'middle', 'font-size': 10.5, fill: 'var(--warn)', 'font-style': 'italic' }, svg, 'encrassé : 0,91 à 0,96');
+  })();
+})();
+</script>
+
+</body>
+</html>

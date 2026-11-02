@@ -184,13 +184,22 @@
 // away the journal it exists to protect.
 //
 // So: bump CACHE_NAME on a release again, as the repo always said.
-const CACHE_NAME = 'wangap-v339';
+const CACHE_NAME = 'wangap-v356';
 const IMAGE_CACHE = 'wangap-images-v1';
 const TILE_CACHE = 'wangap-tiles-v1';
 // V3.4 item 2 — Supabase REST responses: the offline journal. Unversioned on
 // purpose, so it survives every shell bump.
 const API_CACHE = 'wangap-api-v1';
-const EXPECTED_CACHES = new Set([CACHE_NAME, IMAGE_CACHE, TILE_CACHE, API_CACHE]);
+// ROUTE-028 (ADR-0039 D29) — « calculer sur cet appareil » : les cartes du
+// routeur en tuiles (/routing/charts/v1/…), gardées pour le hors-ligne. Non
+// versionné : une mise à jour de l'app ne doit pas les effacer en mer. La page
+// et le worker du routage (src/lib/localRouting/browserStore.js) y écrivent
+// aussi eux-mêmes ; une tuile a son empreinte dans l'adresse (`?v=`).
+const ROUTING_CACHE = 'wangap-routing-v1';
+// V3.44.1 — les pages d'aide de B&C (/aide/routage.html, /aide/polaires.html, leurs images) : réseau
+// d'abord, gardées pour relire hors ligne en mer. Hors CACHE_NAME, sinon chaque version les effacerait.
+const AIDE_CACHE = 'wangap-aide-v1';
+const EXPECTED_CACHES = new Set([CACHE_NAME, IMAGE_CACHE, TILE_CACHE, API_CACHE, ROUTING_CACHE, AIDE_CACHE]);
 // Approx upper-bounds per cache. Tile entries are small (10-40 KB raster,
 // ~5-20 KB glyph PBF) so 2000 ≈ 50-100 MB. Image entries vary (sm 15 KB,
 // md 80 KB, lg 300 KB); 500 covers thousands of variants at most-used
@@ -417,8 +426,34 @@ self.addEventListener('fetch', (event) => {
   // nautical mode has always been blank offline. The CARTO entry stays only as
   // a safety net for any call site the swap missed; the activate handler above
   // purges what it had already cached.
+  //
+  // HOME-MAP-2 — `tiles.openfreemap.org`, the Accueil mini-map's vector
+  // basemap (src/lib/basemap.js VECTOR_HOST). Its tiles (.pbf, under a build
+  // id) and glyphs never change at a given URL → cache-first below. Its
+  // TileJSON (`/planet`) DOES change — it names the current weekly build — so
+  // it is network-first, 3 s, then the cached copy: offline, the map keeps
+  // reading the build whose tiles this device already holds.
+  if (url.hostname === 'tiles.openfreemap.org' && url.pathname === '/planet') {
+    const fromCache = () => caches.match(event.request).then((r) => r || new Response('', { status: 504 }));
+    safeRespond(event, () => {
+      let timer;
+      const net = fetch(event.request).then((response) => {
+        if (response && response.ok) {
+          safePutWithCap(TILE_CACHE, event.request, response.clone(), TILE_CACHE_MAX);
+          return response;
+        }
+        return fromCache().then((c) => (c.ok ? c : response));
+      });
+      const slow = new Promise((resolve) => {
+        timer = setTimeout(() => caches.match(event.request).then((c) => c && resolve(c)), 3000);
+      });
+      return Promise.race([net, slow]).catch(fromCache).finally(() => clearTimeout(timer));
+    }, new Response('', { status: 504 }));
+    return;
+  }
   if (
     url.hostname === 'server.arcgisonline.com' ||
+    url.hostname === 'tiles.openfreemap.org' ||
     url.hostname.endsWith('basemaps.cartocdn.com') ||
     url.hostname.endsWith('openseamap.org') ||
     url.hostname === 'demotiles.maplibre.org'
@@ -460,6 +495,21 @@ self.addEventListener('fetch', (event) => {
           .catch(() => new Response('', { status: 404 }));
       }),
     new Response('', { status: 404 }));
+    return;
+  }
+
+  // V3.44.1 — /aide/* (pages statiques d'aide + images) : le réseau d'abord, la copie gardée hors ligne.
+  if (url.origin === self.location.origin && url.pathname.startsWith('/aide/') && event.request.method === 'GET') {
+    safeRespond(event, () =>
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.ok && response.type === 'basic') {
+            const copy = response.clone();
+            caches.open(AIDE_CACHE).then((c) => c.put(event.request, copy)).catch(() => undefined);
+          }
+          return response;
+        })
+        .catch(() => caches.open(AIDE_CACHE).then((c) => c.match(event.request, { ignoreSearch: true })).then((hit) => hit || Response.error())));
     return;
   }
 
@@ -519,6 +569,22 @@ self.addEventListener('fetch', (event) => {
           .catch(() => offlinePage);
       }),
     offlinePage);
+    return;
+  }
+
+  // ROUTE-028 — les cartes du routeur : une tuile (adresse avec empreinte) en
+  // cache d'abord ; l'index en ligne d'abord (4 s), sinon sa copie. Jamais dans
+  // CACHE_NAME (effacé à chaque version).
+  if (url.origin === self.location.origin && url.pathname.startsWith('/routing/charts/')) {
+    const isIndex = url.pathname.endsWith('/index.json');
+    safeRespond(event, () => caches.open(ROUTING_CACHE).then((cache) => {
+      const net = () => fetch(event.request).then((response) => {
+        if (response && response.ok) cache.put(event.request, response.clone()).catch(() => undefined);
+        return response;
+      });
+      if (isIndex) return net().catch(() => cache.match(event.request).then((c) => c || new Response('', { status: 504 })));
+      return cache.match(event.request).then((c) => c || net());
+    }), new Response('', { status: 504 }));
     return;
   }
 
