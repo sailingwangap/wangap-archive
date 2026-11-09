@@ -1,9 +1,9 @@
 {
  "v": 1,
- "sources": "46a4abeee310ebf0",
- "sha256": "264966e43f62b01106b6601e4c12c3a3fb2bab146bae643d688ce6446eb6ef02",
- "bytes": 464493,
- "builtAt": "2026-10-29T19:23:01.932Z",
+ "sources": "394bb01fff244e1f",
+ "sha256": "daa1e739cf29b2a7a01da02540356cf6b090ce4a871e2bb8a03ac914d87a1695",
+ "bytes": 524718,
+ "builtAt": "2026-11-05T05:33:25.811Z",
  "node": ">=20",
  "charts": "/routing/charts/v1/"
 }

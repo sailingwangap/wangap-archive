@@ -7,5 +7,6 @@ Disallow: /inbox
 Disallow: /settings
 Disallow: /maintenance
 Disallow: /todos
+Disallow: /partage/
 
 Sitemap: https://jdb-wangap-bay.vercel.app/sitemap.xml

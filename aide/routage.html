@@ -157,6 +157,7 @@
   h4 { font-size: 1rem; margin: 0; }
   .stack { display: grid; gap: 0.85rem; }
   .stack > * { min-width: 0; }
+  .stack > h3 { margin-top: 1.1rem; }
   .note { color: var(--muted); font-size: 0.9rem; }
   ul.plain { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.4rem; }
   ul.plain li::marker { color: var(--accent); }
@@ -292,7 +293,7 @@
     <h1>Le routage pas à pas</h1>
     <p class="byline">Pour Bertrand et Catherine · Flavien</p>
     <div class="chips" aria-label="En bref">
-      <span class="chip live">Nouveau · v3.44</span>
+      <span class="chip live">Nouveau · v3.50</span>
       <span class="chip">Onglet 🧭 Routage</span>
       <span class="chip">Test : 10 min</span>
     </div>
@@ -330,7 +331,7 @@
           <li><strong>Huit étapes déjà remplies</strong> avec vos valeurs. « Lancer » marche tout de suite : on n’ouvre que ce qu’on veut changer.</li>
           <li><strong>Le coût avant de lancer</strong> : une bande au-dessus de « Lancer » dit le temps et la part de la météo du jour.</li>
           <li><strong>Vos réglages du routage sont dans le routage</strong> (⚙). Dans les Réglages de l’app, la carte 🧭 Routage ne fait plus qu’ouvrir ceux-ci.</li>
-          <li><strong>Rien n’a disparu.</strong> ✎ Modifier et ↻ Relancer sont dans « ＋ Ajouter un calcul ». « 🕘 Mes calculs » est devenu le mode ③ Calculs.</li>
+          <li><strong>Rien n’a disparu.</strong> ✎ Modifier et ↻ Relancer sont dans le <span class="ui">＋</span> au bout du fil du Résultat. « 🕘 Mes calculs » est devenu le mode ③ Calculs.</li>
         </ul>
         <p class="note">Pour y aller : l’onglet 🧭 du menu du bas, ou le menu de votre avatar → Routage. Dès que vous travaillez dans le routage, le menu du bas se range dans un bouton rond <span class="ui">☰</span> en bas à droite : touchez-le pour le retrouver. Le panneau se monte et se descend par sa bande du haut (━, ⌃ / ⌄).</p>
       </div>
@@ -351,7 +352,7 @@
         <ul class="plain">
           <li>Au port ou au mouillage, Starlink allumé.</li>
           <li>Pas la veille d’un départ. Jamais pendant une traversée.</li>
-          <li>Vérifiez la version : Réglages → 🔧 Maintenance technique. Il doit être écrit <strong>« Wang’ap v3.44.0 »</strong>.</li>
+          <li>Vérifiez la version : Réglages → 🔧 Maintenance technique. Il doit être écrit <strong>« Wang’ap v3.50.0 »</strong>.</li>
           <li>Si l’app semble ancienne : au même endroit, le bouton <span class="ui">Forcer la mise à jour</span>. Ou ouvrez <a href="https://www.wangap.fr/?reset=1">www.wangap.fr/?reset=1</a>.</li>
         </ul>
       </div>
@@ -399,7 +400,7 @@
           <p class="closed"><span>Fermée</span><q>Bateau → WPT 07</q></p>
           <div class="pair">
             <ul class="plain">
-              <li><strong>De</strong> : le bateau, sa dernière position et son âge (« il y a 2 h »). Après « ＋ Ajouter un calcul », ce peut être le départ du calcul d’origine ; « ⛵ partir du bateau » ramène au bateau.</li>
+              <li><strong>De</strong> : le bateau, sa dernière position et son âge (« il y a 2 h » ; en ambre dès 1 h, ⚠ en rouge dès 3 h : il a pu bouger depuis). <span class="ui">Changer</span> ouvre les mêmes choix que pour l’arrivée : ⛵ le bateau ; « 📍 Ma position », le GPS de ce téléphone (au mouillage, le PC du bord éteint, c’est la position du moment ; un refus ou un GPS muet est dit) ; « Un point sur la carte » (l’épingle à glisser, puis <span class="ui">Confirmer</span>) ; un nom ou des coordonnées ; les lieux récents. Un départ à plus de 20 milles du bateau est signalé, jamais refusé. Après le « ＋ » au bout du fil, ce peut être le départ du calcul d’origine ; « ⛵ partir du bateau » ramène au bateau en un toucher.</li>
               <li><strong>À</strong> : déjà remplie avec le waypoint actif du B&amp;G, sinon votre dernière arrivée. <span class="ui">✕</span> pour en choisir une autre :
                 <ul>
                   <li>« Waypoint actif du B&amp;G » ;</li>
@@ -411,8 +412,8 @@
               <li>« ≈ 700 milles à vol d’oiseau · cap initial 230° — pas une route » : un ordre d’idée, pas la route.</li>
             </ul>
             <figure class="shot">
-              <img src="img/iphone-etape1.jpg" width="780" height="1226" loading="lazy" decoding="async" alt="L’étape 1 ouverte : De, Bateau 36,12 N 5,35 O il y a 2 h ; À, WPT 07, 28,14 N 15,41 O, environ 700 milles à vol d’oiseau, cap initial 230°, préremplie : le waypoint du B&amp;G ou ton dernier calcul, avec une croix pour changer.">
-              <figcaption>L’arrivée préremplie par le waypoint du B&amp;G. La croix ✕ ouvre les autres choix.</figcaption>
+              <img src="img/iphone-etape1.jpg" width="780" height="1474" loading="lazy" decoding="async" alt="L’étape 1 ouverte, le départ en train de changer : De, « Port, mouillage… ou 29.22, -13.53 » ; Le bateau, sa dernière position 28,60 N 16,00 O, il y a 7 h (choisi) ; Ma position, le GPS de cet appareil — à bord, la position du moment ; Un point sur la carte, une épingle à glisser, ou un appui long sur la carte, puis Confirmer ; Garder ce départ. À : 28,14 N 15,41 O, environ 42 milles à vol d’oiseau, cap initial 131°, pas une route, avec une croix pour changer. La ligne fermée dit Bateau (⚠ il y a 7 h) → 28,14 N 15,41 O.">
+              <figcaption><span class="ui">Changer</span> sous « De » : le bateau, votre position, un point sur la carte, ou un nom. Sous « À », la croix ✕ ouvre les mêmes choix pour l’arrivée.</figcaption>
             </figure>
           </div>
         </div>
@@ -429,7 +430,7 @@
               <li><strong>Maintenant</strong> : le départ à la prochaine heure pleine, à l’heure du téléphone.</li>
               <li><strong>À une date</strong> : « demain 08:00 », « +12 h », « +24 h », ou la date de votre choix.</li>
               <li><strong>★ Optimisé</strong> <span class="skipper">skipper</span> : le meilleur départ autour de maintenant ou d’une date, sur ±12 h, ±1 j ou ±2 j. Un départ toutes les 3 h : « 17 départs, de mer. 28 · 21:00 à ven. 30 · 21:00 ».</li>
-              <li>Le prix : <span class="num">≈ 4 min</span> de plus, <strong>0 crédit</strong> (il relit la météo déjà téléchargée).</li>
+              <li>Le prix : jusqu’à <span class="num">≈ 4 min</span> de plus au nuage (son budget : ce qui n’y tient pas est dit), <strong>0 crédit</strong> (il relit la météo déjà téléchargée). Le temps de VOTRE calcul est sur la ligne.</li>
               <li>Le résultat s’ouvre alors sur « Quand ? » : une ligne par objectif, une colonne par départ, ★ le meilleur départ de chaque ligne. Touchez une case pour voir sa route.</li>
             </ul>
             <figure class="shot">
@@ -497,25 +498,27 @@
               <ul class="plain">
                 <li><strong>⛵ Polaire</strong> : son incertitude. <span class="ui">Aucune</span> · <span class="ui">Prudente</span> (toutes les cases −10 %) · <span class="ui">Fourchette</span> (85 à 110 %) · <span class="ui">Par case</span> (selon la confiance de chaque case : votre défaut).</li>
                 <li><strong>😴 Équipage</strong> : 2 à bord, 6 heures dures d’affilée au plus, une nuit en mer « coûte » 3 h, 2 % de rendement perdu par jour après 48 h, préférer arriver reposés.</li>
+                <li><strong>🌙 La nuit, la polaire à</strong> : 100 % par défaut — la nuit comme le jour. La nuit, ni spi ni gennaker, des ris pris tôt : à 90 %, le calcul fait aller le bateau 10 % moins vite sous voiles une fois le soleil couché (au moteur, rien ne change ; sous 4,5 nds à la voile, le moteur prend le relais, comme le jour). Ici, un choix vaut pour ce calcul seulement ; votre défaut se règle de la même façon dans ⚙ Réglages → 😴 Équipage. Les valeurs sont mesurées sur les données du bord (17 juin – 5 nov., 12 nuits) : <span class="ui">Comme le jour · 100 %</span> · <span class="ui">Médiane · 97 %</span> · <span class="ui">80ᵉ centile · 96 %</span> · <span class="ui">✏️ Personnalisé</span> — un écart nuit / jour pas encore sûr ; rien ne s’applique tout seul (<a href="#reglages">plus bas</a>).</li>
                 <li>Changées ici : pour ce calcul seulement (✎) ; la famille peut les changer aussi. Les valeurs par défaut : ⚙ Réglages → ⛵ Polaires et 😴 Équipage.</li>
               </ul>
               <h4>Puis, des calculs en plus <span class="skipper">skipper</span></h4>
-              <p>Pour savoir si la réponse tient quand on change une hypothèse. ⛵ et 😴 se calculent aussi hors ligne, sur l’appareil ou au PC du bord (quelques secondes de plus) ; 🎲 reste au nuage — l’app le dit.</p>
+              <p>Pour savoir si la réponse tient quand on change une hypothèse. ⛵, 😴 et 🌙 se calculent aussi hors ligne, sur l’appareil ou au PC du bord (quelques secondes de plus) ; 🎲 reste au nuage — l’app le dit.</p>
               <div class="tbl">
                 <table>
                   <thead><tr><th scope="col">Case</th><th scope="col">Ce qu’elle fait</th><th scope="col">Prix</th></tr></thead>
                   <tbody>
-                    <tr><th scope="row">🎲 Ensembles météo</th><td>173 variantes de la prévision : l’arrivée au plus tôt, la plus probable, au plus tard, et la part de jour. <strong>Au nuage seulement</strong> (trop lourds pour l’appareil).</td><td class="num">≈ 5 min<br>≈ 800 crédits*</td></tr>
-                    <tr><th scope="row">⛵ Incertitude des polaires</th><td>La route refaite avec le bateau à 85 % (carène sale, chargé) et à 110 % (bien réglé). Aussi hors ligne.</td><td class="num">≈ 15 s<br>0 crédit<br><small>ici : ≈ +5 à 10 s</small></td></tr>
-                    <tr><th scope="row">😴 Équipage / perf.</th><td>La route refaite « reposés », puis « fatigués ». Aussi hors ligne.</td><td class="num">≈ 15 s<br>0 crédit<br><small>ici : ≈ +5 à 10 s</small></td></tr>
+                    <tr><th scope="row">🎲 Ensembles météo</th><td>173 variantes de la prévision : l’arrivée au plus tôt, la plus probable, au plus tard, et la part de jour. <strong>Au nuage</strong> depuis l’iPhone et l’iPad (pas encore essayés sur l’appareil lui-même) ; <strong>sur place</strong> sur un ordinateur capable et au PC du bord.</td><td class="num">au nuage : ≈ 5 min (150 milles) à ≈ 13 min (770 milles)<br>≈ 2 200 crédits*</td></tr>
+                    <tr><th scope="row">⛵ Incertitude des polaires</th><td>La route refaite avec le bateau à 85 % (carène sale, chargé) et à 110 % (bien réglé). Aussi hors ligne.</td><td class="num">≈ 5 à 15 s<br>0 crédit<br><small>ici : quelques secondes</small></td></tr>
+                    <tr><th scope="row">😴 Équipage / perf.</th><td>La route refaite « reposés », puis « fatigués ». Aussi hors ligne.</td><td class="num">≈ 5 à 15 s<br>0 crédit<br><small>ici : quelques secondes</small></td></tr>
+                    <tr><th scope="row">🌙 La nuit autrement</th><td>La route refaite avec deux autres polaires de nuit : 100 % (la nuit comme le jour) et 10 % sous votre réglage — à 100 % : 90 et 80 %. La case le dit : « (100 · 97 · 87 %) ». Aussi hors ligne.</td><td class="num">≈ 5 à 15 s<br>0 crédit<br><small>ici : quelques secondes</small></td></tr>
                   </tbody>
                 </table>
               </div>
-              <p class="note">* 0 si la même zone a été calculée il y a moins de 3 h.</p>
+              <p class="note">* 0 si la même zone a été calculée il y a moins de 3 h. Les temps grandissent avec la route : chaque case dit celui de VOTRE calcul (le même modèle partout, 30 oct.).</p>
             </div>
             <figure class="shot">
-              <img src="img/iphone-etape5.jpg" width="780" height="1108" loading="lazy" decoding="async" alt="L’étape 5 ouverte : la ligne dit polaire selon les cases · 2 à bord · ensembles météo, avec +800 crédits, +5 min et le signe ✎ ; dessous, Polaire : Incertitude des polaires, Aucune, Prudente, Fourchette, Par case (choisi) ; Équipage : Personnes à bord 2 ; la bande des coûts dit ≈ 7 min et 23 % du jour.">
-              <figcaption>Les hypothèses d’abord (⛵ polaire, 😴 équipage) ; les trois cases sont plus bas. 🎲 coché : la bande passe de ≈ 2 min · 15 % à ≈ 7 min · 23 % du jour.</figcaption>
+              <img src="img/iphone-etape5.jpg" width="780" height="1944" loading="lazy" decoding="async" alt="L’étape 5 ouverte : la ligne dit polaire selon les cases · 2 à bord · aucune ; dessous, Polaire : Incertitude des polaires, Aucune, Prudente, Fourchette, Par case (choisi) ; Équipage : Personnes à bord 2, Heures dures d’affilée 6 h, Une nuit en mer coûte 3,0 h, Rendement perdu par jour 2,0 % après 48 h, Préférer arriver reposés (allumé) ; La nuit, la polaire à, avec son point d’interrogation, et quatre boutons : Comme le jour 100 % (choisi), Médiane 97 %, 80ᵉ centile 96 %, Personnalisé 60 – 100 % ; en bas, la bande des coûts et Choisis une arrivée (étape 1).">
+              <figcaption>Les hypothèses d’abord : ⛵ la polaire, 😴 l’équipage, et en dernier 🌙 la nuit — les mêmes choix qu’en ⚙ Réglages, pour ce calcul. Les quatre cases des calculs en plus sont plus bas.</figcaption>
             </figure>
           </div>
         </div>
@@ -552,7 +555,7 @@
           <div class="pair">
             <ul class="plain">
               <li><strong>☁️ Nuage</strong> : par défaut. Le calcul se fait à terre ; il faut du réseau. Vous pouvez quitter la page : le résultat vous attendra.</li>
-              <li><strong>📱 Cet appareil</strong> : le même calcul sur l’iPhone ou l’iPad, sans réseau, avec une météo rangée d’avance (voir <a href="#hors-ligne">Hors ligne</a>). <span class="num">≈ 15 s</span>, 0 crédit ; ⛵ et 😴 aussi (quelques secondes de plus) ; ★ Optimisé : une grille légère sur l’iPad (<span class="num">≈ 1 min</span>), pas sur l’iPhone ; 🎲 au nuage seulement. Le bouton devient « 📱 Calculer sur cet appareil ».</li>
+              <li><strong>📱 Cet appareil</strong> : le même calcul sur l’iPhone ou l’iPad, sans réseau, avec une météo rangée d’avance (voir <a href="#hors-ligne">Hors ligne</a>). <span class="num">≈ 15 s</span>, 0 crédit ; ⛵ et 😴 aussi (quelques secondes de plus) ; ★ Optimisé : une grille légère sur l’iPad (<span class="num">≈ 1 min</span>), pas sur l’iPhone ; 🎲 au nuage depuis l’iPhone et l’iPad (un ordinateur capable, comme le Mac de Flavien, calcule tout sur place, ensembles compris). Le bouton devient « 📱 Calculer sur cet appareil ». Si le nuage a atteint son budget du mois, le message propose « 📱 Calculer sur cet appareil » en un toucher.</li>
               <li><strong>🖥️ PC du bord</strong> : pas encore installé chez vous. Flavien vous enverra de quoi le faire. D’ici là, laissez-le de côté.</li>
             </ul>
             <figure class="shot">
@@ -576,6 +579,7 @@
                 <li>Le détail du coût, ligne par ligne, puis « En tout ».</li>
                 <li>Une barre : les crédits du jour déjà pris par vos calculs, celui-ci, ce qui restera.</li>
                 <li>Puis <span class="ui">Lancer · ≈ 2 min</span>. Vous pouvez quitter la page pendant le calcul.</li>
+                <li><strong>Pendant le calcul</strong>, la barre avance et dit quand il finira : « fin vers 04:12 · ≈ 6 min ». Chaque étape faite dit son temps, celle en cours son temps qui passe (« Option : une route par scénario d’ensemble · 71/173 · 4 min 15 s »). Une étape plus longue que prévu : « ⏳ plus long que prévu », l’heure de fin recule — le calcul continue. Dans Préparer, le pied dit la même chose ; sur iPhone, la feuille repliée aussi.</li>
               </ul>
               <div class="panel">
                 <h3>🤖 Un briefing écrit par Claude</h3>
@@ -584,7 +588,7 @@
                   <li>Chaque chiffre vient du calcul. Claude n’en invente aucun ; le texte est marqué « ✨ écrit par Claude d’après les chiffres du calcul ».</li>
                   <li>Le prix : <span class="num">2 à 3 centimes</span> (l’app dit « ≈ 4 000 jetons » : la longueur du texte lu et écrit).</li>
                   <li>Il peut manquer : jamais sur une météo 🧪 fictive, ni pour un calcul 📱 ou 🖥️. Si Claude ne répond pas, vous avez les raisons du calcul, sans les phrases.</li>
-                  <li>Après coup : la carte « ✨ Briefing » en tête du Résultat le demande aussi.</li>
+                  <li>Après coup : Résultat → <span class="ui">⋯ Détails</span> → « 📋 Briefing » le demande aussi (<a href="#resultat-cartes">plus bas</a>).</li>
                 </ul>
               </div>
             </div>
@@ -608,7 +612,7 @@
       <table>
         <thead><tr><th scope="col">Case</th><th scope="col">Exemple</th><th scope="col">Ce qu’elle dit</th></tr></thead>
         <tbody>
-          <tr><th scope="row">⏱ temps</th><td class="num">≈ 6 min</td><td>Le temps du calcul, estimé, arrondi vers le haut.</td></tr>
+          <tr><th scope="row">⏱ temps</th><td class="num">≈ 6 min</td><td>Le temps du calcul, estimé, arrondi vers le haut — selon la longueur de la route (150 milles ≠ 700), l’endroit (le nuage, ou cet appareil) et les cases cochées. Le même chiffre partout : la bande, l’étape 8, les cases, « ＋ Ajouter un calcul ».</td></tr>
           <tr><th scope="row">🌐 du jour</th><td class="num">15 %</td><td>La part des crédits météo du jour que ce calcul prendra.</td></tr>
           <tr><th scope="row">🤖 Claude</th><td class="num">0</td><td>Le briefing : 0, ou ≈ 4 000 jetons s’il est coché.</td></tr>
           <tr><th scope="row">aujourd’hui</th><td class="num">3</td><td>Vos calculs au nuage des dernières 24 h. Pas de plafond pour le skipper. La famille voit « 3 / 10 aujourd’hui » : 10 par jour.</td></tr>
@@ -623,28 +627,122 @@
     <p class="eyebrow">② Résultat</p>
     <h2 id="h-resultat">Le résultat</h2>
     <div class="stack">
+      <div class="pair">
+        <ul class="plain">
+          <li><strong>La réponse d’abord</strong>, en une phrase : « Partir mar. 27 · 04:00, à quai dim. 1 vers 8 h, de jour ». Dessous, ce qui la précise : « Au large vers 01:58, 6 h 15 d’attente » et l’heure du port « (07:12 heure locale) ».</li>
+          <li>Avec une grille des départs, à droite, le <strong>score</strong> de votre objectif (« 50 / 100 · 🛡 Prudent »). Puis deux pastilles : la <strong>confiance</strong> (▮▮▯ moyenne) et la part de vos <strong>limites</strong> que la route approche (« 80 % des limites » ; ⛔ dès 90 %).</li>
+          <li><strong>Trois chiffres</strong> : la durée jusqu’au quai (5 j 4 h) · le vent max (≤ 14 nds, raf. 20) · ⛽ les heures de moteur (108 h, ≈ 283 L). Dessous, les dangers croisés (🐋 Orques ibériques ›).</li>
+          <li>Ces chiffres sont ceux de la <strong>route ★</strong> du maillon touché : votre objectif (🛡 Prudent), ou le départ touché dans le calendrier.</li>
+          <li>La confiance dit si les six modèles sont d’accord. Elle ne dit pas si la route est sûre : ce qui approche vos limites est dans « À surveiller ».</li>
+          <li><strong>🛡 Retiré par le garde-fou</strong> : si la route d’un autre modèle coupe la côte ou un dispositif de séparation du trafic, elle est retirée du calcul et c’est dit en tête de « La confiance en détail », dans ② Météo (« La route du modèle UK Met Office traversait le dispositif de séparation du trafic de Gibraltar : retirée du calcul »). La route ★ elle-même ne passe jamais par là : sinon le calcul est refusé.</li>
+          <li>La famille garde une vue simple, en mots : ni fil, ni étapes, ni tableau.</li>
+        </ul>
+        <figure class="shot">
+          <img src="img/iphone-resultat.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="Le Résultat sur l’iPhone : en haut la carte, la route verte et la base en tirets gris, les boutons ★ seule et « ◆ la base » ; dans le panneau, le fil 📌 ◆ Base mar. 27 · 04:00, ★ ±1 j la grille des départs (affiché), ⏱ ; la réponse Partir mar. 27 · 04:00, à quai dim. 1 vers 8 h, de jour ; Au large vers 01:58, 6 h 15 d’attente, 07:12 heure locale ; 50 / 100 Prudent ; vs ◆ la base : à quai ±0 ; Confiance moyenne, 80 % des limites ; 5 j 4 h jusqu’au quai, ≤ 14 nds vent max raf. 20, 108 h moteur ≈ 283 L ; Orques ibériques ; Prendre comme réponse, Garder la base ; les onglets ① Quand, ② Météo, ③ Et si…, Tableau.">
+          <figcaption>Le maillon ★ ±1 j : la phrase, le score, la confiance, les trois chiffres, puis les étapes ① ② ③ ⊞.</figcaption>
+        </figure>
+      </div>
+
+      <h3 id="fil">Le fil du passage <span class="skipper">skipper</span></h3>
+      <div class="pair">
+        <ul class="plain">
+          <li>Sous la ligne du haut, une bande qui défile : <span class="ui">◆ Base</span> › <span class="ui">★ ±1 j</span> › <span class="ui">⏱ mer. 28 · 10:00</span> › <span class="ui">🎲</span> › <span class="ui">🌊 Vagues ≤ 2 m</span> … Chaque maillon est un calcul né du précédent ; un toucher l’affiche (la réponse, la carte, le curseur le suivent).</li>
+          <li>La réponse dit toujours son écart à son parent : « vs ★ ±1 j (mar. 27 · 04:00) : à quai +1 j 2 h · en mer +2 h · ⛽ +12 h 15 ». <strong>La base n’est jamais écrasée.</strong></li>
+          <li>Un maillon en cours dit « fin vers … » ; 🧪 / ⚠ s’affichent sur le maillon. Le <span class="ui">＋</span> au bout du fil mène aux étapes, ou à un autre calcul (✎ un autre trajet ouvre un nouveau passage — <a href="#ajouter">plus bas</a>).</li>
+        </ul>
+        <figure class="shot">
+          <img src="img/iphone-fil.jpg" width="780" height="1240" loading="lazy" decoding="async" alt="Le fil : ★ ±1 j la grille des départs, puis ⏱ mer. 28 · 10:00 calculé en détail (affiché), et le bouton ＋ au bout ; la réponse Partir mer. 28 · 10:00, arrivée lun. 2 vers 10 h, de jour ; vs ★ ±1 j (mar. 27 · 04:00) : à quai +1 j 2 h, en mer +2 h, moteur +12 h 15 ; Confiance faible, 69 % des limites ; 5 j 0 h, ≤ 7 nds raf. 24, 120 h moteur ; les deux boutons Prendre comme réponse et Garder la base ; l’onglet ② Météo ouvert.">
+          <figcaption>Un départ calculé en détail, né de la grille : la réponse dit son écart à la grille. Deux boutons, puisqu’il y a un choix à faire.</figcaption>
+        </figure>
+      </div>
+      <div class="pair flip">
+        <figure class="shot">
+          <img src="img/iphone-fil-pris.jpg" width="780" height="1240" loading="lazy" decoding="async" alt="Juste après Prendre comme réponse : le maillon ⏱ mer. 28 · 10:00 porte 📌 et ✓ réponse, bordé d’or ; sous la réponse, ✓ la réponse retenue ; un message dit 📌 suit la réponse — la famille la voit.">
+          <figcaption>« Prendre comme réponse » touché : ✓ la réponse retenue, et le 📌 l’a suivie (il était sur ◆ la base, dans ce passage).</figcaption>
+        </figure>
+        <ul class="plain">
+          <li><strong>« Prendre comme réponse »</strong> : ce maillon passe en tête du passage — c’est lui qui s’ouvre la prochaine fois. Les autres skippers la voient (« retenue par Bertrand ») ; hors ligne, elle part au retour du réseau, et le dernier choix l’emporte. Le calcul d’un autre skipper s’ouvre en lecture seule.</li>
+          <li>Les deux boutons, <span class="ui">Prendre comme réponse</span> et <span class="ui">Garder la base</span> (ou <span class="ui">Garder la réponse</span> quand un autre maillon est retenu), ne s’affichent que s’il y a un choix à faire ; le maillon retenu porte « ✓ la réponse retenue ».</li>
+          <li><strong>Le 📌 suit la réponse</strong> quand il est déjà sur ce passage : c’est la route que la famille voit sur ses cartes (« 📌 suit la réponse — la famille la voit »). ③ Calculs le montre aussitôt sur la nouvelle ligne.</li>
+          <li>S’il est ailleurs, rien n’est épinglé tout seul. S’il ne peut pas suivre (hors ligne, un calcul de cet appareil pas encore envoyé), l’écran dit où il est resté. Jamais une météo fictive 🧪.</li>
+        </ul>
+      </div>
+
+      <h3 id="trois-questions">Trois questions, dans l’ordre d’un marin</h3>
+      <p>Sous la réponse, quatre onglets : <span class="ui">① Quand</span> · <span class="ui">② Météo</span> · <span class="ui">③ Et si…</span> · <span class="ui">⊞ Tableau</span>. Un seul ouvert à la fois (un toucher sur l’onglet ouvert le referme) ; le point dessous dit ● calculé, ○ à faire.</p>
+      <div class="pair">
+        <ul class="plain">
+          <li><strong>① Quand partir ?</strong> Le calendrier des départs : les jours en lignes, les heures en colonnes, comme les dates de Google Flights. La phrase du haut nomme le meilleur (« mer. 28 · 10:00 — à quai lun. 2 · 09:34, 81/100 »).</li>
+          <li>L’objectif au-dessus (🛡 · 🛋 · ⛵ · ⚡), puis la valeur, au choix : Score, À quai, En mer, Vent max, Rafales max, Vagues, % des limites, Moteur, Attente. Plus foncé = mieux.</li>
+          <li>Les signes : ★ le meilleur (cerclé d’or), ◆ la base, ☾ entre de nuit, ⚓ attend le jour, ≈ calculé en détail, ⛔ hors limites — jamais classé. Un départ <strong>passé est grisé</strong> et ne se lance plus ; s’il a été calculé en détail, il s’ouvre encore ; quand la ★ est passée, la phrase nomme le meilleur départ à venir.</li>
+          <li><span class="ui">…</span>, au bout des valeurs : <strong>les poids du score</strong> et comment il se calcule (temps, confort, marge, jour, certitude). Glisser un poids recalcule le score des cases sur l’appareil, sans relancer de calcul, et passe l’objectif en ✏️ Personnalisé : vos poids sont gardés avec lui (⚙ Réglages → Objectif), le prochain calcul aura sa ligne ✏️.</li>
+        </ul>
+        <figure class="shot">
+          <img src="img/iphone-quand.jpg" width="780" height="1600" loading="lazy" decoding="async" alt="① Quand partir ? Le meilleur pour Prudent : mer. 28 · 10:00 — à quai lun. 2 · 09:34, 81/100 ; les objectifs Prudent (choisi), Confort, Voile, Rapide ; les valeurs Score (choisi), À quai, En mer, Vent max et le bouton … ; le calendrier mar. 27, mer. 28, jeu. 29 sur 01h à 22h, des scores de 46 à 81, ★ sur mer. 28 · 10:00, ◆ sur mar. 27 · 04:00, des ancres ; la légende ; dessous, ouvert par …, 50 / 100 · Prudent · les poids de l’objectif : Temps 10 / 10, Confort 4 / 20, Marge 17 / 35, Jour 16 / 25, Certitude 3 / 10.">
+          <figcaption>① sur la grille ±1 j. « … » a ouvert les poids du score : 50 / 100 pour la case touchée, et d’où vient chaque point.</figcaption>
+        </figure>
+      </div>
+      <div class="pair flip">
+        <figure class="shot">
+          <img src="img/iphone-panier.jpg" width="780" height="1700" loading="lazy" decoding="async" alt="Le calendrier avec deux cases cerclées, mer. 28 · 16:00 et mer. 28 · 22:00 ; la carte de la case touchée : mer. 28 · 22:00 → à quai mar. 3 · 08:14, Prudent, 5 j 1 h en mer + 9 h 30 d’attente, vs ◆ la base : à quai +2 j 0 h ; le bouton ≈ Calculer ce départ en détail, les 6 modèles et l’optimiseur pour ce départ · ≈ 90 s · même météo, 0 crédit ; ✓ Dans le panier — retirer ; puis Le panier · 2 départs, mer. 28 · 16:00 et mer. 28 · 22:00, et le bouton Les 6 modèles pour 2 départs · ≈ 3 min · même météo, 0 crédit.">
+          <figcaption>Deux départs au panier. Un bouton les calcule l’un après l’autre, le temps total annoncé.</figcaption>
+        </figure>
+        <ul class="plain">
+          <li>Une case touchée montre sa carte : l’heure à quai, le temps en mer, l’écart à la base. Puis <span class="ui">≋ Calculer ce départ en détail</span>, avec son temps, en un toucher : les 6 modèles et l’optimiseur, sur la même météo (0 crédit).</li>
+          <li><strong>🧺 Le panier</strong> : touchez un départ, <span class="ui">＋ Au panier</span>, recommencez. Le bouton du panier calcule tout, l’un après l’autre, avec le temps total annoncé (« ≈ 3 min · même météo, 0 crédit »). Chaque départ devient un maillon ⏱ du fil.</li>
+        </ul>
+      </div>
+      <div class="pair">
+        <ul class="plain">
+          <li><strong>② Ce départ, selon la météo.</strong> Une phrase : où arrivent les modèles, avant ou après le lever du jour, et si la réponse tient (« 🛡 Prudent entre de jour, à 10:02 : la réponse tient »).</li>
+          <li>La frise des arrivées : chaque modèle a sa forme, la nuit est grisée, l’heure à quai est le trait plein. Dessous, les modèles en liste ; un modèle trop court dit pourquoi (✕).</li>
+          <li><span class="ui">🎲 Ajouter les ensembles (173 scénarios)</span>, avec son temps et ses crédits ; « ▸ Où les météos divergent, heure par heure » ; la confiance en une phrase.</li>
+          <li>Pour une case de la grille pas encore calculée, ② propose de la calculer ici, sur la météo du calcul (0 crédit).</li>
+        </ul>
+        <figure class="shot">
+          <img src="img/iphone-meteo.jpg" width="780" height="1520" loading="lazy" decoding="async" alt="② mer. 28 · 10:00, selon la météo : Au large lun. 2 entre 07:17 et 09:49 selon les modèles — 3 sur 4 avant le lever du jour (08:13). Prudent entre de jour, à 10:02 : la réponse tient ; la frise, la nuit grisée, quatre formes et le trait à quai 10:02 ; la liste ECMWF 07:52, GFS 07:45, ICON 07:17, AIFS 09:49, UKMO et MF prévision trop courte ; Ajouter les ensembles (173 scénarios) ≈ 12 min, ≈ 2 200 crédits météo ; Où les météos divergent, heure par heure ; Confiance faible.">
+          <figcaption>② sur le départ calculé en détail : quatre modèles sur six arrivent, et la réponse tient.</figcaption>
+        </figure>
+      </div>
+      <div class="pair flip">
+        <figure class="shot">
+          <img src="img/iphone-etsi.jpg" width="780" height="1680" loading="lazy" decoding="async" alt="③ Et si… ? Ce qui ferait bouger l’arrivée à quai (lun. 2 · 10:02) — en heures, autour de 0 : Vagues ≤ 2 m +22 h 15, Moteur sous 3,5 nds +3 h 15, La météo (4 modèles) −35 min / +2 h ; Ne changent rien ici : Vagues ≤ 2,5 m, Vent ≤ 22 · raf. 29, Nuit acceptée ; la carte dorée Vagues ≤ 2 m vs mer. 28 · 10:00 : à quai lun. 2 · 10:02 contre mar. 3 · 08:14, +22 h 15 ; en mer +11 h ; attente au large +11 h 15 ; vagues max −0,2 m ; moteur +6 h ; Voir sur la carte.">
+          <figcaption>③ : la seule limite qui mord ici, ce sont les vagues ≤ 2 m (+22 h 15 à quai). Touchée, sa comparaison avec la base.</figcaption>
+        </figure>
+        <ul class="plain">
+          <li><strong>③ Et si…</strong> D’abord ce qui ferait bouger l’heure à quai, en heures autour de 0 : en clair l’incertain (la météo), en foncé les essais déjà faits. Ce qui ne change rien tient en une phrase.</li>
+          <li>Puis les leviers, chacun avec la valeur de la base et une à trois valeurs à essayer : vagues, vent, moteur, nuit, polaire, équipage, 🌙 la nuit (les valeurs mesurées — 97 · 96 % — autres que la vôtre, et 100 % si vous êtes en dessous). Une puce en tirets dit son coût (« à calculer ≈ 90 s »).</li>
+          <li>Chaque essai est un nouveau maillon ; touché, sa comparaison avec la base en cinq lignes (à quai, en mer, l’attente, les vagues, le moteur), et sa route en tirets or sur la carte.</li>
+        </ul>
+      </div>
+      <div class="pair">
+        <ul class="plain">
+          <li><strong>⊞ Le tableau</strong> (vue avancée) : les départs en colonnes, en lignes l’<strong>objectif</strong>, le <strong>modèle</strong> ou un <strong>seuil</strong> (vagues, vent, moteur, polaire, équipage, 🌙), et une valeur.</li>
+          <li><strong>Une case hachurée n’est pas calculée</strong> : son coût est écrit dedans (« 90 s »), un toucher la calcule (un maillon, sur la météo du calcul).</li>
+          <li>≈ marque une passe de la grille (dans la ligne ◆ d’un seuil, à côté des départs calculés en détail) : touchée, <span class="ui">≋ Calculer ce départ en détail</span> s’affiche sous le tableau. Une colonne passée est grisée.</li>
+          <li><span class="ui">⇄</span> échange lignes et colonnes. « 🗓 Chaque modèle à chaque départ » remplit la ligne des modèles d’un coup. Une ligne entière de seuils se calcule au PC du bord. Sur l’iPad et l’ordinateur, le panneau s’élargit.</li>
+        </ul>
+        <figure class="shot">
+          <img src="img/iphone-tableau.jpg" width="780" height="1600" loading="lazy" decoding="async" alt="⊞ Le tableau : Les départs en colonnes, une dimension en lignes, une valeur. Une case hachurée n’est pas calculée : son coût est écrit, un toucher la calcule ; Lignes : Objectif, Modèle, Vagues max (choisi), ⇄ ; Valeur : À quai (choisi), En mer, Vent max, Rafales max ; le tableau mar. 27 04h à 19h : les lignes 2 m, 2,5 m et 3,5 m hachurées avec 90 s dans chaque case, la ligne ◆ 3 m la base remplie (dim. 08h, 08h, 08h, 12h, 15h, 17h) ; la légende ; en bas, 2 m : 16 cases à calculer.">
+          <figcaption>⊞ Vagues max × Départ : la ligne ◆ de la base est remplie ; les autres seuils sont hachurés, chacun avec son coût.</figcaption>
+        </figure>
+      </div>
+
+      <h3 id="resultat-cartes">Puis des cartes repliées</h3>
       <ul class="plain">
-        <li><strong>La réponse d’abord</strong>, en une phrase : « Arrivée sam. 31 vers 15 h, de jour — confiance moyenne ▮▮▯ », et l’heure du port « (13:45 heure locale) ».</li>
-        <li><strong>Trois chiffres</strong> : la durée (5 j 2 h) · le vent max (≤ 16 nds, raf. 21) · ⛽ les heures de moteur (111 h, ≈ 292 L). Dessous, la fourchette des modèles et les dangers croisés (🐋 Orques ibériques).</li>
-        <li>Ces chiffres sont ceux de la <strong>route ★</strong> : votre objectif (🛡 Prudent), ou le départ touché dans la grille.</li>
-        <li>La confiance dit si les six modèles sont d’accord. Elle ne dit pas si la route est sûre : ce qui approche vos limites est dans « À surveiller ».</li>
-        <li><strong>Trois onglets</strong>, toujours dans le même ordre : <span class="ui">Quand ?</span> les départs · <span class="ui">Route</span> les routes, 📌, la carte, la feuille de route · <span class="ui">Certitude</span> pourquoi, les modèles, les sensibilités.</li>
-        <li><strong>Puis des cartes repliées</strong>. Fermées, elles disent l’essentiel en une ligne : Ce qui a changé · À surveiller ⚠ 5 · Profil · Météo sur la carte ▶ · Comparer · Feuille de route (B&amp;G) · Les autres départs · Pourquoi « moyenne » ? · Les modèles · Sensibilités · 📋 Briefing.</li>
-        <li>Sur l’iPhone, une carte ouverte à la fois ; elle remonte le panneau à mi-hauteur. Tout en bas : « ＋ Ajouter un calcul ».</li>
+        <li>Fermées, elles disent l’essentiel en une ligne : <strong>Heure par heure</strong> · <strong>À surveiller ⚠ 6</strong> (« Arrivée de nuit · Beaucoup de moteur… ») · <strong>⋯ Détails</strong>.</li>
+        <li><strong>⋯ Détails</strong> : les modèles en chiffres, les routes (comparer), la météo toutes les 3 h, la feuille de route (B&amp;G), 📋 le briefing, Δ ce qui a changé, 📌 Montrer à la famille.</li>
+        <li>Tout en bas : <span class="ui">📤 Exporter / Partager</span> (<a href="#partager">plus bas</a>).</li>
       </ul>
-      <p class="swipe" aria-hidden="true">Glissez pour voir les trois captures →</p>
-      <div class="strip" tabindex="0" role="group" aria-label="Captures du résultat">
+      <p class="swipe" aria-hidden="true">Glissez pour voir les deux captures →</p>
+      <div class="strip" tabindex="0" role="group" aria-label="Captures des cartes du résultat">
         <figure class="shot">
-          <img src="img/iphone-resultat.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="Le Résultat sur l’iPhone : la route verte sur la carte, avec les orques ; Arrivée sam. 31 vers 15 h, de jour — confiance moyenne ; 5 j 2 h durée, ≤ 16 nds vent max raf. 21, 111 h moteur environ 292 L ; les modèles : sam. 31, 15 h – 16 h (4) ; Orques ibériques ; Ajouter un calcul.">
-          <figcaption>La phrase et les trois chiffres.</figcaption>
+          <img src="img/iphone-surveiller.jpg" width="780" height="1200" loading="lazy" decoding="async" alt="La carte À surveiller ouverte, avec ⚠ 6 : Arrivée de nuit, Beaucoup de moteur, Orques ibériques, Au-delà de ta marge (80 %), Gazole, Longue traversée ; chaque ligne a son point d’interrogation ; dessous, Le détail : Détails.">
+          <figcaption>« À surveiller ⚠ 6 » ouverte. Chaque ligne a son « ? ».</figcaption>
         </figure>
         <figure class="shot">
-          <img src="img/iphone-surveiller.jpg" width="780" height="1158" loading="lazy" decoding="async" alt="La carte À surveiller ouverte, avec ⚠ 5 : Beaucoup de moteur, Orques ibériques, Dans ta marge (80 % de tes limites), Gazole, Longue traversée ; chaque ligne a son point d’interrogation.">
-          <figcaption>« À surveiller ⚠ 5 » ouverte. Chaque ligne a son « ? ».</figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="img/iphone-briefing.jpg" width="780" height="1158" loading="lazy" decoding="async" alt="La carte Briefing ouverte : écrit par Claude d’après les chiffres du calcul ; En bref : Départ lun. 26 · 13:00, arrivée sam. 31 · 14:45 (13:45 heure locale) — 5 j 2 h, 749 milles. Vent max 16 nds, rafales 21 nds, vagues 2,3 m, moteur 111 h ; puis Pourquoi ?">
-          <figcaption>📋 Briefing, quand il a été demandé : « En bref », puis « Pourquoi ? ».</figcaption>
+          <img src="img/iphone-briefing.jpg" width="780" height="1200" loading="lazy" decoding="async" alt="Dans Détails, la carte Briefing ouverte : écrit par Claude d’après les chiffres du calcul ; En bref : Départ mer. 28 · 10:00, arrivée lun. 2 · 10:02 — 5 j 0 h, 716 milles. Vent max 7 nds, rafales 24 nds, vagues 2 m, moteur 120 h ; Pourquoi ? ; Le passage.">
+          <figcaption>⋯ Détails → 📋 Briefing, quand il a été demandé : « En bref », « Pourquoi ? », puis le passage.</figcaption>
         </figure>
       </div>
     </div>
@@ -656,10 +754,11 @@
     <h2 id="h-carte">La carte</h2>
     <div class="pair">
       <ul class="plain">
-        <li>Trois boutons à droite : <span class="ui">⋯</span> (l’aide, « une aide, pas une vérité », la disposition de l’iPad) · <span class="ui">🗂 Calques</span> · la <strong>vue</strong>, dont l’icône change (voilier, viseur, drapeau) : départ, point choisi, arrivée, toute la route.</li>
+        <li>Trois boutons à droite : <span class="ui">⋯</span> (l’aide, « une aide, pas une vérité » ; sur une fenêtre étroite, la disposition) · <span class="ui">🗂 Calques</span> · la <strong>vue</strong>, dont l’icône change (voilier, viseur, drapeau) : départ, point choisi, arrivée, toute la route.</li>
+        <li>En Résultat, en haut à gauche : <span class="ui">★ seule</span> · <span class="ui">≋ Modèles</span> · <span class="ui">▒ Bande</span> — la route ★ seule (les autres objectifs en gris, avec leur écart), un trait par modèle, ou la bande des modèles en travers de la route. Sur l’iPhone, ≋ et ▒ sont des icônes. Dessous, la légende : <span class="ui">◆ la base</span> en tirets gris, un essai en tirets or.</li>
         <li><strong>🗂 Calques</strong> : un panneau qui prend la place du routage ; la carte reste visible. La météo : Aucune · Vent · Rafales · Vagues. Le vent en <strong>Barbules</strong> (force et direction exactes) ou <strong>Particules</strong> (comme 🗺 Carte). Le modèle. « Le long de la route » : le vent que le bateau rencontrera, là où il sera. <span class="ui">✕</span> ferme.</li>
         <li><strong>⚠️ Dangers</strong> (dans Calques) : une case par zone (🐋 orques, Sahara occidental · Mauritanie), allumées par défaut. Les masquer ne change ni le calcul ni « À surveiller ».</li>
-        <li><strong>▶</strong>, le bouton rond en bas à droite (en Résultat) : rejoue le passage, avec ou sans météo. Le point du bateau avance heure par heure (×1, ×4, ×16 ; −3 h / +3 h) ; ⌄ le replie. Aussi dans la carte « Météo sur la carte ▶ ».</li>
+        <li><strong>▶</strong>, dans la bande sous la carte (en Résultat, le panneau baissé) : l’heure, le vent, les vagues et la vitesse à cet instant, et le profil du passage. ▶ le rejoue : le point du bateau avance le long de la route (10 h de route par seconde ; sur l’iPad, ×10 change la vitesse) ; glissez sur la bande pour choisir une heure.</li>
         <li><strong>L’épingle</strong> : un appui long sur la carte → « Arriver ici ? » ; glissez-la, puis <span class="ui">Confirmer</span> (✕ pour renoncer).</li>
       </ul>
       <figure class="shot">
@@ -671,25 +770,27 @@
 
   <!-- ======================= Ajouter un calcul ======================= -->
   <section id="ajouter" aria-labelledby="h-ajouter">
-    <p class="eyebrow">Sous le résultat</p>
+    <p class="eyebrow">Au bout du fil</p>
     <h2 id="h-ajouter">＋ Ajouter un calcul</h2>
     <div class="pair">
       <div class="stack">
-        <p>Un toucher ouvre le menu :</p>
+        <p>Le <span class="ui">＋</span> au bout du fil (la famille : en bas de la page) ouvre le menu — d’abord les trois étapes (⏱ un autre départ → ①, ≋ les modèles de ce départ → ②, 🚧 une limite → ③), puis les calculs :</p>
         <ul class="plain">
-          <li>✎ <strong>Modifier l’arrivée ou le départ</strong> : un autre port, une autre heure ;</li>
-          <li>★ <strong>Optimiser la date ±1 j</strong> : un départ toutes les 3 h autour de celui-ci ;</li>
-          <li>🎲 <strong>Ajouter les sensibilités</strong> : ensembles, polaires, équipage ;</li>
-          <li>↻ <strong>Relancer le même calcul</strong> : avec la météo la plus récente ;</li>
-          <li>＋ <strong>Nouveau calcul, sans lien</strong> : repart de vos valeurs.</li>
+          <li>✎ <strong>Modifier l’arrivée ou le départ</strong> : un autre port, une autre heure — un nouveau passage ;</li>
+          <li>★ <strong>Optimiser la date ±1 j</strong> : un départ toutes les 3 h autour de celui-ci — seulement tant que le passage n’a pas sa grille des départs ;</li>
+          <li>🎲 <strong>Ajouter les sensibilités</strong> : ensembles, polaires, équipage, 🌙 la nuit — seulement celles qui manquent (« Ajouter les ensembles et la polaire de nuit ») ;</li>
+          <li>↻ <strong>Relancer le même calcul</strong> : avec la météo la plus récente — un nouveau passage ;</li>
+          <li>＋ <strong>Nouveau calcul, sans lien</strong> : repart de vos valeurs — un nouveau passage.</li>
         </ul>
         <p>Préparer revient <strong>prérempli</strong>, avec ✎ sur l’étape changée. La ligne du haut commence par « ↳ » : le nouveau calcul est lié au premier (« À partir de : … » ; ✕ « Indépendant » coupe le lien).</p>
         <p><strong>0 crédit</strong> quand la zone a été calculée il y a moins de 3 h.</p>
-        <p>Dans le nouveau résultat, « Δ Depuis le calcul d’origine » dit ce qui a bougé : l’arrivée, le vent, les vagues, la route, la certitude, la météo.</p>
+        <p>♻ <strong>★ et 🎲⛵😴 ne refont pas le calcul affiché.</strong> Ils partent de son résultat — sa route, ses modèles, l’optimiseur sont repris — et lisent <strong>exactement la même météo</strong>, même si elle a plus de 3 h : rien n’est téléchargé (0 crédit), seule l’option ajoutée se calcule, et la réponse se compare à celle d’origine. Préparer l’annonce sous « ↳ À partir de » (« ♻ Même météo que ce calcul (d’il y a 4 h)… »), le nouveau résultat aussi (« ♻ Même météo que le calcul de base · il y a 4 h »).</p>
+        <p>⟳ Si vous changez l’arrivée, le départ, l’heure (sauf avec ★, qui essaie d’autres départs), les réglages ou la source de la météo — ou si cette météo n’est plus là (calculée sur un autre appareil, ou trop ancienne pour le service) — c’est un <strong>calcul complet</strong>, et c’est dit (« Calcul complet : réglages changés »). Chaque nouvelle route passe les mêmes contrôles : la terre, les dispositifs de séparation, les dangers.</p>
+        <p>Dans le nouveau résultat, la ligne « vs … » sous la réponse dit l’écart à son parent ; <span class="ui">⋯ Détails</span> → « Δ Ce qui a changé » dit ce qui a bougé : l’arrivée, le vent, les vagues, la route, la certitude, la météo.</p>
       </div>
       <figure class="shot">
-        <img src="img/iphone-ajouter.jpg" width="780" height="1158" loading="lazy" decoding="async" alt="Le menu Ajouter un calcul : Modifier l’arrivée ou le départ ; Optimiser la date ±1 j ; Ajouter les sensibilités ; Relancer le même calcul, la météo la plus récente ; Nouveau calcul, sans lien, repart des valeurs de B&amp;C. Chaque ligne dit son temps et ses crédits.">
-        <figcaption>Le menu. Dans cet essai, la météo de la zone avait plus de 3 h, d’où ≈ 1 450 crédits ; juste après un calcul, c’est 0.</figcaption>
+        <img src="img/iphone-ajouter.jpg" width="780" height="1280" loading="lazy" decoding="async" alt="Le menu du ＋ au bout du fil, ouvert sous le maillon ⏱ mer. 28 · 10:00 : Les étapes — Un autre départ, ① le calendrier des départs ; Les modèles de ce départ, ② la météo de ce départ ; Une limite, le bateau, l’équipage, la nuit, ③ et si… — un essai garde ce départ comme base ; Un calcul — Modifier l’arrivée ou le départ, ≈ 90 s · 0 crédit · zone déjà là · un nouveau passage ; Ajouter les sensibilités, ≈ 13 min · ≈ 2 200 crédits météo · à partir du calcul de base ; Relancer le même calcul.">
+        <figcaption>Le menu du ＋ : les trois étapes, puis les calculs, chacun avec son temps et ses crédits. ★ Optimiser n’y est pas : ce passage a déjà sa grille.</figcaption>
       </figure>
     </div>
   </section>
@@ -701,17 +802,17 @@
     <div class="pair">
       <ul class="plain">
         <li>Vos derniers calculs : faits, ratés ou annulés. Chaque ligne dit ce qui a été calculé, avant qu’on l’ouvre : l’arrivée, quand, l’objectif, l’arrivée prévue, et où (☁️ 📱 🖥️).</li>
-        <li>Les calculs nés d’un autre sont rangés dessous (↳ ✎, ↳ ★). « affiché » marque celui qui est à l’écran.</li>
+        <li><strong>Un passage = une carte</strong> : la base, puis ses maillons en puces (★ ⏱ 🎲 🌊…) — un toucher ouvre le maillon ; ✓ marque la réponse retenue (« retenue par … » si ce n’est pas vous ; « Passage de … » : celui d’un autre skipper, quand il a une réponse) ; « ⋯ Les N calculs du passage en détail » déplie leurs lignes (☆, ⋯). Un autre trajet (✎) ouvre sa propre carte (↳ ✎). « affiché » marque celui qui est à l’écran.</li>
         <li><span class="ui">☆</span> sur la ligne : marquer ★.</li>
         <li><span class="ui">⋯</span> : le détail, 🗄 Archiver, 🗑 Supprimer. Supprimer demande confirmation dans la page : « Supprimer ce calcul ? » → <span class="ui">Supprimer</span> / <span class="ui">Garder</span>.</li>
-        <li>La route montrée à la famille (📌) ne se supprime pas : retirez d’abord le 📌. Un calcul en cours non plus.</li>
+        <li>La route montrée à la famille (📌) ne se supprime pas : retirez d’abord le 📌. Un calcul en cours non plus. Quand le 📌 suit « Prendre comme réponse », la liste le montre tout de suite sur la nouvelle ligne.</li>
         <li>Les filtres : Tous · ★ · Archivés. « Tous » cache les archivés.</li>
         <li>Un calcul raté dit pourquoi, en clair (« Le service météo gratuit a refusé… »).</li>
         <li>En bas : « ＋ Nouveau calcul ».</li>
       </ul>
       <figure class="shot">
-        <img src="img/iphone-calculs.jpg" width="780" height="1324" loading="lazy" decoding="async" alt="Le mode Calculs : 5 calculs, 1 ★, 1 archivés ; filtres Tous 5, ★ 1, Archivés 1 ; Las Palmas ; dessous, rangés avec ↳, Puerto de Mogán puis Puerto de Mogán optimisé ±1 j (affiché, le calcul n’a pas abouti) ; Las Palmas raté, le service météo gratuit a refusé ; Las Palmas avec 📌 et ★ ; chaque ligne a ☆ et ⋯ ; Nouveau calcul.">
-        <figcaption>Les chaînes ↳, les ☆, les ⋯ et les filtres.</figcaption>
+        <img src="img/iphone-calculs.jpg" width="780" height="1360" loading="lazy" decoding="async" alt="Le mode Calculs : 11 calculs, 0 ★, 0 archivés ; filtres Tous 11, ★ 0, Archivés 0 ; une carte pour le passage Las Palmas : la ligne de la base, départ mar. 27 · 04:00, Prudent, à quai dim. 1, avec ☆ et ⋯ ; ses maillons en puces : ★ ±1 j, ⏱ mer. 28 · 10:00 ✓ (touché), Les ensembles, Vagues ≤ 2 m, Moteur sous 3,5 nds, Vagues ≤ 2,5 m, Vent ≤ 22 · raf. 29, Nuit acceptée ; Réponse retenue sur cet appareil : ⏱ mer. 28 · 10:00 ; Les 8 calculs du passage en détail ; dessous, la carte d’un autre trajet, ↳ ✎ ; en bas, Nouveau calcul.">
+        <figcaption>Un passage = une carte : la base, ses maillons en puces, ✓ la réponse retenue. « ⋯ Les 8 calculs du passage en détail » déplie leurs lignes.</figcaption>
       </figure>
     </div>
   </section>
@@ -745,9 +846,18 @@
         </div>
       </div>
       <figure class="shot">
-        <img src="img/iphone-reglages.jpg" width="780" height="1036" loading="lazy" decoding="async" alt="Réglages, les valeurs par défaut de B&amp;C : le groupe Contraintes ouvert, Vent max 27 nds (par défaut : 26 nds), Rafales max 34 nds, Vagues max 3,0 m, Près pas sous 50°, chacun avec – et + ; en bas, Annuler et Enregistrer · 1 changement.">
+        <img src="img/iphone-reglages.jpg" width="780" height="1040" loading="lazy" decoding="async" alt="Réglages, les valeurs par défaut de B&amp;C : le groupe Contraintes ouvert, Vent max 27 nds (par défaut : 26 nds), Rafales max 34 nds, Vagues max 3,0 m, Près pas sous 50°, chacun avec – et + ; en bas, Annuler et Enregistrer · 1 changement.">
         <figcaption>Vent max passé à 27 nds pour l’exemple : « Enregistrer · 1 changement » apparaît. « Annuler » remet 26.</figcaption>
       </figure>
+    </div>
+    <div class="pair flip" id="reglages-nuit" style="margin-top:1.5rem">
+      <figure class="shot">
+        <img src="img/iphone-reglages-nuit.jpg" width="780" height="1280" loading="lazy" decoding="async" alt="Réglages, le groupe Équipage ouvert : Rendement perdu par jour 2,0 % après 48 h, Préférer arriver reposés (allumé) ; La nuit, la polaire à, avec son point d’interrogation, et quatre boutons : Comme le jour 100 % (enregistré), Médiane 97 % (choisi), 80ᵉ centile 96 %, Personnalisé 60 – 100 % ; en bas, Annuler et Enregistrer · 1 changement.">
+        <figcaption>« Médiane · 97 % » touché pour l’exemple : rien n’est gardé avant « Enregistrer » ; « Comme le jour · 100 % » reste marqué « enregistré ».</figcaption>
+      </figure>
+      <ul class="plain">
+          <li><strong>😴 Équipage → 🌙 La nuit, la polaire à</strong> : un choix. <span class="ui">Comme le jour · 100 %</span> (le défaut : rien ne change) · <span class="ui">Médiane · 97 %</span> (la vitesse rapportée à la polaire, la nuit contre le jour, sur 12 nuits et 210 fenêtres de nuit contre 409 de jour) · <span class="ui">80ᵉ centile · 96 %</span> (les mêmes fenêtres, comme la polaire elle-même se définit) · <span class="ui">✏️ Personnalisé</span> (60 à 100 %, avec – et +). « ? » dit d’où vient chaque chiffre et sa fourchette ; l’écart nuit / jour n’est pas sûr. Un choix ne fait que préparer : rien ne change avant « Enregistrer ».</li>
+      </ul>
     </div>
   </section>
 
@@ -759,11 +869,11 @@
       <div class="grid2">
         <div class="panel">
           <h3>📌 Retenir la route</h3>
-          <p>Résultat → Route, sous « Les routes » : <span class="ui">📌 Montrer à la famille</span>. Cette route ★ devient la route retenue : la famille la voit, la tuile du Cockpit et « En route » la suivent. Une route 🧪 fictive ne se retient jamais.</p>
+          <p>Résultat → <span class="ui">⋯ Détails</span> → <span class="ui">📌 Montrer à la famille</span>. Cette route ★ devient la route retenue : la famille la voit, la tuile du Cockpit et « En route » la suivent. Ensuite, « Prendre comme réponse » dans le même passage la déplace (<a href="#fil">le fil</a>). Une route 🧪 fictive ne se retient jamais.</p>
         </div>
         <div class="panel">
           <h3>⛵ En route</h3>
-          <p>Partis avec la route retenue, l’onglet « En route » prend la place de « Quand ? ». Il s’ouvre seul à plus de 5 milles du départ : l’avance ou le retard, l’écart et son côté (« 2,1 M au sud-est »), l’arrivée estimée, le prochain point (cap et milles depuis le bateau), le prochain changement de cap et la manœuvre probable (empanner, virer), les 12 prochaines heures. « ↻ Recalculer depuis ici » repart de votre dernière position.</p>
+          <p>Partis avec la route retenue, une ligne sous la réponse ouvre « ⛵ En route ». Il s’ouvre seul à plus de 5 milles du départ : l’avance ou le retard, l’écart et son côté (« 2,1 M au sud-est »), l’arrivée estimée, le prochain point (cap et milles depuis le bateau), le prochain changement de cap et la manœuvre probable (empanner, virer), les 12 prochaines heures. « ↻ Recalculer depuis ici » repart de votre dernière position.</p>
         </div>
         <div class="panel">
           <h3>🧭 La tuile Route du Cockpit</h3>
@@ -780,7 +890,7 @@
                 <tr><th scope="row">Le conseil</th><td class="num">≈ 20 s</td><td class="num">≈ 16 s</td><td class="num">≈ 10 s</td></tr>
                 <tr><th scope="row">⛵ 😴</th><td class="num">+ 20 s</td><td class="num">+ 12 s</td><td class="num">+ 6 s</td></tr>
                 <tr><th scope="row">★ Optimisé</th><td>non (la mémoire)</td><td class="num">grille légère ≈ 1 min</td><td class="num">grille complète ≈ 3 à 4 min</td></tr>
-                <tr><th scope="row">🎲 Ensembles</th><td colspan="3">au nuage seulement — l’app le dit</td></tr>
+                <tr><th scope="row">🎲 Ensembles</th><td colspan="2">au nuage — l’app le dit</td><td class="num">sur place ≈ 2 à 3 min (leur météo téléchargée en ligne)</td></tr>
               </tbody>
             </table>
           </div>
@@ -789,19 +899,36 @@
       </div>
       <div class="pair flip" style="margin-top:0.6rem">
         <figure class="shot">
-          <img src="img/iphone-feuille.jpg" width="780" height="1158" loading="lazy" decoding="async" alt="La feuille de route : WP0 départ 36°07,2’N 005°22,8’W lun. 26 13:00, 207°, 3,2 M ; WP1 36°04,4’N 005°24,6’W 13:32, 227°, 3,2 M ; WP2, WP3, WP4, WP5, WP6 avec position, heure de passage, cap vrai et milles vers le suivant.">
-          <figcaption>La feuille de route : position, heure de passage, cap vrai et milles vers le point suivant.</figcaption>
+          <img src="img/iphone-feuille.jpg" width="780" height="1200" loading="lazy" decoding="async" alt="Dans Détails, la Feuille de route (B&amp;G) ouverte : Feuille de route · 14 points, Prudent, départ mer. 28 · 10:00, caps vrais, heure du téléphone ; Points 6, 8 (choisi), 12, tous ; Position DM (choisi), DMS, déc. ; 6 point(s) de plus que demandé : sans eux, une branche passerait trop près de la côte ou dans un dispositif de séparation du trafic ; le tableau WP0 départ 36°07,2’N 005°22,8’W mer. 28 10:00, 207°, 3,2 M ; WP1 36°04,4’N 005°24,6’W 10:32, 227°, 3,2 M.">
+          <figcaption>La feuille de route : le nombre de points, le format, puis position, heure de passage, cap vrai et milles vers le point suivant.</figcaption>
         </figure>
         <div class="stack">
           <h3>📄 La feuille de route pour le B&amp;G</h3>
           <ul class="plain">
-            <li>Résultat → Route → « Feuille de route (B&amp;G) ».</li>
+            <li>Résultat → <span class="ui">⋯ Détails</span> → « Feuille de route (B&amp;G) ».</li>
             <li>6, 8 ou 12 points, ou tous. Positions en DM (<span class="num">36°03,2'N 005°24,6'W</span>), DMS ou décimal ; toujours N / S / E / W. Caps vrais. Heures de passage à l’heure du téléphone.</li>
             <li><span class="ui">⬇ GPX pour le B&amp;G</span> : un GPX léger de ces points seulement. Copier · Partager · Imprimer.</li>
             <li>Aucune branche ne coupe la terre : c’est vérifié sur la côte exacte.</li>
             <li>Rien n’est envoyé au pilote. Vous chargez le GPX vous-mêmes (carte SD ou appli B&amp;G) et vérifiez chaque branche sur la carte du bord.</li>
           </ul>
         </div>
+      </div>
+      <div class="pair" id="partager" style="margin-top:0.6rem">
+      <div class="panel">
+        <h3>📤 Exporter / Partager une route</h3>
+        <p>Résultat → <span class="ui">📤 Exporter / Partager</span>, en bas du panneau (la famille : sous la route retenue). Cochez une ou plusieurs routes — celles de ce calcul, la ★ des autres calculs du même passage (6 au plus). Puis l’une des deux formes :</p>
+        <ul class="plain">
+          <li><b>🔗 Un lien privé</b> : écrivez pour qui (« Seb », « le routeur »), choisissez la durée (1 jour à 3 mois), <span class="ui">Créer le lien</span>, puis Partager… ou Copier. Il s’ouvre sans compte, sur <b>10 appareils au plus</b> — vous pouvez l’envoyer à quelques personnes ; un 11ᵉ appareil ne l’ouvre pas (« demandez un nouveau lien »). Il montre la carte des routes, leurs heures, leurs points-clés, la météo du calcul et son âge — jamais la position du bateau en direct. Jamais public, jamais trouvé par un moteur de recherche.</li>
+          <li><b>⛵ Une route calculée « depuis le bateau »</b> part de là où était le bateau au moment du calcul : le panneau le dit avant de créer le lien (« Ce lien montre où était le bateau le lun. 26 · 21:30 (le départ de la route), à toute personne qui l’ouvre »). C’est une position passée, mais tous ceux qui ouvrent le lien la voient. Une route partie de « 📍 Ma position » (le GPS du téléphone, à bord) est dite de la même façon.</li>
+          <li><b>📄 Un fichier</b> : le <b>GPX</b> (un itinéraire de points-clés par route + la trace complète, heures UTC — pour un traceur, NavimetriX, qtVlm…) ou le <b>PDF</b> (la carte, les points-clés, les heures UTC). Il se fait sur l’appareil, même sans réseau ; vous l’envoyez vous-même.</li>
+          <li>« Mes liens » (les skippers : tous) : vu combien de fois, « 📱 ouvert sur N appareils · 10 au plus » ; <span class="ui">Oublier les appareils</span> remet le compte à zéro (chaque appareil qui le rouvre est recompté) ; <span class="ui">Retirer</span> — le lien ne s’ouvre plus.</li>
+          <li>Une route sur météo 🧪 fictive ne se partage pas. Un calcul 📱 pas encore envoyé part en fichier seulement.</li>
+        </ul>
+      </div>
+      <figure class="shot">
+        <img src="img/iphone-partager.jpg" width="780" height="1576" loading="lazy" decoding="async" alt="Le panneau Exporter / Partager : la forme Un lien privé (choisie), qui expire, sans compte, 10 appareils au plus, ou Un fichier GPX ou PDF ; Pour qui ? Le routeur ; Valable 1 jour, 3 jours, 7 jours (choisi), 1 mois, 3 mois ; Le lien s’ouvre sans compte jusqu’au mar. 3 nov. — jamais public, jamais indexé ; il montre le plan, jamais la position du bateau en direct ; 10 appareils au plus, Oublier les appareils ; l’avis ⛵ Ce lien montre où était le bateau le lun. 26 · 21:30 (le départ de la route), à toute personne qui l’ouvre ; Créer le lien ; Les liens : Le routeur, 1 route, vu 3 fois, ouvert sur 1 appareil · 10 au plus, Copier, Oublier les appareils, Retirer.">
+        <figcaption>Un lien pour « Le routeur », 7 jours. Cette route part du bateau : l’avis le dit avant « Créer le lien ».</figcaption>
+      </figure>
       </div>
     </div>
   </section>
@@ -815,11 +942,11 @@
         <li>Votre avatar, en haut à droite → « En mer » → <span class="ui">Mode nuit rouge</span>.</li>
         <li>Tout passe au rouge sombre, sans éblouir.</li>
         <li>La météo se lit en bandes de rouge. La route mise en avant reste un trait épais plein, les autres des tirets fins.</li>
-        <li>« Lancer » et « Enregistrer » deviennent un contour rouge.</li>
+        <li>Les boutons gardent leur forme, en rouge sombre ; ★ ◆ ☾ ⚓ ⛔ sont des formes, pas des couleurs : le calendrier se lit aussi, plus clair = mieux.</li>
         <li>Même chemin pour revenir au jour.</li>
       </ul>
       <figure class="shot">
-        <img src="img/iphone-nuit.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="Le Résultat en mode nuit rouge : tout est en rouge sombre sur fond noir, la route, la phrase Arrivée sam. 31 vers 15 h, de jour — confiance moyenne, les trois chiffres et le bouton Ajouter un calcul.">
+        <img src="img/iphone-nuit.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="Le Résultat en mode nuit rouge : tout est en rouge sombre sur fond noir, la route et la base en tirets, le fil ◆ Base, ★ ±1 j, la phrase Partir mar. 27 · 04:00, à quai dim. 1 vers 8 h, de jour, le score 50 / 100, les trois chiffres, Prendre comme réponse, Garder la base et les onglets ① Quand, ② Météo, ③ Et si…, Tableau.">
         <figcaption>Le même résultat, en nuit rouge.</figcaption>
       </figure>
     </div>
@@ -831,17 +958,17 @@
     <h2 id="h-ipad">Sur l’iPad</h2>
     <div class="stack">
       <ul class="plain">
-        <li><strong>Couché</strong> : les quatre modes forment un rail à gauche ; la barre de l’app se replie en icônes le temps du routage. Le profil le long de la route s’affiche sous la carte. Le panneau s’élargit pour les tableaux.</li>
-        <li><strong>Debout</strong> : la carte en haut (55 %), le panneau en bas (45 %). <span class="ui">⋯</span> → « Carte 55 % · panneau 45 % » passe à l’empilé (carte, profil, panneau) ; l’iPad s’en souvient. Dites-nous lequel vous préférez.</li>
-        <li>Plusieurs étapes ou cartes peuvent rester ouvertes en même temps.</li>
+        <li><strong>Couché</strong> : les quatre modes forment un rail à gauche ; la barre de l’app se replie en icônes le temps du routage. Le panneau à gauche, la carte à droite, le profil le long de la route sous la carte. Le panneau s’élargit pour ⊞ le tableau.</li>
+        <li><strong>Debout</strong> : la même chose, sans le rail — le panneau à gauche, la carte à droite, le profil dessous ; les quatre modes restent en haut du panneau, et la carte garde sa largeur. ① Quand ne tombe plus sous la carte.</li>
+        <li>Plusieurs étapes de Préparer ou cartes peuvent rester ouvertes en même temps. Au Résultat, ① ② ③ ⊞ restent un onglet à la fois, comme sur l’iPhone.</li>
       </ul>
       <figure class="shot wide">
-        <img src="img/ipad-couche.jpg" width="1400" height="1049" loading="lazy" decoding="async" alt="L’iPad couché : à gauche la barre de l’app en icônes puis le rail Préparer, Résultat, Calculs, Réglages ; le panneau du Résultat avec la phrase, les trois chiffres, Ce qui a changé, Briefing, Quand ? Route ? Certitude ?, Les routes Rapide et Prudent ★, Montrer à la famille, Ce qui a changé, À surveiller ⚠ 5, Météo sur la carte, Comparer, Feuille de route (B&amp;G) 8 points ; à droite la carte et, dessous, le profil du vent et des vagues le long de la route.">
-        <figcaption>iPad couché : le rail à gauche, le panneau, la carte et le profil dessous.</figcaption>
+        <img src="img/ipad-couche.jpg" width="1400" height="1049" loading="lazy" decoding="async" alt="L’iPad couché : à gauche la barre de l’app en icônes puis le rail Préparer, Résultat, Calculs, Réglages ; le panneau du Résultat : le fil 📌 ◆ Base, ★ ±1 j la grille des départs, ⏱ ; la phrase Partir mar. 27 · 04:00, à quai dim. 1 vers 8 h, de jour, 50 / 100 Prudent, Confiance moyenne, 80 % des limites, les trois chiffres, Orques ibériques, Prendre comme réponse, Garder la base ; ① Quand ouvert : le calendrier des départs ; à droite la carte avec ★ seule, Modèles, Bande, la route verte, les autres objectifs et la base en tirets ; dessous, le profil du vent, des vagues, de l’accord et du moteur le long de la route.">
+        <figcaption>iPad couché : le rail à gauche, le panneau avec ① le calendrier, la carte et le profil dessous.</figcaption>
       </figure>
       <figure class="shot tall-ipad">
-        <img src="img/ipad-debout.jpg" width="1024" height="1366" loading="lazy" decoding="async" alt="L’iPad debout : la carte sur la moitié haute ; dessous la barre des modes Préparer, Résultat, Calculs, Réglages, puis le Résultat : Arrivée sam. 31 vers 15 h, de jour — confiance moyenne, les trois chiffres, Ce qui a changé, Briefing, Quand ? Route ? Certitude ?, Les routes, et Ajouter un calcul.">
-        <figcaption>iPad debout : carte 55 %, panneau 45 %.</figcaption>
+        <img src="img/ipad-debout.jpg" width="1024" height="1366" loading="lazy" decoding="async" alt="L’iPad debout : à gauche la barre de l’app en icônes, puis le panneau avec en haut les modes Préparer, Résultat, Calculs, Réglages ; le fil, la réponse Partir mar. 27 · 04:00, à quai dim. 1 vers 8 h, de jour, les trois chiffres, Prendre comme réponse, Garder la base, ① Quand partir ? et le calendrier des départs, À surveiller ⚠ 6, Détails ; à droite la carte, la route vers Las Palmas, et dessous le profil le long de la route.">
+        <figcaption>iPad debout : le panneau à gauche, les modes en haut ; la carte et le profil à droite.</figcaption>
       </figure>
     </div>
   </section>
@@ -863,8 +990,8 @@
             <tr><td>B3</td><td>2–3 min</td><td data-label="À faire">Ouvrir 1 → l’arrivée. Ouvrir 5 → cocher 🎲, puis décocher</td><td data-label="À regarder">La bande des coûts bouge (temps, % du jour). Est-ce clair ?</td><td>📸 la bande</td></tr>
             <tr><td>B4</td><td>3–4 min</td><td data-label="À faire">Toucher la bande des coûts</td><td data-label="À regarder">Le détail (étape 8) : utile, ou trop ?</td><td></td></tr>
             <tr><td>B5</td><td>4–6 min</td><td data-label="À faire"><strong>Lancer</strong> (le seul vrai calcul)</td><td data-label="À regarder">La progression, puis le Résultat : la phrase, les 3 chiffres, « À surveiller ⚠ N »</td><td>📸 le résultat</td></tr>
-            <tr><td>B6</td><td>6–7 min</td><td data-label="À faire">Déplier « À surveiller », puis ▶ sur la carte</td><td data-label="À regarder">▸ / ▾ : la ligne entière se touche ?</td><td></td></tr>
-            <tr><td>B7</td><td>7–8 min</td><td data-label="À faire">＋ Ajouter un calcul → ★ Optimiser la date ±1 j (<strong>ne pas lancer</strong>)</td><td data-label="À regarder">Préparer revient prérempli, ✎ sur l’étape 2 et 0 crédit</td><td>📸</td></tr>
+            <tr><td>B6</td><td>6–7 min</td><td data-label="À faire">Déplier « À surveiller », puis ▶ dans la bande sous la carte</td><td data-label="À regarder">▸ / ▾ : la ligne entière se touche ?</td><td></td></tr>
+            <tr><td>B7</td><td>7–8 min</td><td data-label="À faire">Le <span class="ui">＋</span> au bout du fil → ★ Optimiser la date ±1 j (<strong>ne pas lancer</strong>)</td><td data-label="À regarder">Préparer revient prérempli, ✎ sur l’étape 2 et 0 crédit</td><td>📸</td></tr>
             <tr><td>B8</td><td>8–9 min</td><td data-label="À faire">③ Calculs : retrouver le calcul, ☆, ⋯</td><td data-label="À regarder">Retrouve-t-on ce qu’on a fait ?</td><td></td></tr>
             <tr><td>B9</td><td>9–10 min</td><td data-label="À faire">⚙ Réglages : déplier « Contraintes », <strong>sans enregistrer</strong></td><td data-label="À regarder">Vos valeurs : 26 nds · raf. 34 · 3 m · près 50° · côte 3 M (la marge 80 % est dans « Objectif »)</td><td></td></tr>
             <tr><td>B10</td><td>le soir</td><td data-label="À faire">Mode nuit rouge (menu de l’avatar) : une capture</td><td data-label="À regarder">Tout est lisible sans éblouir ? Les deux routes se distinguent ?</td><td>📸</td></tr>

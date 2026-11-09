@@ -1,1 +1,0 @@
-import"./photoPost-C9uFtk1d.js";var e={left:12,width:380};function t({wide:t=!1,panelOpen:n=!1}={}){return{left:t&&n?e.left+e.width:0,right:70}}function n({wide:e=!1,panelOpen:n=!1}={}){if(!e)return{left:8,right:8};let r=t({wide:e,panelOpen:n});return{left:r.left+12,right:r.right,maxWidth:520}}function r(e){return!!e&&e.type===`photo`}export{n as i,t as n,r,e as t};
