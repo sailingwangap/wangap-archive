@@ -1,1 +1,0 @@
-import{c as e,s as t,t as n}from"./inboxReads-D3BAMQuG.js";function r(){let{messages:r,comments:i,sailor:a,carre:o}=e().counts;return{unreadCount:r+i+a+o,messageUnread:r,commentUnread:i,sailorPending:a,carreUnread:o,refresh:t,markAllRead:n}}export{r as t};

@@ -267,6 +267,7 @@
       <li><a href="#voilure">Par voilure</a></li>
       <li><a href="#loch">Le loch</a></li>
       <li><a href="#routage">Le routage</a></li>
+      <li><a href="#exporter">Exporter</a></li>
       <li><a href="#progresser">À faire</a></li>
       <li><a href="#questions">Questions</a></li>
     </ul>
@@ -623,6 +624,17 @@
   </section>
 
   <!-- ======================= 9. À faire ======================= -->
+  <section id="exporter" aria-labelledby="h-exporter">
+    <p class="eyebrow">Dans vos outils</p>
+    <h2 id="h-exporter">Exporter la polaire vers le B&amp;G ou NavimetriX</h2>
+    <p>Dans l’app : <strong>⛵ Polaires → Voir → ⬇ Exporter la polaire</strong>. C’est la polaire <em>en usage</em>, celle que suit le routage : la vitesse surface au loch corrigé, avec vos vraies voiles, en eau plate. Elle est plus basse qu’une polaire de chantier — c’est voulu.</p>
+    <ul class="todo">
+      <li><p><strong>B&amp;G — le processeur de voile (Triton Edge).</strong> Fichier <code>.txt</code> au format Expedition, avec les angles cibles au près et au portant. Sur l’iPad, rejoindre le Wi-Fi du processeur (nom et clé sur la carte à QR code et au dos du boîtier), ouvrir <code>192.168.76.1</code> → <em>Corrections and targets</em> → <em>Polars</em> → ⤢ → <strong>d’abord <em>Export</em></strong> (garder la table actuelle), puis <em>Load from file</em>. Les cibles servent ensuite à tous les écrans : laylines « Polar » et SailSteer du Zeus SR, les Triton. ⚠️ <em>Load from file</em> remplace la table du B&amp;G.</p></li>
+      <li><p><strong>NavimetriX.</strong> Fichier <code>.pol</code> (grille à tabulations). Enregistrer dans Fichiers, puis dans NavimetriX : <em>My Boat</em> → toucher la polaire → <em>Import a Polar</em>. Avec le compte NavimetriX, elle se synchronise sur tous les appareils.</p></li>
+      <li><p><strong>Un tableur, PredictWind, qtVlm, OpenCPN…</strong> Fichier <code>.csv</code> : les angles en lignes (0 à 180°), les forces en colonnes (0 à 30 nœuds).</p></li>
+    </ul>
+  </section>
+
   <section id="progresser" aria-labelledby="h-progresser">
     <p class="eyebrow">À bord</p>
     <h2 id="h-progresser">Ce qui ferait progresser la polaire</h2>

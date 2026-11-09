@@ -184,7 +184,7 @@
 // away the journal it exists to protect.
 //
 // So: bump CACHE_NAME on a release again, as the repo always said.
-const CACHE_NAME = 'wangap-v356';
+const CACHE_NAME = 'wangap-v363';
 const IMAGE_CACHE = 'wangap-images-v1';
 const TILE_CACHE = 'wangap-tiles-v1';
 // V3.4 item 2 — Supabase REST responses: the offline journal. Unversioned on
@@ -541,6 +541,17 @@ self.addEventListener('fetch', (event) => {
     // Symptom: visiting /uat-guide.html, then /, returned the UAT guide
     // content at the root URL.
     const isShell = url.pathname === '/';
+    // ⚠️ OFFLINE-001 (4 nov.) — une ROUTE de l'app (`/cockpit`, `/routage`,
+    // `/timeline?compose=1`…) est le MÊME index.html (la réécriture de
+    // vercel.json) : elle reçoit la coquille gardée, tout de suite, comme `/`.
+    // Avant, seule `/` l'avait : recharger le Cockpit hors ligne, ou l'ouvrir
+    // depuis une notification en mer, montrait « Hors-ligne — reconnectez-vous »
+    // (et sur un réseau muet, iOS, attendait sans fin). Un FICHIER (une
+    // extension : uat-guide.html…) ou un dossier statique garde le réseau d'abord.
+    const isAppRoute = isShell || (
+      !/\.[a-z0-9]+$/i.test(url.pathname) &&
+      !/^\/(api|assets|aide|screenshots|help-shots|images|icons|routing)(\/|$)/.test(url.pathname)
+    );
     safeRespond(event, () =>
       caches.match('/').then((cached) => {
         // Background revalidation: fire-and-forget. Errors silenced so a
@@ -553,7 +564,7 @@ self.addEventListener('fetch', (event) => {
           })
           .catch(() => undefined);
 
-        if (cached && isShell) return cached;
+        if (cached && isAppRoute) return cached;
 
         // Cache miss (first visit / cleared cache) — or non-root navigation
         // (uat-guide.html etc.) — fall back to network synchronously, and

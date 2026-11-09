@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// ⚠️⚠️ FICHIER GÉNÉRÉ — scripts/routing/build-route-local-bundle.mjs (sources 46a4abeee310ebf0, 63 fichiers).
+// ⚠️⚠️ FICHIER GÉNÉRÉ — scripts/routing/build-route-local-bundle.mjs (sources 394bb01fff244e1f, 66 fichiers).
 // Le routeur de Wang'ap pour le PC du bord : node route-local.mjs --help.
 import { createRequire } from "node:module";
 import fs from "node:fs";
@@ -994,6 +994,48 @@ function sunTimes(lat, lon, dayMs) {
 	};
 }
 /**
+* NIGHT-1 (POLAR-009, ADR-0039 D40) — LA HAUTEUR DU SOLEIL (degrés) à un instant et un lieu.
+* La MÊME formule que src/lib/sailInference.js `sunElevation` (la coupure jour / nuit du
+* journal des voiles estimé ; verify-routing-night les compare). Elle ne passe pas par un
+* « jour UTC » : juste à toutes les longitudes. (`sunTimes`, lui, prend le lever et le
+* coucher du JOUR UTC de l'instant : au-delà d'≈ 100° de longitude — le Pacifique —, ce ne
+* sont plus ceux du jour local. `arrivalLight` et graphRoute.isNight en héritent ; laissés
+* tels quels ici pour que les routes d'aujourd'hui ne bougent pas — dit dans D40.)
+*/
+function sunElevation(ms, lat, lon) {
+	const d = (ms - Date.UTC(2e3, 0, 1, 12)) / 864e5;
+	const g = (357.529 + .98560028 * d) * RAD$5;
+	const L = (280.459 + .98564736 * d + 1.915 * Math.sin(g) + .02 * Math.sin(2 * g)) * RAD$5;
+	const e = (23.439 - 36e-8 * d) * RAD$5;
+	const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
+	const dec = Math.asin(Math.sin(e) * Math.sin(L));
+	const ha = ((18.697374558 + 24.06570982441908 * d) % 24 * 15 + lon) * RAD$5 - ra;
+	return Math.asin(Math.sin(lat * RAD$5) * Math.sin(dec) + Math.cos(lat * RAD$5) * Math.cos(dec) * Math.cos(ha)) / RAD$5;
+}
+/** Le soleil sous l'horizon : −0,833° (le bord du disque et la réfraction — le lever et le coucher de `sunTimes`). */
+var NIGHT_ELEV = -.833;
+var nightCache$1 = /* @__PURE__ */ new Map();
+/**
+* NIGHT-1 (E5) — LA NUIT POUR LA POLAIRE : le soleil sous l'horizon, au DEMI-DEGRÉ et à
+* l'HEURE près (en cache, comme graphRoute.isNight) — pris au centre de la case et au
+* milieu de l'heure. Les deux moteurs (isochrones, A*) la lisent au début de chaque pas,
+* comme le vent. Seulement quand la polaire de nuit est sous 100 % : sinon elle n'est
+* jamais appelée et les routes restent celles d'avant, à l'octet près.
+*/
+function nightAt$1(lat, lon, t) {
+	const la = Math.round(lat * 2) / 2;
+	const lo = Math.round(lon * 2) / 2;
+	const h = Math.floor(t / 36e5);
+	const key = `${la}:${lo}:${h}`;
+	let v = nightCache$1.get(key);
+	if (v === void 0) {
+		v = sunElevation(h * 36e5 + 18e5, la, lo) < NIGHT_ELEV;
+		if (nightCache$1.size > 2e5) nightCache$1.clear();
+		nightCache$1.set(key, v);
+	}
+	return v;
+}
+/**
 * L'arrivée est-elle de jour ? « De jour » : du lever jusqu'à une heure avant
 * le coucher (le temps d'entrer et de s'amarrer avec de la lumière).
 * → { day: bool, waitH: heures jusqu'au prochain lever si de nuit, rise, set }
@@ -1026,19 +1068,37 @@ function arrivalLight(lat, lon, t, { marginBeforeSetH = 1 } = {}) {
 * Le membre 0 est le contrôle (`wind_speed_10m`), puis `…_member01`, `…_member02`…
 */
 function parseEnsemble(responses, { model, lats, lons }) {
+	const h0 = responses[0].hourly;
+	return parseEnsembleFrom({
+		count: responses.length,
+		keys: Object.keys(h0),
+		times: h0.time,
+		get: (idx, k, t) => responses[idx].hourly[k]?.[t]
+	}, {
+		model,
+		lats,
+		lons
+	});
+}
+/**
+* LOC2 (30 oct., ADR-0039 D29 ter) — le MÊME calcul que parseEnsemble, sur une
+* source quelconque : `src = { count (points), keys (les variables de la réponse,
+* dans son ordre), times (les heures telles que l'API les écrit, « AAAA-MM-JJTHH:MM »),
+* get(point, variable, heure) → valeur | null | undefined }`. L'appareil range les
+* réponses compactes (src/lib/localRouting/ensPack.js) et les relit par ici : mêmes
+* membres, mêmes grilles, au bit près (verify-routing-local).
+*/
+function parseEnsembleFrom(src, { model, lats, lons }) {
 	const pts = [];
 	for (const la of lats) for (const lo of lons) pts.push([la, lo]);
-	if (responses.length !== pts.length) throw new Error(`ensemble ${model} : ${responses.length} réponses pour ${pts.length} points`);
-	const h0 = responses[0].hourly;
-	const members = Object.keys(h0).map((k) => k === "wind_speed_10m" ? 0 : k.match(/^wind_speed_10m_member(\d+)$/)?.[1]).filter((x) => x != null).map(Number).sort((a, b) => a - b);
+	if (src.count !== pts.length) throw new Error(`ensemble ${model} : ${src.count} réponses pour ${pts.length} points`);
+	const members = src.keys.map((k) => k === "wind_speed_10m" ? 0 : k.match(/^wind_speed_10m_member(\d+)$/)?.[1]).filter((x) => x != null).map(Number).sort((a, b) => a - b);
 	const key = (base, n) => n === 0 ? base : `${base}_member${String(n).padStart(2, "0")}`;
-	const allTimes = h0.time.map((t) => Date.parse(`${t}:00Z`));
+	const allTimes = src.times.map((t) => Date.parse(`${t}:00Z`));
 	let T = allTimes.length;
-	for (const r of responses) {
-		const s = r.hourly.wind_speed_10m;
-		const d = r.hourly.wind_direction_10m;
+	for (let idx = 0; idx < src.count; idx++) {
 		let last = -1;
-		for (let t = 0; t < T; t++) if (s[t] != null && d[t] != null) last = t;
+		for (let t = 0; t < T; t++) if (src.get(idx, "wind_speed_10m", t) != null && src.get(idx, "wind_direction_10m", t) != null) last = t;
 		T = Math.min(T, last + 1);
 	}
 	const times = allTimes.slice(0, T);
@@ -1055,10 +1115,9 @@ function parseEnsemble(responses, { model, lats, lons }) {
 		pts.forEach(([la, lo], idx) => {
 			const i = lats.indexOf(la);
 			const j = lons.indexOf(lo);
-			const h = responses[idx].hourly;
 			for (let t = 0; t < T; t++) {
-				const ws = h[ks]?.[t];
-				const wd = h[kd]?.[t];
+				const ws = src.get(idx, ks, t);
+				const wd = src.get(idx, kd, t);
 				if (ws == null || wd == null) continue;
 				const a = (wd + 180) * Math.PI / 180;
 				u[t][i][j] = ws * Math.sin(a);
@@ -1368,6 +1427,97 @@ function previousEnsembleGrids(model, bbox, { step = 2, days = 10, cacheDir, now
 	};
 	return grids;
 }
+/**
+* ADR-0039 D37 (ROUTE-038, 30 oct.) — « ＋ Ajouter un calcul » : LA grille même
+* qu'un calcul de base a lue, retrouvée dans le cache par son `fetchedAt` (le
+* résultat le dit par modèle : `forecast.models[m].fetchedAt`, `weather.waves.fetchedAt`),
+* QUEL QUE SOIT SON ÂGE et même si une grille plus récente est arrivée depuis.
+* Le fichier porte l'heure où son téléchargement a COMMENCÉ (cachedFile) ; `fetchedAt`
+* est écrit à la fin : on cherche de 6 h avant à 1 h après, la plus proche d'abord, et
+* on ne rend que la grille dont `fetchedAt` est EXACTEMENT celui demandé.
+* Lecture seule, jamais de réseau. → la grille | null (effacée du cache, un autre appareil…).
+*/
+function exactGrid(cacheDir, kind, bbox, step = 1, days = 10, fetchedAt = null) {
+	const want = Date.parse(fetchedAt || "");
+	if (!cacheDir || !fs.existsSync(cacheDir) || !Number.isFinite(want)) return null;
+	const [w, s, e, n] = bbox;
+	const cands = [];
+	for (const f of fs.readdirSync(cacheDir)) {
+		if (!f.startsWith(`${kind}-`)) continue;
+		const m = /^(.+)-([\d.]+)-(\d+)j-(\d{4}-\d\d-\d\dT\d\d)\.json$/.exec(f.slice(kind.length + 1));
+		if (!m) continue;
+		const b = m[1].split("_").map(Number);
+		if (b.length !== 4 || b.some((x) => !Number.isFinite(x))) continue;
+		if (Number(m[2]) !== step || Number(m[3]) < days) continue;
+		if (!(b[0] <= w + 1e-9 && b[1] <= s + 1e-9 && b[2] >= e - 1e-9 && b[3] >= n - 1e-9)) continue;
+		const at = Date.parse(`${m[4]}:00:00Z`);
+		if (!Number.isFinite(at) || at > want + 36e5 || at < want - 6 * 36e5) continue;
+		cands.push({
+			file: path.join(cacheDir, f),
+			d: Math.abs(want - at)
+		});
+	}
+	cands.sort((a, b2) => a.d - b2.d);
+	for (const c of cands) try {
+		const g = JSON.parse(fs.readFileSync(c.file, "utf8"));
+		if (Date.parse(g.fetchedAt || "") === want) return g;
+	} catch {}
+	return null;
+}
+/**
+* D37 — les ENSEMBLES d'un calcul enchaîné : le fichier brut en cache qui couvre
+* l'emprise et dont l'heure est la plus PROCHE de `atMs` (la prévision du calcul
+* de base), à `maxDiffH` heures au plus. → [membres] (`.download`, `.near`) | null.
+*/
+function ensembleNear(model, bbox, { step = 2, days = 10, cacheDir, atMs, maxDiffH = 6, nowMs = Date.now() } = {}) {
+	if (!cacheDir || !fs.existsSync(cacheDir) || !Number.isFinite(atMs)) return null;
+	const [w, s, e, n] = bbox;
+	const gb = [
+		w,
+		s,
+		w + Math.ceil((e - w) / step) * step,
+		s + Math.ceil((n - s) / step) * step
+	];
+	const kind = `ens-${model}`;
+	let best = null;
+	for (const f of fs.readdirSync(cacheDir)) {
+		if (!f.startsWith(`${kind}-`)) continue;
+		const m = /^(.+)-([\d.]+)-(\d+)j-(\d{4}-\d\d-\d\dT\d\d)\.json$/.exec(f.slice(kind.length + 1));
+		if (!m) continue;
+		const b = m[1].split("_").map(Number);
+		if (b.length !== 4 || b.some((x) => !Number.isFinite(x)) || Number(m[2]) !== step || Number(m[3]) < days) continue;
+		if (!(b[0] <= gb[0] + 1e-9 && b[1] <= gb[1] + 1e-9 && b[2] >= gb[2] - 1e-9 && b[3] >= gb[3] - 1e-9)) continue;
+		const at = Date.parse(`${m[4]}:00:00Z`);
+		const d = Math.abs(at - atMs);
+		if (!Number.isFinite(at) || d > maxDiffH * 36e5) continue;
+		if (!best || d < best.d) best = {
+			file: path.join(cacheDir, f),
+			at,
+			b,
+			d
+		};
+	}
+	if (!best) return null;
+	const t0 = Date.now();
+	const txt = fs.readFileSync(best.file, "utf8");
+	const { lats, lons } = gridPoints(best.b, step);
+	const grids = parseEnsemble(JSON.parse(txt), {
+		model,
+		lats,
+		lons
+	});
+	grids.download = {
+		bytes: txt.length,
+		ms: Date.now() - t0,
+		cached: path.basename(best.file)
+	};
+	grids.near = {
+		fetchedAt: new Date(best.at).toISOString(),
+		diffH: Math.round(best.d / 36e4) / 10,
+		ageH: Math.round((nowMs - best.at) / 36e4) / 10
+	};
+	return grids;
+}
 /** La grille des points : emprise [ouest, sud, est, nord], pas en degrés. */
 function gridPoints(bbox, step) {
 	const [w, s, e, n] = bbox;
@@ -1559,24 +1709,69 @@ var ENSEMBLES = {
 	ecmwf_ifs025: {
 		label: "ECMWF IFS ENS",
 		members: 51,
-		kind: "physique"
+		kind: "physique",
+		credits: 10.2
 	},
 	ecmwf_aifs025: {
 		label: "ECMWF AIFS ENS (IA)",
 		members: 51,
-		kind: "IA"
+		kind: "IA",
+		credits: 10.2
 	},
 	gfs025: {
 		label: "GFS ENS (NOAA)",
 		members: 31,
-		kind: "physique"
+		kind: "physique",
+		credits: 6.2
 	},
 	icon_seamless: {
 		label: "ICON EPS (DWD)",
 		members: 40,
-		kind: "physique"
+		kind: "physique",
+		credits: 8
 	}
 };
+/** L'emprise de la grille d'ensemble (pas `step`, arrondie VERS L'EXTÉRIEUR) — pur. */
+function ensembleGridBbox(bbox, step = 2) {
+	const [w, s, e, n] = bbox;
+	return [
+		w,
+		s,
+		w + Math.ceil((e - w) / step) * step,
+		s + Math.ceil((n - s) / step) * step
+	];
+}
+/**
+* LOC2 — les réponses BRUTES de l'API d'ensembles pour un modèle (sans disque) :
+* les mêmes requêtes que fetchEnsembleGrids (20 points à la fois). Le navigateur et
+* le PC du bord les rangent (src/lib/localRouting/ensPack.js) ; le service les écrit
+* dans son cache. → { res, lats, lons, gb, bytes, ms }
+*/
+async function fetchEnsembleRaw(model, bbox, { step = 2, days = 10, log = () => {}, noBytes = false } = {}) {
+	const gb = ensembleGridBbox(bbox, step);
+	const { lats, lons } = gridPoints(gb, step);
+	const t0 = Date.now();
+	const pts = [];
+	for (const la of lats) for (const lo of lons) pts.push([la, lo]);
+	const res = new Array(pts.length);
+	for (let k = 0; k < pts.length; k += 20) {
+		const chunk = pts.slice(k, k + 20);
+		const tq = Date.now();
+		const d = await getJson(omUrl("ensemble-api", `/v1/ensemble?latitude=${chunk.map((p) => p[0]).join(",")}&longitude=${chunk.map((p) => p[1]).join(",")}&hourly=wind_speed_10m,wind_direction_10m&wind_speed_unit=kn&forecast_days=${days}&models=${model}&timezone=GMT`));
+		(Array.isArray(d) ? d : [d]).forEach((x, i) => {
+			res[k + i] = x;
+		});
+		log(`  ${model} (ensemble) : ${Math.min(k + 20, pts.length)}/${pts.length} points (${((Date.now() - tq) / 1e3).toFixed(1)} s)`);
+	}
+	return {
+		res,
+		lats,
+		lons,
+		gb,
+		bytes: noBytes ? null : JSON.stringify(res).length,
+		ms: Date.now() - t0
+	};
+}
 /**
 * Tous les membres d'un modèle d'ensemble sur une grille GROSSIÈRE (2° : ≈ 90
 * points au lieu de ≈ 200 — c'est le téléchargement qui coûte, pas le calcul).
@@ -1591,13 +1786,7 @@ var ENSEMBLES = {
 * → [grille du membre 0 (contrôle), 1, 2…], avec `.download = { bytes, ms, cached }`.
 */
 async function fetchEnsembleGrids(model, bbox, { step = 2, days = 10, cacheDir, maxAgeH = 3, log = () => {} } = {}) {
-	const [w, s, e, n] = bbox;
-	const gb = [
-		w,
-		s,
-		w + Math.ceil((e - w) / step) * step,
-		s + Math.ceil((n - s) / step) * step
-	];
+	const gb = ensembleGridBbox(bbox, step);
 	const { lats, lons } = gridPoints(gb, step);
 	const hour = (/* @__PURE__ */ new Date()).toISOString().slice(0, 13);
 	const stem = `ens-${model}-${gb.join("_")}-${step}-${days}j-`;
@@ -1613,18 +1802,12 @@ async function fetchEnsembleGrids(model, bbox, { step = 2, days = 10, cacheDir, 
 		bytes = txt.length;
 		cached = recent;
 	} else {
-		const pts = [];
-		for (const la of lats) for (const lo of lons) pts.push([la, lo]);
-		res = new Array(pts.length);
-		for (let k = 0; k < pts.length; k += 20) {
-			const chunk = pts.slice(k, k + 20);
-			const tq = Date.now();
-			const d = await getJson(omUrl("ensemble-api", `/v1/ensemble?latitude=${chunk.map((p) => p[0]).join(",")}&longitude=${chunk.map((p) => p[1]).join(",")}&hourly=wind_speed_10m,wind_direction_10m&wind_speed_unit=kn&forecast_days=${days}&models=${model}&timezone=GMT`));
-			(Array.isArray(d) ? d : [d]).forEach((x, i) => {
-				res[k + i] = x;
-			});
-			log(`  ${model} (ensemble) : ${Math.min(k + 20, pts.length)}/${pts.length} points (${((Date.now() - tq) / 1e3).toFixed(1)} s)`);
-		}
+		({res} = await fetchEnsembleRaw(model, bbox, {
+			step,
+			days,
+			log,
+			noBytes: true
+		}));
 		const txt = JSON.stringify(res);
 		bytes = txt.length;
 		if (file) {
@@ -2453,6 +2636,17 @@ function applyWeatherSource(result) {
 		...tag(result.optimiser.model)
 	};
 	for (const [m, v] of Object.entries(result.forecast?.models || {})) if (v) Object.assign(v, tag(m));
+	return tagOptionBlocks(result);
+}
+/**
+* Le drapeau sur les blocs d'OPTIONS seuls (les ensembles, la grille des départs) —
+* applyWeatherSource l'appelle ; D37 (ROUTE-038) : un calcul enchaîné reprend le
+* résultat de sa base (déjà marqué) et ne marque que les blocs qu'il ajoute. Pur, idempotent.
+*/
+function tagOptionBlocks(result) {
+	const w = result?.weather;
+	const src = w?.source;
+	if (!result || !src || src === "live") return result;
 	if (result.ensemble) result.ensemble.weather = {
 		source: src,
 		...src === "dummy" ? {
@@ -2468,65 +2662,6 @@ function applyWeatherSource(result) {
 		} : { ageH: w.previous?.ages?.[result.bestDeparture.model] ?? null }
 	};
 	return result;
-}
-//#endregion
-//#region scripts/routing/lib/zones.mjs
-var memo = /* @__PURE__ */ new WeakMap();
-/** rings : [[[lon, lat], …], …] → { crosses(a, b), inside(p), blocks(a, b) } | null. */
-function exactZones(rings) {
-	if (!Array.isArray(rings) || !rings.length) return null;
-	if (memo.has(rings)) return memo.get(rings);
-	const valid = rings.filter((r) => Array.isArray(r) && r.length > 3);
-	if (!valid.length) {
-		memo.set(rings, null);
-		return null;
-	}
-	let w = Infinity;
-	let s = Infinity;
-	let e = -Infinity;
-	let n = -Infinity;
-	const boxes = valid.map((r) => {
-		let x0 = Infinity;
-		let y0 = Infinity;
-		let x1 = -Infinity;
-		let y1 = -Infinity;
-		for (const [x, y] of r) {
-			if (x < x0) x0 = x;
-			if (x > x1) x1 = x;
-			if (y < y0) y0 = y;
-			if (y > y1) y1 = y;
-		}
-		w = Math.min(w, x0);
-		s = Math.min(s, y0);
-		e = Math.max(e, x1);
-		n = Math.max(n, y1);
-		return [
-			x0,
-			y0,
-			x1,
-			y1
-		];
-	});
-	const ix = buildCoastIndex(valid.map((r) => ({ geometry: {
-		type: "Polygon",
-		coordinates: [r]
-	} })), [
-		w - .1,
-		s - .1,
-		e + .1,
-		n + .1
-	], .05);
-	const inside = (p) => valid.some((r, k) => {
-		const b = boxes[k];
-		return p.lon >= b[0] && p.lon <= b[2] && p.lat >= b[1] && p.lat <= b[3] && inPolygon(p.lat, p.lon, r);
-	});
-	const out = {
-		crosses: (a, b) => ix.crosses(a, b),
-		inside,
-		blocks: (a, b) => inside(b) || ix.crosses(a, b)
-	};
-	memo.set(rings, out);
-	return out;
 }
 //#endregion
 //#region scripts/routing/lib/sailsRef.mjs
@@ -2896,11 +3031,11 @@ var CREW_BOUNDS = {
 /** Le rendement ne descend pas sous 85 % de la polaire. */
 var CREW_DECAY_FLOOR = .85;
 var RESTED_HARD_W = .5;
-var num$2 = (v, d) => Number.isFinite(Number(v)) ? Number(v) : d;
+var num$3 = (v, d) => Number.isFinite(Number(v)) ? Number(v) : d;
 /** Les paramètres de l'équipage (défauts + réglages), et l'effet du nombre : à 4, la moitié de la fatigue. */
 function crewOf(L = {}) {
 	const c = {};
-	for (const [k, [lo, hi]] of Object.entries(CREW_BOUNDS)) c[k] = Math.min(hi, Math.max(lo, num$2(L[k], CREW_DEFAULTS[k])));
+	for (const [k, [lo, hi]] of Object.entries(CREW_BOUNDS)) c[k] = Math.min(hi, Math.max(lo, num$3(L[k], CREW_DEFAULTS[k])));
 	c.crewN = Math.round(c.crewN);
 	c.crewRested = c.crewRested ? 1 : 0;
 	const k = 2 / c.crewN;
@@ -3126,8 +3261,24 @@ var PROPULSION_DEFAULTS = {
 	motorHeadSeaLoss: .5,
 	motorUpwindMaxTws: 15,
 	motorUpwindMaxWave: 2.5,
-	motorMinKn: 2
+	motorMinKn: 2,
+	nightPolarPct: 1
 };
+/**
+* NIGHT-1 — la polaire de nuit : un FACTEUR (0,6 – 1 ; le nom garde « Pct » comme la clé de
+* l'essai D39, `variant.kind = 'nightPolar'`). L'app l'affiche en % (⚙ Réglages → 😴 Équipage).
+* LA source des défauts et des bornes : prefs.mjs les reprend, src/lib/routage.js les recopie
+* (verify-routage-ui vérifie l'égalité).
+*/
+var NIGHT_POLAR_DEFAULTS = { nightPolarPct: 1 };
+var NIGHT_POLAR_BOUNDS = { nightPolarPct: [.6, 1] };
+/** Le facteur de nuit d'un jeu de limites, borné (absent, illisible : 1). */
+function nightPolarOf(limits = {}) {
+	const v = Number(limits?.nightPolarPct);
+	if (limits?.nightPolarPct == null || !Number.isFinite(v)) return 1;
+	const [lo, hi] = NIGHT_POLAR_BOUNDS.nightPolarPct;
+	return Math.min(hi, Math.max(lo, v));
+}
 /**
 * La consommation retenue pour le BILAN (L/h), selon le réglage `engineMode` :
 * bâbord, tribord, les deux, ou Auto = le mélange MESURÉ (heures bâbord ×
@@ -3188,6 +3339,7 @@ var propulsionOf = (limits = {}) => {
 		...limits
 	};
 	if (limits.crewDecayPct != null) P.crew = crewOf(limits);
+	P.nightPolarPct = nightPolarOf(limits);
 	return P;
 };
 /**
@@ -3202,11 +3354,14 @@ function motorSpeed(P, tws, twa, hs) {
 /**
 * Les façons d'avancer à ce cap, la plus rapide d'abord : [{ mode, speed }]
 * (vide : on n'avance pas à ce cap). `minTwa` : l'angle minimal de la voile
-* (50°, 60° dans une mer formée — les limites de B&C).
+* (50°, 60° dans une mer formée — les limites de B&C). NIGHT-1 (E5, D40) :
+* `night` (sun.mjs `nightAt`, lu par l'appelant au début du pas) — la voile × la
+* polaire de nuit ; le moteur ne change pas (la nuit, au moteur de toute façon).
 */
-function propulsionOptions(P, polar, { tws, twa, hs = null, minTwa, elapsedH = 0 }, policy = "crew") {
+function propulsionOptions(P, polar, { tws, twa, hs = null, minTwa, elapsedH = 0, night = false }, policy = "crew") {
 	const fat = P.crew && elapsedH > P.crew.decayAfterH ? fatigueFactor(P, elapsedH) : 1;
-	const sail = twa < minTwa ? 0 : boatSpeed(polar, tws, twa) * P.efficiency * fat;
+	let sail = twa < minTwa ? 0 : boatSpeed(polar, tws, twa) * P.efficiency * fat;
+	if (night && P.nightPolarPct < 1) sail *= P.nightPolarPct;
 	if (sail >= P.motorBelowKn) return [{
 		mode: "voile",
 		speed: sail
@@ -3244,719 +3399,14 @@ function propulsionOptions(P, polar, { tws, twa, hs = null, minTwa, elapsedH = 0
 function propel(P, polar, cond) {
 	return propulsionOptions(P, polar, cond, "crew")[0] || null;
 }
-/** La plus grande vitesse possible (heuristique admissible de l'A*). */
+/**
+* La plus grande vitesse possible (heuristique admissible de l'A*). NIGHT-1 : la
+* polaire de nuit ne fait que baisser la voile (facteur ≤ 1) — la borne reste vraie.
+*/
 function maxSpeedKn(P, polar) {
 	let v = 0;
 	for (const row of polar) for (const x of row) v = Math.max(v, x);
 	return Math.max(v * P.efficiency, P.motor ? P.motorKn : 0);
-}
-//#endregion
-//#region scripts/routing/lib/isochrone.mjs
-var DEFAULT_LIMITS = {
-	maxTws: 26,
-	maxGust: 34,
-	maxWave: 3,
-	minTwa: 50,
-	minTwaInSea: 60,
-	seaWave: 2,
-	coastNm: 3,
-	coastFreeNm: 10,
-	coastMinNm: .5,
-	coastMinFreeNm: 1.5,
-	motor: true,
-	motorBelowKn: 4.5,
-	motorKn: 6,
-	efficiency: .95
-};
-/**
-* opts = {
-*   start, dest : { lat, lon },  departMs,
-*   polar (table), wind(lat, lon, ms) → { tws, twd, gust } | null,
-*   wave(lat, lon, ms) → m | null,
-*   land : { isLand, segmentHitsLand },  forbidden : [ring [[lon, lat], …]],
-*   limits, dtH = 1, headingStep = 5, maxHours = 168, coast, forbiddenMask, coastIndex
-* }
-* → { ok, reason?, arrivalMs, hours, distanceNm, points: [...], stats }
-*/
-function route(opts) {
-	const L = {
-		...DEFAULT_LIMITS,
-		...opts.limits || {}
-	};
-	const P = propulsionOf(L);
-	const { start, dest, departMs, polar, wind, wave, land, forbidden = [] } = opts;
-	const dtH = opts.dtH ?? 1;
-	const step = opts.headingStep ?? 5;
-	const maxHours = opts.maxHours ?? 168;
-	const startBrgToDest = bearing(start, dest);
-	const voyage0 = opts.voyageStartMs ?? departMs;
-	const clear = makeClear({
-		start,
-		dest,
-		L,
-		land,
-		coast: opts.coast || null,
-		coastFree: opts.coastFree === true,
-		forbidden,
-		forbiddenMask: opts.forbiddenMask || null,
-		coastIndex: opts.coastIndex || null,
-		zoneStepNm: opts.zoneStepNm ?? .4
-	});
-	let beyondForecast = false;
-	const move = (p, heading, t) => {
-		const w = wind(p.lat, p.lon, t);
-		if (!w) {
-			beyondForecast = true;
-			return null;
-		}
-		if (w.tws > L.maxTws || w.gust != null && w.gust > L.maxGust) return null;
-		const twa = twaAbs(heading, w.twd);
-		const hs = wave ? wave(p.lat, p.lon, t) : null;
-		const minTwa = hs != null && hs >= L.seaWave ? L.minTwaInSea : L.minTwa;
-		const go = propel(P, polar, {
-			tws: w.tws,
-			twa,
-			hs,
-			minTwa,
-			elapsedH: (t - voyage0) / 36e5
-		});
-		if (!go) return null;
-		return {
-			speed: go.speed,
-			mode: go.mode,
-			tws: w.tws,
-			twd: w.twd,
-			twa,
-			gust: w.gust
-		};
-	};
-	let iso = [{
-		lat: start.lat,
-		lon: start.lon,
-		t: departMs,
-		parent: null,
-		d0: 0
-	}];
-	let best = null;
-	const nSteps = Math.round(maxHours / dtH);
-	for (let k = 0; k < nSteps && !best; k++) {
-		const t = departMs + k * dtH * 36e5;
-		const bySector = /* @__PURE__ */ new Map();
-		let closest = null;
-		for (const p of iso) {
-			const dd = distNm(p, dest);
-			const hd = bearing(p, dest);
-			const mv0 = move(p, hd, t);
-			if (mv0 && dd <= mv0.speed * dtH && clear(p, dest)) {
-				const tArr = t + dd / mv0.speed * 36e5;
-				if (!best || tArr < best.t) best = {
-					lat: dest.lat,
-					lon: dest.lon,
-					t: tArr,
-					parent: p,
-					heading: hd,
-					...mv0,
-					d0: distNm(start, dest)
-				};
-				continue;
-			}
-			for (let h = 0; h < 360; h += step) {
-				const mv = move(p, h, t);
-				if (!mv) continue;
-				const q = destination(p, h, mv.speed * dtH);
-				if (!clear(p, q)) continue;
-				if (wave) {
-					const hs = wave(q.lat, q.lon, t + dtH * 36e5);
-					if (hs != null && hs > L.maxWave) continue;
-				}
-				const d0 = distNm(start, q);
-				const sec = Math.round((bearing(start, q) - startBrgToDest + 540) % 360 - 180);
-				const prev = bySector.get(sec);
-				const node = {
-					lat: q.lat,
-					lon: q.lon,
-					t: t + dtH * 36e5,
-					parent: p,
-					heading: h,
-					...mv,
-					d0
-				};
-				const dq = distNm(q, dest);
-				if (!closest || dq < closest.dq) closest = {
-					node,
-					dq,
-					reach: mv.speed * dtH
-				};
-				if (!prev || d0 > prev.d0 + .05 || Math.abs(d0 - prev.d0) <= .05 && dq < distNm(prev, dest)) bySector.set(sec, node);
-			}
-		}
-		if (best) break;
-		iso = [...bySector.values()];
-		if (closest && closest.dq <= 3 * closest.reach && !iso.includes(closest.node)) iso.push(closest.node);
-		if (!iso.length) return beyondForecast ? {
-			ok: false,
-			short: true,
-			reason: `prévision trop courte (${k * dtH} h) pour atteindre l'arrivée`
-		} : {
-			ok: false,
-			reason: `aucune route dans les limites après ${k * dtH} h`
-		};
-	}
-	if (!best) return {
-		ok: false,
-		short: true,
-		reason: `pas d'arrivée en ${maxHours} h (prévision trop courte)`
-	};
-	const pts = [];
-	for (let n = best; n; n = n.parent) pts.push(n);
-	pts.reverse();
-	const points = pts.map((n, i) => {
-		const next = pts[i + 1];
-		return {
-			t: n.t,
-			lat: n.lat,
-			lon: n.lon,
-			heading: next?.heading ?? n.heading ?? null,
-			speed: next?.speed ?? n.speed ?? null,
-			mode: next?.mode ?? n.mode ?? null,
-			tws: next?.tws ?? n.tws ?? null,
-			twd: next?.twd ?? n.twd ?? null,
-			twa: next?.twa ?? n.twa ?? null,
-			gust: next?.gust ?? n.gust ?? null,
-			wave: wave ? wave(n.lat, n.lon, n.t) : null
-		};
-	});
-	let distanceNm = 0;
-	let motorH = 0;
-	let upwindH = 0;
-	let reachH = 0;
-	let downH = 0;
-	let maxTws = 0;
-	let maxGust = null;
-	let maxWave = 0;
-	for (let i = 0; i < points.length - 1; i++) {
-		const a = points[i];
-		const b = points[i + 1];
-		const h = (b.t - a.t) / 36e5;
-		distanceNm += distNm(a, b);
-		if (a.mode === "moteur") motorH += h;
-		else if (a.twa < 60) upwindH += h;
-		else if (a.twa < 120) reachH += h;
-		else downH += h;
-		maxTws = Math.max(maxTws, a.tws || 0);
-		if (a.gust != null) maxGust = Math.max(maxGust ?? 0, a.gust);
-		maxWave = Math.max(maxWave, a.wave || 0);
-	}
-	const hours = (best.t - departMs) / 36e5;
-	return {
-		ok: true,
-		arrivalMs: best.t,
-		hours,
-		distanceNm,
-		points,
-		stats: {
-			avgKn: distanceNm / hours,
-			motorH,
-			upwindH,
-			reachH,
-			downH,
-			maxTws,
-			maxGust,
-			maxWave
-		}
-	};
-}
-/**
-* LE CONTRÔLE DE SÉCURITÉ d'un segment a → b (pur) — le MÊME pour les deux
-* moteurs (isochrones et graphe A*, 26 oct.) : zones interdites tramées le
-* long du segment, côte exacte (aucune arête croisée ; dégagement minimal
-* d'un demi-mille, levé dans le premier et le dernier mille et demi), marge à
-* la côte (3 milles + petits fonds, levée près des bouts de la jambe et dans
-* un détroit), terre au pas de 0,25 mille.
-* ctx = { start, dest, L, land, coast?, coastFree?, forbidden?, forbiddenMask?, coastIndex?, zoneStepNm? (0,4) }
-* → clear(a, b) : true si le segment est permis.
-*/
-function makeClear({ start, dest, L, land, coast = null, coastFree = false, forbidden = [], forbiddenMask = null, coastIndex = null, zoneStepNm = .4 }) {
-	const freeNm = coastFree === true ? Infinity : L.coastFreeNm;
-	const blocked = (p) => forbidden.some((ring) => inPolygon(p.lat, p.lon, ring));
-	const zones = forbiddenMask;
-	const exactZ = exactZones(forbidden);
-	const exact = coastIndex;
-	return (a, b) => {
-		if (exactZ) {
-			if (exactZ.blocks(a, b)) return false;
-		} else if (zones ? zones.segmentHitsLand(a, b, zoneStepNm) : blocked(b)) return false;
-		if (exact) {
-			if (distNm(a, start) < L.coastMinFreeNm || distNm(b, dest) < L.coastMinFreeNm ? exact.crosses(a, b) : exact.near(a, b, L.coastMinNm)) return false;
-		}
-		if (coast && distNm(b, start) > freeNm && distNm(b, dest) > freeNm) return !coast.segmentHitsLand(a, b, .5);
-		return !land.segmentHitsLand(a, b, .25);
-	};
-}
-//#endregion
-//#region scripts/routing/lib/pool.mjs
-function createPool(file, workerData, size = Math.max(1, os.availableParallelism() - 1)) {
-	const idle = [];
-	const all = [];
-	const queue = [];
-	const pending = /* @__PURE__ */ new Map();
-	let seq = 0;
-	const pump = () => {
-		while (idle.length && queue.length) {
-			const w = idle.pop();
-			const job = queue.shift();
-			pending.set(job.id, job);
-			w.postMessage({
-				...job.msg,
-				id: job.id
-			});
-		}
-	};
-	for (let i = 0; i < size; i++) {
-		const w = new Worker$1(file, { workerData });
-		w.on("message", ({ id, r, error }) => {
-			const job = pending.get(id);
-			pending.delete(id);
-			idle.push(w);
-			pump();
-			if (error) job.ko(new Error(error));
-			else job.ok(r);
-		});
-		w.on("error", (e) => {
-			for (const job of pending.values()) job.ko(e);
-			pending.clear();
-		});
-		all.push(w);
-		idle.push(w);
-	}
-	return {
-		size,
-		run: (msg) => new Promise((ok, ko) => {
-			queue.push({
-				id: ++seq,
-				msg,
-				ok,
-				ko
-			});
-			pump();
-		}),
-		close: () => Promise.all(all.map((w) => w.terminate()))
-	};
-}
-//#endregion
-//#region scripts/routing/lib/alongRoute.mjs
-/** La position et le cap à l'instant t sur une route horodatée. */
-function positionAt(timed, t) {
-	for (let i = 0; i < timed.length - 1; i++) {
-		const a = timed[i];
-		const b = timed[i + 1];
-		if (t >= a.t && t <= b.t) {
-			const f = b.t === a.t ? 0 : (t - a.t) / (b.t - a.t);
-			const crs = bearing(a, b);
-			return {
-				...destination(a, crs, distNm(a, b) * f),
-				course: crs
-			};
-		}
-	}
-	return null;
-}
-/** L'écart d'angles (°) : le plus grand écart à la moyenne circulaire. */
-function angularSpread(degs) {
-	if (degs.length < 2) return 0;
-	const x = degs.reduce((s, d) => s + Math.cos(d * Math.PI / 180), 0);
-	const y = degs.reduce((s, d) => s + Math.sin(d * Math.PI / 180), 0);
-	const mean = Math.atan2(y, x) * 180 / Math.PI;
-	return Math.max(...degs.map((d) => Math.abs((d - mean + 540) % 360 - 180)));
-}
-/**
-* L'accord des modèles en un point : le vent faible varie beaucoup en
-* direction sans conséquence, donc sous 8 nds on ne juge que la force.
-* → 'accord' | 'partiel' | 'désaccord'
-*/
-function agreement(winds) {
-	const ws = winds.filter(Boolean);
-	if (ws.length < 2) return {
-		level: "inconnu",
-		twsSpread: 0,
-		twdSpread: 0
-	};
-	const tws = ws.map((w) => w.tws);
-	const twsSpread = Math.max(...tws) - Math.min(...tws);
-	const twdSpread = Math.min(...tws) >= 8 ? angularSpread(ws.map((w) => w.twd)) : 0;
-	return {
-		level: twsSpread > 10 || twdSpread > 60 ? "désaccord" : twsSpread > 5 || twdSpread > 30 ? "partiel" : "accord",
-		twsSpread,
-		twdSpread
-	};
-}
-/** Ce qui sort des limites de B&C en un point (une liste de courtes phrases). */
-function flags({ winds, wave, course }, limits) {
-	const f = [];
-	const ws = winds.filter(Boolean);
-	const maxTws = Math.max(0, ...ws.map((w) => w.tws));
-	const gusts = ws.map((w) => w.gust).filter((g) => g != null);
-	if (maxTws > limits.maxTws) f.push(`vent ${maxTws.toFixed(0)} nds`);
-	if (gusts.length && Math.max(...gusts) > limits.maxGust) f.push(`rafales ${Math.max(...gusts).toFixed(0)} nds`);
-	if (wave != null && wave > limits.maxWave) f.push(`vagues ${wave.toFixed(1)} m`);
-	const tight = ws.filter((w) => w.tws >= 8 && twaAbs(course, w.twd) < (wave != null && wave >= limits.seaWave ? limits.minTwaInSea : limits.minTwa));
-	if (tight.length && tight.length >= ws.length / 2) f.push("près serré");
-	return f;
-}
-//#endregion
-//#region scripts/routing/lib/extras.mjs
-var ROUTE_WORKER = new URL("./routeWorker.mjs", import.meta.url);
-var round1$1 = (x) => x == null ? null : Math.round(x * 10) / 10;
-var LEVELS$2 = [
-	"élevée",
-	"moyenne",
-	"faible"
-];
-/**
-* Lance `jobs` ({ model, departMs, limits? }) sur un groupe de fils ; `grids` = les grilles utiles.
-* D29 bis (29 oct.) — `ctx.createPool` : les fils de CET endroit (les Web Workers du navigateur, le
-* fichier unique du PC du bord) ; sinon worker_threads (le service). Avant, `pool.mjs` en dur : la
-* sensibilité à la polaire / à l'équipage ne pouvait pas tourner sur l'appareil.
-*/
-async function runJobs(ctx, grids, jobs, { limits = ctx.limits, threads = ctx.threads, onDone = () => {} } = {}) {
-	const pool = (ctx.createPool || createPool)(ROUTE_WORKER, {
-		polar: ctx.polar,
-		grids,
-		waves: ctx.waves,
-		land: ctx.land.data,
-		coast: ctx.coast.data,
-		forbidden: ctx.forbidden,
-		forbiddenMask: ctx.forbiddenMask.data,
-		coastIndex: ctx.coastIndex?.data,
-		limits
-	}, Math.max(1, Math.min(jobs.length, threads)));
-	try {
-		let n = 0;
-		return await Promise.all(jobs.map((j) => pool.run({
-			model: j.model,
-			stops: ctx.stops,
-			departMs: j.departMs,
-			...j.limits ? { limits: j.limits } : {}
-		}).then((r) => {
-			onDone(++n, jobs.length);
-			return r;
-		})));
-	} finally {
-		await pool.close();
-	}
-}
-/**
-* La sensibilité à la polaire : la référence refaite avec un rendement
-* multiplié par chaque facteur (la base, 100 %, est le conseil lui-même).
-* ⚠️ Moins vite à la voile, c'est aussi plus souvent au moteur (sous 4,5 nds) :
-* l'arrivée recule moins que la vitesse ne baisse — c'est la réalité du bord.
-*/
-async function polarSensitivity(ctx, { factors = [.85, 1.1], base = null, onStep = () => {} } = {}) {
-	const grids = { [ctx.refModel]: ctx.grids[ctx.refModel] };
-	const jobs = factors.map((f) => ({
-		model: ctx.refModel,
-		departMs: ctx.departMs,
-		limits: {
-			...ctx.limits,
-			efficiency: (ctx.limits.efficiency ?? .95) * f
-		}
-	}));
-	const res = await runJobs(ctx, grids, jobs, {
-		threads: Math.min(jobs.length, ctx.threads || 1),
-		onDone: (done, total) => onStep({
-			name: "polar",
-			done,
-			total
-		})
-	});
-	const out = factors.map((f, i) => summarizeRoute$1(ctx, res[i], f));
-	if (base) out.push(summarizeRoute$1(ctx, base, 1));
-	return out.sort((a, b) => a.factor - b.factor);
-}
-function summarizeRoute$1(ctx, r, factor) {
-	if (!r.ok) return {
-		factor,
-		ok: false,
-		short: Boolean(r.short),
-		reason: r.reason
-	};
-	return {
-		factor,
-		ok: true,
-		arrivalMs: r.arrivalMs,
-		hours: round1$1(r.hours),
-		distanceNm: Math.round(r.distanceNm),
-		motorH: round1$1(r.stats.motorH),
-		maxTws: round1$1(r.stats.maxTws),
-		maxGust: round1$1(r.stats.maxGust),
-		maxWave: round1$1(r.stats.maxWave),
-		day: arrivalLight(ctx.to.lat, ctx.to.lon, r.arrivalMs).day,
-		...typeof ctx.bilan === "function" && Array.isArray(r.points) ? { bilan: ctx.bilan(r.points) } : {}
-	};
-}
-/** Les deux hypothèses autour des réglages en vigueur (pur). */
-function crewCases(limits = {}) {
-	const pct = Number.isFinite(Number(limits.crewDecayPct)) ? Number(limits.crewDecayPct) : 2;
-	const after = Number.isFinite(Number(limits.crewDecayAfterH)) ? Number(limits.crewDecayAfterH) : 48;
-	return [{
-		key: "rested",
-		crewDecayPct: 0,
-		crewDecayAfterH: after
-	}, {
-		key: "tired",
-		crewDecayPct: Math.min(10, Math.max(4, pct * 2)),
-		crewDecayAfterH: Math.min(after, 24)
-	}];
-}
-async function crewSensitivity(ctx, { base = null, onStep = () => {} } = {}) {
-	const grids = { [ctx.refModel]: ctx.grids[ctx.refModel] };
-	const cases = crewCases(ctx.limits);
-	const jobs = cases.map((c) => ({
-		model: ctx.refModel,
-		departMs: ctx.departMs,
-		limits: {
-			...ctx.limits,
-			crewDecayPct: c.crewDecayPct,
-			crewDecayAfterH: c.crewDecayAfterH
-		}
-	}));
-	const res = await runJobs(ctx, grids, jobs, {
-		threads: Math.min(jobs.length, ctx.threads || 1),
-		onDone: (done, total) => onStep({
-			name: "crew",
-			done,
-			total
-		})
-	});
-	const out = cases.map((c, i) => ({
-		key: c.key,
-		decayPct: c.crewDecayPct,
-		afterH: c.crewDecayAfterH,
-		...summarizeRoute$1(ctx, res[i], 1)
-	}));
-	if (base) out.push({
-		key: "base",
-		decayPct: Number(ctx.limits.crewDecayPct ?? 2),
-		afterH: Number(ctx.limits.crewDecayAfterH ?? 48),
-		...summarizeRoute$1(ctx, base, 1)
-	});
-	const order = {
-		rested: 0,
-		base: 1,
-		tired: 2
-	};
-	return out.map(({ factor: _factor, ...x }) => x).sort((a, b) => order[a.key] - order[b.key]);
-}
-/** Le meilleur départ : toutes les 3 h sur `spanH`, tous les modèles. ✓ = tous (3 au moins) dans les limites, arrivée médiane de jour, confiance pas faible. */
-async function departurePlan(ctx, { spanH = 48, stepH = 3, onStep = () => {} } = {}) {
-	const models = Object.keys(ctx.grids);
-	const deps = [];
-	for (let d = ctx.departMs; d <= ctx.departMs + spanH * 36e5; d += stepH * 36e5) deps.push(d);
-	const jobs = deps.flatMap((departMs) => models.map((model) => ({
-		model,
-		departMs
-	})));
-	const res = await runJobs(ctx, ctx.grids, jobs, { onDone: (done, total) => onStep({
-		name: "departures",
-		done,
-		total
-	}) });
-	return deps.map((dep, k) => {
-		const R = Object.fromEntries(models.map((m, i) => [m, res[k * models.length + i]]));
-		const ok = models.filter((m) => R[m].ok);
-		const short = models.filter((m) => !R[m].ok && R[m].short);
-		const etas = ok.map((m) => R[m].arrivalMs).sort((a, b) => a - b);
-		const medianEta = etas.length ? etas[Math.floor((etas.length - 1) / 2)] : null;
-		const spreadH = etas.length > 1 ? (etas.at(-1) - etas[0]) / 36e5 : 0;
-		let lateral = 0;
-		for (let i = 0; i < ok.length; i++) for (let j = i + 1; j < ok.length; j++) {
-			const a = R[ok[i]].points;
-			const b = R[ok[j]].points;
-			for (let t = dep; t <= Math.min(R[ok[i]].arrivalMs, R[ok[j]].arrivalMs); t += 6 * 36e5) lateral = Math.max(lateral, distNm(pointAt(a, t), pointAt(b, t)));
-		}
-		const conf = ok.length < 2 ? "faible" : spreadH > 18 || lateral > 150 ? "faible" : spreadH > 6 || lateral > 60 ? "moyenne" : "élevée";
-		const light = medianEta ? arrivalLight(ctx.to.lat, ctx.to.lon, medianEta) : null;
-		const judged = models.length - short.length;
-		return {
-			dep,
-			medianEta,
-			light: light ? {
-				day: light.day,
-				waitH: round1$1(light.waitH)
-			} : null,
-			okN: ok.length,
-			models: judged,
-			spreadH: round1$1(spreadH),
-			lateralNm: Math.round(lateral),
-			conf,
-			maxTws: ok.length ? round1$1(Math.max(...ok.map((m) => R[m].stats.maxTws))) : null,
-			maxWave: ok.length ? round1$1(Math.max(...ok.map((m) => R[m].stats.maxWave))) : null,
-			motorH: ok.length ? round1$1(percentile(ok.map((m) => R[m].stats.motorH), .5)) : null,
-			good: ok.length === judged && ok.length >= 3 && Boolean(light?.day) && conf !== "faible"
-		};
-	});
-}
-function pointAt(points, t) {
-	if (t <= points[0].t) return points[0];
-	for (let i = 0; i < points.length - 1; i++) if (t <= points[i + 1].t) {
-		const f = (t - points[i].t) / (points[i + 1].t - points[i].t);
-		return {
-			lat: points[i].lat + (points[i + 1].lat - points[i].lat) * f,
-			lon: points[i].lon + (points[i + 1].lon - points[i].lon) * f
-		};
-	}
-	return points.at(-1);
-}
-/**
-* Les ensembles : chaque membre routé, une PART des membres par fil (173
-* grilles copiées dans chaque fil = 6 Go mesurés ; une part chacun = 2 Go).
-* → { all, byModel, hist, median: { model, member, line }, download }
-*/
-async function ensembleRun(ctx, { models: asked = Object.keys(ENSEMBLES), onStep = () => {} } = {}) {
-	const grids = {};
-	let bytes = 0;
-	const missing = [];
-	const ages = {};
-	for (const m of asked) {
-		const list = ctx.fetchEnsemble ? await ctx.fetchEnsemble(m, ctx.bbox, {
-			step: 2,
-			days: 10
-		}) : await fetchEnsembleGrids(m, ctx.bbox, {
-			step: 2,
-			days: 10,
-			cacheDir: ctx.cacheDir,
-			log: ctx.log
-		});
-		if (!list?.length) missing.push(m);
-		else {
-			for (const g of list) grids[`${m}#${String(g.member).padStart(2, "0")}`] = g;
-			bytes += list.download?.bytes || 0;
-			if (list.previous) ages[m] = list.previous.ageH;
-		}
-		onStep({
-			name: "ensembles-weather",
-			done: asked.indexOf(m) + 1,
-			total: asked.length
-		});
-	}
-	const models = asked.filter((m) => !missing.includes(m));
-	if (!models.length) throw Object.assign(/* @__PURE__ */ new Error(`ensembles : aucun en cache pour cette zone (${missing.join(", ")})`), { code: "ensemble-none" });
-	const keys = Object.keys(grids);
-	const threads = Math.max(1, Math.min(keys.length, ctx.threads));
-	const parts = Array.from({ length: threads }, (_, p) => keys.filter((_k, i) => i % threads === p));
-	const done = new Array(keys.length);
-	let n = 0;
-	await Promise.all(parts.map(async (part, p) => {
-		const out = await runJobs(ctx, Object.fromEntries(part.map((k) => [k, grids[k]])), part.map((k) => ({
-			model: k,
-			departMs: ctx.departMs
-		})), {
-			threads: 1,
-			onDone: () => onStep({
-				name: "ensembles",
-				done: ++n,
-				total: keys.length
-			})
-		});
-		part.forEach((_k, j) => {
-			done[j * threads + p] = out[j];
-		});
-	}));
-	const members = keys.map((k, i) => {
-		const [model, num] = k.split("#");
-		return {
-			key: k,
-			model,
-			member: Number(num),
-			...done[i]
-		};
-	});
-	const sum = (list) => {
-		const ok = list.filter((r) => r.ok);
-		const arr = ok.map((r) => r.arrivalMs);
-		const blocked = list.filter((r) => !r.ok && !r.short).length;
-		const short = list.filter((r) => !r.ok && r.short).length;
-		const c = ensembleConfidence({
-			arrivals: arr,
-			blocked,
-			short
-		});
-		return {
-			n: list.length,
-			routed: ok.length,
-			blocked,
-			short,
-			p10: percentile(arr, .1),
-			p50: percentile(arr, .5),
-			p90: percentile(arr, .9),
-			daylight: daylightShare(arr, ctx.to),
-			maxTwsP90: round1$1(percentile(ok.map((r) => r.stats.maxTws), .9)),
-			motorHMed: round1$1(percentile(ok.map((r) => r.stats.motorH), .5)),
-			confidence: {
-				level: c.level,
-				widthH: round1$1(c.widthH),
-				blockedShare: c.blockedShare == null ? null : Math.round(c.blockedShare * 100) / 100
-			}
-		};
-	};
-	const all = sum(members);
-	const arrivals = members.filter((r) => r.ok).map((r) => ({
-		t: r.arrivalMs,
-		model: r.model
-	}));
-	const hist = arrivalBins(arrivals, { binH: binHoursFor(arrivals.length ? (Math.max(...arrivals.map((a) => a.t)) - Math.min(...arrivals.map((a) => a.t))) / 36e5 : 0) });
-	const med = medianMember(members);
-	return {
-		models: Object.fromEntries(models.map((m) => [m, {
-			label: ENSEMBLES[m].label,
-			...sum(members.filter((r) => r.model === m))
-		}])),
-		all,
-		hist: {
-			binMs: hist.binMs,
-			start: hist.start,
-			bins: hist.bins.map((b) => ({
-				t0: b.t0,
-				n: b.n,
-				by: b.by
-			}))
-		},
-		median: med ? {
-			model: med.model,
-			member: med.member,
-			line: med.points.map((p) => [
-				Math.round(p.lon * 1e4) / 1e4,
-				Math.round(p.lat * 1e4) / 1e4,
-				p.t
-			])
-		} : null,
-		download: { bytes },
-		members: members.length,
-		...missing.length ? { missing } : {},
-		...Object.keys(ages).length ? { ages } : {}
-	};
-}
-/**
-* La confiance unique (D11) avec les options : la plus basse des niveaux
-* connus ; l'ensemble ajoute sa raison (largeur P10–P90, part bloquée). Pur.
-*/
-function withEnsembleConfidence(confidence, ens) {
-	if (!ens?.all?.confidence) return confidence;
-	const e = ens.all.confidence;
-	const level = LEVELS$2[Math.max(LEVELS$2.indexOf(confidence.level), LEVELS$2.indexOf(e.level))];
-	const reasons = [...confidence.reasons, {
-		code: "ensemble",
-		level: e.level === "élevée" ? "ok" : e.level === "moyenne" ? "mid" : "bad",
-		widthH: e.widthH,
-		blockedShare: e.blockedShare,
-		members: ens.members
-	}];
-	return {
-		...confidence,
-		level,
-		ensemble: e.level,
-		reasons
-	};
 }
 //#endregion
 //#region scripts/routing/lib/polarUncertainty.mjs
@@ -4198,7 +3648,7 @@ var SCORE_K = {
 	nightH: 3
 };
 var clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-var num$1 = (v) => typeof v === "number" && Number.isFinite(v) ? v : null;
+var num$2 = (v) => typeof v === "number" && Number.isFinite(v) ? v : null;
 /**
 * Des poids propres (pur) : les six critères, chacun borné à 0–100 (arrondi),
 * un critère absent ou illisible vaut 0 ; null si ce n'est pas un objet ou si
@@ -4243,7 +3693,7 @@ function hardHours(c, crewNightH = SCORE_K.nightH) {
 		c && c.nights,
 		f && f.overH,
 		f && f.restedH
-	].map(num$1);
+	].map(num$2);
 	if (xs.some((x) => x == null)) return null;
 	const [h20, hW, up, nights, over, rested] = xs;
 	return h20 + hW + .5 * up + crewNightH * nights + over + rested;
@@ -4251,14 +3701,14 @@ function hardHours(c, crewNightH = SCORE_K.nightH) {
 /** Les heures EN MER d'une case (l'attente au large exclue — décision 5). */
 function seaHours(c) {
 	if (!c) return null;
-	if (num$1(c.arrivalMs) != null && num$1(c.dep) != null) return (c.arrivalMs - c.dep) / 36e5;
-	const h = num$1(c.hours);
-	return h == null ? null : h - (num$1(c.waitH) || 0);
+	if (num$2(c.arrivalMs) != null && num$2(c.dep) != null) return (c.arrivalMs - c.dep) / 36e5;
+	const h = num$2(c.hours);
+	return h == null ? null : h - (num$2(c.waitH) || 0);
 }
 /** Pourquoi une case n'a pas de score : 'noroute' · 'limits' (≥ 90 % des limites) · 'fuel' (réserve entamée) — ou null (elle en a un). */
 function unscoredWhy(c) {
 	if (!c || !c.ok) return "noroute";
-	if (num$1(c.limitRatio) != null && c.limitRatio >= SCORE_K.redRatio - 1e-9 || c.cls === "red" && c.why !== "fuel") return "limits";
+	if (num$2(c.limitRatio) != null && c.limitRatio >= SCORE_K.redRatio - 1e-9 || c.cls === "red" && c.why !== "fuel") return "limits";
 	if (c.intoReserve || c.why === "fuel") return "fuel";
 	return null;
 }
@@ -4278,24 +3728,24 @@ function scoreContext(cellsByRow, { crewNightH = SCORE_K.nightH, marginPct = SCO
 	return {
 		v: 1,
 		fastestSeaH,
-		crewNightH: num$1(crewNightH) ?? SCORE_K.nightH,
-		marginPct: num$1(marginPct) ?? SCORE_K.marginPct
+		crewNightH: num$2(crewNightH) ?? SCORE_K.nightH,
+		marginPct: num$2(marginPct) ?? SCORE_K.marginPct
 	};
 }
 /** Les six critères d'une case, 0–100 chacun (null = inconnu). */
 function criteria(c, ctx) {
 	const K = SCORE_K;
 	const sea = seaHours(c);
-	const hours = num$1(c.hours);
+	const hours = num$2(c.hours);
 	const hard = hardHours(c, ctx.crewNightH);
-	const span = Math.max(K.margeMinSpan, 2 * (100 - (num$1(ctx.marginPct) ?? K.marginPct)));
+	const span = Math.max(K.margeMinSpan, 2 * (100 - (num$2(ctx.marginPct) ?? K.marginPct)));
 	const level = c.agree && typeof c.agree === "object" ? c.agree.level : c.agree;
 	return {
 		temps: sea > 0 && ctx.fastestSeaH > 0 ? clamp(100 - K.tempsPerPct * ((sea - ctx.fastestSeaH) / ctx.fastestSeaH) * 100, 0, 100) : null,
 		confort: hard != null && hours > 0 ? clamp(100 - K.confortPerPct * (hard / hours) * 100, 0, 100) : null,
-		voile: num$1(c.sailPct) != null ? clamp(c.sailPct, 0, 100) : null,
-		marge: num$1(c.marginPct) != null ? clamp(100 * c.marginPct / span, 0, 100) : null,
-		jour: c.day == null ? null : !c.day ? 0 : Math.max(K.jourFloor, 100 - K.jourPerWaitH * (num$1(c.waitH) || 0)),
+		voile: num$2(c.sailPct) != null ? clamp(c.sailPct, 0, 100) : null,
+		marge: num$2(c.marginPct) != null ? clamp(100 * c.marginPct / span, 0, 100) : null,
+		jour: c.day == null ? null : !c.day ? 0 : Math.max(K.jourFloor, 100 - K.jourPerWaitH * (num$2(c.waitH) || 0)),
 		certitude: K.certitude[level] ?? null
 	};
 }
@@ -4336,8 +3786,8 @@ function scoreCell(c, weights, ctx) {
 		missing,
 		renorm: missing.length > 0,
 		seaH: seaHours(c),
-		waitH: num$1(c.waitH) || 0,
-		quayMs: num$1(c.dayArrivalMs) ?? num$1(c.arrivalMs)
+		waitH: num$2(c.waitH) || 0,
+		quayMs: num$2(c.dayArrivalMs) ?? num$2(c.arrivalMs)
 	};
 }
 var lexLess$1 = (a, b) => {
@@ -4350,7 +3800,7 @@ var lexLess$1 = (a, b) => {
 	}
 	return false;
 };
-var quayOf = (c) => num$1(c.dayArrivalMs) ?? num$1(c.arrivalMs) ?? Infinity;
+var quayOf = (c) => num$2(c.dayArrivalMs) ?? num$2(c.arrivalMs) ?? Infinity;
 /**
 * La ★ du score d'une ligne (pur) → l'indice de la case, ou null.
 * Le plus grand score parmi les cases notées ; `dayFilter` (décision 3) : les
@@ -4432,7 +3882,8 @@ var ROUTAGE_DEFAULTS = {
 	saharaAvoid: 0,
 	saharaNm: 50,
 	...POLAR_UNCERT_DEFAULTS,
-	...CREW_DEFAULTS
+	...CREW_DEFAULTS,
+	...NIGHT_POLAR_DEFAULTS
 };
 /** Les bornes (min, max) des valeurs numériques — les mêmes que l'app. */
 var PREF_BOUNDS = {
@@ -4457,7 +3908,8 @@ var PREF_BOUNDS = {
 	saharaAvoid: [0, 1],
 	saharaNm: [0, 200],
 	...POLAR_UNCERT_BOUNDS,
-	...CREW_BOUNDS
+	...CREW_BOUNDS,
+	...NIGHT_POLAR_BOUNDS
 };
 /**
 * D22 bis — LE PROFIL « ✏️ PERSONNALISÉ » (Flavien, 27 oct.) : son ordre et ses
@@ -4476,7 +3928,7 @@ function cleanCustom(c) {
 	if (w) out.weights = w;
 	return out;
 }
-var num = (v, [lo, hi], d) => {
+var num$1 = (v, [lo, hi], d) => {
 	if (v === null || v === void 0 || v === "") return d;
 	const n = Number(v);
 	return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : d;
@@ -4498,7 +3950,7 @@ function prefsOf(limits = {}) {
 function prefsOf0(limits) {
 	const L = limits && typeof limits === "object" ? limits : {};
 	const out = {};
-	for (const [k, b] of Object.entries(PREF_BOUNDS)) out[k] = num(typeof L[k] === "boolean" ? Number(L[k]) : L[k], b, ROUTAGE_DEFAULTS[k]);
+	for (const [k, b] of Object.entries(PREF_BOUNDS)) out[k] = num$1(typeof L[k] === "boolean" ? Number(L[k]) : L[k], b, ROUTAGE_DEFAULTS[k]);
 	for (const k of [
 		"engineMode",
 		"routesShown",
@@ -4614,307 +4066,450 @@ function fuelPlan(motorH, prefs, motorKn = PROPULSION_DEFAULTS.motorKn) {
 	};
 }
 //#endregion
-//#region scripts/routing/lib/hazards.mjs
-var RAD$2 = Math.PI / 180;
-var HAZARDS = [{
-	id: "orca",
-	kind: "orca",
-	glyph: "🐋",
-	ring: [
-		[-5.2, 36.35],
-		[-5.95, 36.75],
-		[-6.4, 37.05],
-		[-7.4, 37.45],
-		[-8.2, 37.35],
-		[-8.95, 37.25],
-		[-9.35, 36.95],
-		[-8.3, 36.45],
-		[-7, 35.95],
-		[-6.55, 35.2],
-		[-6.05, 35.05],
-		[-5.75, 35.55],
-		[-5.55, 35.8],
-		[-5.2, 35.75],
-		[-5.2, 36.35]
-	],
-	seasonMonths: [
-		4,
-		5,
-		6,
-		7,
-		8,
-		9,
-		10
-	],
-	source: "GTOA · MITECO · Instituto Hidrográfico (tracé à la main)"
-}, {
-	id: "sahara",
-	kind: "offshore",
-	glyph: "⚠",
-	coast: [
-		[-13.05, 27.67],
-		[-13.4, 27.1],
-		[-14, 26.55],
-		[-14.5, 26.1],
-		[-14.9, 25.3],
-		[-15.45, 24.5],
-		[-16, 23.65],
-		[-16.35, 22.75],
-		[-16.7, 22.3],
-		[-17, 21.3],
-		[-17.05, 20.77],
-		[-16.55, 19.4],
-		[-16.05, 18.1],
-		[-16.05, 17],
-		[-16.5, 16.05]
-	],
-	source: "trait de côte approximatif ; retours des propriétaires d'Outremer (B&C)"
-}];
-var signedArea = (ring) => {
-	let s = 0;
-	for (let i = 0; i < ring.length - 1; i++) s += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1];
-	return s / 2;
-};
-/** Un anneau agrandi de `nm` milles (chaque sommet poussé vers l'extérieur, normales moyennées). */
-function growRing(ring, nm) {
-	if (!(nm > 0)) return ring;
-	const open = ring.slice(0, -1);
-	const n = open.length;
-	const lat0 = open.reduce((s, p) => s + p[1], 0) / n;
-	const k = Math.cos(lat0 * RAD$2);
-	const ccw = signedArea(open.map(([x, y]) => [x * k, y]).concat([[open[0][0] * k, open[0][1]]])) > 0;
-	const out = open.map((p, i) => {
-		const a = open[(i - 1 + n) % n];
-		const b = open[(i + 1) % n];
-		const n1 = edgeNormal(a, p, k, ccw);
-		const n2 = edgeNormal(p, b, k, ccw);
-		let nx = n1[0] + n2[0];
-		let ny = n1[1] + n2[1];
-		const l = Math.hypot(nx, ny) || 1;
-		nx /= l;
-		ny /= l;
-		const cos = Math.max(.35, nx * n1[0] + ny * n1[1]);
-		const d = nm / 60 / cos;
-		return [p[0] + nx * d / k, p[1] + ny * d];
-	});
-	return [...out, out[0]];
-}
-function edgeNormal(a, b, k, ccw) {
-	const dx = (b[0] - a[0]) * k;
-	const dy = b[1] - a[1];
-	const l = Math.hypot(dx, dy) || 1;
-	return ccw ? [dy / l, -dx / l] : [-dy / l, dx / l];
-}
-/** La bande de `nm` milles le long d'une côte (la mer à droite), refermée dans les terres. */
-function coastBand(coast, nm) {
-	const n = coast.length;
-	const lat0 = coast.reduce((s, p) => s + p[1], 0) / n;
-	const k = Math.cos(lat0 * RAD$2);
-	const sea = coast.map((p, i) => {
-		const a = coast[Math.max(0, i - 1)];
-		const b = coast[Math.min(n - 1, i + 1)];
-		const dx = (b[0] - a[0]) * k;
-		const dy = b[1] - a[1];
-		const l = Math.hypot(dx, dy) || 1;
-		const rx = dy / l;
-		const ry = -dx / l;
-		return [p[0] + rx * nm / 60 / k, p[1] + ry * nm / 60];
-	});
-	const land = coast.map(([x, y]) => [x + .3, y]).reverse();
-	return [
-		...sea,
-		...land,
-		sea[0]
-	];
-}
-/** Les zones des Réglages : [{ id, kind, glyph, show, avoid, nm, ring, source, seasonMonths? }]. */
-function hazardZones(prefs) {
-	const out = [];
-	for (const h of HAZARDS) {
-		const show = Boolean(prefs[`${h.id}Show`]);
-		const avoid = Boolean(prefs[`${h.id}Avoid`]);
-		const nm = Number(prefs[`${h.id}Nm`]) || 0;
-		if (!show && !avoid) continue;
-		const ring = h.coast ? coastBand(h.coast, Math.max(1, nm)) : growRing(h.ring, nm);
-		out.push({
-			id: h.id,
-			kind: h.kind,
-			glyph: h.glyph,
-			show,
-			avoid,
-			nm,
-			ring,
-			source: h.source,
-			seasonMonths: h.seasonMonths || null
-		});
+//#region scripts/routing/lib/zones.mjs
+var memo = /* @__PURE__ */ new WeakMap();
+/** rings : [[[lon, lat], …], …] → { crosses(a, b), inside(p), blocks(a, b) } | null. */
+function exactZones(rings) {
+	if (!Array.isArray(rings) || !rings.length) return null;
+	if (memo.has(rings)) return memo.get(rings);
+	const valid = rings.filter((r) => Array.isArray(r) && r.length > 3);
+	if (!valid.length) {
+		memo.set(rings, null);
+		return null;
 	}
+	let w = Infinity;
+	let s = Infinity;
+	let e = -Infinity;
+	let n = -Infinity;
+	const boxes = valid.map((r) => {
+		let x0 = Infinity;
+		let y0 = Infinity;
+		let x1 = -Infinity;
+		let y1 = -Infinity;
+		for (const [x, y] of r) {
+			if (x < x0) x0 = x;
+			if (x > x1) x1 = x;
+			if (y < y0) y0 = y;
+			if (y > y1) y1 = y;
+		}
+		w = Math.min(w, x0);
+		s = Math.min(s, y0);
+		e = Math.max(e, x1);
+		n = Math.max(n, y1);
+		return [
+			x0,
+			y0,
+			x1,
+			y1
+		];
+	});
+	const ix = buildCoastIndex(valid.map((r) => ({ geometry: {
+		type: "Polygon",
+		coordinates: [r]
+	} })), [
+		w - .1,
+		s - .1,
+		e + .1,
+		n + .1
+	], .05);
+	const inside = (p) => valid.some((r, k) => {
+		const b = boxes[k];
+		return p.lon >= b[0] && p.lon <= b[2] && p.lat >= b[1] && p.lat <= b[3] && inPolygon(p.lat, p.lon, r);
+	});
+	const out = {
+		crosses: (a, b) => ix.crosses(a, b),
+		inside,
+		blocks: (a, b) => inside(b) || ix.crosses(a, b)
+	};
+	memo.set(rings, out);
 	return out;
 }
-var xy = (p, k) => [p.lon * k * 60, p.lat * 60];
-var orient = (ax, ay, bx, by, cx, cy) => (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
-function ptSeg(px, py, x1, y1, x2, y2) {
-	const dx = x2 - x1;
-	const dy = y2 - y1;
-	const L = dx * dx + dy * dy;
-	const t = L ? Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / L)) : 0;
-	const qx = x1 + t * dx;
-	const qy = y1 + t * dy;
-	return {
-		d: Math.hypot(px - qx, py - qy),
-		qx,
-		qy
-	};
-}
-function segsCross(a, b, c, d) {
-	const d1 = orient(a[0], a[1], b[0], b[1], c[0], c[1]);
-	const d2 = orient(a[0], a[1], b[0], b[1], d[0], d[1]);
-	const d3 = orient(c[0], c[1], d[0], d[1], a[0], a[1]);
-	const d4 = orient(c[0], c[1], d[0], d[1], b[0], b[1]);
-	return (d1 <= 0 && d2 >= 0 || d1 >= 0 && d2 <= 0) && (d3 <= 0 && d4 >= 0 || d3 >= 0 && d4 <= 0);
-}
-/** Un point {lat, lon} : distance (milles) au bord d'un anneau, 0 dedans ; et le point du bord le plus proche. */
-function pointToRing(p, ring) {
-	const k = Math.cos(p.lat * RAD$2);
-	const [px, py] = xy(p, k);
-	let best = {
-		d: Infinity,
-		qx: 0,
-		qy: 0
-	};
-	for (let i = 1; i < ring.length; i++) {
-		const r = ptSeg(px, py, ring[i - 1][0] * k * 60, ring[i - 1][1] * 60, ring[i][0] * k * 60, ring[i][1] * 60);
-		if (r.d < best.d) best = r;
-	}
-	const inside = inPolygon(p.lat, p.lon, ring);
-	return {
-		d: inside ? 0 : best.d,
-		inside,
-		q: {
-			lon: best.qx / (k * 60),
-			lat: best.qy / 60
-		}
-	};
-}
-/** Un segment a → b : distance (milles) à l'anneau, 0 s'il le touche ou y entre. */
-function segmentToRing(a, b, ring) {
-	if (inPolygon(a.lat, a.lon, ring) || inPolygon(b.lat, b.lon, ring)) return 0;
-	const k = Math.cos((a.lat + b.lat) / 2 * RAD$2);
-	const A = xy(a, k);
-	const B = xy(b, k);
-	let d = Infinity;
-	for (let i = 1; i < ring.length; i++) {
-		const C = [ring[i - 1][0] * k * 60, ring[i - 1][1] * 60];
-		const D = [ring[i][0] * k * 60, ring[i][1] * 60];
-		if (segsCross(A, B, C, D)) return 0;
-		d = Math.min(d, ptSeg(A[0], A[1], C[0], C[1], D[0], D[1]).d, ptSeg(B[0], B[1], C[0], C[1], D[0], D[1]).d, ptSeg(C[0], C[1], A[0], A[1], B[0], B[1]).d, ptSeg(D[0], D[1], A[0], A[1], B[0], B[1]).d);
-	}
-	return d;
-}
+//#endregion
+//#region scripts/routing/lib/isochrone.mjs
+var DEFAULT_LIMITS = {
+	maxTws: 26,
+	maxGust: 34,
+	maxWave: 3,
+	minTwa: 50,
+	minTwaInSea: 60,
+	seaWave: 2,
+	coastNm: 3,
+	coastFreeNm: 10,
+	coastMinNm: .5,
+	coastMinFreeNm: 1.5,
+	motor: true,
+	motorBelowKn: 4.5,
+	motorKn: 6,
+	efficiency: .95
+};
 /**
-* Les zones à éviter POUR CE CALCUL : celles qui sont cochées, sauf si elles
-* contiennent (ou frôlent à moins de `freeNm`) un bout de la route — départ,
-* porte, arrivée : on ne peut pas éviter l'endroit où l'on va. → { rings, lifted: [id] }
+* opts = {
+*   start, dest : { lat, lon },  departMs,
+*   polar (table), wind(lat, lon, ms) → { tws, twd, gust } | null,
+*   wave(lat, lon, ms) → m | null,
+*   land : { isLand, segmentHitsLand },  forbidden : [ring [[lon, lat], …]],
+*   limits, dtH = 1, headingStep = 5, maxHours = 168, coast, forbiddenMask, coastIndex
+* }
+* → { ok, reason?, arrivalMs, hours, distanceNm, points: [...], stats }
 */
-function avoidRings(zones, stops, { freeNm = 1.5 } = {}) {
-	const rings = [];
-	const lifted = [];
-	for (const z of zones) {
-		if (!z.avoid) continue;
-		if (stops.some((s) => pointToRing(s, z.ring).d < freeNm)) {
-			lifted.push(z.id);
-			continue;
-		}
-		rings.push(z.ring);
-	}
-	return {
-		rings,
-		lifted
+function route(opts) {
+	const L = {
+		...DEFAULT_LIMITS,
+		...opts.limits || {}
 	};
-}
-/**
-* Les dangers LE LONG d'une route [{ t, lat, lon }] (pur) : pour chaque zone
-* affichée ou évitée, à moins de `corridorNm` milles —
-* { id, kind, glyph, inside, closestNm, atMs, side, enterMs, exitMs, insideH, inSeason, avoid, nm, source }.
-* Chaque segment est échantillonné tous les ≈ 0,5 mille pour les heures ; la
-* distance au plus près est celle du SEGMENT (exacte dans le plan local).
-*/
-function hazardsAlong(points, zones, { corridorNm = 30 } = {}) {
-	const out = [];
-	if (!Array.isArray(points) || points.length < 2) return out;
-	for (const z of zones) {
-		let best = {
-			d: Infinity,
-			t: null,
-			side: null
-		};
-		let enter = null;
-		let exit = null;
-		let insideMs = 0;
-		for (let i = 1; i < points.length; i++) {
-			const a = points[i - 1];
-			const b = points[i];
-			const dSeg = segmentToRing(a, b, z.ring);
-			if (dSeg > corridorNm && dSeg > best.d) continue;
-			const n = Math.max(1, Math.min(200, Math.ceil(distNm(a, b) / .5)));
-			for (let s = 0; s <= n; s++) {
-				const f = s / n;
-				const p = {
-					lat: a.lat + (b.lat - a.lat) * f,
-					lon: a.lon + (b.lon - a.lon) * f
-				};
-				const t = a.t + (b.t - a.t) * f;
-				const r = pointToRing(p, z.ring);
-				if (r.inside) {
-					if (enter == null) enter = t;
-					exit = t;
-					if (s > 0) insideMs += (b.t - a.t) / n;
-				}
-				if (r.d < best.d || r.d === 0 && best.d === 0 && best.t == null) {
-					const k = Math.cos(p.lat * RAD$2);
-					const hx = (b.lon - a.lon) * k;
-					const hy = b.lat - a.lat;
-					const vx = (r.q.lon - p.lon) * k;
-					const cr = hx * (r.q.lat - p.lat) - hy * vx;
-					best = {
-						d: r.d,
-						t,
-						side: r.inside ? null : cr > 0 ? "port" : "starboard"
-					};
-				}
-			}
-			if (dSeg === 0 && best.d > 0) best = {
-				...best,
-				d: 0
-			};
+	const P = propulsionOf(L);
+	const { start, dest, departMs, polar, wind, wave, land, forbidden = [] } = opts;
+	const dtH = opts.dtH ?? 1;
+	const step = opts.headingStep ?? 5;
+	const maxHours = opts.maxHours ?? 168;
+	const startBrgToDest = bearing(start, dest);
+	const voyage0 = opts.voyageStartMs ?? departMs;
+	const nightOn = P.nightPolarPct < 1;
+	const clear = makeClear({
+		start,
+		dest,
+		L,
+		land,
+		coast: opts.coast || null,
+		coastFree: opts.coastFree === true,
+		forbidden,
+		forbiddenMask: opts.forbiddenMask || null,
+		coastIndex: opts.coastIndex || null,
+		zoneStepNm: opts.zoneStepNm ?? .4
+	});
+	let beyondForecast = false;
+	const move = (p, heading, t, night = false) => {
+		const w = wind(p.lat, p.lon, t);
+		if (!w) {
+			beyondForecast = true;
+			return null;
 		}
-		if (!(best.d <= corridorNm)) continue;
-		const seasonAt = enter ?? best.t;
-		const inSeason = z.seasonMonths ? z.seasonMonths.includes(new Date(seasonAt).getUTCMonth() + 1) : null;
-		out.push({
-			id: z.id,
-			kind: z.kind,
-			glyph: z.glyph,
-			inside: enter != null || best.d === 0,
-			closestNm: Math.round(best.d * 10) / 10,
-			atMs: best.t != null ? Math.round(best.t) : null,
-			side: best.side,
-			enterMs: enter != null ? Math.round(enter) : null,
-			exitMs: exit != null ? Math.round(exit) : null,
-			insideH: Math.round(insideMs / 36e5 * 10) / 10,
-			inSeason,
-			avoid: z.avoid,
-			show: z.show,
-			nm: z.nm,
-			source: z.source
+		if (w.tws > L.maxTws || w.gust != null && w.gust > L.maxGust) return null;
+		const twa = twaAbs(heading, w.twd);
+		const hs = wave ? wave(p.lat, p.lon, t) : null;
+		const minTwa = hs != null && hs >= L.seaWave ? L.minTwaInSea : L.minTwa;
+		const go = propel(P, polar, {
+			tws: w.tws,
+			twa,
+			hs,
+			minTwa,
+			elapsedH: (t - voyage0) / 36e5,
+			night
 		});
+		if (!go) return null;
+		return {
+			speed: go.speed,
+			mode: go.mode,
+			tws: w.tws,
+			twd: w.twd,
+			twa,
+			gust: w.gust
+		};
+	};
+	let iso = [{
+		lat: start.lat,
+		lon: start.lon,
+		t: departMs,
+		parent: null,
+		d0: 0
+	}];
+	let best = null;
+	const nSteps = Math.round(maxHours / dtH);
+	for (let k = 0; k < nSteps && !best; k++) {
+		const t = departMs + k * dtH * 36e5;
+		const bySector = /* @__PURE__ */ new Map();
+		let closest = null;
+		for (const p of iso) {
+			const night = nightOn ? nightAt$1(p.lat, p.lon, t) : false;
+			const dd = distNm(p, dest);
+			const hd = bearing(p, dest);
+			const mv0 = move(p, hd, t, night);
+			if (mv0 && dd <= mv0.speed * dtH && clear(p, dest)) {
+				const tArr = t + dd / mv0.speed * 36e5;
+				if (!best || tArr < best.t) best = {
+					lat: dest.lat,
+					lon: dest.lon,
+					t: tArr,
+					parent: p,
+					heading: hd,
+					...mv0,
+					d0: distNm(start, dest)
+				};
+				continue;
+			}
+			for (let h = 0; h < 360; h += step) {
+				const mv = move(p, h, t, night);
+				if (!mv) continue;
+				const q = destination(p, h, mv.speed * dtH);
+				if (!clear(p, q)) continue;
+				if (wave) {
+					const hs = wave(q.lat, q.lon, t + dtH * 36e5);
+					if (hs != null && hs > L.maxWave) continue;
+				}
+				const d0 = distNm(start, q);
+				const sec = Math.round((bearing(start, q) - startBrgToDest + 540) % 360 - 180);
+				const prev = bySector.get(sec);
+				const node = {
+					lat: q.lat,
+					lon: q.lon,
+					t: t + dtH * 36e5,
+					parent: p,
+					heading: h,
+					...mv,
+					d0
+				};
+				const dq = distNm(q, dest);
+				if (!closest || dq < closest.dq) closest = {
+					node,
+					dq,
+					reach: mv.speed * dtH
+				};
+				if (!prev || d0 > prev.d0 + .05 || Math.abs(d0 - prev.d0) <= .05 && dq < distNm(prev, dest)) bySector.set(sec, node);
+			}
+		}
+		if (best) break;
+		iso = [...bySector.values()];
+		if (closest && closest.dq <= 3 * closest.reach && !iso.includes(closest.node)) iso.push(closest.node);
+		if (!iso.length) return beyondForecast ? {
+			ok: false,
+			short: true,
+			reason: `prévision trop courte (${k * dtH} h) pour atteindre l'arrivée`
+		} : {
+			ok: false,
+			reason: `aucune route dans les limites après ${k * dtH} h`
+		};
 	}
-	return out.sort((x, y) => (x.enterMs ?? x.atMs ?? 0) - (y.enterMs ?? y.atMs ?? 0));
+	if (!best) return {
+		ok: false,
+		short: true,
+		reason: `pas d'arrivée en ${maxHours} h (prévision trop courte)`
+	};
+	const pts = [];
+	for (let n = best; n; n = n.parent) pts.push(n);
+	pts.reverse();
+	const points = pts.map((n, i) => {
+		const next = pts[i + 1];
+		return {
+			t: n.t,
+			lat: n.lat,
+			lon: n.lon,
+			heading: next?.heading ?? n.heading ?? null,
+			speed: next?.speed ?? n.speed ?? null,
+			mode: next?.mode ?? n.mode ?? null,
+			tws: next?.tws ?? n.tws ?? null,
+			twd: next?.twd ?? n.twd ?? null,
+			twa: next?.twa ?? n.twa ?? null,
+			gust: next?.gust ?? n.gust ?? null,
+			wave: wave ? wave(n.lat, n.lon, n.t) : null
+		};
+	});
+	let distanceNm = 0;
+	let motorH = 0;
+	let upwindH = 0;
+	let reachH = 0;
+	let downH = 0;
+	let maxTws = 0;
+	let maxGust = null;
+	let maxWave = 0;
+	for (let i = 0; i < points.length - 1; i++) {
+		const a = points[i];
+		const b = points[i + 1];
+		const h = (b.t - a.t) / 36e5;
+		distanceNm += distNm(a, b);
+		if (a.mode === "moteur") motorH += h;
+		else if (a.twa < 60) upwindH += h;
+		else if (a.twa < 120) reachH += h;
+		else downH += h;
+		maxTws = Math.max(maxTws, a.tws || 0);
+		if (a.gust != null) maxGust = Math.max(maxGust ?? 0, a.gust);
+		maxWave = Math.max(maxWave, a.wave || 0);
+	}
+	const hours = (best.t - departMs) / 36e5;
+	return {
+		ok: true,
+		arrivalMs: best.t,
+		hours,
+		distanceNm,
+		points,
+		stats: {
+			avgKn: distanceNm / hours,
+			motorH,
+			upwindH,
+			reachH,
+			downH,
+			maxTws,
+			maxGust,
+			maxWave
+		}
+	};
 }
-/** L'anneau d'une zone, arrondi pour l'écran (dessin seulement). */
-var ringForMap = (ring) => ring.map(([lo, la]) => [Math.round(lo * 1e3) / 1e3, Math.round(la * 1e3) / 1e3]);
+/**
+* LE CONTRÔLE DE SÉCURITÉ d'un segment a → b (pur) — le MÊME pour les deux
+* moteurs (isochrones et graphe A*, 26 oct.) : zones interdites tramées le
+* long du segment, côte exacte (aucune arête croisée ; dégagement minimal
+* d'un demi-mille, levé dans le premier et le dernier mille et demi), marge à
+* la côte (3 milles + petits fonds, levée près des bouts de la jambe et dans
+* un détroit), terre au pas de 0,25 mille.
+* ctx = { start, dest, L, land, coast?, coastFree?, forbidden?, forbiddenMask?, coastIndex?, zoneStepNm? (0,4) }
+* → clear(a, b) : true si le segment est permis.
+*/
+function makeClear({ start, dest, L, land, coast = null, coastFree = false, forbidden = [], forbiddenMask = null, coastIndex = null, zoneStepNm = .4 }) {
+	const freeNm = coastFree === true ? Infinity : L.coastFreeNm;
+	const blocked = (p) => forbidden.some((ring) => inPolygon(p.lat, p.lon, ring));
+	const zones = forbiddenMask;
+	const exactZ = exactZones(forbidden);
+	const exact = coastIndex;
+	return (a, b) => {
+		if (exactZ) {
+			if (exactZ.blocks(a, b)) return false;
+		} else if (zones ? zones.segmentHitsLand(a, b, zoneStepNm) : blocked(b)) return false;
+		if (exact) {
+			if (distNm(a, start) < L.coastMinFreeNm || distNm(b, dest) < L.coastMinFreeNm ? exact.crosses(a, b) : exact.near(a, b, L.coastMinNm)) return false;
+		}
+		if (coast && distNm(b, start) > freeNm && distNm(b, dest) > freeNm) return !coast.segmentHitsLand(a, b, .5);
+		return !land.segmentHitsLand(a, b, .25);
+	};
+}
+var MAX_BINS = 40;
+var isNum = (x) => typeof x === "number" && Number.isFinite(x);
+var increasing = (a, lo, hi) => Array.isArray(a) && a.length >= 2 && a.length <= MAX_BINS && a.every((x, i) => isNum(x) && x >= lo && x <= hi && (i === 0 || x > a[i - 1]));
+/** Une table [tws][twa] de la bonne taille, chaque vitesse dans ]0, 30[ (pas de NaN, pas de null). → null | raison */
+function tableIssue(t, nTws, nTwa, name) {
+	if (!Array.isArray(t) || t.length !== nTws) return `${name} : ${Array.isArray(t) ? t.length : "pas"} lignes au lieu de ${nTws}`;
+	for (let i = 0; i < nTws; i++) {
+		const row = t[i];
+		if (!Array.isArray(row) || row.length !== nTwa) return `${name}[${i}] : ${Array.isArray(row) ? row.length : "pas de"} colonnes au lieu de ${nTwa}`;
+		for (let j = 0; j < nTwa; j++) if (!isNum(row[j]) || !(row[j] > 0 && row[j] < 30)) return `${name}[${i}][${j}] = ${row[j]} hors de ]0, 30[`;
+	}
+	return null;
+}
+/**
+* Ce qui ne va pas dans une polaire (la forme du fichier du routeur), ou null.
+* Vérifie : TWS_BINS / TWA_BINS croissants et plausibles ; `mixed.table` de
+* leur taille, chaque vitesse un nombre dans ]0, 30[ ; si présentes, la
+* confiance par case (même taille, measured | blended | escale) et l'axe des
+* vagues du lot 3 (HS_BINS croissants, `mixed.tableHs[hs][tws][twa]` de même).
+* Les autres clés (calibration, learned, bySail, loch…) ne sont pas lues par
+* le moteur pour router : tolérées telles quelles.
+*/
+function polarShapeIssue(P) {
+	if (!P || typeof P !== "object" || Array.isArray(P)) return "pas un objet";
+	if (!increasing(P.TWS_BINS, 0, 80)) return "TWS_BINS invalides";
+	if (!increasing(P.TWA_BINS, 0, 180)) return "TWA_BINS invalides";
+	const nTws = P.TWS_BINS.length;
+	const nTwa = P.TWA_BINS.length;
+	const t = tableIssue(P.mixed?.table, nTws, nTwa, "mixed.table");
+	if (t) return t;
+	const conf = P.calibration?.confidence;
+	if (conf != null) {
+		if (!Array.isArray(conf) || conf.length !== nTws || conf.some((r) => !Array.isArray(r) || r.length !== nTwa || r.some((c) => ![
+			"measured",
+			"blended",
+			"escale"
+		].includes(c)))) return "calibration.confidence invalide";
+	}
+	if (P.HS_BINS != null || P.mixed?.tableHs != null) {
+		if (!increasing(P.HS_BINS, 0, 20)) return "HS_BINS invalides";
+		const th = P.mixed?.tableHs;
+		if (!Array.isArray(th) || th.length !== P.HS_BINS.length) return "mixed.tableHs : pas une table par Hs";
+		for (let h = 0; h < th.length; h++) {
+			const e = tableIssue(th[h], nTws, nTwa, `mixed.tableHs[${h}]`);
+			if (e) return e;
+		}
+	}
+	return null;
+}
+var UUID$1 = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+var iso = (v) => {
+	const t = Date.parse(v || "");
+	return Number.isFinite(t) ? new Date(t).toISOString() : null;
+};
+/**
+* La polaire telle que le moteur la reçoit : le fichier, plus SA version
+* (`polarVersion` — une clé que le fichier n'a pas ; computeAdvice ne lit que
+* la table, la confiance et les cases). source : 'db' (la version active en
+* base), 'bundled' (le fichier embarqué), 'file' (--polar du PC du bord).
+*/
+function withVersion(data, { id = null, label = null, builtAt = null, source = "db", cached = false } = {}) {
+	return {
+		...data,
+		polarVersion: {
+			id: id && UUID$1.test(id) ? id : null,
+			label: label || null,
+			builtAt: iso(builtAt) || iso(data?.builtAt),
+			source,
+			...cached ? { cached: true } : {}
+		}
+	};
+}
+/** Ce que `result.polar` dit de la version (computeAdvice) : { versionId, label, source } — le fichier embarqué si rien n'est dit. */
+function polarVersionBlock(P) {
+	const v = P?.polarVersion;
+	if (!v) return {
+		versionId: null,
+		label: null,
+		source: "bundled"
+	};
+	return {
+		versionId: v.id || null,
+		label: v.label || null,
+		source: v.source || "bundled",
+		...v.cached ? { cached: true } : {}
+	};
+}
+//#endregion
+//#region scripts/routing/lib/pool.mjs
+function createPool(file, workerData, size = Math.max(1, os.availableParallelism() - 1)) {
+	const idle = [];
+	const all = [];
+	const queue = [];
+	const pending = /* @__PURE__ */ new Map();
+	let seq = 0;
+	const pump = () => {
+		while (idle.length && queue.length) {
+			const w = idle.pop();
+			const job = queue.shift();
+			pending.set(job.id, job);
+			w.postMessage({
+				...job.msg,
+				id: job.id
+			});
+		}
+	};
+	for (let i = 0; i < size; i++) {
+		const w = new Worker$1(file, { workerData });
+		w.on("message", ({ id, r, error }) => {
+			const job = pending.get(id);
+			pending.delete(id);
+			idle.push(w);
+			pump();
+			if (error) job.ko(new Error(error));
+			else job.ok(r);
+		});
+		w.on("error", (e) => {
+			for (const job of pending.values()) job.ko(e);
+			pending.clear();
+		});
+		all.push(w);
+		idle.push(w);
+	}
+	return {
+		size,
+		run: (msg) => new Promise((ok, ko) => {
+			queue.push({
+				id: ++seq,
+				msg,
+				ok,
+				ko
+			});
+			pump();
+		}),
+		close: () => Promise.all(all.map((w) => w.terminate()))
+	};
+}
 //#endregion
 //#region scripts/routing/lib/graphRoute.mjs
-var RAD$1 = Math.PI / 180;
+var RAD$2 = Math.PI / 180;
 var FEATURES = [
 	"upwind",
 	"beamSea",
@@ -5079,7 +4674,7 @@ function buildLattice(a, b, { spacingNm = null, widthNm = null, padNm = null, bb
 	const s = spacingNm ?? Math.min(3, Math.max(.5, len / 200));
 	const W = widthNm ?? Math.max(15, .4 * len);
 	const pad = padNm ?? Math.max(5, .1 * len);
-	const k = Math.cos((a.lat + b.lat) / 2 * RAD$1);
+	const k = Math.cos((a.lat + b.lat) / 2 * RAD$2);
 	const bx = (b.lon - a.lon) * 60 * k;
 	const by = (b.lat - a.lat) * 60;
 	const L = Math.hypot(bx, by) || 1;
@@ -5304,8 +4899,8 @@ function optimise(opts) {
 				const limitH = refH * (1 + slow.pct / 100);
 				slowInfo = {
 					pct: slow.pct,
-					refHours: round1(refH),
-					limitH: round1(limitH),
+					refHours: round1$1(refH),
+					limitH: round1$1(limitH),
 					ref: slow.refHours != null ? "rapide" : "fastest"
 				};
 				if (!fits(res, limitH)) {
@@ -5346,7 +4941,7 @@ function optimise(opts) {
 						});
 					}
 				}
-				slowInfo.hours = round1(res.hours);
+				slowInfo.hours = round1$1(res.hours);
 				slowInfo.slowerPct = Math.round((res.hours / refH - 1) * 1e3) / 10;
 			}
 		}
@@ -5359,8 +4954,8 @@ function optimise(opts) {
 			sweep.push(r.ok ? {
 				lambda: Math.round(lambda * 1e3) / 1e3,
 				ok: true,
-				hours: round1(r.hours),
-				motorH: round1(r.motorH),
+				hours: round1$1(r.hours),
+				motorH: round1$1(r.motorH),
 				share: Math.round(share(r) * 100) / 100
 			} : {
 				lambda,
@@ -5438,8 +5033,8 @@ function optimise(opts) {
 			const limitH = refH * (1 + slow.pct / 100);
 			slowInfo = {
 				pct: slow.pct,
-				refHours: round1(refH),
-				limitH: round1(limitH),
+				refHours: round1$1(refH),
+				limitH: round1$1(limitH),
 				ref: slow.refHours != null ? "rapide" : "fastest"
 			};
 			if (!fits(res, limitH)) {
@@ -5488,7 +5083,7 @@ function optimise(opts) {
 					});
 				}
 			}
-			slowInfo.hours = round1(res.hours);
+			slowInfo.hours = round1$1(res.hours);
 			slowInfo.slowerPct = Math.round((res.hours / refH - 1) * 1e3) / 10;
 		}
 		sweep.sort((x, y) => x.lambda - y.lambda);
@@ -5513,7 +5108,7 @@ function optimise(opts) {
 	};
 	return out;
 }
-var round1 = (x) => x == null ? null : Math.round(x * 10) / 10;
+var round1$1 = (x) => x == null ? null : Math.round(x * 10) / 10;
 /** Les passes ε-lexicographiques sur la chaîne des jambes. */
 function lexi(o) {
 	const tol = o.tolerance ?? .05;
@@ -5564,6 +5159,7 @@ function chainSearch(o) {
 		maxWave: L0.maxWave * limitsScale
 	};
 	const P = propulsionOf(L);
+	const nightPolarOn = P.nightPolarPct < 1;
 	const vmax = maxSpeedKn(P, polar);
 	const nc = crit.length;
 	const W = crit.map((c) => {
@@ -5769,6 +5365,7 @@ function chainSearch(o) {
 			const hs0 = wave ? wave(p.lat, p.lon, t) : null;
 			const minTwa = hs0 != null && hs0 >= L.seaWave ? L.minTwaInSea : L.minTwa;
 			const night = needNight ? isNight$1(p.lat, p.lon, t) : false;
+			const nightP = nightPolarOn ? nightAt$1(p.lat, p.lon, t) : false;
 			const nf = needNode && lab.n >= 0 ? nodeFlags(lab.n) : 0;
 			const gustHi = w.gust != null && w.gust > .8 * L0.maxGust;
 			const nearLim = w.tws > .8 * L0.maxTws || gustHi || hs0 != null && hs0 > .8 * L0.maxWave;
@@ -5835,7 +5432,8 @@ function chainSearch(o) {
 					twa,
 					hs: hs0,
 					minTwa,
-					elapsedH: T(t)
+					elapsedH: T(t),
+					night: nightP
 				}, policy);
 				for (const go of opts2) {
 					stats.edges++;
@@ -6051,6 +5649,305 @@ function routeStats(points, { coastIndex = null, stops = [], waitH = 0, freeNm =
 	};
 }
 //#endregion
+//#region scripts/routing/lib/hazards.mjs
+var RAD$1 = Math.PI / 180;
+var HAZARDS = [{
+	id: "orca",
+	kind: "orca",
+	glyph: "🐋",
+	ring: [
+		[-5.2, 36.35],
+		[-5.95, 36.75],
+		[-6.4, 37.05],
+		[-7.4, 37.45],
+		[-8.2, 37.35],
+		[-8.95, 37.25],
+		[-9.35, 36.95],
+		[-8.3, 36.45],
+		[-7, 35.95],
+		[-6.55, 35.2],
+		[-6.05, 35.05],
+		[-5.75, 35.55],
+		[-5.55, 35.8],
+		[-5.2, 35.75],
+		[-5.2, 36.35]
+	],
+	seasonMonths: [
+		4,
+		5,
+		6,
+		7,
+		8,
+		9,
+		10
+	],
+	source: "GTOA · MITECO · Instituto Hidrográfico (tracé à la main)"
+}, {
+	id: "sahara",
+	kind: "offshore",
+	glyph: "⚠",
+	coast: [
+		[-13.05, 27.67],
+		[-13.4, 27.1],
+		[-14, 26.55],
+		[-14.5, 26.1],
+		[-14.9, 25.3],
+		[-15.45, 24.5],
+		[-16, 23.65],
+		[-16.35, 22.75],
+		[-16.7, 22.3],
+		[-17, 21.3],
+		[-17.05, 20.77],
+		[-16.55, 19.4],
+		[-16.05, 18.1],
+		[-16.05, 17],
+		[-16.5, 16.05]
+	],
+	source: "trait de côte approximatif ; retours des propriétaires d'Outremer (B&C)"
+}];
+var signedArea = (ring) => {
+	let s = 0;
+	for (let i = 0; i < ring.length - 1; i++) s += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1];
+	return s / 2;
+};
+/** Un anneau agrandi de `nm` milles (chaque sommet poussé vers l'extérieur, normales moyennées). */
+function growRing(ring, nm) {
+	if (!(nm > 0)) return ring;
+	const open = ring.slice(0, -1);
+	const n = open.length;
+	const lat0 = open.reduce((s, p) => s + p[1], 0) / n;
+	const k = Math.cos(lat0 * RAD$1);
+	const ccw = signedArea(open.map(([x, y]) => [x * k, y]).concat([[open[0][0] * k, open[0][1]]])) > 0;
+	const out = open.map((p, i) => {
+		const a = open[(i - 1 + n) % n];
+		const b = open[(i + 1) % n];
+		const n1 = edgeNormal(a, p, k, ccw);
+		const n2 = edgeNormal(p, b, k, ccw);
+		let nx = n1[0] + n2[0];
+		let ny = n1[1] + n2[1];
+		const l = Math.hypot(nx, ny) || 1;
+		nx /= l;
+		ny /= l;
+		const cos = Math.max(.35, nx * n1[0] + ny * n1[1]);
+		const d = nm / 60 / cos;
+		return [p[0] + nx * d / k, p[1] + ny * d];
+	});
+	return [...out, out[0]];
+}
+function edgeNormal(a, b, k, ccw) {
+	const dx = (b[0] - a[0]) * k;
+	const dy = b[1] - a[1];
+	const l = Math.hypot(dx, dy) || 1;
+	return ccw ? [dy / l, -dx / l] : [-dy / l, dx / l];
+}
+/** La bande de `nm` milles le long d'une côte (la mer à droite), refermée dans les terres. */
+function coastBand(coast, nm) {
+	const n = coast.length;
+	const lat0 = coast.reduce((s, p) => s + p[1], 0) / n;
+	const k = Math.cos(lat0 * RAD$1);
+	const sea = coast.map((p, i) => {
+		const a = coast[Math.max(0, i - 1)];
+		const b = coast[Math.min(n - 1, i + 1)];
+		const dx = (b[0] - a[0]) * k;
+		const dy = b[1] - a[1];
+		const l = Math.hypot(dx, dy) || 1;
+		const rx = dy / l;
+		const ry = -dx / l;
+		return [p[0] + rx * nm / 60 / k, p[1] + ry * nm / 60];
+	});
+	const land = coast.map(([x, y]) => [x + .3, y]).reverse();
+	return [
+		...sea,
+		...land,
+		sea[0]
+	];
+}
+/** Les zones des Réglages : [{ id, kind, glyph, show, avoid, nm, ring, source, seasonMonths? }]. */
+function hazardZones(prefs) {
+	const out = [];
+	for (const h of HAZARDS) {
+		const show = Boolean(prefs[`${h.id}Show`]);
+		const avoid = Boolean(prefs[`${h.id}Avoid`]);
+		const nm = Number(prefs[`${h.id}Nm`]) || 0;
+		if (!show && !avoid) continue;
+		const ring = h.coast ? coastBand(h.coast, Math.max(1, nm)) : growRing(h.ring, nm);
+		out.push({
+			id: h.id,
+			kind: h.kind,
+			glyph: h.glyph,
+			show,
+			avoid,
+			nm,
+			ring,
+			source: h.source,
+			seasonMonths: h.seasonMonths || null
+		});
+	}
+	return out;
+}
+var xy = (p, k) => [p.lon * k * 60, p.lat * 60];
+var orient = (ax, ay, bx, by, cx, cy) => (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+function ptSeg(px, py, x1, y1, x2, y2) {
+	const dx = x2 - x1;
+	const dy = y2 - y1;
+	const L = dx * dx + dy * dy;
+	const t = L ? Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / L)) : 0;
+	const qx = x1 + t * dx;
+	const qy = y1 + t * dy;
+	return {
+		d: Math.hypot(px - qx, py - qy),
+		qx,
+		qy
+	};
+}
+function segsCross(a, b, c, d) {
+	const d1 = orient(a[0], a[1], b[0], b[1], c[0], c[1]);
+	const d2 = orient(a[0], a[1], b[0], b[1], d[0], d[1]);
+	const d3 = orient(c[0], c[1], d[0], d[1], a[0], a[1]);
+	const d4 = orient(c[0], c[1], d[0], d[1], b[0], b[1]);
+	return (d1 <= 0 && d2 >= 0 || d1 >= 0 && d2 <= 0) && (d3 <= 0 && d4 >= 0 || d3 >= 0 && d4 <= 0);
+}
+/** Un point {lat, lon} : distance (milles) au bord d'un anneau, 0 dedans ; et le point du bord le plus proche. */
+function pointToRing(p, ring) {
+	const k = Math.cos(p.lat * RAD$1);
+	const [px, py] = xy(p, k);
+	let best = {
+		d: Infinity,
+		qx: 0,
+		qy: 0
+	};
+	for (let i = 1; i < ring.length; i++) {
+		const r = ptSeg(px, py, ring[i - 1][0] * k * 60, ring[i - 1][1] * 60, ring[i][0] * k * 60, ring[i][1] * 60);
+		if (r.d < best.d) best = r;
+	}
+	const inside = inPolygon(p.lat, p.lon, ring);
+	return {
+		d: inside ? 0 : best.d,
+		inside,
+		q: {
+			lon: best.qx / (k * 60),
+			lat: best.qy / 60
+		}
+	};
+}
+/** Un segment a → b : distance (milles) à l'anneau, 0 s'il le touche ou y entre. */
+function segmentToRing(a, b, ring) {
+	if (inPolygon(a.lat, a.lon, ring) || inPolygon(b.lat, b.lon, ring)) return 0;
+	const k = Math.cos((a.lat + b.lat) / 2 * RAD$1);
+	const A = xy(a, k);
+	const B = xy(b, k);
+	let d = Infinity;
+	for (let i = 1; i < ring.length; i++) {
+		const C = [ring[i - 1][0] * k * 60, ring[i - 1][1] * 60];
+		const D = [ring[i][0] * k * 60, ring[i][1] * 60];
+		if (segsCross(A, B, C, D)) return 0;
+		d = Math.min(d, ptSeg(A[0], A[1], C[0], C[1], D[0], D[1]).d, ptSeg(B[0], B[1], C[0], C[1], D[0], D[1]).d, ptSeg(C[0], C[1], A[0], A[1], B[0], B[1]).d, ptSeg(D[0], D[1], A[0], A[1], B[0], B[1]).d);
+	}
+	return d;
+}
+/**
+* Les zones à éviter POUR CE CALCUL : celles qui sont cochées, sauf si elles
+* contiennent (ou frôlent à moins de `freeNm`) un bout de la route — départ,
+* porte, arrivée : on ne peut pas éviter l'endroit où l'on va. → { rings, lifted: [id] }
+*/
+function avoidRings(zones, stops, { freeNm = 1.5 } = {}) {
+	const rings = [];
+	const lifted = [];
+	for (const z of zones) {
+		if (!z.avoid) continue;
+		if (stops.some((s) => pointToRing(s, z.ring).d < freeNm)) {
+			lifted.push(z.id);
+			continue;
+		}
+		rings.push(z.ring);
+	}
+	return {
+		rings,
+		lifted
+	};
+}
+/**
+* Les dangers LE LONG d'une route [{ t, lat, lon }] (pur) : pour chaque zone
+* affichée ou évitée, à moins de `corridorNm` milles —
+* { id, kind, glyph, inside, closestNm, atMs, side, enterMs, exitMs, insideH, inSeason, avoid, nm, source }.
+* Chaque segment est échantillonné tous les ≈ 0,5 mille pour les heures ; la
+* distance au plus près est celle du SEGMENT (exacte dans le plan local).
+*/
+function hazardsAlong(points, zones, { corridorNm = 30 } = {}) {
+	const out = [];
+	if (!Array.isArray(points) || points.length < 2) return out;
+	for (const z of zones) {
+		let best = {
+			d: Infinity,
+			t: null,
+			side: null
+		};
+		let enter = null;
+		let exit = null;
+		let insideMs = 0;
+		for (let i = 1; i < points.length; i++) {
+			const a = points[i - 1];
+			const b = points[i];
+			const dSeg = segmentToRing(a, b, z.ring);
+			if (dSeg > corridorNm && dSeg > best.d) continue;
+			const n = Math.max(1, Math.min(200, Math.ceil(distNm(a, b) / .5)));
+			for (let s = 0; s <= n; s++) {
+				const f = s / n;
+				const p = {
+					lat: a.lat + (b.lat - a.lat) * f,
+					lon: a.lon + (b.lon - a.lon) * f
+				};
+				const t = a.t + (b.t - a.t) * f;
+				const r = pointToRing(p, z.ring);
+				if (r.inside) {
+					if (enter == null) enter = t;
+					exit = t;
+					if (s > 0) insideMs += (b.t - a.t) / n;
+				}
+				if (r.d < best.d || r.d === 0 && best.d === 0 && best.t == null) {
+					const k = Math.cos(p.lat * RAD$1);
+					const hx = (b.lon - a.lon) * k;
+					const hy = b.lat - a.lat;
+					const vx = (r.q.lon - p.lon) * k;
+					const cr = hx * (r.q.lat - p.lat) - hy * vx;
+					best = {
+						d: r.d,
+						t,
+						side: r.inside ? null : cr > 0 ? "port" : "starboard"
+					};
+				}
+			}
+			if (dSeg === 0 && best.d > 0) best = {
+				...best,
+				d: 0
+			};
+		}
+		if (!(best.d <= corridorNm)) continue;
+		const seasonAt = enter ?? best.t;
+		const inSeason = z.seasonMonths ? z.seasonMonths.includes(new Date(seasonAt).getUTCMonth() + 1) : null;
+		out.push({
+			id: z.id,
+			kind: z.kind,
+			glyph: z.glyph,
+			inside: enter != null || best.d === 0,
+			closestNm: Math.round(best.d * 10) / 10,
+			atMs: best.t != null ? Math.round(best.t) : null,
+			side: best.side,
+			enterMs: enter != null ? Math.round(enter) : null,
+			exitMs: exit != null ? Math.round(exit) : null,
+			insideH: Math.round(insideMs / 36e5 * 10) / 10,
+			inSeason,
+			avoid: z.avoid,
+			show: z.show,
+			nm: z.nm,
+			source: z.source
+		});
+	}
+	return out.sort((x, y) => (x.enterMs ?? x.atMs ?? 0) - (y.enterMs ?? y.atMs ?? 0));
+}
+/** L'anneau d'une zone, arrondi pour l'écran (dessin seulement). */
+var ringForMap = (ring) => ring.map(([lo, la]) => [Math.round(lo * 1e3) / 1e3, Math.round(la * 1e3) / 1e3]);
+//#endregion
 //#region scripts/routing/lib/optimiser.mjs
 /** Les profils de l'optimiseur (Rapide = les isochrones). */
 var ASTAR_PROFILES = [
@@ -6115,7 +6012,7 @@ function windPeak(points) {
 * et l'A* : arrivée (et à quai de jour), vent / rafales / vagues max, heures
 * de moteur → litres et reste, près, nuit, côte au plus près, dangers.
 */
-function summarizeRoute(points, { key, source, model, to, stops, coastIndex, zones, prefs, motorKn, waitH = 0, extra = {} }) {
+function summarizeRoute$1(points, { key, source, model, to, stops, coastIndex, zones, prefs, motorKn, waitH = 0, extra = {} }) {
 	const s = routeStats(points, {
 		coastIndex,
 		stops,
@@ -6299,7 +6196,7 @@ var DEP_ROWS = [
 	"prudent"
 ];
 var r1 = (x) => x == null || !Number.isFinite(x) ? null : Math.round(x * 10) / 10;
-var LEVELS$1 = [
+var LEVELS$2 = [
 	"élevée",
 	"moyenne",
 	"faible"
@@ -6322,7 +6219,7 @@ function firstPassOrder(order) {
 	if (!soft) out.push("fast");
 	return out.join(",");
 }
-var worst$1 = (...ls) => LEVELS$1[Math.max(...ls.map((l) => Math.max(0, LEVELS$1.indexOf(l))))];
+var worst$1 = (...ls) => LEVELS$2[Math.max(...ls.map((l) => Math.max(0, LEVELS$2.indexOf(l))))];
 /** L'ordre « du gros au fin » des colonnes : 0, n−1, le milieu, puis les quarts… (pur). */
 function coarseToFine(n) {
 	if (n <= 0) return [];
@@ -6670,6 +6567,33 @@ function lineAtSea(line, { coastIndex, zones = null, hazards = null }) {
 	}
 	return null;
 }
+/**
+* TSS-1 (ROUTE-035) — le même contrôle, avec OÙ : → null | { kind, at: [lat, lon] } (le milieu du
+* premier segment fautif, au millième) — pour dire la case retirée (`dropped`).
+*/
+function lineAtSeaAt(line, { coastIndex, zones = null, hazards = null }) {
+	const pts = line.map((p) => ({
+		lon: p[0],
+		lat: p[1]
+	}));
+	const mid = (j) => [Math.round((pts[j - 1].lat + pts[j].lat) / 2 * 1e3) / 1e3, Math.round((pts[j - 1].lon + pts[j].lon) / 2 * 1e3) / 1e3];
+	const i = coastIndex ? coastIndex.firstCrossing(pts) : -1;
+	if (i >= 0) return {
+		kind: "land",
+		at: mid(Math.max(1, i))
+	};
+	for (let j = 1; j < pts.length; j++) {
+		if (zones && zones.blocks(pts[j - 1], pts[j])) return {
+			kind: "tss",
+			at: mid(j)
+		};
+		if (hazards && hazards.blocks(pts[j - 1], pts[j])) return {
+			kind: "hazard",
+			at: mid(j)
+		};
+	}
+	return null;
+}
 /** L'accord des modèles LE LONG d'une route (les points ●/◐/○ de D11) → { level, ok, partial, disagree } (pur). */
 function agreeLevel(counts) {
 	const known = counts.accord + counts.partiel + counts["désaccord"];
@@ -6758,6 +6682,7 @@ async function bestDeparture(ctx, { windowH = 48, stepH = 3, budgetMs = 24e4, on
 	const cells = Object.fromEntries(rows.map((r) => [r, deps.map(() => null)]));
 	const zonesX = exactZones(ctx.forbidden);
 	const hazX = ctx.avoid?.length ? exactZones(ctx.avoid) : null;
+	const dropped = [];
 	const crew = crewOf(ctx.limits);
 	const colOrder = coarseToFine(deps.length);
 	const isoJobs = [];
@@ -6906,12 +6831,26 @@ async function bestDeparture(ctx, { windowH = 48, stepH = 3, budgetMs = 24e4, on
 			hazards: hazX
 		});
 		if (bad) {
+			const at = lineAtSeaAt(line, {
+				coastIndex: ctx.coastIndex,
+				zones: zonesX,
+				hazards: hazX
+			});
 			cells[j.row][j.ci] = {
 				ok: false,
 				dep: j.dep,
 				reason: "guard",
 				guard: bad
 			};
+			dropped.push({
+				line: "dep",
+				model: ctx.astarModel,
+				row: j.row,
+				ci: j.ci,
+				dep: j.dep,
+				kind: bad,
+				...at ? { at: at.at } : {}
+			});
 			continue;
 		}
 		const st = cellStats(r.points, {
@@ -7014,7 +6953,18 @@ async function bestDeparture(ctx, { windowH = 48, stepH = 3, budgetMs = 24e4, on
 			});
 		}
 		for (const ci of starDeps) {
-			const mine = ci === 0 && ctx.reuse?.models ? ctx.reuse.models : Object.fromEntries(jobs.filter((j) => j.ci === ci && j.out).map((j) => [j.m, j.out]));
+			const mine0 = ci === 0 && ctx.reuse?.models ? ctx.reuse.models : Object.fromEntries(jobs.filter((j) => j.ci === ci && j.out).map((j) => [j.m, j.out]));
+			const mine = Object.fromEntries(Object.entries(mine0).filter(([m, x]) => {
+				const f = x?.ok && ctx.guard ? ctx.guard.fault(x.points) : null;
+				if (f) dropped.push({
+					line: "spread",
+					model: m,
+					ci: Number(ci),
+					dep: deps[ci],
+					...f
+				});
+				return !f;
+			}));
 			const skipped = jobs.filter((j) => j.ci === ci && j.skip);
 			if (skipped.length) spreadWhy[ci] = skipped.some((j) => j.skip === "cancelled") ? "cancelled" : "time";
 			if (!Object.keys(mine).length) continue;
@@ -7109,7 +7059,8 @@ async function bestDeparture(ctx, { windowH = 48, stepH = 3, budgetMs = 24e4, on
 		budgetS: Math.round(budgetMs / 1e3),
 		timedOut,
 		cancelled,
-		...rows.length < allRows.length ? { rowsOf: allRows } : {}
+		...rows.length < allRows.length ? { rowsOf: allRows } : {},
+		...dropped.length ? { dropped } : {}
 	};
 }
 /**
@@ -7214,91 +7165,1137 @@ function departureLines(block) {
 	});
 	return out;
 }
-var MAX_BINS = 40;
-var isNum = (x) => typeof x === "number" && Number.isFinite(x);
-var increasing = (a, lo, hi) => Array.isArray(a) && a.length >= 2 && a.length <= MAX_BINS && a.every((x, i) => isNum(x) && x >= lo && x <= hi && (i === 0 || x > a[i - 1]));
-/** Une table [tws][twa] de la bonne taille, chaque vitesse dans ]0, 30[ (pas de NaN, pas de null). → null | raison */
-function tableIssue(t, nTws, nTwa, name) {
-	if (!Array.isArray(t) || t.length !== nTws) return `${name} : ${Array.isArray(t) ? t.length : "pas"} lignes au lieu de ${nTws}`;
-	for (let i = 0; i < nTws; i++) {
-		const row = t[i];
-		if (!Array.isArray(row) || row.length !== nTwa) return `${name}[${i}] : ${Array.isArray(row) ? row.length : "pas de"} colonnes au lieu de ${nTwa}`;
-		for (let j = 0; j < nTwa; j++) if (!isNum(row[j]) || !(row[j] > 0 && row[j] < 30)) return `${name}[${i}][${j}] = ${row[j]} hors de ]0, 30[`;
-	}
-	return null;
-}
-/**
-* Ce qui ne va pas dans une polaire (la forme du fichier du routeur), ou null.
-* Vérifie : TWS_BINS / TWA_BINS croissants et plausibles ; `mixed.table` de
-* leur taille, chaque vitesse un nombre dans ]0, 30[ ; si présentes, la
-* confiance par case (même taille, measured | blended | escale) et l'axe des
-* vagues du lot 3 (HS_BINS croissants, `mixed.tableHs[hs][tws][twa]` de même).
-* Les autres clés (calibration, learned, bySail, loch…) ne sont pas lues par
-* le moteur pour router : tolérées telles quelles.
-*/
-function polarShapeIssue(P) {
-	if (!P || typeof P !== "object" || Array.isArray(P)) return "pas un objet";
-	if (!increasing(P.TWS_BINS, 0, 80)) return "TWS_BINS invalides";
-	if (!increasing(P.TWA_BINS, 0, 180)) return "TWA_BINS invalides";
-	const nTws = P.TWS_BINS.length;
-	const nTwa = P.TWA_BINS.length;
-	const t = tableIssue(P.mixed?.table, nTws, nTwa, "mixed.table");
-	if (t) return t;
-	const conf = P.calibration?.confidence;
-	if (conf != null) {
-		if (!Array.isArray(conf) || conf.length !== nTws || conf.some((r) => !Array.isArray(r) || r.length !== nTwa || r.some((c) => ![
-			"measured",
-			"blended",
-			"escale"
-		].includes(c)))) return "calibration.confidence invalide";
-	}
-	if (P.HS_BINS != null || P.mixed?.tableHs != null) {
-		if (!increasing(P.HS_BINS, 0, 20)) return "HS_BINS invalides";
-		const th = P.mixed?.tableHs;
-		if (!Array.isArray(th) || th.length !== P.HS_BINS.length) return "mixed.tableHs : pas une table par Hs";
-		for (let h = 0; h < th.length; h++) {
-			const e = tableIssue(th[h], nTws, nTwa, `mixed.tableHs[${h}]`);
-			if (e) return e;
-		}
-	}
-	return null;
-}
-var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-var iso = (v) => {
-	const t = Date.parse(v || "");
-	return Number.isFinite(t) ? new Date(t).toISOString() : null;
+/** Ce qu'un calcul enchaîné peut AJOUTER à sa base ; le reste est repris tel quel. */
+var REUSE_ADDS = [
+	"bestDeparture",
+	"departures",
+	"polar",
+	"crew",
+	"nightPolar",
+	"ensembles"
+];
+/** Les options qui explorent d'AUTRES départs : l'heure de la demande y est le début de la fenêtre. */
+var DEPART_EXPLORERS = ["bestDeparture", "departures"];
+/** Le bloc du résultat de chaque option. */
+var OPTION_BLOCK = {
+	polar: "sensitivity",
+	crew: "crewSensitivity",
+	nightPolar: "nightSensitivity",
+	ensembles: "ensemble",
+	bestDeparture: "bestDeparture",
+	departures: "departures"
 };
+/** Les raisons d'un calcul complet (codes, traduits dans l'app : routageReuse.why.*). D39 : + `weather-horizon`. */
+var REUSE_WHY = [
+	"base-missing",
+	"base-forbidden",
+	"base-not-done",
+	"base-result",
+	"base-local",
+	"from",
+	"to",
+	"depart",
+	"limits",
+	"weather-source",
+	"polar",
+	"optimiser",
+	"models",
+	"weather-gone",
+	"weather-horizon"
+];
+/** D39 (E3) — les essais (`request.variant.kind`) : 🌊 🌬 ⛽ ☾ ⛵ 😴 🌙 et un autre départ. */
+var VARIANT_KINDS = [
+	"wave",
+	"wind",
+	"motor",
+	"night",
+	"polar",
+	"crew",
+	"nightPolar",
+	"depart"
+];
+/** D39 (E2) — ce qu'une case d'une AUTRE ligne de la grille change en plus de l'heure : l'objectif de sa ligne. */
+var CELL_KEYS = ["profile", "order"];
 /**
-* La polaire telle que le moteur la reçoit : le fichier, plus SA version
-* (`polarVersion` — une clé que le fichier n'a pas ; computeAdvice ne lit que
-* la table, la confiance et les cases). source : 'db' (la version active en
-* base), 'bundled' (le fichier embarqué), 'file' (--polar du PC du bord).
+* D39 — la prévision de la base couvre-t-elle CE départ et le passage ? La règle de la fenêtre des départs
+* (departures.mjs departureWindow, D22) : du début de la grille jusqu'à sa fin moins 1,15 × le passage − 6 h —
+* une case de la grille passe toujours. (src/lib/routageReuse.js en a la copie, vérifiée égale.)
 */
-function withVersion(data, { id = null, label = null, builtAt = null, source = "db", cached = false } = {}) {
+var COVER = {
+	factor: 1.15,
+	extraH: 6
+};
+/** Les champs du résultat de la base qui ne passent PAS dans le calcul enchaîné (propres à SON calcul). */
+var DROP = [
+	"ms",
+	"service",
+	"computedOn",
+	"localWeather",
+	"deviceCaps",
+	"reuse",
+	"basedOn",
+	"wxGrids"
+];
+var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+var LOCAL = /^local-[a-z0-9-]{3,60}$/i;
+var num = (x) => x == null || x === "" ? NaN : Number(x);
+/** La demande veut-elle partir d'une base ? → { baseRunId, weather: 'base' } | null (un identifiant douteux : non). */
+function reuseAsk(request) {
+	const r = request?.reuse;
+	if (!r || typeof r !== "object") return null;
+	const id = String(r.baseRunId || "");
+	if (UUID.test(id)) return {
+		baseRunId: id.toLowerCase(),
+		weather: "base"
+	};
+	if (LOCAL.test(id)) return {
+		baseRunId: id,
+		weather: "base"
+	};
+	return null;
+}
+/**
+* D39 (E3) — l'essai d'une demande : `request.variant = { kind, key, value, of }` validé (un essai douteux : null).
+* `key` : la clé changée (« maxWave », « efficiency », « crew:tired »…) ; `value` : un nombre, un booléen, un mot court
+* ou null ; `of` : le maillon parent (uuid, ou un calcul de l'appareil `local-…`).
+*/
+function variantAsk(request) {
+	const v = request?.variant;
+	if (!v || typeof v !== "object" || !VARIANT_KINDS.includes(v.kind)) return null;
+	const key = typeof v.key === "string" && /^[A-Za-z][\w.:-]{0,39}$/.test(v.key) ? v.key : null;
+	const value = typeof v.value === "number" ? Number.isFinite(v.value) ? v.value : null : typeof v.value === "boolean" ? v.value : typeof v.value === "string" && v.value.length <= 40 ? v.value : null;
+	const of0 = String(v.of || "");
+	const of = UUID.test(of0) ? of0.toLowerCase() : LOCAL.test(of0) ? of0 : null;
 	return {
-		...data,
-		polarVersion: {
-			id: id && UUID.test(id) ? id : null,
-			label: label || null,
-			builtAt: iso(builtAt) || iso(data?.builtAt),
-			source,
-			...cached ? { cached: true } : {}
+		kind: v.kind,
+		key,
+		value,
+		of
+	};
+}
+/** D39 — `weather` (E2 « calculer ce départ », E3 un essai : la météo de la base, tout refait) | `result` (D37). */
+function reuseMode(request) {
+	const via = request?.via;
+	if (via === "cell") return "weather";
+	if (via === "variant" && variantAsk(request)) return "weather";
+	return "result";
+}
+/** D39 — la prévision de la base couvre-t-elle `departMs` + le passage ? → { ok: true } | { ok: false, side: 'start' | 'end' | 'unknown', lastMs? } (pur). */
+function weatherCovers({ departMs, fromMs, toMs, passageH = null }) {
+	if (![
+		departMs,
+		fromMs,
+		toMs
+	].every(Number.isFinite)) return {
+		ok: false,
+		side: "unknown"
+	};
+	if (departMs < fromMs) return {
+		ok: false,
+		side: "start"
+	};
+	const lastMs = toMs - (Number.isFinite(passageH) && passageH > 0 ? passageH * COVER.factor + COVER.extraH : 0) * 36e5;
+	if (departMs > lastMs) return {
+		ok: false,
+		side: "end",
+		lastMs
+	};
+	return {
+		ok: true,
+		lastMs
+	};
+}
+/** D39 — l'étendue d'une grille (sa première et sa dernière heure). → { fromMs, toMs } | null */
+function gridSpan(grid) {
+	const t = grid?.times;
+	const n = t && typeof t.length === "number" ? t.length : 0;
+	return n && Number.isFinite(t[0]) && Number.isFinite(t[n - 1]) ? {
+		fromMs: Number(t[0]),
+		toMs: Number(t[n - 1])
+	} : null;
+}
+/** Un JSON STABLE (clés triées, `undefined` omis) : deux réglages égaux s'écrivent pareil. */
+function stableJson(x) {
+	if (x === void 0) return "null";
+	if (x === null || typeof x !== "object") return JSON.stringify(x);
+	if (Array.isArray(x)) return `[${x.map(stableJson).join(",")}]`;
+	return `{${Object.keys(x).filter((k) => x[k] !== void 0).sort().map((k) => `${JSON.stringify(k)}:${stableJson(x[k])}`).join(",")}}`;
+}
+/** Les clés dont la valeur diffère (le « ? » de l'écran : ce qui a changé). */
+function diffKeys(a = {}, b = {}) {
+	return [...new Set([...Object.keys(a || {}), ...Object.keys(b || {})])].filter((k) => stableJson(a?.[k]) !== stableJson(b?.[k])).sort();
+}
+/**
+* Les LIMITES EFFECTIVES d'une demande — ce que computeAdvice lit (les défauts du
+* moteur, puis la demande ; les réglages de l'équipage relus par prefsOf, D24).
+* Le service a déjà fusionné les valeurs des Réglages (core.mjs). → { limits, prefs0 }
+*/
+function effectiveLimits(reqLimits) {
+	const crewKeys = Object.keys(CREW_DEFAULTS);
+	const prefs0 = prefsOf({
+		...DEFAULT_LIMITS,
+		...reqLimits || {}
+	});
+	const limits = {
+		...DEFAULT_LIMITS,
+		...Object.fromEntries(crewKeys.map((k) => [k, prefs0[k]])),
+		...reqLimits || {}
+	};
+	for (const k of crewKeys) limits[k] = prefs0[k];
+	if (reqLimits?.nightPolarPct != null) limits.nightPolarPct = prefs0.nightPolarPct;
+	return {
+		limits,
+		prefs0
+	};
+}
+/** Le point DEMANDÉ d'un bout de la base (avant d'être ramené en mer), son nom et sa sorte. */
+function basePlace(p) {
+	const a = p?.asked && Number.isFinite(num(p.asked.lat)) ? p.asked : p;
+	return {
+		lat: num(a?.lat),
+		lon: num(a?.lon),
+		name: p?.name || null,
+		kind: p?.kind || "point"
+	};
+}
+var samePoint = (a, b, tol = 1e-6) => !!a && !!b && Math.abs(num(a.lat) - num(b.lat)) <= tol && Math.abs(num(a.lon) - num(b.lon)) <= tol;
+/** Le même bout ? La demande en coordonnées = le point demandé de la base ; un nom (« bateau », « Las Palmas ») = le même nom dans la demande de la base. */
+function sameEnd(asked, baseEnd, baseAsked, dflt = null) {
+	const v = asked ?? dflt;
+	if (v && typeof v === "object" && Number.isFinite(num(v.lat))) return samePoint(v, basePlace(baseEnd));
+	const bv = baseAsked ?? dflt;
+	if (bv && typeof bv === "object") return false;
+	return typeof v === "string" && v === bv;
+}
+/** Les options demandées (vraies), dans l'ordre de REUSE_ADDS. */
+var askedOptions = (o) => REUSE_ADDS.filter((k) => o?.[k]);
+var sameRows = (a, b) => stableJson(Array.isArray(a) && a.length ? [...a].sort() : null) === stableJson(Array.isArray(b) && b.length ? [...b].sort() : null);
+/**
+* La base a-t-elle DÉJÀ cette option (le même calcul) ? Son bloc est là, sans
+* erreur ; pour la grille des départs : la même fenêtre (début, durée) et les mêmes lignes.
+*/
+function baseHas(base, k, request) {
+	if (!base?.options?.[k] || base[OPTION_BLOCK[k]] == null || base.optionErrors?.[k]) return false;
+	const start = Number.isFinite(request?.departMs) ? request.departMs : base.departMs;
+	if (k === "bestDeparture") {
+		const want = request?.options?.bestDeparture || {};
+		const bd = base.bestDeparture;
+		const asked = Math.max(0, Math.min(216, Number(want.windowH) || 48));
+		return bd.deps?.[0] === start && Number(bd.askedH) === asked && sameRows(want.rows, bd.rowsOf ? bd.rows : null);
+	}
+	if (k === "departures") return Array.isArray(base.departures) && base.departures[0]?.dep === start;
+	return true;
+}
+/** La même source de météo (D26) : en direct, précédente, ou fictive avec la même graine et le même scénario. */
+function sameWeatherSource(ws, baseWeather) {
+	const n = normalizeWeatherSource(ws);
+	const src = baseWeather?.source || "live";
+	if (n.source !== src) return false;
+	return src !== "dummy" || n.seed === baseWeather.seed && n.scenario === baseWeather.scenario;
+}
+/** La même polaire (D33) : la même version (id) construite au même moment. */
+function samePolar(P, basePolar) {
+	const v = polarVersionBlock(P);
+	const builtAt = P?.polarVersion?.builtAt || P?.builtAt || null;
+	return (v.versionId || null) === (basePolar?.versionId || null) && String(builtAt || "") === String(basePolar?.builtAt || "");
+}
+/**
+* PEUT-ON PARTIR DU RÉSULTAT DE LA BASE ? (pur — le moteur le relit lui-même, il ne croit pas l'app)
+*   request : la demande (le service a fusionné les Réglages et retiré ce qui n'est pas permis) ;
+*   base    : le résultat de la base ; limits : les limites effectives de la demande ;
+*   models  : les modèles que CET endroit lirait ; polar : la polaire de ce calcul.
+* → { ok: true, add: [k], kept: [k] } | { ok: false, why, detail? }
+*/
+function reuseCheck({ request, base, limits, models, polar }) {
+	const b = base;
+	if (!b || b.v !== 1 || b.ok !== true || !b.reference || !Number.isFinite(b.departMs)) return {
+		ok: false,
+		why: "base-result"
+	};
+	const o = request?.options || {};
+	if (!sameEnd(request?.from, b.from, b.request?.from, "bateau")) return {
+		ok: false,
+		why: "from"
+	};
+	if (!sameEnd(request?.to, b.to, b.request?.to)) return {
+		ok: false,
+		why: "to"
+	};
+	if (reuseMode(request) === "weather") {
+		const changed = diffKeys(limits, b.limits);
+		if (request.via === "cell" && changed.some((k) => !CELL_KEYS.includes(k))) return {
+			ok: false,
+			why: "limits",
+			detail: changed.filter((k) => !CELL_KEYS.includes(k)).slice(0, 8)
+		};
+		if (!sameWeatherSource(request?.weatherSource, b.weather)) return {
+			ok: false,
+			why: "weather-source"
+		};
+		if (!samePolar(polar, b.polar)) return {
+			ok: false,
+			why: "polar"
+		};
+		const list = Array.isArray(models) ? models : [];
+		if (!(b.rowModels || []).length || !(b.rowModels || []).every((m) => list.includes(m))) return {
+			ok: false,
+			why: "models"
+		};
+		const d = Number.isFinite(request?.departMs) ? request.departMs : null;
+		return {
+			ok: true,
+			mode: "weather",
+			via: request.via,
+			add: [],
+			kept: [],
+			changed: [...d !== b.departMs ? ["departMs"] : [], ...changed].slice(0, 12)
+		};
+	}
+	const want = askedOptions(o);
+	const add = want.filter((k) => !baseHas(b, k, request));
+	const kept = want.filter((k) => !add.includes(k));
+	if (!add.some((k) => DEPART_EXPLORERS.includes(k))) {
+		if ((Number.isFinite(request?.departMs) ? request.departMs : null) !== b.departMs) return {
+			ok: false,
+			why: "depart"
+		};
+	}
+	if (stableJson(limits) !== stableJson(b.limits)) return {
+		ok: false,
+		why: "limits",
+		detail: diffKeys(limits, b.limits).slice(0, 8)
+	};
+	if (!sameWeatherSource(request?.weatherSource, b.weather)) return {
+		ok: false,
+		why: "weather-source"
+	};
+	if (!samePolar(polar, b.polar)) return {
+		ok: false,
+		why: "polar"
+	};
+	if (o.optimiser === false !== !b.profiles) return {
+		ok: false,
+		why: "optimiser"
+	};
+	const list = Array.isArray(models) ? models : [];
+	if (!(b.rowModels || []).length || !(b.rowModels || []).every((m) => list.includes(m))) return {
+		ok: false,
+		why: "models"
+	};
+	return {
+		ok: true,
+		add,
+		kept
+	};
+}
+/**
+* D39 — la SOURCE de la météo d'une base, telle qu'elle l'a dite (D26 : la graine d'une 🧪 fictive, les âges d'une
+* 🗄 précédente À SON calcul, ce qui manquait) : un calcul refait sur ses grilles dit la même chose qu'elle. (Pur.)
+*/
+function baseSourceInfo(w) {
+	const src = w?.source === "dummy" || w?.source === "previous" ? w.source : "live";
+	if (src === "dummy") return {
+		source: "dummy",
+		seed: w.seed,
+		scenario: w.scenario,
+		...w.dummyV != null ? { dummyV: w.dummyV } : {}
+	};
+	if (src === "previous") return {
+		source: "previous",
+		...w.previous ? { previous: w.previous } : {},
+		...w.missing ? { missing: w.missing } : {}
+	};
+	return { source: "live" };
+}
+/** L'heure de chaque grille que la base a lue. → { models: { m: iso | null }, waves: iso | null, oldest, newest } */
+function baseFetchedAt(b) {
+	const models = Object.fromEntries((b?.rowModels || Object.keys(b?.forecast?.models || {})).map((m) => [m, b?.forecast?.models?.[m]?.fetchedAt || b?.weather?.models?.[m]?.fetchedAt || null]));
+	const waves = b?.weather?.waves ? b.weather.waves.fetchedAt || null : null;
+	const all = [...Object.values(models), waves].map((x) => Date.parse(x || "")).filter(Number.isFinite).sort((x, y) => x - y);
+	return {
+		models,
+		waves,
+		oldest: all.length ? new Date(all[0]).toISOString() : null,
+		newest: all.length ? new Date(all.at(-1)).toISOString() : null
+	};
+}
+var sameAt = (a, b) => Number.isFinite(Date.parse(a || "")) && Date.parse(a || "") === Date.parse(b || "");
+/**
+* LA MÉTÉO DE LA BASE, À L'IDENTIQUE (aucun téléchargement) :
+*  · 🧪 fictive : refaite (la même graine, le même scénario, le même jour — celui de
+*    sa prévision —, la même emprise, la même terre), vérifiée sur ses heures ;
+*  · 🌐 en direct / 🗄 précédente : chaque grille retrouvée par son `fetchedAt`
+*    (`io.exactGrid`) — quel que soit son âge.
+* `io` = { exactGrid(cacheDir, kind, bbox, step, days, fetchedAt) → grille | null,
+*          ensembleNear?(model, bbox, { step, days, cacheDir, atMs, maxDiffH }) → membres | null }
+* → { ok: true, wx } (la forme de loadWeather, + `reuse: true`) | { ok: false, missing: [m | 'waves'] }
+*/
+async function loadBaseWeather(b, { bbox, cacheDir = null, isLand = null, io = {} } = {}) {
+	const ws = normalizeWeatherSource(b?.weather?.source === "dummy" ? {
+		source: "dummy",
+		seed: b.weather.seed,
+		scenario: b.weather.scenario
+	} : b?.weather?.source);
+	const models = (b?.rowModels || []).slice();
+	const at = baseFetchedAt(b);
+	const grids = {};
+	let waves = null;
+	const missing = [];
+	let ensemble = null;
+	if (ws.source === "dummy") {
+		if (b.weather?.dummyV != null && b.weather.dummyV !== 1) return {
+			ok: false,
+			missing: [...models, "dummy-version"]
+		};
+		const t0 = Date.parse(at.oldest || b.computedAt || "");
+		if (!Number.isFinite(t0)) return {
+			ok: false,
+			missing: models
+		};
+		const D = dummyWeather({
+			seed: ws.seed,
+			scenario: ws.scenario,
+			bbox,
+			nowMs: t0,
+			step: 1,
+			days: 10,
+			isLand,
+			models
+		});
+		for (const m of models) if (D.grids[m] && sameAt(D.grids[m].fetchedAt, at.models[m])) grids[m] = D.grids[m];
+		else missing.push(m);
+		if (b.weather?.waves) if (sameAt(D.waves?.fetchedAt, at.waves)) waves = D.waves;
+		else missing.push("waves");
+		ensemble = async (model, bb, o = {}) => dummyEnsemble(model, {
+			seed: ws.seed,
+			scenario: ws.scenario,
+			bbox: bb,
+			nowMs: t0,
+			step: o.step ?? 2,
+			days: o.days ?? 10,
+			isLand
+		});
+	} else {
+		for (const m of models) {
+			const g = at.models[m] && typeof io.exactGrid === "function" ? await io.exactGrid(cacheDir, `wind-${m}`, bbox, 1, 10, at.models[m]) : null;
+			if (g) grids[m] = g.model ? g : {
+				...g,
+				model: m
+			};
+			else missing.push(m);
+		}
+		if (b?.weather?.waves) {
+			waves = at.waves && typeof io.exactGrid === "function" ? await io.exactGrid(cacheDir, "waves", bbox, 1, 10, at.waves) : null;
+			if (!waves) missing.push("waves");
+		}
+		if (typeof io.ensembleNear === "function") {
+			const atMs = Date.parse(at.oldest || "");
+			ensemble = async (model, bb, o = {}) => io.ensembleNear(model, bb, {
+				step: o.step ?? 2,
+				days: o.days ?? 10,
+				cacheDir,
+				atMs,
+				maxDiffH: ws.source === "previous" ? Infinity : 6
+			});
+		}
+	}
+	if (missing.length) return {
+		ok: false,
+		missing
+	};
+	return {
+		ok: true,
+		wx: {
+			ws,
+			grids,
+			waves,
+			models,
+			missing: {
+				models: [],
+				waves: false
+			},
+			offline: true,
+			ensemble,
+			reuse: true
 		}
 	};
 }
-/** Ce que `result.polar` dit de la version (computeAdvice) : { versionId, label, source } — le fichier embarqué si rien n'est dit. */
-function polarVersionBlock(P) {
-	const v = P?.polarVersion;
-	if (!v) return {
-		versionId: null,
-		label: null,
-		source: "bundled"
+/**
+* D38 (ROUTE-035) × D37 — les lignes que la BASE avait retirées (`result.dropped`) restent retirées et
+* dites dans le calcul enchaîné (la base recopiée ne les a plus : rien ne les ressuscite) — sauf celles
+* d'une option que l'enchaîné REFAIT (une autre fenêtre de ★…) : son nouveau bloc dit les siennes.
+* `replaced` : les options refaites avec succès. → la liste gardée (pure).
+*/
+var DROPPED_OPTION = {
+	ensemble: "ensembles",
+	polar: "polar",
+	crew: "crew",
+	nightPolar: "nightPolar",
+	departures: "departures",
+	dep: "bestDeparture",
+	spread: "bestDeparture"
+};
+function keptDropped(list, replaced = []) {
+	return (Array.isArray(list) ? list : []).filter((d) => !replaced.includes(DROPPED_OPTION[d?.line]));
+}
+/** Le résultat de la base, recopié pour le calcul enchaîné (sans ce qui était propre à SON calcul). */
+function copyBase(b) {
+	const r = JSON.parse(JSON.stringify(b));
+	for (const k of DROP) delete r[k];
+	return r;
+}
+/**
+* `result.reuse` — ce que l'écran dit (« ♻ même météo que le calcul de base · il y a 4 h »).
+* ok : { v, ok: true, baseRunId, weather: 'base', source, fetchedAt (la plus vieille grille), ageH
+*        (son âge À CE CALCUL), baseComputedAt, baseAgeH, added: [k], kept: [k], ensembles? }
+* sinon : { v, ok: false, baseRunId, why, detail?, missing?, fallback? }
+*/
+function reuseBlock({ ask, plan, base = null, nowMs = Date.now(), ensembles = null, span = null }) {
+	if (!ask) return null;
+	if (!plan?.ok) return {
+		v: 1,
+		ok: false,
+		baseRunId: ask.baseRunId,
+		why: REUSE_WHY.includes(plan?.why) ? plan.why : "base-missing",
+		...plan?.mode === "weather" ? { mode: "weather" } : {},
+		...plan?.detail?.length ? { detail: plan.detail } : {},
+		...plan?.missing?.length ? { missing: plan.missing } : {},
+		...plan?.fallback ? { fallback: plan.fallback } : {},
+		...plan?.span ? { span: plan.span } : {}
+	};
+	const at = baseFetchedAt(base);
+	const f = Date.parse(at.oldest || "");
+	const c = Date.parse(base?.computedAt || "");
+	const h = (x) => Number.isFinite(x) ? Math.max(0, Math.round((nowMs - x) / 36e5 * 10) / 10) : null;
+	return {
+		v: 1,
+		ok: true,
+		baseRunId: ask.baseRunId,
+		weather: "base",
+		source: base?.weather?.source || "live",
+		fetchedAt: at.oldest,
+		ageH: h(f),
+		baseComputedAt: base?.computedAt || null,
+		baseAgeH: h(c),
+		added: plan.add.slice(),
+		kept: plan.kept.slice(),
+		...ensembles && Object.keys(ensembles).length ? { ensembles } : {},
+		...plan.mode === "weather" ? {
+			mode: "weather",
+			via: plan.via,
+			changed: (plan.changed || []).slice(),
+			...span ? { span } : {}
+		} : {}
+	};
+}
+/**
+* D39 — 🎲 SUR LA MÉTÉO D'UNE BASE (D37, et le départ d'un maillon — E4) : l'ensemble du MÊME cycle (le cache, les
+* rangés de l'appareil, le dossier du PC du bord : `wx.ensemble`, ± 6 h de la prévision de la base), sinon — en
+* direct seulement — téléchargé maintenant et DIT (`reuse.ensembles[m].from = 'download'`) ; 🗄 précédente : jamais
+* de réseau. → { fetch(model, bbox, o) → membres | null, ens: { [m]: { from, fetchedAt?, diffH? } } }
+*/
+function baseEnsembleFetcher(wx, { fetchEnsembleGrids = null, cacheDir = null, log = () => {} } = {}) {
+	const ens = {};
+	const fetch = async (m, bb, o) => {
+		const near = wx?.ensemble ? await wx.ensemble(m, bb, o) : null;
+		if (near?.length) {
+			ens[m] = {
+				from: wx.ws?.source === "dummy" ? "dummy" : "cache",
+				...near.near ? {
+					fetchedAt: near.near.fetchedAt,
+					diffH: near.near.diffH
+				} : {}
+			};
+			return near;
+		}
+		if (wx?.ws?.source !== "live" || typeof fetchEnsembleGrids !== "function") {
+			ens[m] = { from: "none" };
+			return null;
+		}
+		const got = await fetchEnsembleGrids(m, bb, {
+			...o,
+			cacheDir,
+			log
+		});
+		ens[m] = { from: got?.download?.cached ? "cache" : "download" };
+		return got;
 	};
 	return {
-		versionId: v.id || null,
-		label: v.label || null,
-		source: v.source || "bundled",
-		...v.cached ? { cached: true } : {}
+		fetch,
+		ens
+	};
+}
+//#endregion
+//#region scripts/routing/lib/alongRoute.mjs
+/** La position et le cap à l'instant t sur une route horodatée. */
+function positionAt(timed, t) {
+	for (let i = 0; i < timed.length - 1; i++) {
+		const a = timed[i];
+		const b = timed[i + 1];
+		if (t >= a.t && t <= b.t) {
+			const f = b.t === a.t ? 0 : (t - a.t) / (b.t - a.t);
+			const crs = bearing(a, b);
+			return {
+				...destination(a, crs, distNm(a, b) * f),
+				course: crs
+			};
+		}
+	}
+	return null;
+}
+/** L'écart d'angles (°) : le plus grand écart à la moyenne circulaire. */
+function angularSpread(degs) {
+	if (degs.length < 2) return 0;
+	const x = degs.reduce((s, d) => s + Math.cos(d * Math.PI / 180), 0);
+	const y = degs.reduce((s, d) => s + Math.sin(d * Math.PI / 180), 0);
+	const mean = Math.atan2(y, x) * 180 / Math.PI;
+	return Math.max(...degs.map((d) => Math.abs((d - mean + 540) % 360 - 180)));
+}
+/**
+* L'accord des modèles en un point : le vent faible varie beaucoup en
+* direction sans conséquence, donc sous 8 nds on ne juge que la force.
+* → 'accord' | 'partiel' | 'désaccord'
+*/
+function agreement(winds) {
+	const ws = winds.filter(Boolean);
+	if (ws.length < 2) return {
+		level: "inconnu",
+		twsSpread: 0,
+		twdSpread: 0
+	};
+	const tws = ws.map((w) => w.tws);
+	const twsSpread = Math.max(...tws) - Math.min(...tws);
+	const twdSpread = Math.min(...tws) >= 8 ? angularSpread(ws.map((w) => w.twd)) : 0;
+	return {
+		level: twsSpread > 10 || twdSpread > 60 ? "désaccord" : twsSpread > 5 || twdSpread > 30 ? "partiel" : "accord",
+		twsSpread,
+		twdSpread
+	};
+}
+/** Ce qui sort des limites de B&C en un point (une liste de courtes phrases). */
+function flags({ winds, wave, course }, limits) {
+	const f = [];
+	const ws = winds.filter(Boolean);
+	const maxTws = Math.max(0, ...ws.map((w) => w.tws));
+	const gusts = ws.map((w) => w.gust).filter((g) => g != null);
+	if (maxTws > limits.maxTws) f.push(`vent ${maxTws.toFixed(0)} nds`);
+	if (gusts.length && Math.max(...gusts) > limits.maxGust) f.push(`rafales ${Math.max(...gusts).toFixed(0)} nds`);
+	if (wave != null && wave > limits.maxWave) f.push(`vagues ${wave.toFixed(1)} m`);
+	const tight = ws.filter((w) => w.tws >= 8 && twaAbs(course, w.twd) < (wave != null && wave >= limits.seaWave ? limits.minTwaInSea : limits.minTwa));
+	if (tight.length && tight.length >= ws.length / 2) f.push("près serré");
+	return f;
+}
+//#endregion
+//#region scripts/routing/lib/extras.mjs
+var ROUTE_WORKER = new URL("./routeWorker.mjs", import.meta.url);
+var round1 = (x) => x == null ? null : Math.round(x * 10) / 10;
+var LEVELS$1 = [
+	"élevée",
+	"moyenne",
+	"faible"
+];
+/**
+* Lance `jobs` ({ model, departMs, limits? }) sur un groupe de fils ; `grids` = les grilles utiles.
+* D29 bis (29 oct.) — `ctx.createPool` : les fils de CET endroit (les Web Workers du navigateur, le
+* fichier unique du PC du bord) ; sinon worker_threads (le service). Avant, `pool.mjs` en dur : la
+* sensibilité à la polaire / à l'équipage ne pouvait pas tourner sur l'appareil.
+*/
+async function runJobs(ctx, grids, jobs, { limits = ctx.limits, threads = ctx.threads, onDone = () => {} } = {}) {
+	const pool = (ctx.createPool || createPool)(ROUTE_WORKER, {
+		polar: ctx.polar,
+		grids,
+		waves: ctx.waves,
+		land: ctx.land.data,
+		coast: ctx.coast.data,
+		forbidden: ctx.forbidden,
+		forbiddenMask: ctx.forbiddenMask.data,
+		coastIndex: ctx.coastIndex?.data,
+		limits
+	}, Math.max(1, Math.min(jobs.length, threads)));
+	try {
+		let n = 0;
+		return await Promise.all(jobs.map((j) => pool.run({
+			model: j.model,
+			stops: ctx.stops,
+			departMs: j.departMs,
+			...j.limits ? { limits: j.limits } : {}
+		}).then((r) => {
+			onDone(++n, jobs.length);
+			return r;
+		})));
+	} finally {
+		await pool.close();
+	}
+}
+/**
+* La sensibilité à la polaire : la référence refaite avec un rendement
+* multiplié par chaque facteur (la base, 100 %, est le conseil lui-même).
+* ⚠️ Moins vite à la voile, c'est aussi plus souvent au moteur (sous 4,5 nds) :
+* l'arrivée recule moins que la vitesse ne baisse — c'est la réalité du bord.
+*/
+async function polarSensitivity(ctx, { factors = [.85, 1.1], base = null, onStep = () => {} } = {}) {
+	const grids = { [ctx.refModel]: ctx.grids[ctx.refModel] };
+	const jobs = factors.map((f) => ({
+		model: ctx.refModel,
+		departMs: ctx.departMs,
+		limits: {
+			...ctx.limits,
+			efficiency: (ctx.limits.efficiency ?? .95) * f
+		}
+	}));
+	const res = await runJobs(ctx, grids, jobs, {
+		threads: Math.min(jobs.length, ctx.threads || 1),
+		onDone: (done, total) => onStep({
+			name: "polar",
+			done,
+			total
+		})
+	});
+	const out = factors.map((f, i) => summarizeRoute(ctx, guarded(ctx, res[i], {
+		line: "polar",
+		model: ctx.refModel,
+		factor: f
+	}), f));
+	if (base) out.push(summarizeRoute(ctx, base, 1));
+	return out.sort((a, b) => a.factor - b.factor);
+}
+/**
+* TSS-1 (ROUTE-035) — une route d'option passée au contrôle exact (`ctx.guard`, celui du dernier
+* garde-fou) : si elle échoue, elle ne compte plus (`{ ok: false, guard }`) et c'est dit (`ctx.onDrop`).
+*/
+function guarded(ctx, r, rec) {
+	if (!r?.ok || !ctx.guard) return r;
+	const f = ctx.guard.fault(r.points);
+	if (!f) return r;
+	ctx.onDrop?.({
+		...rec,
+		...f
+	});
+	return {
+		ok: false,
+		guard: f.kind
+	};
+}
+function summarizeRoute(ctx, r, factor) {
+	if (r.guard) return {
+		factor,
+		ok: false,
+		reason: "guard",
+		guard: r.guard
+	};
+	if (!r.ok) return {
+		factor,
+		ok: false,
+		short: Boolean(r.short),
+		reason: r.reason
+	};
+	return {
+		factor,
+		ok: true,
+		arrivalMs: r.arrivalMs,
+		hours: round1(r.hours),
+		distanceNm: Math.round(r.distanceNm),
+		motorH: round1(r.stats.motorH),
+		maxTws: round1(r.stats.maxTws),
+		maxGust: round1(r.stats.maxGust),
+		maxWave: round1(r.stats.maxWave),
+		day: arrivalLight(ctx.to.lat, ctx.to.lon, r.arrivalMs).day,
+		...typeof ctx.bilan === "function" && Array.isArray(r.points) ? { bilan: ctx.bilan(r.points) } : r.bilan ? { bilan: r.bilan } : {}
+	};
+}
+/** Les deux hypothèses autour des réglages en vigueur (pur). */
+function crewCases(limits = {}) {
+	const pct = Number.isFinite(Number(limits.crewDecayPct)) ? Number(limits.crewDecayPct) : 2;
+	const after = Number.isFinite(Number(limits.crewDecayAfterH)) ? Number(limits.crewDecayAfterH) : 48;
+	return [{
+		key: "rested",
+		crewDecayPct: 0,
+		crewDecayAfterH: after
+	}, {
+		key: "tired",
+		crewDecayPct: Math.min(10, Math.max(4, pct * 2)),
+		crewDecayAfterH: Math.min(after, 24)
+	}];
+}
+async function crewSensitivity(ctx, { base = null, onStep = () => {} } = {}) {
+	const grids = { [ctx.refModel]: ctx.grids[ctx.refModel] };
+	const cases = crewCases(ctx.limits);
+	const jobs = cases.map((c) => ({
+		model: ctx.refModel,
+		departMs: ctx.departMs,
+		limits: {
+			...ctx.limits,
+			crewDecayPct: c.crewDecayPct,
+			crewDecayAfterH: c.crewDecayAfterH
+		}
+	}));
+	const res = await runJobs(ctx, grids, jobs, {
+		threads: Math.min(jobs.length, ctx.threads || 1),
+		onDone: (done, total) => onStep({
+			name: "crew",
+			done,
+			total
+		})
+	});
+	const out = cases.map((c, i) => ({
+		key: c.key,
+		decayPct: c.crewDecayPct,
+		afterH: c.crewDecayAfterH,
+		...summarizeRoute(ctx, guarded(ctx, res[i], {
+			line: "crew",
+			model: ctx.refModel,
+			case: c.key
+		}), 1)
+	}));
+	if (base) out.push({
+		key: "base",
+		decayPct: Number(ctx.limits.crewDecayPct ?? 2),
+		afterH: Number(ctx.limits.crewDecayAfterH ?? 48),
+		...summarizeRoute(ctx, base, 1)
+	});
+	const order = {
+		rested: 0,
+		base: 1,
+		tired: 2
+	};
+	return out.map(({ factor: _factor, ...x }) => x).sort((a, b) => order[a.key] - order[b.key]);
+}
+/**
+* Les deux autres hypothèses autour du réglage en vigueur x (pur) — « 100 · x · x − 10 % » :
+* x < 100 % → la nuit comme le jour (100 %) et x − 10 % (au plus bas 60 %) ; x = 100 % (le
+* défaut) → 90 % et 80 % (les valeurs du levier ③, ROUTAGE_RESULTAT_V2 § 4.5).
+*/
+function nightCases(limits = {}) {
+	const x = nightPolarOf(limits);
+	const r2 = (v) => Math.round(v * 100) / 100;
+	if (x >= 1) return [{
+		key: "less",
+		nightPolarPct: .9
+	}, {
+		key: "lesser",
+		nightPolarPct: .8
+	}];
+	return [{
+		key: "day",
+		nightPolarPct: 1
+	}, {
+		key: "less",
+		nightPolarPct: r2(Math.max(.6, x - .1))
+	}];
+}
+/** → [{ key: 'day' | 'base' | 'less' | 'lesser', pct, ok, arrivalMs, hours, motorH, maxTws, …, bilan }], du plus rapide (100 %) au plus lent. */
+async function nightSensitivity(ctx, { base = null, onStep = () => {} } = {}) {
+	const grids = { [ctx.refModel]: ctx.grids[ctx.refModel] };
+	const cases = nightCases(ctx.limits);
+	const jobs = cases.map((c) => ({
+		model: ctx.refModel,
+		departMs: ctx.departMs,
+		limits: {
+			...ctx.limits,
+			nightPolarPct: c.nightPolarPct
+		}
+	}));
+	const res = await runJobs(ctx, grids, jobs, {
+		threads: Math.min(jobs.length, ctx.threads || 1),
+		onDone: (done, total) => onStep({
+			name: "nightPolar",
+			done,
+			total
+		})
+	});
+	const out = cases.map((c, i) => ({
+		key: c.key,
+		pct: c.nightPolarPct,
+		...summarizeRoute(ctx, guarded(ctx, res[i], {
+			line: "nightPolar",
+			model: ctx.refModel,
+			case: c.key
+		}), 1)
+	}));
+	if (base) out.push({
+		key: "base",
+		pct: nightPolarOf(ctx.limits),
+		...summarizeRoute(ctx, base, 1)
+	});
+	return out.map(({ factor: _factor, ...x }) => x).sort((a, b) => b.pct - a.pct);
+}
+/**
+* D39 (E1, ROUTE-041) — LA ROUTE DE CHAQUE MODÈLE à un départ du plan, en chiffres (le tableau ⊞ Départ × Modèle) :
+* les champs d'une case de la grille (departures.mjs cellStats, via `ctx.bilan` = bilanOf, mesurés contre les
+* limites de B&C), la route des isochrones n'attendant jamais au large (waitH 0 : dayArrivalMs = arrivalMs, `day`
+* dit si elle arrive de jour — l'heure à quai se lit comme celle de `models[m]`). Une route ratée : { ok: false,
+* short? } ; retirée par le garde-fou (D38) : { ok: false, guard }. Compact (≈ 10 Ko pour 17 départs × 6 modèles).
+*/
+function planModelCell(ctx, r) {
+	if (r?.guard) return {
+		ok: false,
+		guard: r.guard
+	};
+	if (!r?.ok) return {
+		ok: false,
+		...r?.short ? { short: true } : {}
+	};
+	const b = typeof ctx.bilan === "function" && Array.isArray(r.points) ? ctx.bilan(r.points) : null;
+	const L = ctx.limits || {};
+	const s = r.stats || {};
+	const ratio = b?.limitRatio ?? Math.round(Math.max((s.maxTws || 0) / (L.maxTws || 26), s.maxGust != null ? s.maxGust / (L.maxGust || 34) : 0, (s.maxWave || 0) / (L.maxWave || 3)) * 100) / 100;
+	return {
+		arrivalMs: r.arrivalMs,
+		dayArrivalMs: b?.dayArrivalMs ?? r.arrivalMs,
+		waitH: b?.waitH ?? 0,
+		hours: b?.hours ?? round1(r.hours),
+		maxTws: b?.maxTws ?? round1(s.maxTws),
+		maxGust: b ? b.maxGust : round1(s.maxGust),
+		maxWave: b?.maxWave ?? round1(s.maxWave),
+		limitRatio: ratio,
+		motorH: b?.motorH ?? round1(s.motorH),
+		day: b ? b.day : arrivalLight(ctx.to.lat, ctx.to.lon, r.arrivalMs).day
+	};
+}
+/** Le meilleur départ : toutes les 3 h sur `spanH`, tous les modèles. ✓ = tous (3 au moins) dans les limites, arrivée médiane de jour, confiance pas faible. */
+async function departurePlan(ctx, { spanH = 48, stepH = 3, onStep = () => {} } = {}) {
+	const models = Object.keys(ctx.grids);
+	const deps = [];
+	for (let d = ctx.departMs; d <= ctx.departMs + spanH * 36e5; d += stepH * 36e5) deps.push(d);
+	const jobs = deps.flatMap((departMs) => models.map((model) => ({
+		model,
+		departMs
+	})));
+	const res = await runJobs(ctx, ctx.grids, jobs, { onDone: (done, total) => onStep({
+		name: "departures",
+		done,
+		total
+	}) });
+	const drops = {};
+	const plan = deps.map((dep, k) => {
+		const R = Object.fromEntries(models.map((m, i) => {
+			const r = res[k * models.length + i];
+			const f = r?.ok && ctx.guard ? ctx.guard.fault(r.points) : null;
+			if (f) (drops[m] || (drops[m] = {
+				line: "departures",
+				model: m,
+				...f,
+				deps: []
+			})).deps.push(dep);
+			return [m, f ? {
+				ok: false,
+				guard: f.kind
+			} : r];
+		}));
+		const ok = models.filter((m) => R[m].ok);
+		const short = models.filter((m) => !R[m].ok && R[m].short);
+		const guardN = models.filter((m) => R[m].guard).length;
+		const etas = ok.map((m) => R[m].arrivalMs).sort((a, b) => a - b);
+		const medianEta = etas.length ? etas[Math.floor((etas.length - 1) / 2)] : null;
+		const spreadH = etas.length > 1 ? (etas.at(-1) - etas[0]) / 36e5 : 0;
+		let lateral = 0;
+		for (let i = 0; i < ok.length; i++) for (let j = i + 1; j < ok.length; j++) {
+			const a = R[ok[i]].points;
+			const b = R[ok[j]].points;
+			for (let t = dep; t <= Math.min(R[ok[i]].arrivalMs, R[ok[j]].arrivalMs); t += 6 * 36e5) lateral = Math.max(lateral, distNm(pointAt(a, t), pointAt(b, t)));
+		}
+		const conf = ok.length < 2 ? "faible" : spreadH > 18 || lateral > 150 ? "faible" : spreadH > 6 || lateral > 60 ? "moyenne" : "élevée";
+		const light = medianEta ? arrivalLight(ctx.to.lat, ctx.to.lon, medianEta) : null;
+		const judged = models.length - short.length - guardN;
+		return {
+			dep,
+			medianEta,
+			light: light ? {
+				day: light.day,
+				waitH: round1(light.waitH)
+			} : null,
+			okN: ok.length,
+			models: judged,
+			spreadH: round1(spreadH),
+			lateralNm: Math.round(lateral),
+			conf,
+			...guardN ? { dropped: guardN } : {},
+			maxTws: ok.length ? round1(Math.max(...ok.map((m) => R[m].stats.maxTws))) : null,
+			maxWave: ok.length ? round1(Math.max(...ok.map((m) => R[m].stats.maxWave))) : null,
+			motorH: ok.length ? round1(percentile(ok.map((m) => R[m].stats.motorH), .5)) : null,
+			good: ok.length === judged && ok.length >= 3 && Boolean(light?.day) && conf !== "faible",
+			byModel: Object.fromEntries(models.map((m) => [m, planModelCell(ctx, R[m])]))
+		};
+	});
+	for (const d of Object.values(drops)) ctx.onDrop?.(d);
+	return plan;
+}
+function pointAt(points, t) {
+	if (t <= points[0].t) return points[0];
+	for (let i = 0; i < points.length - 1; i++) if (t <= points[i + 1].t) {
+		const f = (t - points[i].t) / (points[i + 1].t - points[i].t);
+		return {
+			lat: points[i].lat + (points[i + 1].lat - points[i].lat) * f,
+			lon: points[i].lon + (points[i + 1].lon - points[i].lon) * f
+		};
+	}
+	return points.at(-1);
+}
+/**
+* Les ensembles : chaque membre routé, une PART des membres par fil (173
+* grilles copiées dans chaque fil = 6 Go mesurés ; une part chacun = 2 Go).
+* → { all, byModel, hist, median: { model, member, line }, download }
+*/
+async function ensembleRun(ctx, { models: asked = Object.keys(ENSEMBLES), onStep = () => {} } = {}) {
+	const grids = {};
+	let bytes = 0;
+	const missing = [];
+	const ages = {};
+	for (const m of asked) {
+		const list = ctx.fetchEnsemble ? await ctx.fetchEnsemble(m, ctx.bbox, {
+			step: 2,
+			days: 10
+		}) : await fetchEnsembleGrids(m, ctx.bbox, {
+			step: 2,
+			days: 10,
+			cacheDir: ctx.cacheDir,
+			log: ctx.log
+		});
+		if (!list?.length) missing.push(m);
+		else {
+			for (const g of list) grids[`${m}#${String(g.member).padStart(2, "0")}`] = g;
+			bytes += list.download?.bytes || 0;
+			if (list.previous) ages[m] = list.previous.ageH;
+		}
+		onStep({
+			name: "ensembles-weather",
+			done: asked.indexOf(m) + 1,
+			total: asked.length
+		});
+	}
+	const models = asked.filter((m) => !missing.includes(m));
+	if (!models.length) throw Object.assign(/* @__PURE__ */ new Error(`ensembles : aucun en cache pour cette zone (${missing.join(", ")})`), { code: "ensemble-none" });
+	const keys = Object.keys(grids);
+	const threads = Math.max(1, Math.min(keys.length, ctx.threads));
+	const parts = Array.from({ length: threads }, (_, p) => keys.filter((_k, i) => i % threads === p));
+	const done = new Array(keys.length);
+	let n = 0;
+	await Promise.all(parts.map(async (part, p) => {
+		const out = await runJobs(ctx, Object.fromEntries(part.map((k) => [k, grids[k]])), part.map((k) => ({
+			model: k,
+			departMs: ctx.departMs
+		})), {
+			threads: 1,
+			onDone: () => onStep({
+				name: "ensembles",
+				done: ++n,
+				total: keys.length
+			})
+		});
+		part.forEach((_k, j) => {
+			done[j * threads + p] = out[j];
+		});
+	}));
+	const members0 = keys.map((k, i) => {
+		const [model, num] = k.split("#");
+		return {
+			key: k,
+			model,
+			member: Number(num),
+			...done[i]
+		};
+	});
+	const dropBy = {};
+	const members = members0.filter((r) => {
+		const f = r.ok && ctx.guard ? ctx.guard.fault(r.points) : null;
+		if (!f) return true;
+		(dropBy[`${r.model}|${f.kind}`] || (dropBy[`${r.model}|${f.kind}`] = {
+			line: "ensemble",
+			model: r.model,
+			kind: f.kind,
+			at: f.at,
+			...f.zone ? { zone: f.zone } : {},
+			members: []
+		})).members.push(r.member);
+		return false;
+	});
+	for (const d of Object.values(dropBy)) ctx.onDrop?.(d);
+	const sum = (list) => {
+		const ok = list.filter((r) => r.ok);
+		const arr = ok.map((r) => r.arrivalMs);
+		const blocked = list.filter((r) => !r.ok && !r.short).length;
+		const short = list.filter((r) => !r.ok && r.short).length;
+		const c = ensembleConfidence({
+			arrivals: arr,
+			blocked,
+			short
+		});
+		return {
+			n: list.length,
+			routed: ok.length,
+			blocked,
+			short,
+			p10: percentile(arr, .1),
+			p50: percentile(arr, .5),
+			p90: percentile(arr, .9),
+			daylight: daylightShare(arr, ctx.to),
+			maxTwsP90: round1(percentile(ok.map((r) => r.stats.maxTws), .9)),
+			motorHMed: round1(percentile(ok.map((r) => r.stats.motorH), .5)),
+			confidence: {
+				level: c.level,
+				widthH: round1(c.widthH),
+				blockedShare: c.blockedShare == null ? null : Math.round(c.blockedShare * 100) / 100
+			}
+		};
+	};
+	const all = sum(members);
+	const arrivals = members.filter((r) => r.ok).map((r) => ({
+		t: r.arrivalMs,
+		model: r.model
+	}));
+	const hist = arrivalBins(arrivals, { binH: binHoursFor(arrivals.length ? (Math.max(...arrivals.map((a) => a.t)) - Math.min(...arrivals.map((a) => a.t))) / 36e5 : 0) });
+	const med = medianMember(members);
+	return {
+		models: Object.fromEntries(models.map((m) => [m, {
+			label: ENSEMBLES[m].label,
+			...sum(members.filter((r) => r.model === m))
+		}])),
+		all,
+		hist: {
+			binMs: hist.binMs,
+			start: hist.start,
+			bins: hist.bins.map((b) => ({
+				t0: b.t0,
+				n: b.n,
+				by: b.by
+			}))
+		},
+		median: med ? {
+			model: med.model,
+			member: med.member,
+			line: med.points.map((p) => [
+				Math.round(p.lon * 1e4) / 1e4,
+				Math.round(p.lat * 1e4) / 1e4,
+				p.t
+			])
+		} : null,
+		download: { bytes },
+		members: members.length,
+		...missing.length ? { missing } : {},
+		...Object.keys(ages).length ? { ages } : {},
+		...Object.keys(dropBy).length ? { dropped: Object.values(dropBy).reduce((n, d) => n + d.members.length, 0) } : {}
+	};
+}
+/**
+* La confiance unique (D11) avec les options : la plus basse des niveaux
+* connus ; l'ensemble ajoute sa raison (largeur P10–P90, part bloquée). Pur.
+*/
+function withEnsembleConfidence(confidence, ens) {
+	if (!ens?.all?.confidence) return confidence;
+	const e = ens.all.confidence;
+	const level = LEVELS$1[Math.max(LEVELS$1.indexOf(confidence.level), LEVELS$1.indexOf(e.level))];
+	const reasons = [...confidence.reasons, {
+		code: "ensemble",
+		level: e.level === "élevée" ? "ok" : e.level === "moyenne" ? "mid" : "bad",
+		widthH: e.widthH,
+		blockedShare: e.blockedShare,
+		members: ens.members
+	}];
+	return {
+		...confidence,
+		level,
+		ensemble: e.level,
+		reasons
 	};
 }
 var REACH_GC_GAP_NM = .05;
@@ -7464,7 +8461,8 @@ var STEPS = [
 	"ensembles",
 	"bestDeparture",
 	"bestDeparture-models",
-	"crew"
+	"crew",
+	"nightPolar"
 ];
 /** D22 — le budget de l'optimiseur de départ (s) ; au-delà, « trop long » dans les cases restantes. */
 var BEST_DEPARTURE_BUDGET_MS = 24e4;
@@ -7837,9 +8835,83 @@ function relaxSteps(askedScale, hasAvoid) {
 	});
 	return out;
 }
+/**
+* ROUTE-016 — la météo le long d'UNE route, toutes les `everyH` heures (tous les
+* modèles, les vagues, l'accord, les limites, la marge) ; D37 : une fabrique, pour
+* que le calcul enchaîné (followUpAdvice) lise les routes qu'il ajoute EXACTEMENT
+* comme le conseil (les mêmes grilles, limites, marge).
+*/
+function makeAlongRows({ models, grids, waves, limits, routeLimits, scale, departMs, everyH = 3 }) {
+	return (points, tEnd, counts = null, tStart = departMs) => {
+		const timed = points.map((p) => ({
+			lat: p.lat,
+			lon: p.lon,
+			t: p.t
+		}));
+		const times = [];
+		for (let t = tStart; t < tEnd; t += everyH * 36e5) times.push(t);
+		times.push(tEnd);
+		const out = [];
+		for (const t of times) {
+			const p = positionAt(timed, t) || {
+				...timed[timed.length - 1],
+				course: out.at(-1)?.course ?? 0
+			};
+			const winds = models.map((m) => windAt(grids[m], p.lat, p.lon, t));
+			const wave = waveAt(waves, p.lat, p.lon, t);
+			const ag = agreement(winds);
+			if (counts) counts[ag.level]++;
+			const fl = flags({
+				winds,
+				wave,
+				course: p.course
+			}, limits);
+			const mfl = scale < 1 && !fl.length ? flags({
+				winds,
+				wave,
+				course: p.course
+			}, {
+				...limits,
+				...routeLimits
+			}).filter((f) => !f.startsWith("près")) : [];
+			out.push({
+				t,
+				lat: Math.round(p.lat * 1e3) / 1e3,
+				lon: Math.round(p.lon * 1e3) / 1e3,
+				course: Math.round(p.course ?? 0),
+				night: isNight(p.lat, p.lon, t),
+				winds: winds.map((w) => w ? {
+					tws: Math.round(w.tws * 10) / 10,
+					twd: Math.round(w.twd),
+					gust: w.gust != null ? Math.round(w.gust) : null
+				} : null),
+				wave: wave != null ? Math.round(wave * 10) / 10 : null,
+				ag: {
+					level: ag.level,
+					twsSpread: Math.round(ag.twsSpread * 10) / 10,
+					twdSpread: Math.round(ag.twdSpread)
+				},
+				flags: fl,
+				...mfl.length ? { marginFlags: mfl } : {}
+			});
+		}
+		return out;
+	};
+}
 /** Le conseil. */
-async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.availableParallelism() - 1), log = () => {}, onStep = () => {}, polar = null, nowMs = Date.now(), astarBudgetMs = 15e4, engineUsage = null, departBudgetMs = BEST_DEPARTURE_BUDGET_MS, shouldStop = null, onWeather = null, io = null } = {}) {
+async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.availableParallelism() - 1), log = () => {}, onStep = () => {}, polar = null, nowMs = Date.now(), astarBudgetMs = 15e4, engineUsage = null, departBudgetMs = BEST_DEPARTURE_BUDGET_MS, shouldStop = null, onWeather = null, io = null, startMs = null, base: baseRun = null } = {}) {
 	const t0 = Date.now();
+	const tBase = Number.isFinite(startMs) && startMs <= t0 ? startMs : t0;
+	const firstT = {};
+	const emit = (s) => {
+		const t = Math.max(0, Date.now() - tBase);
+		if (firstT[s.name] == null) firstT[s.name] = t;
+		return onStep({
+			...s,
+			t0: firstT[s.name],
+			t
+		});
+	};
 	const IO = {
 		loadCharts,
 		fetchWindGrid,
@@ -7847,6 +8919,8 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 		fetchEnsembleGrids,
 		previousGrid,
 		previousEnsembleGrids,
+		exactGrid,
+		ensembleNear,
 		createPool,
 		resolvePlace,
 		timezoneAt,
@@ -7856,18 +8930,8 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 		label: m,
 		kind: "physique"
 	};
-	const crewKeys = Object.keys(CREW_DEFAULTS);
-	const prefs0 = prefsOf({
-		...DEFAULT_LIMITS,
-		...request.limits || {}
-	});
-	const limits = {
-		...DEFAULT_LIMITS,
-		...Object.fromEntries(crewKeys.map((k) => [k, prefs0[k]])),
-		...request.limits || {}
-	};
-	for (const k of crewKeys) limits[k] = prefs0[k];
-	const step = (name, extra = {}) => onStep({
+	const { limits, prefs0 } = effectiveLimits(request.limits);
+	const step = (name, extra = {}) => emit({
 		name,
 		index: STEPS.indexOf(name),
 		of: STEPS.length,
@@ -7882,15 +8946,34 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 			table: PU.table
 		}
 	};
-	step("places");
+	const ask = reuseAsk(request);
+	let plan = null;
+	if (ask) if (baseRun?.refused) plan = {
+		ok: false,
+		why: baseRun.refused
+	};
+	else if (!baseRun?.result || baseRun.id && String(baseRun.id).toLowerCase() !== ask.baseRunId.toLowerCase()) plan = {
+		ok: false,
+		why: "base-missing"
+	};
+	else plan = reuseCheck({
+		request,
+		base: baseRun.result,
+		limits,
+		models: Array.isArray(IO.models) && IO.models.length ? IO.models : Object.keys(MODELS),
+		polar: POLAR0
+	});
+	const B = plan?.ok ? baseRun.result : null;
+	if (B) step("places", { reused: true });
+	else step("places");
 	const place = async (v) => typeof v === "object" && v && Number.isFinite(v.lat) ? {
 		lat: v.lat,
 		lon: v.lon,
 		name: v.name || `${v.lat.toFixed(2)}, ${v.lon.toFixed(2)}`,
 		kind: v.kind || "point"
 	} : IO.resolvePlace(v);
-	const from0 = await place(request.from ?? "bateau");
-	const to0 = await place(request.to);
+	const from0 = await place(B ? basePlace(B.from) : request.from ?? "bateau");
+	const to0 = await place(B ? basePlace(B.to) : request.to);
 	const BBOX = passageBbox(from0, to0);
 	step("charts");
 	const CH = await IO.loadCharts(BBOX, {
@@ -7930,8 +9013,97 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 			strait: g.strait
 		};
 	});
-	step("weather");
-	const wx = await loadWeather(request.weatherSource, {
+	if (!B) step("weather");
+	let rw = null;
+	if (B) {
+		rw = await loadBaseWeather(B, {
+			bbox: BBOX,
+			cacheDir,
+			isLand: CH.land.isLand,
+			io: {
+				exactGrid: IO.exactGrid,
+				ensembleNear: IO.ensembleNear
+			}
+		});
+		if (!rw.ok) {
+			const fallback = B.weather?.source === "dummy" ? "dummy" : "live";
+			plan = {
+				ok: false,
+				why: "weather-gone",
+				missing: rw.missing,
+				fallback
+			};
+			log(`météo de la base introuvable (${rw.missing.join(", ")}) : calcul complet, météo ${fallback === "dummy" ? "fictive" : "du moment"}`);
+		}
+	}
+	let wxBase = null;
+	let span = null;
+	if (rw?.ok && plan.mode === "weather") {
+		const dep = request.departMs ?? nextHour(nowMs);
+		span = gridSpan(rw.wx.grids.ecmwf_ifs025 || rw.wx.grids[rw.wx.models[0]]);
+		const cov = weatherCovers({
+			departMs: dep,
+			fromMs: span?.fromMs,
+			toMs: span?.toMs,
+			passageH: B.reference?.hours
+		});
+		if (cov.ok) wxBase = rw.wx;
+		else {
+			plan = {
+				ok: false,
+				mode: "weather",
+				why: "weather-horizon",
+				detail: [cov.side],
+				fallback: B.weather?.source === "dummy" ? "dummy" : "live",
+				...span ? { span: {
+					...span,
+					...Number.isFinite(cov.lastMs) ? { lastMs: cov.lastMs } : {}
+				} } : {}
+			};
+			log(`météo de la base : elle ne couvre pas ce départ (${cov.side}) — calcul complet, météo ${plan.fallback === "dummy" ? "fictive" : "du moment"}`);
+		}
+	}
+	if (rw?.ok && plan.ok && plan.mode !== "weather") {
+		onWeather?.(rw.wx);
+		return followUpAdvice({
+			request,
+			base: B,
+			ask,
+			plan,
+			from,
+			to,
+			gates,
+			BBOX,
+			CH,
+			wx: rw.wx,
+			limits,
+			POLAR,
+			PU,
+			POLAR0,
+			nowMs,
+			threads,
+			cacheDir,
+			log,
+			step,
+			emit,
+			IO,
+			departBudgetMs,
+			shouldStop,
+			engineUsage,
+			t0
+		});
+	}
+	if (B && !wxBase) step("weather");
+	const wsAsked = plan && !plan.ok && (plan.why === "weather-gone" || plan.why === "weather-horizon") ? plan.fallback === "dummy" ? request.weatherSource : "live" : request.weatherSource;
+	let wx;
+	if (wxBase) {
+		step("weather", {
+			done: wxBase.models.length,
+			total: wxBase.models.length,
+			reused: true
+		});
+		wx = wxBase;
+	} else wx = await loadWeather(wsAsked, {
 		bbox: BBOX,
 		nowMs,
 		cacheDir,
@@ -7954,7 +9126,7 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 	const { grids, waves, models } = wx;
 	const weather = {
 		...weatherFreshness(grids, waves),
-		...weatherSourceInfo(wx)
+		...wxBase ? baseSourceInfo(B.weather) : weatherSourceInfo(wx)
 	};
 	if (weather.stale) log(`⚠ météo d'avant (${weather.oldestAgeH} h) : ${[...weather.staleModels, ...weather.wavesStale ? ["vagues"] : []].join(", ")}`);
 	const departMs = request.departMs ?? nextHour(nowMs);
@@ -8057,8 +9229,29 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 		});
 	}
 	const avoided = zones.filter((z) => z.avoid && !avoidLifted.some((x) => x.id === z.id)).map((z) => z.id);
-	const ok = models.filter((m) => R[m].ok);
-	const refModel = ok.includes("ecmwf_ifs025") ? "ecmwf_ifs025" : ok[0] || null;
+	const ok0 = models.filter((m) => R[m].ok);
+	const refModel = ok0.includes("ecmwf_ifs025") ? "ecmwf_ifs025" : ok0[0] || null;
+	const GUARD = guardFor({
+		coastIndex: CH.coastIndex,
+		forbidden: CH.forbidden,
+		avoid: avoidNow,
+		zones
+	});
+	const dropped = [];
+	for (const m of ok0) {
+		if (m === refModel) continue;
+		const f = GUARD.fault(R[m].points);
+		if (f) {
+			dropped.push({
+				line: "model",
+				model: m,
+				...f
+			});
+			log(`⚠ la route de ${m} échoue au garde-fou (${f.kind} vers ${f.at.join(", ")}) : retirée du calcul`);
+		}
+	}
+	const droppedModels = new Set(dropped.map((d) => d.model));
+	const ok = ok0.filter((m) => !droppedModels.has(m));
 	const short = models.filter((m) => !R[m].ok && R[m].short);
 	const blocked = models.filter((m) => !R[m].ok && !R[m].short);
 	const astarLate = lateKeys.length && refModel ? runOptimiser({
@@ -8069,10 +9262,11 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 			refHours: R[refModel].hours
 		}
 	}, lateKeys) : null;
-	const tz = await IO.timezoneAt(to.lat, to.lon, {
+	const tz = wxBase && B.to && "tz" in B.to ? B.to.tz : await IO.timezoneAt(to.lat, to.lon, {
 		cacheDir,
 		offline: wx.offline
 	});
+	const fspan = gridSpan(grids[astarModel]) || {};
 	const base = {
 		v: 1,
 		computedAt: new Date(nowMs).toISOString(),
@@ -8128,6 +9322,10 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 		},
 		forecast: {
 			fetchedAt: grids[models[0]].fetchedAt,
+			...Number.isFinite(fspan.fromMs) ? {
+				fromMs: fspan.fromMs,
+				toMs: fspan.toMs
+			} : {},
 			models: Object.fromEntries(models.map((m) => [m, {
 				label: modelMeta(m).label,
 				kind: modelMeta(m).kind,
@@ -8161,6 +9359,13 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 					models: blocked.length ? blocked : short
 				}]
 			},
+			...ask ? { reuse: reuseBlock({
+				ask,
+				plan,
+				base: wxBase ? B : null,
+				nowMs,
+				span
+			}) } : {},
 			ms: Date.now() - t0
 		});
 	}
@@ -8179,61 +9384,16 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 		wave: p.wave != null ? Math.round(p.wave * 10) / 10 : null
 	}));
 	const everyH = 3;
-	const alongRows = (points, tEnd, counts = null, tStart = departMs) => {
-		const timed = points.map((p) => ({
-			lat: p.lat,
-			lon: p.lon,
-			t: p.t
-		}));
-		const times = [];
-		for (let t = tStart; t < tEnd; t += everyH * 36e5) times.push(t);
-		times.push(tEnd);
-		const out = [];
-		for (const t of times) {
-			const p = positionAt(timed, t) || {
-				...timed[timed.length - 1],
-				course: out.at(-1)?.course ?? 0
-			};
-			const winds = models.map((m) => windAt(grids[m], p.lat, p.lon, t));
-			const wave = waveAt(waves, p.lat, p.lon, t);
-			const ag = agreement(winds);
-			if (counts) counts[ag.level]++;
-			const fl = flags({
-				winds,
-				wave,
-				course: p.course
-			}, limits);
-			const mfl = scale < 1 && !fl.length ? flags({
-				winds,
-				wave,
-				course: p.course
-			}, {
-				...limits,
-				...routeLimits
-			}).filter((f) => !f.startsWith("près")) : [];
-			out.push({
-				t,
-				lat: Math.round(p.lat * 1e3) / 1e3,
-				lon: Math.round(p.lon * 1e3) / 1e3,
-				course: Math.round(p.course ?? 0),
-				night: isNight(p.lat, p.lon, t),
-				winds: winds.map((w) => w ? {
-					tws: Math.round(w.tws * 10) / 10,
-					twd: Math.round(w.twd),
-					gust: w.gust != null ? Math.round(w.gust) : null
-				} : null),
-				wave: wave != null ? Math.round(wave * 10) / 10 : null,
-				ag: {
-					level: ag.level,
-					twsSpread: Math.round(ag.twsSpread * 10) / 10,
-					twdSpread: Math.round(ag.twdSpread)
-				},
-				flags: fl,
-				...mfl.length ? { marginFlags: mfl } : {}
-			});
-		}
-		return out;
-	};
+	const alongRows = makeAlongRows({
+		models,
+		grids,
+		waves,
+		limits,
+		routeLimits,
+		scale,
+		departMs,
+		everyH
+	});
 	const counts = {
 		accord: 0,
 		partiel: 0,
@@ -8358,7 +9518,7 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 			distanceNm: Math.round(ref.distanceNm),
 			stats: Object.fromEntries(Object.entries(ref.stats).map(([k, v]) => [k, round1(v)]))
 		},
-		models: Object.fromEntries(models.map((m) => [m, {
+		models: Object.fromEntries(models.filter((m) => !droppedModels.has(m)).map((m) => [m, {
 			...R[m].ok ? {
 				ok: true,
 				arrivalMs: R[m].arrivalMs,
@@ -8452,7 +9612,7 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 			prefs,
 			motorKn: limits.motorKn ?? 6
 		};
-		const rapide = summarizeRoute(ref.points, {
+		const rapide = summarizeRoute$1(ref.points, {
 			...common,
 			key: "rapide",
 			source: "isochrones",
@@ -8484,7 +9644,7 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 				profiles[k].why = profileWhy(profiles[k], rapide);
 				continue;
 			}
-			const sm = summarizeRoute(r.points, {
+			const sm = summarizeRoute$1(r.points, {
 				...common,
 				key: k,
 				source: "astar",
@@ -8521,7 +9681,12 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 		};
 	}
 	const opt = request.options || {};
-	if (opt.polar || opt.departures || opt.ensembles || opt.bestDeparture || opt.crew) {
+	const ensBase = wxBase ? baseEnsembleFetcher(wx, {
+		fetchEnsembleGrids: IO.fetchEnsembleGrids,
+		cacheDir,
+		log
+	}) : null;
+	if (opt.polar || opt.departures || opt.ensembles || opt.bestDeparture || opt.crew || opt.nightPolar) {
 		const ctx = {
 			from,
 			to,
@@ -8541,9 +9706,15 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 			threads,
 			cacheDir,
 			log,
-			fetchEnsemble: wx.offline ? wx.ensemble : null,
+			fetchEnsemble: ensBase ? ensBase.fetch : wx.offline ? wx.ensemble : (m, b, o = {}) => IO.fetchEnsembleGrids(m, b, {
+				...o,
+				cacheDir,
+				log
+			}),
 			bilan: bilanFor,
-			createPool: IO.createPool
+			createPool: IO.createPool,
+			guard: GUARD,
+			onDrop: (d) => dropped.push(d)
 		};
 		const errs = {};
 		const tryOpt = async (key, fn) => {
@@ -8572,6 +9743,12 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 				onStep: step2
 			});
 		});
+		if (opt.nightPolar) await tryOpt("nightPolar", async () => {
+			result.nightSensitivity = await nightSensitivity(ctx, {
+				base: ref,
+				onStep: step2
+			});
+		});
 		if (opt.ensembles) await tryOpt("ensembles", async () => {
 			const ens = await ensembleRun(ctx, { onStep: step2 });
 			result.ensemble = ens;
@@ -8580,7 +9757,7 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 		if (opt.bestDeparture) await tryOpt("bestDeparture", async () => {
 			const askedH = Number(opt.bestDeparture?.windowH) || 48;
 			const sameRapide = scale === askedScale && refModel === astarModel && avoidNow.length === avoid.rings.length;
-			const others = Object.fromEntries(models.filter((m) => m !== astarModel).map((m) => [m, R[m]]));
+			const others = Object.fromEntries(models.filter((m) => m !== astarModel && !droppedModels.has(m)).map((m) => [m, R[m]]));
 			result.bestDeparture = await bestDeparture({
 				stops,
 				to,
@@ -8604,6 +9781,7 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 				zones,
 				modeSpans,
 				createPool: IO.createPool,
+				guard: GUARD,
 				avoid: avoidNow,
 				departMs,
 				orderFor,
@@ -8630,13 +9808,16 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 			});
 		});
 		if (Object.keys(errs).length) result.optionErrors = errs;
+		if (Array.isArray(result.bestDeparture?.dropped)) dropped.push(...result.bestDeparture.dropped);
 	}
+	if (dropped.length) result.dropped = dropped;
 	result.options = {
 		polar: Boolean(opt.polar),
 		departures: Boolean(opt.departures),
 		ensembles: Boolean(opt.ensembles),
 		bestDeparture: Boolean(opt.bestDeparture),
 		crew: Boolean(opt.crew),
+		...opt.nightPolar ? { nightPolar: true } : {},
 		...request.optionsStripped?.length ? { stripped: request.optionsStripped } : {}
 	};
 	try {
@@ -8672,16 +9853,286 @@ async function computeAdvice(request, { cacheDir, threads = Math.max(1, os.avail
 		log(`feuille de route (reach) : ${e?.message || e}`);
 	}
 	applyWeatherSource(result);
+	if (ask) result.reuse = reuseBlock({
+		ask,
+		plan,
+		base: wxBase ? B : null,
+		nowMs,
+		span,
+		ensembles: wxBase && opt.ensembles ? ensBase.ens : null
+	});
+	if (wxBase) result.basedOn = {
+		runId: ask.baseRunId,
+		computedAt: B.computedAt || null,
+		mode: "weather"
+	};
 	assertLinesAtSea(result, CH.coastIndex, CH.forbidden, avoidNow);
 	result.ms = Date.now() - t0;
 	return result;
 	function step2(sx) {
-		onStep({
+		return emit({
 			...sx,
 			index: STEPS.indexOf(sx.name),
 			of: STEPS.length
 		});
 	}
+}
+/**
+* D37 (ROUTE-038) — LE CALCUL ENCHAÎNÉ : le résultat de la base, repris tel quel
+* (la référence, les 6 modèles, l'A*, « À surveiller », la confiance, la feuille de
+* route…), + les options AJOUTÉES seules (★ la grille des départs, le plan des
+* départs, ⛵, 😴, 🎲), calculées sur les grilles EXACTES de la base, avec le
+* contexte même du conseil (bouts, portes, cartes, marge appliquée, dangers évités,
+* gazole). Puis le DERNIER garde-fou relit TOUTES les lignes (celles de la base
+* comprises). Appelé par computeAdvice une fois `reuseCheck` passé et la météo trouvée.
+*/
+async function followUpAdvice(F) {
+	const { request, base: B, ask, plan, from, to, gates, BBOX, CH, wx, limits, POLAR, PU, nowMs, threads, cacheDir, log, step, emit, IO, departBudgetMs, shouldStop, engineUsage, t0 } = F;
+	const step2 = (sx) => emit({
+		...sx,
+		index: STEPS.indexOf(sx.name),
+		of: STEPS.length
+	});
+	const { grids, waves, models } = wx;
+	step("weather", {
+		done: models.length,
+		total: models.length,
+		reused: true
+	});
+	step("reference", { reused: true });
+	step("models", {
+		done: models.length,
+		total: models.length,
+		reused: true
+	});
+	step("along", { reused: true });
+	step("checks", { reused: true });
+	const nProfiles = Math.max(0, (B.profileOrder || []).length - 1);
+	if (B.profiles) step("optimiser", {
+		done: nProfiles,
+		total: nProfiles,
+		reused: true
+	});
+	const departRef = B.departMs;
+	const stops = [
+		from,
+		...gates,
+		to
+	];
+	const prefs = withEngineUsage(prefsOf(limits), engineUsage);
+	const askedScale = rapideScale(prefs);
+	const scale = Number.isFinite(B.margin?.used) ? B.margin.used : askedScale;
+	const routeLimits = scaleLimits(limits, scale);
+	const zones = hazardZones(prefs);
+	const avoid = avoidRings(zones, stops);
+	const avoidNow = (B.avoidLifted || []).some((x) => x.why === "blocked") ? [] : avoid.rings;
+	const refModel = B.refModel;
+	const astarModel = grids.ecmwf_ifs025 ? "ecmwf_ifs025" : models[0];
+	const fp = fuelPlan(0, prefs, routeLimits.motorKn);
+	const fuel = {
+		lph: B.fuel?.lph ?? fp.lph,
+		aboardL: B.fuel?.aboardL ?? fp.aboardL,
+		reserveL: B.fuel?.reserveL ?? fp.reserveL
+	};
+	const alongRows = makeAlongRows({
+		models,
+		grids,
+		waves,
+		limits,
+		routeLimits,
+		scale,
+		departMs: departRef
+	});
+	const bilanFor = (points, waitH = 0) => bilanOf(points, {
+		L: limits,
+		to,
+		isNight,
+		arrivalLight,
+		waitH,
+		fuelLph: fuel.lph,
+		fuelAboardL: fuel.aboardL,
+		fuelReserveL: fuel.reserveL,
+		zones
+	});
+	const result = copyBase(B);
+	result.computedAt = new Date(nowMs).toISOString();
+	result.request = {
+		...request,
+		departMs: Number.isFinite(request.departMs) ? request.departMs : departRef
+	};
+	const opt = request.options || {};
+	const add = plan.add;
+	const errs = { ...B.optionErrors || {} };
+	for (const k of add) delete errs[k];
+	const tryOpt = async (key, fn) => {
+		try {
+			await fn();
+		} catch (e) {
+			if (e?.constructor?.name === "Cancelled") throw e;
+			const msg = String(e?.message || e || "erreur").slice(0, 300);
+			errs[key] = typeof e?.code === "string" && /^[A-Za-z][\w-]{1,30}$/.test(e.code) && !msg.startsWith(`[${e.code}]`) ? `[${e.code}] ${msg}` : msg;
+			log(`option ${key} : ${errs[key]}`);
+		}
+	};
+	const { fetch: fetchEnsemble, ens } = baseEnsembleFetcher(wx, {
+		fetchEnsembleGrids: IO.fetchEnsembleGrids,
+		cacheDir,
+		log
+	});
+	const GUARD = guardFor({
+		coastIndex: CH.coastIndex,
+		forbidden: CH.forbidden,
+		avoid: avoidNow,
+		zones
+	});
+	const newDropped = [];
+	const ctx = {
+		from,
+		to,
+		stops,
+		bbox: BBOX,
+		grids,
+		waves,
+		land: CH.land,
+		coast: CH.coast,
+		forbidden: [...CH.forbidden, ...avoidNow],
+		forbiddenMask: CH.forbiddenMask,
+		coastIndex: CH.coastIndex,
+		polar: POLAR.mixed.table,
+		limits: routeLimits,
+		departMs: departRef,
+		refModel,
+		threads,
+		cacheDir,
+		log,
+		fetchEnsemble,
+		bilan: bilanFor,
+		createPool: IO.createPool,
+		guard: GUARD,
+		onDrop: (d) => newDropped.push(d)
+	};
+	const baseRef = {
+		ok: true,
+		arrivalMs: B.reference.arrivalMs,
+		hours: B.reference.hours,
+		distanceNm: B.reference.distanceNm,
+		stats: B.reference.stats,
+		...B.models?.[refModel]?.bilan ? { bilan: B.models[refModel].bilan } : {}
+	};
+	const gridStart = Number.isFinite(request.departMs) ? request.departMs : departRef;
+	if (add.includes("polar")) await tryOpt("polar", async () => {
+		result.sensitivity = await polarSensitivity(ctx, {
+			base: baseRef,
+			factors: PU.sensitivity,
+			onStep: step2
+		});
+	});
+	if (add.includes("departures")) await tryOpt("departures", async () => {
+		result.departures = await departurePlan({
+			...ctx,
+			departMs: gridStart
+		}, { onStep: step2 });
+	});
+	if (add.includes("crew")) await tryOpt("crew", async () => {
+		result.crewSensitivity = await crewSensitivity(ctx, {
+			base: baseRef,
+			onStep: step2
+		});
+	});
+	if (add.includes("nightPolar")) await tryOpt("nightPolar", async () => {
+		result.nightSensitivity = await nightSensitivity(ctx, {
+			base: baseRef,
+			onStep: step2
+		});
+	});
+	if (add.includes("ensembles")) await tryOpt("ensembles", async () => {
+		const e = await ensembleRun(ctx, { onStep: step2 });
+		result.ensemble = e;
+		const c0 = result.confidence || {
+			level: "faible",
+			reasons: []
+		};
+		if (c0.level === "test") {
+			const c = withEnsembleConfidence({
+				...c0,
+				level: c0.computed || "faible"
+			}, e);
+			result.confidence = {
+				...c,
+				computed: c.level,
+				level: "test"
+			};
+		} else result.confidence = withEnsembleConfidence(c0, e);
+	});
+	if (add.includes("bestDeparture")) await tryOpt("bestDeparture", async () => {
+		const askedH = Number(opt.bestDeparture?.windowH) || 48;
+		result.bestDeparture = await bestDeparture({
+			stops,
+			to,
+			bbox: BBOX,
+			grids,
+			waves,
+			land: CH.land,
+			coast: CH.coast,
+			forbidden: [...CH.forbidden, ...avoidNow],
+			forbiddenMask: CH.forbiddenMask,
+			coastIndex: CH.coastIndex,
+			polar: POLAR.mixed.table,
+			limits,
+			rapideLimits: scaleLimits(limits, askedScale),
+			prefs,
+			astarModel,
+			threads,
+			alongRows,
+			isNight,
+			arrivalLight,
+			zones,
+			modeSpans,
+			createPool: IO.createPool,
+			guard: GUARD,
+			avoid: avoidNow,
+			departMs: gridStart,
+			orderFor,
+			wantsDay: wantsDay(prefs),
+			marginScale: marginScale(prefs),
+			fuel,
+			reuse: null
+		}, {
+			windowH: askedH,
+			budgetMs: departBudgetMs,
+			onStep: step2,
+			shouldStop,
+			passageH: (B.reference.arrivalMs - departRef) / 36e5,
+			rows: Array.isArray(opt.bestDeparture?.rows) ? opt.bestDeparture.rows.filter((r) => typeof r === "string").slice(0, 6) : null
+		});
+	});
+	if (Object.keys(errs).length) result.optionErrors = errs;
+	else delete result.optionErrors;
+	const replaced = add.filter((k) => !errs[k]);
+	if (replaced.includes("bestDeparture") && Array.isArray(result.bestDeparture?.dropped)) newDropped.push(...result.bestDeparture.dropped);
+	const dropped = [...keptDropped(B.dropped, replaced), ...newDropped];
+	if (dropped.length) result.dropped = dropped;
+	else delete result.dropped;
+	const was = B.options || {};
+	result.options = Object.fromEntries(REUSE_ADDS.map((k) => [k, Boolean(was[k] || add.includes(k))]).filter(([k, v]) => k !== "nightPolar" || v));
+	if (request.optionsStripped?.length) result.options.stripped = request.optionsStripped;
+	else delete result.options.stripped;
+	tagOptionBlocks(result);
+	result.basedOn = {
+		runId: ask.baseRunId,
+		computedAt: B.computedAt || null
+	};
+	result.reuse = reuseBlock({
+		ask,
+		plan,
+		base: B,
+		nowMs,
+		ensembles: add.includes("ensembles") ? ens : null
+	});
+	assertLinesAtSea(result, CH.coastIndex, CH.forbidden, avoidNow);
+	result.ms = Date.now() - t0;
+	log(`calcul enchaîné sur ${ask.baseRunId} : ${add.length ? add.join(", ") : "rien de plus"} · ${(result.ms / 1e3).toFixed(1)} s`);
+	return result;
 }
 /**
 * Toutes les lignes d'un résultat, telles que l'app les dessine : la route de
@@ -8703,6 +10154,72 @@ function linesOf(result) {
 	return out;
 }
 /**
+* LE CONTRÔLE EXACT d'une ligne [{ lon, lat }] (pur) — celui du dernier garde-fou,
+* dans le même ordre : la côte (toute la ligne), puis chaque segment, dispositif puis
+* danger évité. → null | { kind: 'land' | 'tss' | 'hazard', i } (le segment i − 1 → i).
+* `zones` / `hz` : exactZones(forbidden) / exactZones(avoid).
+*/
+function lineFault(line, coastIndex, zones = null, hz = null) {
+	const i = coastIndex ? coastIndex.firstCrossing(line) : -1;
+	if (i >= 0) return {
+		kind: "land",
+		i
+	};
+	for (let j = 1; j < line.length; j++) {
+		if (zones && zones.blocks(line[j - 1], line[j])) return {
+			kind: "tss",
+			i: j
+		};
+		if (hz && hz.blocks(line[j - 1], line[j])) return {
+			kind: "hazard",
+			i: j
+		};
+	}
+	return null;
+}
+/**
+* TSS-1 (30 oct., ROUTE-035 — ADR-0039 D38) — LE GARDE-FOU D'UNE LIGNE QUI N'EST PAS LA
+* RÉFÉRENCE (pur, une fois les cartes là). Le 29 oct. à 21:15 UTC un calcul entier a été
+* refusé parce que la route d'UN modèle (UKMO) coupait le dispositif de Gibraltar. Une
+* ligne qui n'est pas la réponse — la route d'un AUTRE modèle, une case de la grille des
+* départs, la route d'un modèle pour une ★, un membre d'ensemble, une route de sensibilité —
+* et qui échoue au contrôle exact est RETIRÉE du résultat (ni tracée, ni comptée nulle part)
+* et DITE (`result.dropped`). La référence et les profils (la ★) refusent toujours le
+* calcul : rien de ce qui touche la terre, un dispositif ou un danger n'est jamais montré,
+* et le dernier garde-fou relit TOUTES les lignes qui restent.
+* → { fault(points) → null | { kind, at: [lat, lon] (le milieu du segment fautif, au millième), zone? } }
+*   `points` : [{ lat, lon }] tels que le moteur les a (arrondis ici au 1e-4°, comme le trait envoyé).
+*/
+function guardFor({ coastIndex, forbidden = null, avoid = null, zones = [] } = {}) {
+	const tz = exactZones(forbidden);
+	const hz = avoid && avoid.length ? exactZones(avoid) : null;
+	const r4 = (x) => Math.round(x * 1e4) / 1e4;
+	const r3 = (x) => Math.round(x * 1e3) / 1e3;
+	return { fault(points) {
+		if (!Array.isArray(points) || points.length < 2) return null;
+		const line = points.map((p) => Array.isArray(p) ? {
+			lon: r4(p[0]),
+			lat: r4(p[1])
+		} : {
+			lon: r4(p.lon),
+			lat: r4(p.lat)
+		});
+		const f = lineFault(line, coastIndex, tz, hz);
+		if (!f) return null;
+		const a = line[Math.max(0, f.i - 1)];
+		const b = line[f.i];
+		const out = {
+			kind: f.kind,
+			at: [r3((a.lat + b.lat) / 2), r3((a.lon + b.lon) / 2)]
+		};
+		if (f.kind === "hazard") {
+			const z = (zones || []).find((x) => x.avoid && Array.isArray(x.ring) && (avoid || []).includes(x.ring) && exactZones([x.ring])?.blocks(a, b));
+			if (z) out.zone = z.id;
+		}
+		return out;
+	} };
+}
+/**
 * Lève une erreur si une ligne du résultat croise la côte exacte, entre dans
 * une zone interdite (les anneaux exacts : code 'tss'), ou dans un danger
 * ÉVITÉ (`avoid`, les anneaux des Réglages : code 'hazard').
@@ -8712,24 +10229,15 @@ function assertLinesAtSea(result, coastIndex, forbidden = null, avoid = null) {
 	const zones = exactZones(forbidden);
 	const hz = avoid && avoid.length ? exactZones(avoid) : null;
 	for (const [k, line] of Object.entries(linesOf(result))) {
-		const i = coastIndex ? coastIndex.firstCrossing(line) : -1;
-		if (i >= 0) {
-			const e = /* @__PURE__ */ new Error(`ligne ${k} sur la terre entre ${line[i - 1].lat.toFixed(3)}, ${line[i - 1].lon.toFixed(3)} et ${line[i].lat.toFixed(3)}, ${line[i].lon.toFixed(3)} — calcul refusé`);
-			e.code = "land";
-			throw e;
-		}
-		for (let j = 1; j < line.length; j++) {
-			if (zones && zones.blocks(line[j - 1], line[j])) {
-				const e = /* @__PURE__ */ new Error(`ligne ${k} dans un dispositif de séparation du trafic entre ${line[j - 1].lat.toFixed(3)}, ${line[j - 1].lon.toFixed(3)} et ${line[j].lat.toFixed(3)}, ${line[j].lon.toFixed(3)} — calcul refusé`);
-				e.code = "tss";
-				throw e;
-			}
-			if (hz && hz.blocks(line[j - 1], line[j])) {
-				const e = /* @__PURE__ */ new Error(`ligne ${k} dans une zone de danger évitée entre ${line[j - 1].lat.toFixed(3)}, ${line[j - 1].lon.toFixed(3)} et ${line[j].lat.toFixed(3)}, ${line[j].lon.toFixed(3)} — calcul refusé`);
-				e.code = "hazard";
-				throw e;
-			}
-		}
+		const f = lineFault(line, coastIndex, zones, hz);
+		if (!f) continue;
+		const a = line[f.i - 1];
+		const b = line[f.i];
+		const where = `entre ${a.lat.toFixed(3)}, ${a.lon.toFixed(3)} et ${b.lat.toFixed(3)}, ${b.lon.toFixed(3)} — calcul refusé`;
+		const what = f.kind === "land" ? "sur la terre" : f.kind === "tss" ? "dans un dispositif de séparation du trafic" : "dans une zone de danger évitée";
+		const e = /* @__PURE__ */ new Error(`ligne ${k} ${what} ${where}`);
+		e.code = f.kind;
+		throw e;
 	}
 }
 var EDGE_PAD = .05;
@@ -9193,12 +10701,66 @@ function weatherSourceOf(pack, models, nowMs = Date.now()) {
 		})) } : {}
 	};
 }
+var NUL = -32768;
+var scaleOf = (k) => k.startsWith("wind_speed") ? 10 : 1;
+var isoHour = (ms) => new Date(ms).toISOString().slice(0, 16);
+/** La source de parseEnsembleFrom sur un ensemble compact (pur). */
+function ensembleSource(c) {
+	const K = c.keys.length;
+	const T = c.times.length;
+	const idx = new Map(c.keys.map((k, i) => [k, i]));
+	const scale = c.keys.map(scaleOf);
+	return {
+		count: c.lats.length * c.lons.length,
+		keys: ["time", ...c.keys],
+		times: c.timeStr || Array.from(c.times, isoHour),
+		get: (p, key, t) => {
+			const k = idx.get(key);
+			if (k == null || t >= T) return void 0;
+			const x = c.vals[(p * K + k) * T + t];
+			return c.int16 ? x === NUL ? null : x / scale[k] : Number.isNaN(x) ? null : x;
+		}
+	};
+}
+/** L'âge (h) d'un ensemble rangé. */
+var ensAgeH = (c, nowMs = Date.now()) => {
+	const t = Date.parse(c?.fetchedAt || "");
+	return Number.isFinite(t) ? Math.max(0, (nowMs - t) / 36e5) : null;
+};
+/**
+* Un ensemble compact → les grilles des membres, au format de fetchEnsembleGrids (`.download`) ;
+* `previous` (D26 🗄, ou rangé depuis plus de 3 h) : `.previous = { fetchedAt, ageH, file: 'device' }` — l'âge est DIT.
+*/
+function ensembleGrids(c, { nowMs = Date.now(), previous = false, file = "device" } = {}) {
+	const t0 = Date.now();
+	const grids = parseEnsembleFrom(ensembleSource(c), {
+		model: c.model,
+		lats: c.lats,
+		lons: c.lons
+	});
+	grids.download = {
+		bytes: c.rawBytes ?? c.bytes,
+		ms: Date.now() - t0,
+		cached: file
+	};
+	const a = ensAgeH(c, nowMs);
+	if (previous || a != null && a > 3) grids.previous = {
+		fetchedAt: c.fetchedAt,
+		ageH: a == null ? null : Math.round(a * 10) / 10,
+		file
+	};
+	return grids;
+}
 //#endregion
 //#region src/lib/localRouting/localIO.js
-/** D29 bis — ce qui reste AU NUAGE, partout ailleurs : les ensembles (173 scénarios ; un paquet n'en a pas). */
+/** D29 bis — ce qui reste AU NUAGE sur un appareil qui ne le porte pas : les ensembles (173 scénarios). D29 ter : un ordinateur capable et le PC du bord les calculent (`opts.ensembles`). */
 var CLOUD_ONLY = ["ensembles"];
-/** D29 bis — les sensibilités qui tournent partout (deux routes chacune, la météo déjà là). */
-var LOCAL_SENS = ["polar", "crew"];
+/** D29 bis — les sensibilités qui tournent partout (deux routes chacune, la météo déjà là). NIGHT-1 (D40) : + 🌙 la polaire de nuit. */
+var LOCAL_SENS = [
+	"polar",
+	"crew",
+	"nightPolar"
+];
 /** D29 bis — la recherche du départ : la grille D22, et le plan des départs (≈ 100 routes isochrones, avec la grille complète seulement). */
 var GRID_OPTIONS = ["bestDeparture", "departures"];
 /** D29 bis — la grille LÉGÈRE : ±12 h (9 départs, toutes les 3 h), l'objectif choisi + Rapide, 120 s au plus. */
@@ -9212,7 +10774,8 @@ var DEVICE_STRIPPED = [
 	"departures",
 	"ensembles",
 	"bestDeparture",
-	"crew"
+	"crew",
+	"nightPolar"
 ];
 var H = 36e5;
 /**
@@ -9328,8 +10891,71 @@ function previousFromPack(pack, kind, bbox, nowMs = Date.now()) {
 	};
 	return grid;
 }
+/**
+* D37 (ROUTE-038) — « ＋ Ajouter un calcul » sur l'appareil : LA grille du paquet que
+* le calcul de base a lue, reconnue à son `fetchedAt` (exactement), quel que soit son
+* âge — sinon null (le paquet a été remplacé, la base vient d'ailleurs : calcul complet, dit). Pur.
+*/
+function exactFromPack(pack, kind, bbox, fetchedAt) {
+	const want = Date.parse(fetchedAt || "");
+	if (!pack || !Number.isFinite(want)) return null;
+	let g = null;
+	try {
+		g = kind === "waves" ? waveGridFor(pack, bbox) : kind.startsWith("wind-") ? windGridFor(pack, kind.slice(5), bbox) : null;
+	} catch {
+		g = null;
+	}
+	if (!g || Date.parse(g.fetchedAt || "") !== want) return null;
+	const { stale, ...grid } = g;
+	return grid;
+}
+/**
+* D29 ter — les ensembles d'un calcul local : `ens = { find(model, bbox, { step, days }) → compact | null,
+* download?(model, bbox, { step, days, log }) → compact | null }` (le navigateur : IndexedDB et Open-Meteo ;
+* le PC du bord : un dossier et Open-Meteo). → les fonctions `fetchEnsembleGrids` / `previousEnsembleGrids` / `ensembleNear` (D37) de `io`.
+*/
+function localEnsembleIO(ens, nowMs = Date.now()) {
+	return {
+		fetchEnsembleGrids: async (model, bbox, o = {}) => {
+			const c = ens ? await ens.find(model, bbox, o) : null;
+			if (c) return ensembleGrids(c, { nowMs });
+			const d = ens?.download ? await ens.download(model, bbox, o) : null;
+			return d ? ensembleGrids(d, {
+				nowMs,
+				file: "open-meteo"
+			}) : null;
+		},
+		previousEnsembleGrids: async (model, bbox, o = {}) => {
+			const c = ens ? await ens.find(model, bbox, {
+				...o,
+				any: true
+			}) : null;
+			return c ? ensembleGrids(c, {
+				nowMs,
+				previous: true
+			}) : null;
+		},
+		ensembleNear: async (model, bbox, o = {}) => {
+			const c = ens ? await ens.find(model, bbox, {
+				...o,
+				any: true
+			}) : null;
+			const at = Date.parse(c?.fetchedAt || "");
+			if (!c || !Number.isFinite(at) || !Number.isFinite(o.atMs)) return null;
+			const d = Math.abs(at - o.atMs);
+			if (d > (o.maxDiffH ?? 6) * 36e5) return null;
+			const g = ensembleGrids(c, { nowMs });
+			g.near = {
+				fetchedAt: new Date(at).toISOString(),
+				diffH: Math.round(d / 36e4) / 10,
+				ageH: Math.round((nowMs - at) / 36e4) / 10
+			};
+			return g;
+		}
+	};
+}
 /** Le `io` de computeAdvice pour un calcul local. */
-function localIO({ pack, store, createPool, timezoneAt = async () => null, nowMs = Date.now(), models }) {
+function localIO({ pack, store, createPool, timezoneAt = async () => null, nowMs = Date.now(), models, ens = null }) {
 	const tc = tileCharts(store);
 	return {
 		loadCharts: (bbox, opts) => loadCharts(bbox, {
@@ -9339,7 +10965,12 @@ function localIO({ pack, store, createPool, timezoneAt = async () => null, nowMs
 		fetchWindGrid: async (model, bbox) => windGridFor(pack, model, bbox, { nowMs }),
 		fetchWaveGrid: async (bbox) => waveGridFor(pack, bbox, { nowMs }),
 		previousGrid: (cacheDir, kind, bbox, step, days, now = nowMs) => previousFromPack(pack, kind, bbox, now),
-		previousEnsembleGrids: async () => null,
+		...typeof ens?.fetchEnsembleGrids === "function" ? {
+			fetchEnsembleGrids: ens.fetchEnsembleGrids,
+			previousEnsembleGrids: ens.previousEnsembleGrids || (async () => null),
+			ensembleNear: ens.ensembleNear || (() => null)
+		} : localEnsembleIO(ens, nowMs),
+		exactGrid: (cacheDir, kind, bbox, step, days, fetchedAt) => exactFromPack(pack, kind, bbox, fetchedAt),
 		...createPool ? { createPool } : {},
 		resolvePlace: async (v) => {
 			throw Object.assign(/* @__PURE__ */ new Error(`lieu « ${v} » : hors ligne, un point (lat, lon) est nécessaire`), { code: "place" });
@@ -9365,7 +10996,11 @@ function localIO({ pack, store, createPool, timezoneAt = async () => null, nowMs
 *          computedOn: 'device' | 'boat-pc', maxModels?, maxRoutes?,
 *          grid?: 'off' | 'light' | 'full' (D29 bis — défaut : 'full' au PC du bord, 'off' ailleurs),
 *          sens?: false (⛵ 😴 retirées — la reprise « Rapide seul »), departBudgetMs?, shouldStop?,
-*          stripHeavy?: true (tout ce que D29 retirait — la reprise « Rapide seul ») }
+*          stripHeavy?: true (tout ce que D29 retirait — la reprise « Rapide seul »),
+*          startMs? (D36 : le zéro du `t` des étapes — la naissance de la ligne),
+*          base?: { id, result } (D37 — « ＋ Ajouter un calcul » : la base, sur l'appareil ; sa météo = ce paquet, s'il est le même),
+*          ensembles?: true (D29 ter — 🎲 ici : un ordinateur capable, le PC du bord ; sinon retirés et dits),
+*          ens?: { find, download? } (D29 ter — la météo des ensembles : localEnsembleIO) }
 */
 async function computeLocal(request, opts) {
 	const { pack, computedOn = "device", nowMs = Date.now(), maxModels = null, maxRoutes = null, noOptimiser = false } = opts;
@@ -9376,6 +11011,7 @@ async function computeLocal(request, opts) {
 		"full"
 	].includes(opts.grid) ? opts.grid : computedOn === "boat-pc" ? "full" : "off";
 	const sensOk = opts.sens !== false;
+	const ensOk = opts.ensembles === true && !stripHeavy;
 	const from = request?.from;
 	const to = request?.to;
 	if (!(from && Number.isFinite(from.lat) && to && Number.isFinite(to.lat))) throw Object.assign(/* @__PURE__ */ new Error("hors ligne, le départ et l'arrivée doivent être des points (lat, lon)"), { code: "place" });
@@ -9414,7 +11050,7 @@ async function computeLocal(request, opts) {
 			}
 		};
 		if (stripHeavy) DEVICE_STRIPPED.forEach(strip);
-		CLOUD_ONLY.forEach(strip);
+		if (!ensOk) CLOUD_ONLY.forEach(strip);
 		if (!sensOk) LOCAL_SENS.forEach(strip);
 		if (grid === "off") GRID_OPTIONS.forEach(strip);
 		if (grid === "light") {
@@ -9443,7 +11079,8 @@ async function computeLocal(request, opts) {
 		createPool: opts.createPool,
 		timezoneAt: opts.timezoneAt,
 		nowMs,
-		models
+		models,
+		ens: ensOk ? opts.ens || null : null
 	});
 	const departBudgetMs = opts.departBudgetMs || (caps.grid?.profile === "light" ? LIGHT_GRID.budgetMs : null);
 	if (caps.grid && departBudgetMs) caps.grid.budgetS = Math.round(departBudgetMs / 1e3);
@@ -9455,9 +11092,14 @@ async function computeLocal(request, opts) {
 		log: opts.log || (() => {}),
 		polar: opts.polar || null,
 		engineUsage: opts.engineUsage || null,
+		...opts.base?.result ? { base: {
+			id: opts.base.id || null,
+			result: opts.base.result
+		} } : {},
 		...opts.astarBudgetMs ? { astarBudgetMs: opts.astarBudgetMs } : {},
 		...departBudgetMs ? { departBudgetMs } : {},
-		...typeof opts.shouldStop === "function" ? { shouldStop: opts.shouldStop } : {}
+		...typeof opts.shouldStop === "function" ? { shouldStop: opts.shouldStop } : {},
+		...Number.isFinite(opts.startMs) ? { startMs: opts.startMs } : {}
 	});
 	result.computedOn = computedOn;
 	result.localWeather = dummy ? {
@@ -10370,6 +12012,14 @@ function packFromGribFiles(files, { id = null, name = null, nowMs = Date.now() }
 //#endregion
 //#region src/lib/localRouting/localRuns.js
 var ENVELOPE_KIND = "wangap-route-run";
+/** D37 — la base qu'une demande du PC porte (`requestEnvelope(…, { base })`) → { id, result } | null. */
+function envelopeBase(env) {
+	const b = env?.base;
+	return b && b.result && b.result.v === 1 && b.result.ok === true ? {
+		id: b.id || null,
+		result: b.result
+	} : null;
+}
 //#endregion
 //#region scripts/routing/localStore.mjs
 var CHARTS_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "public", "routing", "charts", "v1");
@@ -13130,6 +14780,46 @@ async function openMeteoPack(request, days) {
 		name: "Open-Meteo (PC du bord)"
 	});
 }
+/**
+* D29 ter — LES ENSEMBLES du PC du bord : les fonctions du SERVICE sur un dossier à lui (`dir`) — en ligne,
+* téléchargés et gardés (relus 3 h) ; hors ligne (ou Open-Meteo qui refuse), le plus récent du dossier qui
+* couvre le passage, quel que soit son âge, marqué « précédent » (l'âge dit dans `ensemble.ages`).
+*/
+function pcEnsembles(dir, { log: lg = log } = {}) {
+	return {
+		fetchEnsembleGrids: async (model, bbox, o = {}) => {
+			try {
+				return await fetchEnsembleGrids(model, bbox, {
+					step: o.step ?? 2,
+					days: o.days ?? 10,
+					cacheDir: dir,
+					log: (x) => lg(x)
+				});
+			} catch (e) {
+				const p = previousEnsembleGrids(model, bbox, {
+					step: o.step ?? 2,
+					days: o.days ?? 10,
+					cacheDir: dir
+				});
+				if (p) {
+					lg(`🎲 ${model} : Open-Meteo injoignable (${e.message}) — l'ensemble du dossier, d'il y a ${p.previous?.ageH ?? "?"} h`);
+					return p;
+				}
+				throw e;
+			}
+		},
+		previousEnsembleGrids: async (model, bbox, o = {}) => previousEnsembleGrids(model, bbox, {
+			step: o.step ?? 2,
+			days: o.days ?? 10,
+			cacheDir: dir
+		}),
+		ensembleNear: (model, bbox, o = {}) => ensembleNear(model, bbox, {
+			...o,
+			cacheDir: dir
+		})
+	};
+}
+var ensDirArg = (fallback = path.join(process.cwd(), "wangap-ensembles")) => arg("--ens-dir", fallback);
 /** D29 bis — la grille et son budget, de la ligne de commande (défaut : la grille complète, 240 s). */
 var gridArg = () => [
 	"off",
@@ -13144,7 +14834,7 @@ var budgetArg = () => {
 * Le calcul → l'enveloppe que l'app importe.
 * Les fils : ceux du dépôt (worker_threads) ; le fichier publié, les siens (createSelfPool) ; --threads 1 : aucun.
 */
-async function computeToEnvelope(request, pack, { charts, threads, nowMs, onStep, grid = gridArg(), departBudgetMs = budgetArg() } = {}) {
+async function computeToEnvelope(request, pack, { charts, threads, nowMs, onStep, grid = gridArg(), departBudgetMs = budgetArg(), ensDir = ensDirArg(), ensembles = !argv.includes("--no-ensembles"), base = null } = {}) {
 	const startedAt = (/* @__PURE__ */ new Date()).toISOString();
 	const pool = threads === 1 ? createInProcessPool : IN_REPO ? null : createSelfPool;
 	const result = await computeLocal(request, {
@@ -13157,8 +14847,13 @@ async function computeToEnvelope(request, pack, { charts, threads, nowMs, onStep
 		timezoneAt: await tzOf(),
 		onStep,
 		polar: POLAR_USED,
+		...request?.reuse && base?.result ? { base } : {},
 		...departBudgetMs ? { departBudgetMs } : {},
-		...pool ? { createPool: pool } : {}
+		...pool ? { createPool: pool } : {},
+		...ensembles && request?.options?.ensembles ? {
+			ensembles: true,
+			ens: pcEnsembles(ensDir)
+		} : {}
 	});
 	return {
 		kind: ENVELOPE_KIND,
@@ -13191,6 +14886,17 @@ var BENCH = {
 	e: {
 		polar: true,
 		crew: true,
+		bestDeparture: { windowH: 48 }
+	},
+	f: {
+		polar: true,
+		crew: true,
+		ensembles: true
+	},
+	g: {
+		polar: true,
+		crew: true,
+		ensembles: true,
 		bestDeparture: { windowH: 48 }
 	}
 };
@@ -13237,12 +14943,13 @@ async function benchOne(key) {
 		cpuS: Math.round((cpu.user + cpu.system) / 1e5) / 10,
 		maxRssMB: Math.round(process.resourceUsage().maxRSS / 1024),
 		grid: bd ? `${cells.filter((c) => c?.ok).length}/${cells.length}` : null,
-		timedOut: bd?.timedOut ?? null
+		timedOut: bd?.timedOut ?? null,
+		ens: r.ensemble ? r.ensemble.members : null
 	})}`);
 }
 var benchKeys = () => {
 	const v = argv[argv.indexOf("--bench") + 1] || "";
-	return /^[a-e](,[a-e])*$/.test(v) ? v.split(",") : Object.keys(BENCH);
+	return /^[a-g](,[a-g])*$/.test(v) ? v.split(",") : Object.keys(BENCH);
 };
 async function bench(keys) {
 	log(`banc d'essai : ${os.cpus()[0]?.model || "?"} · ${os.availableParallelism()} fils · ${Math.round(os.totalmem() / 2 ** 30)} Go · node ${process.version}`);
@@ -13251,7 +14958,7 @@ async function bench(keys) {
 			fileURLToPath(import.meta.url),
 			"--bench-one",
 			k,
-			...argv.filter((a, i) => a !== "--bench" && !(argv[i - 1] === "--bench" && /^[a-e](,[a-e])*$/.test(a)))
+			...argv.filter((a, i) => a !== "--bench" && !(argv[i - 1] === "--bench" && /^[a-g](,[a-g])*$/.test(a)))
 		], { stdio: [
 			"ignore",
 			"pipe",
@@ -13264,11 +14971,24 @@ async function bench(keys) {
 		await new Promise((ok) => p.on("exit", ok));
 		const line = txt.split("\n").find((l) => l.startsWith("@@"));
 		const m = line ? JSON.parse(line.slice(2)) : null;
-		log(m ? `${k} · ${m.s} s · CPU ${m.cpuS} s · mémoire au pic ${m.maxRssMB} Mo${m.grid ? ` · grille ${m.grid} (trop long ${m.timedOut})` : ""}` : `${k} : échec`);
+		log(m ? `${k} · ${m.s} s · CPU ${m.cpuS} s · mémoire au pic ${m.maxRssMB} Mo${m.grid ? ` · grille ${m.grid} (trop long ${m.timedOut})` : ""}${m.ens ? ` · 🎲 ${m.ens} membres` : ""}` : `${k} : échec`);
 	}
 }
 var slug = (s) => String(s || "route").normalize("NFD").replace(/[^\w]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) || "route";
-var stamp = () => (/* @__PURE__ */ new Date()).toISOString().slice(0, 16).replace(/[:T]/g, "");
+/** D37 / D39 — ce que dit la reprise d'une base (le journal du PC). */
+var reuseLog = (x) => !x.ok ? `calcul complet (${x.why}${x.detail?.length ? ` : ${x.detail.join(", ")}` : ""})` : x.mode === "weather" ? `♻ météo de la base ${x.baseRunId} (même météo, tout refait : ${(x.changed || []).join(", ") || "rien de changé"})` : `♻ repris de la base ${x.baseRunId} (même météo) : ${x.added.join(", ") || "rien de plus"}`;
+/**
+* D39 (« le panier », Q3) — le fichier du calcul rendu : la destination, le départ calculé, la seconde ; jamais celui
+* d'un autre (avant : à la minute — deux calculs du même port finis dans la même minute, ≈ 10–25 s chacun ici,
+* s'écrasaient). → le chemin
+*/
+function calcFileName(dir, request, nowMs = Date.now()) {
+	const dep = Number.isFinite(request?.departMs) ? `-d${new Date(request.departMs).toISOString().slice(0, 16).replace(/[-:T]/g, "")}` : "";
+	const stem = `wangap-calcul-${slug(request?.to?.name)}${dep}-${new Date(nowMs).toISOString().slice(0, 19).replace(/[-:T]/g, "")}`;
+	let f = path.join(dir, `${stem}.json`);
+	for (let k = 2; fs.existsSync(f); k++) f = path.join(dir, `${stem}-${k}.json`);
+	return f;
+}
 async function once() {
 	const fromArg = arg("--from");
 	const from = fromArg ? (([la, lo]) => ({
@@ -13276,7 +14996,15 @@ async function once() {
 		lon: Number(lo),
 		name: "Wang'ap"
 	}))(fromArg.split(",")) : null;
-	const request = readRequest(fs.readFileSync(arg("--request"), "utf8"), { from });
+	const reqText = fs.readFileSync(arg("--request"), "utf8");
+	const request = readRequest(reqText, { from });
+	const base = (() => {
+		try {
+			return envelopeBase(JSON.parse(reqText));
+		} catch {
+			return null;
+		}
+	})();
 	let pack;
 	if (args("--grib").length) {
 		const { pack: p, report } = packFromGribFiles(args("--grib").map((f) => ({
@@ -13294,9 +15022,11 @@ async function once() {
 		charts,
 		threads: Number(arg("--threads")) || null,
 		nowMs: arg("--now") ? Date.parse(arg("--now")) : null,
+		base,
 		onStep: (s) => log("·", s.name, s.total ? `${s.done}/${s.total}` : "")
 	});
-	const out = arg("--out", `wangap-calcul-${slug(request.to?.name)}-${stamp()}.json`);
+	if (env.result?.reuse) log(reuseLog(env.result.reuse));
+	const out = arg("--out", path.basename(calcFileName(".", request)));
 	fs.writeFileSync(out, JSON.stringify(env));
 	const r = env.result;
 	log(r.ok ? `✓ ${r.from.name} → ${r.to.name} · arrivée ${new Date(r.arrival.medianMs).toISOString()} · confiance ${r.confidence.level} · ${(JSON.stringify(env).length / 1024).toFixed(0)} Ko → ${out}` : `pas de route : ${r.reason} → ${out}`);
@@ -13314,7 +15044,15 @@ async function processFolder(dir, { charts = chartStoreFor(), threads = null } =
 	for (const d of fs.readdirSync(dir).filter((f) => /^wangap-demande.*\.json$/i.test(f))) {
 		const full = path.join(dir, d);
 		try {
-			const request = readRequest(fs.readFileSync(full, "utf8"));
+			const text = fs.readFileSync(full, "utf8");
+			const request = readRequest(text);
+			const base = (() => {
+				try {
+					return envelopeBase(JSON.parse(text));
+				} catch {
+					return null;
+				}
+			})();
 			const gribs = fs.readdirSync(dir).filter((f) => /\.(grb2?|grib2?|gr2)$/i.test(f)).map((f) => ({
 				f,
 				t: fs.statSync(path.join(dir, f)).mtimeMs
@@ -13333,9 +15071,12 @@ async function processFolder(dir, { charts = chartStoreFor(), threads = null } =
 			log(`${d} : calcul…`);
 			const env = await computeToEnvelope(request, pack, {
 				charts,
-				threads
+				threads,
+				base,
+				ensDir: ensDirArg(path.join(dir, "ensembles"))
 			});
-			const out = path.join(dir, `wangap-calcul-${slug(request.to?.name)}-${stamp()}.json`);
+			if (env.result?.reuse) log(reuseLog(env.result.reuse));
+			const out = calcFileName(dir, request);
 			fs.writeFileSync(out, JSON.stringify(env));
 			fs.renameSync(full, path.join(dir, "traitees", d));
 			log(`✓ ${path.basename(out)}`);
@@ -13463,4 +15204,4 @@ if (isMainThread && (import.meta.url === `file://${process.argv[1]}` || process.
 	process.exitCode = 1;
 }
 //#endregion
-export { chartStoreFor, computeToEnvelope, createSelfPool, polarFromFile, processFolder, readRequest };
+export { calcFileName, chartStoreFor, computeToEnvelope, createSelfPool, pcEnsembles, polarFromFile, processFolder, readRequest };
