@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// ⚠️⚠️ FICHIER GÉNÉRÉ — scripts/routing/build-route-local-bundle.mjs (sources 394bb01fff244e1f, 66 fichiers).
+// ⚠️⚠️ FICHIER GÉNÉRÉ — scripts/routing/build-route-local-bundle.mjs (sources 9f05d73673b1fd3f, 66 fichiers).
 // Le routeur de Wang'ap pour le PC du bord : node route-local.mjs --help.
 import { createRequire } from "node:module";
 import fs from "node:fs";
@@ -3239,6 +3239,53 @@ Object.freeze({
 		}
 	}
 });
+var ENGINE_DETAIL_COLUMNS_BY_INSTANCE = Object.freeze({
+	0: Object.freeze({
+		coolant: "engine_coolant_c",
+		oil: "engine_oil_kpa",
+		alerts: "engine_alerts"
+	}),
+	1: Object.freeze({
+		coolant: "engine2_coolant_c",
+		oil: "engine2_oil_kpa",
+		alerts: "engine2_alerts"
+	})
+});
+Object.freeze(Object.fromEntries(ENGINE_SIDES.map((s) => [s, ENGINE_DETAIL_COLUMNS_BY_INSTANCE[INSTANCE_OF[s]]])));
+Object.freeze([
+	{
+		fr: "contrôle moteur",
+		en: "check engine"
+	},
+	{
+		fr: "surchauffe",
+		en: "over temperature"
+	},
+	{
+		fr: "huile basse",
+		en: "low oil"
+	},
+	{
+		fr: "refroidissement, gazole ou turbo",
+		en: "cooling, fuel or boost"
+	},
+	{
+		fr: "surrégime",
+		en: "over-revving"
+	},
+	{
+		fr: "alerte moteur",
+		en: "engine warning"
+	},
+	{
+		fr: "EGR, accélérateur ou communication",
+		en: "EGR, throttle or comm."
+	},
+	{
+		fr: "transmission",
+		en: "transmission"
+	}
+]);
 //#endregion
 //#region scripts/routing/lib/propulsion.mjs
 var RAD$3 = Math.PI / 180;

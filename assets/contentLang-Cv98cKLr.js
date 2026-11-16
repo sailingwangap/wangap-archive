@@ -1,0 +1,1 @@
+function e(e,t,n){if(n!==`en`||!e)return;let r=e[`${t}_en`];return typeof r==`string`&&r.trim()?void 0:`fr`}export{e as t};

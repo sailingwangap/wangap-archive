@@ -1,0 +1,1 @@
+import{t as e}from"./supabaseArchive-DbTF1Ohp.js";function t(){return e}export{t};

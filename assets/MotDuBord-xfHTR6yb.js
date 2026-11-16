@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-C6D02mtk.js";import{t}from"./MotDuBordCard-d0fviFHR.js";import{t as n}from"./useMotDuBord-D9VrofYQ.js";var r=e();function i(e){return(0,r.jsx)(t,{...e,useWords:n})}export{i as t};

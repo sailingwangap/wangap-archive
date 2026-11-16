@@ -11,7 +11,8 @@
  *   WG.staticMap(el, opts)                    — tuiles + trace en SVG, sans bibliothèque
  *   WG.openPost(post)                         — le lecteur d'une publication
  *   WG.toast(msg) / WG.inert()                — « lien inactif dans la démo »
- *   WG.DESIGNS                                — les six propositions
+ *   WG.DESIGNS                                — les six propositions + d7, la synthèse, puis ses v2 (d8), v3 (d9), v4 (d10) et v5 (d11)
+ *   ⚠️ Après toute modification de ce fichier : changer le ?v= des pages qui le chargent (index, d9, d10, d11).
  */
 (function () {
   const D = window.WG_DATA;
@@ -51,6 +52,40 @@
       xpFr: 'La carte occupe l’écran d’accueil. Dessous, des tuiles de chiffres (milles, jours, étapes, dernier récit). « Raconte-moi » lance un récit guidé : la carte vole d’étape en étape pendant qu’on fait défiler. Les chapitres sont les planètes du Petit Prince.',
       xpEn: 'The map fills the opening screen. Below, number tiles (miles, days, stages, latest story). “Tell me” starts a guided story: the map flies from stage to stage as you scroll. Chapters are the Little Prince’s planets.',
       fonts: 'Bricolage Grotesque · Inter · JetBrains Mono', palette: ['#0E3B52', '#36B3AE', '#F4E8D4', '#F2843A', '#FFFFFF', '#0F1E28'], pp: 3 },
+    // La synthèse (10 nov.) : construite d'après les avis de Catherine (17 oct.) et de Bertrand (10 nov.).
+    { id: 'd7', file: 'd7-la-synthese.html', fr: 'La Synthèse', en: 'The Synthesis',
+      moodFr: 'La Petite Planète, plus adulte — encre, lavis, marine et or, un carnet de mer.', moodEn: 'The Little Planet, grown up — ink, washes, navy and gold, a sea journal.',
+      xpFr: 'Le livre d’images de la Petite Planète, dessiné à l’encre et au lavis, sans enfantillage. Une carte marine qui se déplie : la route parcourue à l’encre, la route prévue en pointillé. Le carnet de bord en pages, chapitre après chapitre. Des cartes postales à retourner, l’équipage en grand, un petit tableau de bord. Vue de jour, vue de nuit ; menu en bas sur téléphone.',
+      xpEn: 'The Little Planet’s picture book, drawn in ink and washes, without the childishness. A sea chart that unfolds: the route sailed in ink, the planned route dotted. The log in pages, chapter after chapter. Postcards to turn over, the crew in large photos, a small dashboard. Day view, night view; menu at the bottom on phones.',
+      fonts: 'Fraunces · Literata · Caveat', palette: ['#F4ECDB', '#1E2B47', '#C9973B', '#4A74A3', '#B4473D', '#0F1A33'], pp: 3 },
+    // La synthèse v2 (11 nov.) : d1 reprise d'après l'avis de Bertrand sur d7 (« mono-corde,
+    // mono-couleur, pas assez punchy ») — une couleur par section, la police de Wang'ap partout.
+    { id: 'd8', file: 'd8-la-synthese-v2.html', fr: 'La Synthèse v2', en: 'The Synthesis v2',
+      moodFr: 'La Petite Planète, en couleurs franches — une couleur par section, la police de Wang’ap partout.', moodEn: 'The Little Planet in bold colours — one colour per section, Wang’ap’s own font throughout.',
+      xpFr: 'Chaque section a sa couleur et sa vague de séparation : marine et or pour l’accueil, bleu lagon pour la carte, sable pour le journal, vert d’eau profond pour la galerie, terre cuite pour les escales. Des titres simples. Le journal en cartes bien séparées, une photo par récit. Le vrai programme sur la carte du monde, avec ses drapeaux. Un menu en couleurs, la galerie à portée de main ; vue de jour, vue de nuit.',
+      xpEn: 'Every section has its own colour and a wave to set it apart: navy and gold for the opening, lagoon blue for the map, sand for the journal, deep teal for the gallery, terracotta for the stops. Simple titles. The journal as clearly separated cards, one photo per story. The real programme on the world map, with its flags. A colourful menu, the gallery within reach; day view, night view.',
+      fonts: 'Georgia (Wang’ap) · police système', palette: ['#14284B', '#E8B059', '#D3E7EE', '#F6EBDA', '#0E3A42', '#BF4F39'], pp: 2 },
+    // La synthèse v3 (12 nov.) : d8 (5/5 pour Catherine et pour Bertrand) corrigée point par point —
+    // la grande photo de Wang'ap, son logo et sa police, des cartes de géographe, le Petit Prince en exergue.
+    { id: 'd9', file: 'd9-la-synthese-v3.html', fr: 'La Synthèse v3', en: 'The Synthesis v3',
+      moodFr: 'La v2 que vous avez aimée, avec Wang’ap en grand, son logo et sa police, des cartes de géographe et le Petit Prince en exergue.', moodEn: 'The v2 you liked, with Wang’ap full-size, her logo and font, proper geographer’s maps and the Little Prince as epigraphs.',
+      xpFr: 'L’accueil s’ouvre sur une grande photo nette de Wang’ap — à choisir parmi six — avec le logo en grand et « wang’ap » dans sa police. La mappemonde a la mer en bleu, ses méridiens, ses tropiques et une rose des vents ; la route parcourue est sur une carte de géographe, lissée, et se dessine quand on arrive dessus. La galerie a ses photos et ses vidéos. Le lecteur montre chaque photo entière. Une phrase du Petit Prince ouvre chaque section ; l’équipage en bleu Outremer, la genèse en lie-de-vin.',
+      xpEn: 'The opening is a large, sharp photo of Wang’ap — pick one of six — with the logo full-size and “wang’ap” in her own font. The world map has a blue sea, meridians, tropics and a compass rose; the route sailed sits on a geographer’s map, smoothed, and draws itself as you reach it. The gallery has its photos and its videos. The reader shows every photo whole. A line from The Little Prince opens each section; the crew in Outremer blue, the genesis in wine red.',
+      fonts: 'Georgia (Wang’ap) · police système', palette: ['#14284B', '#E8B059', '#9EC3E0', '#F6EBDA', '#1B4572', '#6B2333'], pp: 3 },
+    // La synthèse v4 (12 nov. au soir) : d9 + « Première page : on préfère la V2 » (le cadre plus grand)
+    // + leurs quatre photos au choix + « les cartes harmonisées, la même carte ».
+    { id: 'd10', file: 'd10-la-synthese-v4.html', fr: 'La Synthèse v4', en: 'The Synthesis v4',
+      moodFr: 'La v3, avec la première page de la v2 — les étoiles et l’orbite — et un grand cadre pour votre photo.', moodEn: 'v3 with v2’s opening page — the stars and the orbit — and a large frame for your photo.',
+      xpFr: 'L’accueil de la v2 revient, tel que vous l’aimiez : le ciel étoilé, l’orbite dorée, le halo, la grande phrase et la citation. Seul changement : le cadre de la photo, bien plus grand et à la forme de la photo, pour la voir presque entière — à choisir parmi vos quatre photos. Les deux cartes sont maintenant la même mappemonde, avec le même trait et les mêmes escales. Tout le reste de la v3 est gardé.',
+      xpEn: 'v2’s opening is back, as you liked it: the starry sky, the golden orbit, the halo, the big sentence and the quote. One change: the photo frame, much larger and shaped like the photo, so you see almost all of it — pick one of your four photos. Both maps are now the same world map, with the same line and the same stops. Everything else from v3 stays.',
+      fonts: 'Georgia (Wang’ap) · police système', palette: ['#14284B', '#E8B059', '#9EC3E0', '#F6EBDA', '#1B4572', '#6B2333'], pp: 3 },
+    // La synthèse v5 (13 nov.) : d10 + leur photo d'accueil (« à la barre », leur choix à tous les deux) + le titre
+    // de l'accueil plus petit + le menu vérifié et compacté en paysage.
+    { id: 'd11', file: 'd11-la-synthese-v5.html', fr: 'La Synthèse v5', en: 'The Synthesis v5',
+      moodFr: 'La v4, avec votre photo à la barre, le titre de l’accueil plus petit et un menu vérifié sur tous vos écrans.', moodEn: 'v4 with your photo at the helm, a smaller opening title and a menu checked on all your screens.',
+      xpFr: 'La v4 telle quelle, avec la photo que vous avez choisie tous les deux — à la barre, le premier essai de 2023 — désormais fixe à l’accueil, le grand titre une à deux tailles plus petit, et le menu vérifié sur iPhone, iPad et ordinateur, en portrait comme en paysage — plus compact quand le téléphone est tenu en largeur.',
+      xpEn: 'v4 as it was, with the photo you both chose — at the helm, the first sea trial in 2023 — now fixed on the opening page, the big title one or two sizes smaller, and the menu checked on iPhone, iPad and computer, portrait and landscape — more compact when the phone is held sideways.',
+      fonts: 'Georgia (Wang’ap) · police système', palette: ['#14284B', '#E8B059', '#9EC3E0', '#F6EBDA', '#1B4572', '#6B2333'], pp: 3 },
   ];
 
   let lang = store.get('wg-revue-lang') || ((navigator.language || 'fr').startsWith('fr') ? 'fr' : 'en');

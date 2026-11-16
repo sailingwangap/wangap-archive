@@ -1,0 +1,1520 @@
+<!doctype html>
+<html lang="fr" data-theme="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#FBF6EA">
+<title>Wang'ap — La Synthèse v3 (démo)</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&text=%ED%99%98%EA%B0%91&display=swap" rel="stylesheet">
+<!-- ?v= : le service worker de l'application (déjà installé chez Catherine et Bertrand) sert d'abord SA copie des fichiers de même origine ; une adresse nouvelle n'est jamais dans son cache. ⚠️ Après toute modification de wg.js / survey.js / wg.css / data-*.js : changer ce ?v= (verify-design-survey vérifie qu'il est le même partout). -->
+<link rel="stylesheet" href="wg.css?v=20261113a">
+<script>try { if (localStorage.getItem('wg-d9-theme') === 'night') document.documentElement.setAttribute('data-theme', 'night'); } catch (e) { /* navigation privée */ }</script>
+<style>
+/* Design 9 — « La Synthèse v3 » (12 nov.). d8 a reçu 5/5 de Catherine et de Bertrand ; on
+   garde tout ce qu'ils ont aimé (les couleurs, la lisibilité, le journal à une photo, les cartes
+   postales, la galerie, le sommaire) et on corrige, point par point, leurs remarques :
+   - l'accueil : la photo de Wang'ap EN GRAND et nette (plus de bord estompé), choisie par
+     Bertrand parmi six (« Choisir la photo », le choix part avec son avis) ; le logo en grand
+     et « wang'ap » dans sa police (Georgia 800, comme l'en-tête de l'application) ; des
+     caractères plus petits ;
+   - le Petit Prince revient, sans enfantillage : le logo, et une phrase du livre en exergue
+     de chaque section ;
+   - les cartes : la mappemonde (World Physical : la mer en bleu, les méridiens, les tropiques,
+     une rose des vents) et une vraie carte de géographe pour la route parcourue (NatGeo) ;
+     la route simplifiée et lissée, qui se dessine quand on arrive dessus ;
+   - la galerie : Photos | Vidéos, et les vidéos se regardent sur place ;
+   - le lecteur : chaque photo ENTIÈRE, une à la fois, numérotée, avec des flèches ;
+   - les fonds : fini le vert pâle, le rose et le lavande — bleu Outremer, lie-de-vin, ivoire ;
+   - des animations qui se jouent quand on arrive dessus (Catherine ne les avait pas vues).
+   Données : data-d9.js — un nouvel instantané public (56 récits, la route jusqu'à l'Atlantique,
+   les vidéos), délai public appliqué. Règle 8 : seulement les chapitres et étapes commencés,
+   jamais de « prochaine étape », pas de date de fin pour l'escale encore ouverte. */
+:root{
+  --cream:#FBF6EA;--navy:#14284B;--ink:#1D2B44;--muted:#525D6F;--gold:#E8B059;
+  --c-home:#D9962B;--c-map:#1F6F8B;--c-jnl:#2C5282;--c-gal:#0E7C7B;--c-esc:#C0503A;--c-prg:#A8730F;--c-crw:#1D5C96;--c-gen:#8C2F45;--c-ctc:#14284B;
+  --ch0:#4F7A3F;--ch1:#1F6F8B;--ch2:#C0503A;--ch3:#A8730F;--ch4:#5E4687;
+  --o-med:#1F6F8B;--o-atl:#0E7C7B;--o-pac:#24406E;--o-ind:#A8730F;--o-ret:#C0503A;
+  --fw:Georgia,"Times New Roman",serif;
+  --fs:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --top-bg:#FBF6EA;--top-ink:#14284B;--top-mut:#5A6475;
+  --card:#FFFFFF;--card-ink:#1D2B44;--card-mut:#5A6475;--hair:rgba(29,43,68,.13);--hair-2:rgba(29,43,68,.28);
+  --shadow:0 1px 2px rgba(20,40,75,.07),0 16px 32px -18px rgba(20,40,75,.42);
+  --gut:16px;
+  --rd-bg:#FFFFFF;--rd-ink:#1D2B44;--rd-muted:#5A6475;--rd-accent:#B0432F;--rd-title:#14284B;
+  --rd-title-font:Georgia,"Times New Roman",serif;--rd-body-font:Georgia,"Times New Roman",serif;--rd-radius:20px;
+}
+[data-theme="night"]{
+  --top-bg:#0D1830;--top-ink:#F3EBDA;--top-mut:#A9B2C2;--muted:#A9B2C2;
+  --card:#18233A;--card-ink:#EFE8D8;--card-mut:#A9B2C2;--hair:rgba(239,232,216,.14);--hair-2:rgba(239,232,216,.3);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 18px 34px -18px rgba(0,0,0,.75);
+  --ch0:#8CBF77;--ch1:#5FB0CC;--ch2:#EE8E76;--ch3:#E2B04F;--ch4:#B49BE0;
+  --o-med:#5FB0CC;--o-atl:#45C2BE;--o-pac:#8DB2EA;--o-ind:#E2B04F;--o-ret:#EE8E76;
+  --c-home:#E8B059;--c-map:#4FA3C0;--c-jnl:#7BA3E0;--c-gal:#3FB8B5;--c-esc:#E5876F;--c-prg:#E2B04F;--c-crw:#7FB2E5;--c-gen:#E58A9E;--c-ctc:#E8B059;
+  --rd-bg:#18233A;--rd-ink:#EFE8D8;--rd-muted:#A9B2C2;--rd-accent:#F0C474;--rd-title:#F6EFDF;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:12px}
+body{margin:0;background:var(--top-bg);color:var(--ink);font:400 17px/1.6 var(--fw);overflow-x:hidden;overflow-x:clip;padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))}
+img{max-width:100%}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--c-map);outline-offset:3px;border-radius:6px}
+h1,h2,h3{font-family:var(--fw);font-weight:700;letter-spacing:.02em;line-height:1.12;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding:0 var(--gut)}
+/* une seule colonne qui ne déborde jamais ; les grilles en ajoutent plus bas */
+.hero-in,.near-g,.jgrid,.jlist,.jcards,.crew,.gen,.forms,.oc{grid-template-columns:minmax(0,1fr)}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.mr2{-webkit-mask:var(--m-r2) center/100% 100% no-repeat;mask:var(--m-r2) center/100% 100% no-repeat}
+.mrect{-webkit-mask:var(--m-rect) center/100% 100% no-repeat;mask:var(--m-rect) center/100% 100% no-repeat}
+
+/* ── les bandes : une couleur par section, une vague pour les séparer ── */
+.band{position:relative;background:var(--bg);color:var(--fg);padding:60px 0 70px}
+.band::before{content:"";position:absolute;left:0;right:0;top:-15px;height:16px;background:var(--bg);-webkit-mask:var(--wave) repeat-x 0 0/150px 16px;mask:var(--wave) repeat-x 0 0/150px 16px;pointer-events:none}
+.b-home{--bg:#14284B;--fg:#F6EFE0;--mut:rgba(246,239,224,.8);--acc:#E8B059;--on-acc:#14284B}
+.b-num{--bg:#E8B059;--fg:#14284B;--mut:#4F3D0E;--acc:#14284B;--on-acc:#F6EFE0}
+.b-map{--bg:#D3E7EE;--fg:#10283A;--mut:#3D5566;--acc:#1F6F8B;--on-acc:#FFFFFF}
+.b-jnl{--bg:#F6EBDA;--fg:#1D2B44;--mut:#535E70;--acc:#2C5282;--on-acc:#FFFFFF}
+.b-gal{--bg:#0E3A42;--fg:#EEF5F2;--mut:rgba(238,245,242,.8);--acc:#E8B059;--on-acc:#0E3A42}
+.b-esc{--bg:#BF4F39;--fg:#FFF8EF;--mut:rgba(255,248,239,.88);--acc:#FFF3DA;--on-acc:#9A3826}
+.b-prg{--bg:#F2E2BF;--fg:#2A2414;--mut:#5C5135;--acc:#8F620F;--on-acc:#FFFFFF}
+.b-crw{--bg:#1B4572;--fg:#F4EFE3;--mut:rgba(244,239,227,.84);--acc:#E8B059;--on-acc:#14284B}
+.b-gen{--bg:#6B2333;--fg:#F8EDE6;--mut:rgba(248,237,230,.84);--acc:#E8B059;--on-acc:#4A1622}
+.b-ctc{--bg:#F7EFDD;--fg:#14284B;--mut:#4F5A6B;--acc:#14284B;--on-acc:#F7EFDD}
+.b-end{--bg:#0B1730;--fg:#F3EBDA;--mut:rgba(243,235,218,.8);--acc:#E8B059;--on-acc:#0B1730}
+[data-theme="night"] .b-home{--bg:#0A1630}
+[data-theme="night"] .b-num{--bg:#3A2C10;--fg:#F2C979;--mut:rgba(242,201,121,.78);--acc:#F2C979;--on-acc:#3A2C10}
+[data-theme="night"] .b-map{--bg:#0E2A36;--fg:#E3EEF2;--mut:#A3BCC7;--acc:#5FB0CC;--on-acc:#0E2A36}
+[data-theme="night"] .b-jnl{--bg:#111A2C;--fg:#EFE8D8;--mut:#A9B2C2;--acc:#8DB2EA;--on-acc:#111A2C}
+[data-theme="night"] .b-gal{--bg:#061F24}
+[data-theme="night"] .b-esc{--bg:#4A1F17;--acc:#F3C9A8;--on-acc:#4A1F17}
+[data-theme="night"] .b-prg{--bg:#2A2214;--fg:#F2E6CB;--mut:#C2B391;--acc:#E8B059;--on-acc:#2A2214}
+[data-theme="night"] .b-crw{--bg:#0F2944}
+[data-theme="night"] .b-gen{--bg:#36121B}
+[data-theme="night"] .b-ctc{--bg:#1C1A16;--fg:#F2E9D6;--mut:#BDB29C;--acc:#E8B059;--on-acc:#1C1A16}
+[data-theme="night"] .b-end{--bg:#050B18}
+
+/* ── titres de section : une icône, un titre, une phrase ── */
+.sh{display:flex;gap:14px;align-items:flex-start;margin:0 0 28px;max-width:780px}
+.sh-i{flex:none;width:52px;height:52px;border-radius:16px;background:var(--acc);color:var(--on-acc);display:grid;place-items:center;box-shadow:0 8px 18px -10px rgba(0,0,0,.55);margin-top:2px}
+.sh-i svg{width:28px;height:28px}
+.sh h2{font-size:clamp(29px,5.8vw,44px);color:var(--fg)}
+.sh p{margin:8px 0 0;font:400 17px/1.45 var(--fs);color:var(--mut)}
+/* le Petit Prince en exergue (Catherine : « il n'y a plus vraiment de référence au Petit Prince ») */
+.epi{margin:-12px 0 30px;max-width:640px;padding-left:16px;border-left:2px solid var(--acc);font:italic 400 17px/1.5 var(--fw);color:var(--fg)}
+.epi cite{display:block;margin-top:4px;font:600 13px/1.3 var(--fs);font-style:normal;letter-spacing:.04em;color:var(--mut)}
+.b-num .epi{margin:0 0 24px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:50px;padding:0 22px;border-radius:999px;font:700 16px/1.15 var(--fs);text-decoration:none;border:2px solid transparent;cursor:pointer;transition:transform .15s,filter .15s;white-space:nowrap}
+.btn:hover{filter:brightness(1.07)}
+.btn:active{transform:translateY(1px)}
+.btn-p{background:var(--acc);color:var(--on-acc)}
+.btn-s{background:transparent;color:var(--fg);border-color:currentColor}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+.ctas.c{justify-content:center}
+
+/* ── en-tête ── */
+.top{background:var(--top-bg);color:var(--top-ink);position:relative;z-index:40}
+.top-in{display:flex;align-items:center;gap:10px;min-height:64px;padding-top:calc(6px + env(safe-area-inset-top,0px));padding-bottom:6px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--top-ink);margin-right:auto;min-height:48px;min-width:0}
+.brand .lg{width:46px;height:46px;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.14);flex:none}
+.brand .lg img{width:100%;height:100%;object-fit:cover;display:block}
+.brand b{font:800 25px/1 var(--fw);letter-spacing:.05em;white-space:nowrap}
+.brand small{display:none;font:500 13px/1.25 var(--fs);color:var(--top-mut);border-left:1px solid var(--hair-2);padding-left:11px;margin-left:2px}
+.seg{display:inline-flex;border:1.5px solid var(--hair-2);border-radius:999px;padding:2px;background:var(--top-bg)}
+.seg button{min-width:44px;min-height:40px;border:0;background:none;border-radius:999px;font:700 14px/1 var(--fs);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 11px;color:var(--top-ink)}
+.seg button svg{width:17px;height:17px}
+.seg button[aria-pressed="true"]{background:var(--top-ink);color:var(--top-bg)}
+.top .theme{display:none}
+.login{display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:44px;justify-content:center;padding:0 12px;border-radius:999px;border:1.5px solid var(--hair-2);text-decoration:none;color:var(--top-ink);font:700 14.5px/1 var(--fs)}
+.login span{display:none}
+
+/* barre des sections (iPad, ordinateur) */
+.navbar{display:none}
+.nv-i{width:28px;height:28px;border-radius:9px;background:var(--c);color:#fff;display:grid;place-items:center;flex:none}
+.nv-i svg{width:17px;height:17px}
+[data-theme="night"] .nv-i,[data-theme="night"] .som-i,[data-theme="night"] .tab.on .ti{color:#0D1830}
+
+/* barre d'onglets (téléphone) */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:700;display:flex;background:var(--top-bg);border-top:1px solid var(--hair);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 24px -18px rgba(0,0,0,.5)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:58px;color:var(--top-ink);text-decoration:none;font:700 11.5px/1.1 var(--fs);background:none;border:0;position:relative;cursor:pointer;padding:0;min-width:0}
+.tab+.tab::before{content:"";position:absolute;left:0;top:12px;bottom:12px;border-left:1px solid var(--hair)}
+.tab .ti{width:40px;height:30px;border-radius:10px;display:grid;place-items:center;color:var(--c);transition:background .2s,color .2s}
+.tab .ti svg{width:23px;height:23px}
+.tab.on .ti{background:var(--c);color:#fff}
+.tab.menu .ti{background:var(--top-ink);color:var(--top-bg)}
+
+/* le sommaire */
+.sheet{position:fixed;inset:0;z-index:920;background:rgba(8,14,28,.55);display:none;align-items:flex-end;justify-content:center}
+.sheet.on{display:flex;animation:wgFade .2s}
+.sheet-card{width:100%;max-width:480px;background:var(--top-bg);color:var(--top-ink);border-radius:24px 24px 0 0;padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));animation:wgUp .26s cubic-bezier(.2,.8,.2,1);max-height:92dvh;overflow:auto;overscroll-behavior:contain}
+.sheet-h{display:flex;align-items:center;gap:10px;padding:4px 0 12px;border-bottom:2px solid var(--top-ink)}
+.sheet-h h2{font-size:30px;margin-right:auto}
+.x{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:999px;border:1.5px solid var(--hair-2);background:none;font:700 14px/1 var(--fs);cursor:pointer;color:var(--top-ink)}
+.x svg{width:18px;height:18px}
+.som{list-style:none;margin:0;padding:0}
+.som li+li{border-top:1px solid var(--hair)}
+.som a{display:flex;align-items:center;gap:14px;min-height:62px;padding:8px 2px;text-decoration:none;color:var(--top-ink)}
+.som-i{flex:none;width:42px;height:42px;border-radius:12px;background:var(--c);color:#fff;display:grid;place-items:center}
+.som-i svg{width:22px;height:22px}
+.som b{display:block;font:700 19px/1.2 var(--fw);letter-spacing:.02em}
+.som small{display:block;font:400 14px/1.3 var(--fs);color:var(--top-mut);margin-top:2px}
+.som .arr{margin-left:auto;color:var(--c);display:grid}
+.sheet-f{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding-top:14px;border-top:2px solid var(--top-ink);margin-top:4px}
+
+/* ── accueil (d9) : la photo en grand et nette ; le logo et « wang'ap » dans sa police ── */
+.hero{padding:0 0 64px}
+.hero::before{display:none}
+.hero-ph{position:relative;height:clamp(330px,62vh,700px);overflow:hidden;background:#0A1630}
+.hero-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--hp,50% 55%);display:block;transition:opacity .7s}
+.hero-ph img.kb{animation:kb 24s ease-out both}
+@keyframes kb{from{transform:scale(1.1)}to{transform:scale(1)}}
+.hero-ph::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:16px;background:var(--bg);-webkit-mask:var(--wave) repeat-x 0 0/150px 16px;mask:var(--wave) repeat-x 0 0/150px 16px;z-index:1}
+.hero-cap{position:absolute;left:var(--gut);bottom:var(--hb,78px);z-index:2;max-width:52%;margin:0;font:italic 400 15px/1.3 var(--fw);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.65),0 0 14px rgba(0,0,0,.4)}
+.hero-pick{position:absolute;right:var(--gut);bottom:calc(var(--hb,78px) - 8px);z-index:2;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;border:0;background:rgba(255,255,255,.94);color:#14284B;font:700 14px/1 var(--fs);cursor:pointer;box-shadow:0 6px 18px -8px rgba(0,0,0,.6)}
+.hero-pick svg{width:18px;height:18px}
+.picks{display:none;gap:12px;overflow-x:auto;scrollbar-width:none;padding:16px var(--gut) 6px;max-width:1180px;margin:0 auto;position:relative;z-index:4}
+.picks::-webkit-scrollbar{display:none}
+.picks.on{display:flex}
+.pk{flex:0 0 auto;width:118px;border:0;padding:0;background:none;color:var(--mut);font:600 12.5px/1.25 var(--fs);text-align:left;cursor:pointer}
+.pk img{display:block;width:118px;height:80px;object-fit:cover;border-radius:12px;border:3px solid transparent;margin-bottom:6px}
+.pk[aria-pressed="true"]{color:var(--fg)}
+.pk[aria-pressed="true"] img{border-color:var(--acc)}
+.picks-n{flex:0 0 220px;margin:0;align-self:center;font:500 13.5px/1.4 var(--fs);color:var(--mut)}
+.hero-in{position:relative;display:grid;gap:16px}
+.hero-id{display:flex;align-items:flex-end;gap:16px;margin-top:-58px;position:relative;z-index:3;pointer-events:none}
+.picks.on+.hero-in .hero-id{margin-top:6px}
+.hero-logo{flex:none;width:112px;height:112px;border-radius:28px;background:#fff;overflow:hidden;box-shadow:0 14px 30px -12px rgba(0,0,0,.7),0 0 0 5px rgba(232,176,89,.6)}
+.hero-logo img{display:block;width:100%;height:100%;object-fit:cover}
+.wordmark{margin:0 0 6px;font:800 clamp(40px,9.5vw,64px)/1 var(--fw);letter-spacing:.05em;color:var(--fg)}
+.eyebrow{font:700 13px/1.3 var(--fs);letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin:0;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:28px;height:2px;background:var(--acc);flex:none}
+.lead{margin:14px 0 0;font:400 clamp(19px,2.4vw,22px)/1.45 var(--fw);color:var(--fg);max-width:620px}
+.lead em{font-style:italic;color:var(--acc)}
+.sub{margin:8px 0 0;font:500 16px/1.4 var(--fs);color:var(--mut)}
+.q{margin:0;padding-left:16px;border-left:3px solid var(--acc);font:italic 400 17.5px/1.5 var(--fw);color:var(--fg);max-width:520px}
+.q cite{display:block;font:500 14px/1.3 var(--fs);font-style:normal;color:var(--mut);margin-top:6px}
+.chap{margin:16px 0 0;font:500 14.5px/1.35 var(--fs);color:var(--mut)}
+.chap b{color:var(--fg);font-weight:700}
+.tw{transform-box:fill-box;transform-origin:center;animation:tw 4s ease-in-out infinite}
+.tw:nth-of-type(2n){animation-delay:-2s;animation-duration:5.5s}
+@keyframes tw{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+
+/* ── les chiffres ── */
+.b-num{padding:40px 0 46px}
+.nums{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 14px}
+.nums li{border-left:3px solid var(--fg);padding-left:12px}
+.nums b{display:block;font:700 clamp(36px,8vw,54px)/1 var(--fw);letter-spacing:.01em}
+.nums span{display:block;font:600 15px/1.3 var(--fs);color:var(--mut);margin-top:6px}
+.nums-n{margin:24px 0 0;font:500 14px/1.45 var(--fs);color:var(--mut);display:flex;gap:8px;align-items:flex-start}
+.nums-n svg{width:18px;height:18px;margin-top:1px}
+
+/* ── la carte ── */
+.wm-card,.near-card,.pos-card,.box,.art,.ph,.duo,.boat,.form-card{background:var(--card);color:var(--card-ink);border-radius:22px;box-shadow:var(--shadow)}
+.wm-card{margin:0;overflow:hidden}
+.wm-h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 18px;padding:14px 18px}
+.wm-h b{font:700 20px/1.2 var(--fw);letter-spacing:.02em}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font:600 14px/1.2 var(--fs);color:var(--card-mut)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend i{display:inline-block;width:26px;height:0;border-top:4px solid var(--trk);border-radius:2px}
+.legend i.d{border-top:4px dotted var(--rte)}
+.legend i.p{width:12px;height:12px;border-radius:50%;background:var(--card);border:2.5px solid var(--rte)}
+.wm-card,.near-card{--trk:#C0503A;--rte:#1D3A66}
+[data-theme="night"] .wm-card,[data-theme="night"] .near-card{--trk:#FF8C6E;--rte:#F2C979}
+.wm-scroll{position:relative;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain;touch-action:pan-x pan-y}
+.wm-scroll::-webkit-scrollbar{display:none}
+.wm{position:relative;overflow:hidden;background:#9EC3E0}
+.wm-t{position:absolute;inset:0}
+.wm-t img{position:absolute;max-width:none;user-select:none;-webkit-user-drag:none}
+.wm svg{position:absolute;inset:0;overflow:visible;pointer-events:none}
+.wl{position:absolute;white-space:nowrap;font:700 12.5px/1 var(--fs);color:#10233F;text-shadow:0 0 2px #fff,0 0 3px #fff,0 0 6px rgba(255,255,255,.9),0 0 10px rgba(255,255,255,.7);pointer-events:none}
+.wl .f{font-size:14px;margin-right:4px;text-shadow:none}
+.wl.eq{font:italic 400 12px/1 var(--fw);color:#1F3F66;letter-spacing:.06em}
+[data-theme="night"] .wl{color:#F3EBDA;text-shadow:0 0 2px #0B1730,0 0 4px #0B1730,0 0 8px rgba(11,23,48,.9)}
+[data-theme="night"] .wl.eq{color:#A3BCC7}
+[data-theme="night"] .wm-t,[data-theme="night"] .nm-t{filter:brightness(.58) saturate(.8) contrast(1.12) hue-rotate(-6deg)}
+.wm-f{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px 12px 18px;font:600 14px/1.3 var(--fs);color:var(--card-mut);border-top:1px solid var(--hair)}
+.wm-f .hint{display:inline-flex;align-items:center;gap:8px}
+.arrows{display:flex;gap:8px;flex:none}
+.arrows button{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--hair-2);background:var(--card);color:var(--card-ink);display:grid;place-items:center;cursor:pointer}
+.wm-card.fit .arrows,.wm-card.fit .hint-sw{display:none}
+.near-g{display:grid;gap:18px;margin-top:22px}
+.near-card{margin:0;overflow:hidden;display:flex;flex-direction:column}
+.near{position:relative;height:320px;overflow:hidden;background:#A4C8E8}
+.nm-t{position:absolute;inset:0;overflow:hidden}
+.nm-t img{position:absolute;max-width:none;user-select:none;-webkit-user-drag:none}
+.near svg{position:absolute;inset:0;overflow:visible;pointer-events:none}
+.pill{position:absolute;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;padding:5px 9px;border-radius:999px;background:rgba(255,252,245,.95);color:#14284B;font:700 12.5px/1 var(--fs);box-shadow:0 2px 6px rgba(0,0,0,.25);pointer-events:none}
+[data-theme="night"] .pill{background:rgba(13,24,48,.92);color:#F3EBDA}
+.trk-d{stroke-dasharray:1 2;stroke-dashoffset:1}
+.go .trk-d{animation:draw 3.2s cubic-bezier(.35,.1,.25,1) .25s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.pop{opacity:0;transform:scale(.3);transform-box:fill-box;transform-origin:center}
+.go .pop{animation:pop .5s cubic-bezier(.3,1.6,.5,1) forwards;animation-delay:var(--d,0s)}
+@keyframes pop{to{opacity:1;transform:none}}
+.fadein{opacity:0;transition:opacity 1.2s ease .5s}
+.go .fadein{opacity:1}
+.near-card figcaption{padding:12px 18px;font:600 14.5px/1.3 var(--fs);color:var(--card-mut);border-top:1px solid var(--hair)}
+.boat-mk{display:block;width:18px;height:18px;border-radius:50%;background:var(--trk);border:3px solid #fff;box-shadow:0 0 0 6px rgba(232,176,89,.5),0 2px 6px rgba(0,0,0,.3);animation:beat 2.4s ease-out infinite}
+@keyframes beat{0%{box-shadow:0 0 0 0 rgba(232,176,89,.8),0 2px 6px rgba(0,0,0,.3)}70%{box-shadow:0 0 0 16px rgba(232,176,89,0),0 2px 6px rgba(0,0,0,.3)}100%{box-shadow:0 0 0 0 rgba(232,176,89,0),0 2px 6px rgba(0,0,0,.3)}}
+.pos-card{padding:22px}
+.pos-card h3{font-size:22px}
+.coord{font:700 22px/1.3 var(--fw);letter-spacing:.03em;margin:10px 0 0;color:var(--c-map)}
+.when{margin:2px 0 0;font:500 15px/1.4 var(--fs);color:var(--card-mut)}
+.when::first-letter{text-transform:uppercase}
+.delay{display:flex;gap:10px;margin:16px 0 0;padding:12px 14px;border-radius:14px;background:rgba(31,111,139,.1);font:500 15px/1.45 var(--fs)}
+.delay svg{width:20px;height:20px;color:var(--c-map);margin-top:1px}
+.delay em{display:block;font:italic 400 15px/1.45 var(--fw);color:var(--card-mut);margin-top:4px}
+.pos-card .ctas{margin-top:18px}
+.pos-card .btn-s{color:var(--card-ink)}
+.cockpit{display:flex;align-items:center;gap:12px;margin-top:18px;padding:14px 16px;text-decoration:none;border-radius:16px;border:1.5px solid var(--hair-2)}
+.cockpit b{display:block;font:700 15.5px/1.3 var(--fs)}
+.cockpit small{display:block;font:400 14px/1.35 var(--fs);color:var(--card-mut);margin-top:2px}
+.cockpit>svg:first-child{color:var(--c-map);width:28px;height:28px}
+.cockpit>svg:last-child{margin-left:auto;color:var(--c-map)}
+
+/* ── le journal ── */
+.filters{margin:0 0 26px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--hair-2);background:var(--card);color:var(--card-ink);font:600 14.5px/1.2 var(--fs);cursor:pointer;text-align:left}
+.chip i{width:11px;height:11px;border-radius:50%;background:var(--cc);flex:none}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.fl-row{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:12px}
+.sel{display:flex;align-items:center;gap:10px;font:600 14.5px/1 var(--fs);color:var(--mut)}
+.sel select{min-height:46px;-webkit-appearance:none;appearance:none;padding:0 40px 0 14px;border-radius:12px;border:1.5px solid var(--hair-2);background:var(--card) var(--chev) right 14px center/14px no-repeat;font:500 15px/1.2 var(--fs);color:var(--card-ink);max-width:min(78vw,360px)}
+.fcount{font:500 14.5px/1.3 var(--fs);color:var(--mut);margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fcount button{background:none;border:0;color:var(--acc);font:700 14.5px var(--fs);min-height:44px;cursor:pointer;text-decoration:underline;padding:0}
+.jgrid{display:grid;gap:28px}
+.jlist,.jcards{display:grid;gap:24px}
+.art{position:relative;overflow:hidden;cursor:pointer;border-top:7px solid var(--cc);display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s;min-width:0}
+.art:hover{transform:translateY(-3px)}
+.art-ph{position:relative;aspect-ratio:3/2;margin:12px 12px 0}
+.art-ph .pm{position:absolute;inset:0;background:#E2D6BC}
+.art-ph img,.art-ph video{width:100%;height:100%;object-fit:cover;display:block}
+.art-n{position:absolute;right:10px;bottom:10px;z-index:1;display:inline-flex;align-items:center;gap:6px;background:rgba(14,26,48,.84);color:#fff;font:700 12.5px/1 var(--fs);padding:7px 10px;border-radius:999px}
+.art-n svg{width:15px;height:15px}
+.art-b{padding:14px 18px 16px;display:flex;flex-direction:column;flex:1;min-width:0}
+.art-m{margin:0;font:600 13.5px/1.35 var(--fs);color:var(--card-mut);display:flex;flex-wrap:wrap;gap:2px 10px;align-items:center}
+.art-m .ch{color:var(--cc);text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:800}
+.art h3{font-size:21px;line-height:1.22;margin:8px 0 0}
+.art-x{margin:8px 0 0;font:400 16px/1.55 var(--fw)}
+.art-f{display:flex;align-items:center;gap:10px;margin-top:auto;padding-top:12px;border-top:1px dashed var(--hair-2);font:600 14px/1.3 var(--fs);color:var(--card-mut)}
+.art-f>span:first-child{display:inline-flex;align-items:center;gap:6px;min-width:0}
+.art-f>span:first-child svg{width:16px;height:16px;color:var(--cc)}
+.art-f .more{margin-left:auto;white-space:nowrap;color:var(--c-jnl);display:inline-flex;align-items:center;gap:6px}
+.art-f .more svg{width:17px;height:17px}
+.art-x+.art-f{margin-top:14px}
+.art.feat h3{font-size:clamp(25px,4.4vw,30px)}
+.art.feat .art-x{font-size:17px}
+.art .lbl{position:absolute;left:24px;top:24px;z-index:1;background:var(--cc);color:#fff;font:800 12px/1 var(--fs);letter-spacing:.08em;text-transform:uppercase;padding:7px 10px;border-radius:999px}
+.jside{display:grid;gap:18px;align-content:start}
+.box{padding:18px}
+.box h3{font-size:21px}
+.box p{margin:6px 0 0;font:400 15px/1.45 var(--fs);color:var(--card-mut)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;margin-top:10px;text-align:center}
+.cal i{font:700 12px/1 var(--fs);font-style:normal;color:var(--card-mut);padding:6px 0}
+.cal span,.cal button{display:grid;place-items:center;height:38px;font:500 14.5px/1 var(--fs);border-radius:50%;border:0;background:none;padding:0;color:var(--card-ink)}
+.cal button{font-weight:800;cursor:pointer;background:var(--gold);color:#14284B}
+.gal-sc{display:flex;align-items:center;gap:14px;text-decoration:none;min-height:64px}
+.gal-st{display:flex;flex:none}
+.gal-st img{width:54px;height:54px;object-fit:cover;margin-left:-14px;border:3px solid var(--card);border-radius:50%}
+.gal-st img:first-child{margin-left:0}
+.gal-sc b{display:block;font:700 19px/1.2 var(--fw)}
+.gal-sc small{display:block;font:400 14px/1.35 var(--fs);color:var(--card-mut)}
+.gal-sc>svg{margin-left:auto;color:var(--c-gal)}
+
+/* ── la galerie ── */
+.gal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:150px;gap:8px;grid-auto-flow:dense}
+.gt{position:relative;overflow:hidden;border-radius:14px;border:0;padding:0;cursor:pointer;background:#1A4A52;display:block;min-width:0}
+.gt img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.gt:hover img{transform:scale(1.05)}
+.gt.big{grid-column:span 2;grid-row:span 2}
+.gt.wide{grid-column:span 2}
+.gt span{position:absolute;left:0;right:0;bottom:0;padding:26px 12px 9px;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font:600 13px/1.3 var(--fs);text-align:left;opacity:0;transition:opacity .25s}
+.gt:hover span,.gt:focus-visible span,.gt.big span{opacity:1}
+.gal-f{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-top:22px;font:500 15px/1.4 var(--fs);color:var(--mut)}
+/* d9 : la galerie en deux — les photos, les vidéos (Bertrand) */
+.gtabs{display:inline-flex;gap:4px;padding:4px;border-radius:999px;border:1.5px solid rgba(238,245,242,.3);margin:0 0 20px}
+.gtabs button{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:999px;border:0;background:none;color:var(--fg);font:700 15px/1 var(--fs);cursor:pointer}
+.gtabs button svg{width:18px;height:18px}
+.gtabs button small{font:700 12.5px/1 var(--fs);opacity:.8}
+.gtabs button[aria-selected="true"]{background:var(--acc);color:var(--on-acc)}
+.vgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.vt{position:relative;display:block;aspect-ratio:4/3;border:0;padding:0;border-radius:14px;overflow:hidden;cursor:pointer;background:#123F47;min-width:0}
+.vt img{width:100%;height:100%;object-fit:cover;display:block}
+.vt .pl{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.93);color:#0E3A42;display:grid;place-items:center;box-shadow:0 6px 18px -6px rgba(0,0,0,.6);transition:transform .2s}
+.vt .pl svg{width:24px;height:24px;margin-left:3px;fill:currentColor}
+.vt:hover .pl{transform:translate(-50%,-50%) scale(1.08)}
+.vt .vc{position:absolute;left:0;right:0;bottom:0;padding:26px 10px 8px;background:linear-gradient(transparent,rgba(0,0,0,.78));color:#fff;font:600 12.5px/1.3 var(--fs);text-align:left}
+.vt .vc>span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.vbox{position:fixed;inset:0;z-index:960;background:rgba(5,10,20,.9);display:flex;align-items:center;justify-content:center;padding:16px;animation:wgFade .2s}
+.vbox-in{width:min(960px,100%);color:#F3EBDA}
+.vbox video{display:block;width:100%;max-height:72dvh;background:#000;border-radius:14px}
+.vbox-h{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;margin-top:12px;font:600 14.5px/1.35 var(--fs)}
+.vbox-h b{font:700 19px/1.25 var(--fw);margin-right:auto;flex:1 1 220px}
+.vbox .btn{--acc:#E8B059;--on-acc:#14284B}
+.vbox .x{color:#F3EBDA;border-color:rgba(243,235,218,.45)}
+
+/* ── les escales : cartes postales ── */
+.pcs{--edge:max(var(--gut),calc((100% - 1180px) / 2 + var(--gut)));display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:6px var(--edge) 22px;scroll-padding:0 var(--edge);overscroll-behavior-x:contain}
+.pcs::-webkit-scrollbar{display:none}
+.pc{flex:0 0 min(84vw,350px);height:240px;perspective:1200px;scroll-snap-align:start;cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:6px}
+.pc-in{position:relative;height:100%;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .7s cubic-bezier(.3,.9,.3,1)}
+.pc.is-flip .pc-in{transform:rotateY(180deg)}
+.pc-f,.pc-b{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;background:#FFFCF5;color:#1D2B44;border-radius:6px;box-shadow:0 2px 4px rgba(0,0,0,.18),0 18px 30px -16px rgba(0,0,0,.55);transition:visibility 0s .33s}
+.pc-b{visibility:hidden;transform:rotateY(180deg);display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}
+.pc.is-flip .pc-b{visibility:visible}
+.pc.is-flip .pc-f{visibility:hidden}
+.pc-f{padding:8px}
+.pc-ph{position:relative;width:100%;height:100%;overflow:hidden;border-radius:3px;background:#E9DCC0}
+.pc-ph img,.pc-ph svg{width:100%;height:100%;object-fit:cover;display:block}
+.pc-ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(10,18,34,.72))}
+.pc-lab{position:absolute;left:20px;right:64px;bottom:18px;z-index:2;color:#FFF8EF}
+.pc-lab b{display:block;font:700 20px/1.18 var(--fw);letter-spacing:.02em;text-wrap:balance}
+.pc-lab span{display:block;font:600 14px/1.2 var(--fs);opacity:.92;margin-top:4px}
+.pc-turn{position:absolute;right:18px;bottom:18px;z-index:2;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#FFF8EF;color:#9A3826}
+.pc-turn svg{width:20px;height:20px}
+.pc-note{padding:16px 12px 14px 18px;display:flex;flex-direction:column;border-right:1px solid rgba(29,43,68,.22);margin:12px 0;min-width:0}
+.pc-note p{margin:0;font:italic 400 15.5px/1.45 var(--fw);display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.pc-note .sig{margin-top:auto;padding-top:6px;font:700 14px/1.2 var(--fs);color:#9A3826}
+.pc-addr{position:relative;padding:14px 14px 14px 12px;display:flex;flex-direction:column;min-width:0}
+.pc-stamp{align-self:flex-end;width:48px;height:58px;border:2px dashed rgba(29,43,68,.35);padding:3px;background:#FFFCF5}
+.pc-stamp span{display:grid;place-items:center;width:100%;height:100%;background:#C0503A;color:#FFF3DA}
+.pc-stamp svg{width:24px;height:24px}
+.pc-pm{position:absolute;right:46px;top:34px;width:62px;height:62px;color:#1F6F8B;opacity:.72}
+.pc-lines{margin-top:auto;display:grid;gap:5px}
+.pc-lines span{display:block;font:600 13.5px/1.25 var(--fs);border-bottom:1px solid rgba(29,43,68,.25);padding-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-read{margin-top:10px;align-self:flex-start;min-height:40px;padding:0 14px;font-size:14px;background:#BF4F39;color:#fff}
+.pc-empty{color:#5A6475}
+.pcs-f{display:flex;align-items:center;justify-content:space-between;gap:12px;font:600 15px/1.3 var(--fs);color:var(--mut)}
+.pcs-f .hint{display:inline-flex;align-items:center;gap:8px}
+.b-esc .arrows button{background:transparent;color:var(--fg);border-color:rgba(255,248,239,.6)}
+
+/* ── le programme ── */
+.oc{display:grid;gap:28px}
+.oc-g h3{font-size:21px;margin:0 0 12px;padding-bottom:8px;border-bottom:4px solid var(--oc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.oc-g h3 small{display:block;font:800 13.5px/1.2 var(--fs);color:var(--oc);letter-spacing:.04em;margin-top:4px}
+.ph{position:relative;border-radius:16px;padding:14px 16px 14px 18px;border-left:6px solid var(--oc)}
+.ph+.ph{margin-top:10px}
+.ph .fl{display:block;font-size:22px;line-height:1.1;letter-spacing:3px}
+.ph b{display:block;font:700 17px/1.25 var(--fw);margin-top:7px;letter-spacing:.01em}
+.ph .per{display:block;font:800 13px/1.3 var(--fs);color:var(--oc);margin-top:4px;letter-spacing:.02em}
+.ph small{display:block;font:400 14.5px/1.4 var(--fs);color:var(--card-mut);margin-top:4px}
+.ph .ok{position:absolute;right:12px;top:12px;font:800 11.5px/1 var(--fs);background:#3F7A3A;color:#fff;border-radius:999px;padding:5px 9px;letter-spacing:.03em}
+.prg-n{margin:26px 0 0;font:500 15px/1.5 var(--fs);color:var(--mut);max-width:760px}
+
+/* ── l'équipage ── */
+.crew{display:grid;gap:22px}
+.duo,.boat{margin:0;overflow:hidden;display:flex;flex-direction:column}
+.duo .cp,.boat .cp{position:relative;aspect-ratio:16/10;background:#CFE0EA}
+.duo img,.boat img{width:100%;height:100%;object-fit:cover;display:block}
+.who{display:grid;grid-template-columns:1fr 1fr}
+.who>div{padding:16px 18px 18px}
+.who>div+div{border-left:1px solid var(--hair)}
+.who h3,.boat h3{font-size:26px}
+.role{margin:4px 0 0;font:600 14.5px/1.35 var(--fs);color:var(--card-mut)}
+.alias{margin:6px 0 0;font:italic 400 15.5px/1.3 var(--fw);color:#94650F}
+[data-theme="night"] .alias{color:#E8B059}
+.boat>div:last-child{padding:16px 18px 18px}
+.crew-q{margin:30px auto 0;max-width:640px;text-align:center;font:italic 400 20px/1.5 var(--fw);color:var(--fg)}
+.crew-q cite{display:block;font:500 14.5px/1.3 var(--fs);font-style:normal;color:var(--mut);margin-top:8px}
+
+/* ── la genèse ── */
+.gen{display:grid;gap:26px;align-items:center}
+.gen-mark{display:flex;align-items:center;gap:18px;margin-bottom:12px}
+.gen-mark .kr{font:400 110px/1 'Nanum Brush Script',var(--fw);color:var(--acc);letter-spacing:0;text-transform:none}
+.gen-mark span{font:700 15px/1.3 var(--fs);letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.gen-ph{border-radius:22px;overflow:hidden;aspect-ratio:16/10;box-shadow:var(--shadow)}
+.gen-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.gen p{margin:14px 0 0;font-size:17.5px}
+.lnk{display:inline-flex;align-items:center;gap:8px;margin-top:16px;color:var(--acc);font:700 16px/1.2 var(--fs);text-decoration:none;border-bottom:2px solid currentColor;padding:10px 0 3px}
+.lnk svg{width:18px;height:18px}
+
+/* ── nous écrire ── */
+.forms{display:grid;gap:20px}
+.form-card{padding:22px}
+.form-card h3{font-size:23px;margin-bottom:12px}
+.form{display:grid;gap:12px}
+.fld span{display:block;font:700 14px/1.2 var(--fs);color:var(--card-mut);margin:0 0 6px 2px}
+.fld input,.fld textarea{width:100%;min-height:48px;font:400 16px/1.4 var(--fs);color:var(--card-ink);background:var(--card);border:1.5px solid var(--hair-2);border-radius:12px;padding:11px 13px}
+.fld textarea{min-height:110px;resize:vertical}
+.fld input:focus,.fld textarea:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(20,40,75,.2)}
+.fhint{font:400 14.5px/1.4 var(--fs);color:var(--card-mut);margin:0}
+.opts{display:grid;gap:6px;margin:0;padding:0;border:0}
+.opt{display:flex;align-items:center;gap:12px;min-height:46px;cursor:pointer;font:500 16px/1.3 var(--fs)}
+.opt input{width:22px;height:22px;accent-color:var(--acc);margin:0}
+
+/* ── la fin ── */
+.b-end{text-align:center;padding:84px 0 60px}
+.b-end svg.sky{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.b-end blockquote{position:relative;margin:0 auto;max-width:720px;font:italic 400 clamp(23px,4.6vw,36px)/1.35 var(--fw)}
+.b-end cite{display:block;font:500 15px/1.3 var(--fs);font-style:normal;color:var(--mut);margin-top:14px}
+.b-end .lnk{position:relative}
+.foot{position:relative;margin-top:56px;padding-top:30px;border-top:1px solid rgba(243,235,218,.18);font:400 14.5px/1.5 var(--fs);color:var(--mut)}
+.foot .fwm{display:block;font:800 26px/1 var(--fw);letter-spacing:.05em;color:var(--fg);margin-bottom:8px}
+.foot small{display:block;font-size:13px;margin-top:6px;opacity:.85}
+.foot .ctas{justify-content:center}
+[data-theme="night"] .wg-tab{background:#E8B059;color:#14284B}
+[data-theme="night"] .art .lbl{color:#0D1830}
+
+/* d9 : le lecteur — chaque photo ENTIÈRE (plus rien de coupé), une à la fois, numérotée,
+   avec des flèches ; les vidéos du récit à la suite (Catherine) */
+.wg-reader-card{max-width:880px}
+.rd-wrap{position:relative;background:#0B1730}
+.wg-reader-photos{gap:0;scrollbar-width:none;overscroll-behavior-x:contain}
+.wg-reader-photos::-webkit-scrollbar{display:none}
+.wg-reader-photos figure,.wg-reader-photos figure:only-child{flex:0 0 100%;display:flex;flex-direction:column;background:#0B1730}
+.wg-reader-photos img,.wg-reader-photos video{display:block;width:100%;height:min(62dvh,560px);object-fit:contain;background:#0B1730}
+.wg-reader-photos figcaption{color:#D5DCE6;padding:8px 16px 10px;font:italic 400 14.5px/1.4 var(--fw);min-height:2.6em}
+.rd-n{position:absolute;left:12px;top:12px;z-index:2;background:rgba(11,23,48,.8);color:#fff;font:700 13px/1 var(--fs);padding:7px 10px;border-radius:999px}
+.rd-a{position:absolute;top:calc(min(62dvh,560px) / 2);transform:translateY(-50%);z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#14284B;display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px -4px rgba(0,0,0,.6)}
+.rd-a svg{width:22px;height:22px}
+.rd-a[data-d="-1"]{left:10px}
+.rd-a[data-d="1"]{right:10px}
+.rd-a:disabled{opacity:0;pointer-events:none}
+.rd-dots{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;padding:0 12px 12px}
+.rd-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3)}
+.rd-dots i.on{background:#E8B059}
+
+/* d9 : où donner son avis — un bandeau en haut (hors du design jugé) et l'onglet « Mon avis »
+   en or (il était marine sur l'accueil marine) ; au téléphone, au-dessus de la barre du bas,
+   loin de « Choisir la photo » (Flavien, 12 nov. : « where they can comment the version ») */
+.rvw{background:#E8B059;color:#14284B;font:600 14px/1.3 var(--fs)}
+.rvw-in{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:46px;padding-top:calc(5px + env(safe-area-inset-top,0px));padding-bottom:5px}
+.rvw b{font-weight:800}
+.rvw button{flex:none;border:0;border-radius:999px;background:#14284B;color:#fff;font:700 14px/1 var(--fs);min-height:38px;padding:0 15px;cursor:pointer;white-space:nowrap}
+.rvw+.top .top-in{padding-top:6px}
+.wg-tab{background:#E8B059;color:#14284B;font-weight:700;padding:16px 11px;box-shadow:0 4px 18px rgba(0,0,0,.35)}
+@media (max-width:759px){.wg-tab{top:auto;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:none}}
+
+/* d9 : les animations se jouent quand on arrive dessus (Catherine ne les avait pas vues) */
+.rv{opacity:0}
+.rv.in{animation:rvIn .8s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:var(--rd,0s)}
+@keyframes rvIn{from{opacity:0;transform:translateY(26px)}to{opacity:1}}
+
+@media (max-width:599px){
+  .jcards .art:nth-child(n+5){display:none}
+  .ph{padding:12px 14px 12px 16px}
+}
+@media (min-width:600px){
+  .jcards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .forms{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+}
+@media (min-width:760px){
+  :root{--gut:32px}
+  html{scroll-padding-top:72px}
+  body{padding-bottom:0}
+  .tabbar{display:none}
+  .top .theme{display:inline-flex}
+  .login span{display:inline}
+  .brand small{display:block}
+  .navbar{display:block;position:sticky;top:0;z-index:35;background:var(--top-bg);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);box-shadow:0 10px 20px -18px rgba(0,0,0,.5)}
+  .nav-in{display:flex;align-items:stretch}
+  .nv{display:flex;align-items:center;gap:8px;padding:0 11px;min-height:58px;text-decoration:none;color:var(--top-ink);font:700 15px/1 var(--fs);position:relative;white-space:nowrap}
+  .nv+.nv{border-left:1px solid var(--hair)}
+  .nv::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:4px;border-radius:4px 4px 0 0;background:var(--c);transform:scaleX(0);transition:transform .25s}
+  .nv.on::after,.nv:hover::after{transform:scaleX(1)}
+  .nv.x2{display:none}
+  .som-btn{margin-left:auto;display:inline-flex;align-items:center;gap:8px;background:var(--top-ink);color:var(--top-bg);border:0;border-radius:999px;padding:0 18px;min-height:44px;align-self:center;font:700 15px/1 var(--fs);cursor:pointer;white-space:nowrap}
+  .som-btn svg{width:20px;height:20px}
+  .sheet{align-items:stretch;justify-content:flex-end}
+  .sheet-card{max-width:430px;border-radius:0;max-height:none;height:100%;animation:som-in .28s cubic-bezier(.2,.8,.2,1)}
+  .band{padding:84px 0 92px}
+  .b-num{padding:44px 0 50px}
+  .hero{padding:0 0 84px}
+  .hero-logo{width:136px;height:136px;border-radius:34px}
+  .hero-id{margin-top:-74px;gap:22px}
+  .hero-ph{--hb:96px}
+  .hero-pick{right:calc(var(--gut) + 34px)}
+  .vgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .vt{aspect-ratio:16/10}
+  .vt .pl{top:44%;width:54px;height:54px}
+  .vt .vc{font-size:13px;padding:26px 12px 9px}
+  .nums{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .gal{grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:180px;gap:10px}
+  .oc{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 22px}
+  .near{height:360px}
+}
+@keyframes som-in{from{transform:translateX(40px);opacity:.4}}
+@media (min-width:900px){
+  .near-g{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:stretch}
+  .near{height:auto;flex:1;min-height:360px}
+  .art.feat{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+  .art.feat .art-ph{aspect-ratio:auto;min-height:330px;margin:14px 0 14px 14px}
+  .art.feat .art-b{padding:24px 26px 22px}
+  .crew{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);align-items:stretch}
+  .boat .cp{aspect-ratio:auto;flex:1;min-height:240px}
+  .gen{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:48px}
+  .gen-mark .kr{font-size:140px}
+}
+@media (min-width:1000px){
+  .hero-in{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);align-items:end;gap:18px 56px}
+  .hero-id{grid-column:1/-1}
+  .epi{margin-left:66px}
+  .jgrid{grid-template-columns:minmax(0,1fr) 300px;align-items:start}
+  .jside{position:sticky;top:84px}
+}
+@media (min-width:1100px){
+  .nv{padding:0 15px;gap:9px}
+  .nv.x2{display:flex}
+  .oc{grid-template-columns:repeat(5,minmax(0,1fr));gap:18px}
+  .gal{grid-auto-rows:200px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+  .rv,.pop,.fadein{opacity:1!important;transform:none!important}
+  .trk-d{stroke-dasharray:none!important;stroke-dashoffset:0!important}
+}
+/* revue : garde-fou */ #app{overflow-x:clip}
+</style>
+</head>
+<body data-design="d9">
+<div id="app"></div>
+<script src="data-d9.js?v=20261113a"></script>
+<script src="wg.js?v=20261113a"></script>
+<script>
+(function () {
+  const { D, t, esc } = WG;
+  const app = document.getElementById('app');
+  const root = document.documentElement;
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const S = { chap: '', et: '', flip: new Set(), theme: root.getAttribute('data-theme') === 'night' ? 'night' : 'day', gtab: 'ph' };
+
+  // ── Masques « aquarelle » de d1 et la vague qui sépare les sections ──
+  const url = (s) => `url("data:image/svg+xml,${encodeURIComponent(s)}")`;
+  const disp = (seed, freq, scale, shape, vb = '0 0 200 200', blur = 0.7) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${vb}' preserveAspectRatio='none'><filter id='f' x='-20%' y='-20%' width='140%' height='140%'><feTurbulence type='fractalNoise' baseFrequency='${freq}' numOctaves='3' seed='${seed}'/><feDisplacementMap in='SourceGraphic' scale='${scale}' xChannelSelector='R' yChannelSelector='G'/><feGaussianBlur stdDeviation='${blur}'/></filter><g filter='url(#f)'>${shape}</g></svg>`;
+  const R = root.style;
+  R.setProperty('--m-r2', url(disp(11, 0.035, 20, "<circle cx='100' cy='100' r='84'/>")));
+  R.setProperty('--m-rect', url(disp(5, 0.022, 16, "<rect x='9' y='9' width='282' height='182' rx='6'/>", '0 0 300 200', 0.6)));
+  R.setProperty('--wave', url("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 16' preserveAspectRatio='none'><path d='M0 9C19 3 56 3 75 9S131 15 150 9V16H0Z'/></svg>"));
+  const chev = (c) => url(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 9'><path d='M1.5 1.5l5.5 5.5 5.5-5.5' fill='none' stroke='${c}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>`);
+
+  // ── Icônes (le dessin des icônes Lucide, celles de l'application) ──
+  const ICON = {
+    home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/>',
+    map: '<path d="M14.1 5.6a2 2 0 0 0 1.8 0l3.7-1.9A1 1 0 0 1 21 4.6v12.8a1 1 0 0 1-.6.9l-4.5 2.3a2 2 0 0 1-1.8 0l-4.2-2.1a2 2 0 0 0-1.8 0l-3.7 1.8A1 1 0 0 1 3 19.4V6.6a1 1 0 0 1 .6-.9l4.5-2.3a2 2 0 0 1 1.8 0z"/><path d="M15 5.8v15"/><path d="M9 3.2v15"/>',
+    book: '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+    camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3.2"/>',
+    anchor: '<path d="M12 22V8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/><circle cx="12" cy="5" r="3"/>',
+    globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>',
+    sprout: '<path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/>',
+    mail: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+    menu: '<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>',
+    close: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/>',
+    moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+    user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    pin: '<path d="M20 10c0 5-5.5 10.2-7.4 11.8a1 1 0 0 1-1.2 0C9.5 20.2 4 15 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+    arrow: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+    left: '<path d="m15 18-6-6 6-6"/>',
+    right: '<path d="m9 18 6-6-6-6"/>',
+    play: '<path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z"/>',
+    full: '<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>',
+    compass: '<circle cx="12" cy="12" r="10"/><path d="m16.2 7.8-2.1 6.3-6.3 2.1 2.1-6.3z"/>',
+    clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+    turn: '<path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.9 1 6.7 2.7L21 8"/><path d="M21 3v5h-5"/>',
+    images: '<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',
+    sail: '<path d="M22 18H2a4 4 0 0 0 4 4h12a4 4 0 0 0 4-4Z"/><path d="M21 14 10 2 3 14h18Z"/><path d="M10 2v16"/>',
+    talk: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+    video: '<path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
+    swipe: '<path d="M18 8H6"/><path d="m10 4-4 4 4 4"/><path d="M6 16h12"/><path d="m14 12 4 4-4 4"/>',
+  };
+  const ic = (k, cls = 'i') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>`;
+  const STARP = 'M0-10C1.2-3 3-1.2 10 0 3 1.2 1.2 3 0 10-1.2 3-3 1.2-10 0-3-1.2-1.2-3 0-10z';
+  const star = (x, y, s, c = '#E8B059') => `<g transform="translate(${x} ${y}) scale(${s})"><path class="tw" fill="${c}" d="${STARP}"/></g>`;
+
+  // ── Les sections : une couleur, une icône, un nom simple (menus et titres) ──
+  const SECS = [
+    ['accueil', 'home', 'home', 'Accueil', 'Home', 'Le voyage en un coup d’œil', 'The voyage at a glance'],
+    ['carte', 'map', 'map', 'Carte', 'Map', 'Le tour du monde prévu, la route parcourue', 'The planned voyage, the route sailed'],
+    ['journal', 'book', 'jnl', 'Journal', 'Journal', 'Tous les récits, du plus récent au plus ancien', 'Every story, newest first'],
+    ['galerie', 'camera', 'gal', 'Galerie', 'Gallery', 'Les photos du voyage', 'Photos of the voyage'],
+    ['escales', 'anchor', 'esc', 'Escales', 'Stops', 'Une carte postale de chaque escale', 'A postcard from every stop'],
+    ['programme', 'globe', 'prg', 'Programme', 'Programme', 'La route prévue, 2026–2029, avec ses drapeaux', 'The planned route, 2026–2029, flag by flag'],
+    ['equipage', 'users', 'crw', 'Équipage', 'Crew', 'Catherine, Bertrand et Wang’ap', 'Catherine, Bertrand and Wang’ap'],
+    ['genese', 'sprout', 'gen', 'Genèse', 'Genesis', 'Pourquoi « Wang’ap » ?', 'Why “Wang’ap”?'],
+    ['contact', 'mail', 'ctc', 'Contact', 'Contact', 'Nous écrire, recevoir les nouvelles', 'Write to us, get the news'],
+  ].map(([id, icon, c, fr, en, dFr, dEn]) => ({ id, icon, c: `var(--c-${c})`, label: () => t(fr, en), desc: () => t(dFr, dEn) }));
+  const SEC = Object.fromEntries(SECS.map((s) => [s.id, s]));
+  const sh = (id, title, sub) => `<header class="sh"><span class="sh-i">${ic(SEC[id].icon)}</span><div><h2>${title}</h2>${sub ? `<p>${sub}</p>` : ''}</div></header>`;
+  // Le Petit Prince en exergue, une phrase par section — le texte du livre (Gallimard), traduit par nous.
+  const Q = WG.QUOTES;
+  const EPI = {
+    num: ['« Les grandes personnes aiment les chiffres. »', '“Grown-ups love figures.”'],
+    carte: ['« Droit devant soi on ne peut pas aller bien loin… »', '“Straight ahead of you, nobody can go very far…”'],
+    journal: ['« On ne connaît que les choses que l’on apprivoise. »', '“One only understands the things that one tames.”'],
+    galerie: [Q.heart.fr, Q.heart.en],
+    escales: [Q.desert.fr, Q.desert.en],
+    programme: ['« Pour les uns, qui voyagent, les étoiles sont des guides. »', '“For some, who travel, the stars are guides.”'],
+    equipage: [Q.tame.fr, Q.tame.en],
+    genese: ['« Toutes les grandes personnes ont d’abord été des enfants. (Mais peu d’entre elles s’en souviennent.) »', '“All grown-ups were once children. (But only few of them remember it.)”'],
+  };
+  const epi = (k) => `<blockquote class="epi">${esc(t(EPI[k][0], EPI[k][1]))}<cite>— ${t('Le Petit Prince', 'The Little Prince')}</cite></blockquote>`;
+
+  // ── Données (data.js : ce que le public voit déjà, délai appliqué) ──
+  const byDate = (a, b) => a.date_start.localeCompare(b.date_start);
+  // Règle 8 : seulement les chapitres et les étapes déjà commencés au dernier point public.
+  const begun = (x) => x.date_start && x.date_start <= D.lastPublicAt;
+  const chapters = D.chapters.filter(begun).sort(byDate);
+  const etapes = D.etapes.filter(begun).sort(byDate);
+  const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+  const CHC = [0, 1, 2, 3, 4].map((i) => `var(--ch${i})`);
+  const chapIdx = (id) => chapters.findIndex((c) => c.id === id);
+  const chapColor = (id) => CHC[Math.max(0, chapIdx(id)) % CHC.length];
+  const curChap = chapters[chapters.length - 1];
+  const lastAt = new Date(D.lastPublicAt);
+  const cap1 = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+  const etName = (id) => cap1(WG.etape(id)).replace(/\s*->\s*/g, ' → ');
+  const nStories = (n) => (n ? t(`${n} récit${n > 1 ? 's' : ''}`, `${n} stor${n > 1 ? 'ies' : 'y'}`) : t('pas encore de récit', 'no story yet'));
+  const cut = (s, n) => (s && s.length > n ? `${s.slice(0, s.lastIndexOf(' ', n))}…` : s || '');
+  const im = (u, w, alt = '', lazy = true) => `<img src="${esc(WG.img(u, w))}" alt="${esc(alt)}" ${lazy ? 'loading="lazy" ' : ''}decoding="async">`;
+  const dShort = (iso) => WG.date(iso, { day: 'numeric', month: 'short' });
+  const nf = (n) => WG.fmtNm(n);
+  const postBy = (prefix) => D.posts.find((p) => p.id.startsWith(prefix));
+  const photoOf = (prefix, i) => { const p = postBy(prefix); return p && p.photos[i] ? { p, ph: p.photos[i] } : null; };
+  const nVid = (p) => (p.videos || []).length;
+  const nPh = (p) => Math.max(0, (p.nPhotos || p.photos.length) - nVid(p));
+  const totalPhotos = D.posts.reduce((a, p) => a + nPh(p), 0);
+  const VIDS = D.posts.flatMap((p) => (p.videos || []).map((v) => ({ p, v })));
+  // L'image d'aperçu de chaque vidéo (scripts/design-survey/posters.mjs) : on ne charge une vidéo
+  // que quand on la lance (sinon ≈ 1,4 Mo chacune rien que pour la montrer).
+  const poster = (u) => `snaps/v/${u.split('/').pop().replace(/\.mp4$/i, '.jpg')}`;
+  // Une escale encore ouverte au dernier point public : on tait sa date de fin (règle 8).
+  const range = (e) => (new Date(`${e.date_end}T23:59:59Z`) > lastAt
+    ? t(`depuis le ${dShort(e.date_start)}`, `since ${dShort(e.date_start)}`)
+    : `${dShort(e.date_start)} – ${dShort(e.date_end)}`);
+
+  // ── Le programme RÉEL (src/pages/ProgrammePage.jsx, phases 3 à 18) ──
+  const OCEANS = {
+    med: ['var(--o-med)', 'Méditerranée', 'Mediterranean', '2026', '2026'],
+    atl: ['var(--o-atl)', 'Atlantique', 'Atlantic', '2026–2027 · Caraïbes', '2026–2027 · Caribbean'],
+    pac: ['var(--o-pac)', 'Pacifique', 'Pacific', '2027–2028', '2027–2028'],
+    ind: ['var(--o-ind)', 'Océan Indien', 'Indian Ocean', '2028 · Afrique du Sud', '2028 · South Africa'],
+    ret: ['var(--o-ret)', 'Le retour', 'Homeward', '2029 · Atlantique Sud', '2029 · South Atlantic'],
+  };
+  const PROG = [
+    ['med', '🇫🇷', 'Réception du bateau', 'Taking delivery of the boat', '11 → 28 mai 2026', '11 → 28 May 2026', 'La Grande-Motte', 'La Grande-Motte', '2026-05-28'],
+    ['med', '🇲🇹 🇬🇷 🇮🇹', 'Navigation en Méditerranée', 'Mediterranean sailing', '29 mai → mi-septembre 2026', '29 May → mid-September 2026', 'Malte · Grèce · Sicile · Sardaigne · Corse · Saint-Cyr', 'Malta · Greece · Sicily · Sardinia · Corsica · Saint-Cyr', '2026-09-15'],
+    ['atl', '🇪🇸 🇨🇻 🇲🇶', 'Grand Départ : Saint-Cyr → Caraïbes', 'Grand Departure: Saint-Cyr → Caribbean', '18 sept. → mi-décembre 2026', '18 Sep → mid-December 2026', 'Gibraltar · Canaries · Cap-Vert · Martinique', 'Gibraltar · Canaries · Cape Verde · Martinique'],
+    ['atl', '🇲🇶 🇬🇵', 'Les fêtes aux Antilles', 'The holidays in the Caribbean', 'Décembre 2026', 'December 2026', 'Martinique · Guadeloupe', 'Martinique · Guadeloupe'],
+    ['atl', '🇻🇨 🇨🇼 🇨🇴 🇵🇦', 'Caraïbes & Panama', 'Caribbean & Panama', 'Janvier → début mars 2027', 'January → early March 2027', 'Grenadines · Los Roques · Curaçao · Carthagène · San Blas · Panama', 'Grenadines · Los Roques · Curaçao · Cartagena · San Blas · Panama'],
+    ['pac', '🇪🇨 🇵🇫', 'Du Panama aux Marquises', 'Panama to the Marquesas', 'Mars → avril 2027', 'March → April 2027', 'Galápagos · Marquises', 'Galápagos · Marquesas'],
+    ['pac', '🇵🇫', 'Polynésie française', 'French Polynesia', 'Avril → septembre 2027', 'April → September 2027', 'Marquises · Tuamotu · Tahiti · Bora Bora', 'Marquesas · Tuamotu · Tahiti · Bora Bora'],
+    ['pac', '🇨🇰 🇳🇺 🇹🇴 🇫🇯', 'Polynésie → Fidji → Nouvelle-Zélande', 'Polynesia → Fiji → New Zealand', 'Septembre → novembre 2027', 'September → November 2027', 'Îles Cook · Niue · Tonga · Fidji · Bay of Islands', 'Cook Islands · Niue · Tonga · Fiji · Bay of Islands'],
+    ['pac', '🇳🇿', 'Nouvelle-Zélande', 'New Zealand', 'Décembre 2027 → mars 2028', 'December 2027 → March 2028', 'Hivernage et refit', 'Wintering and refit'],
+    ['pac', '🇳🇨 🇻🇺 🇦🇺', 'Mélanésie & Australie', 'Melanesia & Australia', 'Avril → mi-juillet 2028', 'April → mid-July 2028', 'Nouvelle-Calédonie · Vanuatu · Grande Barrière · Thursday Island', 'New Caledonia · Vanuatu · Great Barrier Reef · Thursday Island'],
+    ['ind', '🇮🇩', 'L’Indonésie, d’est en ouest', 'Indonesia, east to west', 'Mi-juillet → fin août 2028', 'Mid-July → end of August 2028', 'Raja Ampat · Moluques · Komodo · Bali', 'Raja Ampat · Moluccas · Komodo · Bali'],
+    ['ind', '🇨🇽 🇨🇨 🇲🇺 🇷🇪', 'La traversée de l’océan Indien', 'Crossing the Indian Ocean', 'Fin août → fin novembre 2028', 'Late August → late November 2028', 'Christmas · Cocos · Rodrigues · Maurice · La Réunion', 'Christmas · Cocos · Rodrigues · Mauritius · Réunion'],
+    ['ind', '🇿🇦', 'L’Afrique du Sud, jusqu’au Cap', 'South Africa, to Cape Town', 'Fin novembre → mi-décembre 2028', 'Late November → mid-December 2028', 'Richards Bay · Durban · East London · Le Cap', 'Richards Bay · Durban · East London · Cape Town'],
+    ['ret', '🇳🇦 🇸🇭 🇧🇷', 'Namibie & Atlantique Sud', 'Namibia & South Atlantic', 'Mi-janvier → fin février 2029', 'Mid-January → end of February 2029', 'Walvis Bay · Sainte-Hélène · Brésil', 'Walvis Bay · St Helena · Brazil'],
+    ['ret', '🇧🇷 🇬🇩 🇲🇶', 'Du Brésil aux Antilles', 'Brazil to the Antilles', 'Mars 2029', 'March 2029', 'Salvador · Fernando de Noronha · Grenade · Grenadines · Martinique', 'Salvador · Fernando de Noronha · Grenada · Grenadines · Martinique'],
+    ['ret', '🇵🇹 🇫🇷', 'Antilles → Açores → Saint-Cyr', 'Antilles → Azores → Saint-Cyr', 'Avril → été 2029', 'April → summer 2029', 'Martinique · Açores · Gibraltar · Saint-Cyr-sur-Mer', 'Martinique · Azores · Gibraltar · Saint-Cyr-sur-Mer'],
+  ];
+
+  // La route PRÉVUE — copie exacte de PLANNED_ROUTE (src/data/plannedRoute.js), la route
+  // « par la mer » de l'animation du programme. Le tour du monde commence à Saint-Cyr.
+  const PLANNED = [
+    [3.98, 43.56], [5.50, 43.10], [7.00, 43.10], [8.00, 42.80], [8.74, 41.93], [8.60, 41.50], [8.80, 41.20], [9.10, 41.10], [9.50, 40.90],
+    [10.20, 40.50], [10.30, 40.00], [10.00, 39.50], [9.50, 39.22], [9.80, 38.80], [10.50, 38.00], [12.00, 36.80], [13.50, 36.20], [14.51, 35.90],
+    [15.50, 35.80], [17.00, 35.50], [19.00, 35.50], [21.00, 35.50], [22.80, 35.60], [24.50, 36.80], [24.00, 37.80], [23.73, 37.97],
+    [24.20, 37.00], [23.50, 35.80], [21.00, 35.50], [17.50, 35.50], [14.50, 36.00], [12.50, 36.70], [11.00, 37.30], [9.00, 38.00], [7.00, 39.50],
+    [7.00, 41.50], [6.50, 42.80], [5.69, 43.17],
+    [4.50, 42.50], [3.00, 41.00], [1.50, 39.50], [0.00, 38.00], [-1.50, 37.00], [-3.00, 36.50], [-5.35, 36.13],
+    [-6.50, 35.50], [-9.50, 34.00], [-12.00, 32.50], [-14.50, 30.50], [-16.50, 29.00], [-15.40, 28.10],
+    [-17.50, 25.00], [-20.00, 21.00], [-22.50, 18.00], [-23.50, 16.00],
+    [-27.00, 15.50], [-32.00, 15.00], [-37.00, 14.80], [-42.00, 14.70], [-47.00, 14.60], [-52.00, 14.55], [-56.00, 14.55], [-61.00, 14.60],
+    [-61.30, 15.20], [-61.80, 16.00], [-61.55, 16.24], [-61.80, 15.50], [-61.80, 14.50], [-61.50, 13.50], [-61.20, 13.16],
+    [-62.50, 12.50], [-64.00, 12.00], [-66.90, 11.80], [-67.80, 12.00], [-68.97, 12.18],
+    [-70.50, 12.50], [-72.50, 11.80], [-74.00, 11.00], [-75.50, 10.40], [-76.50, 10.00], [-77.80, 9.80], [-78.95, 9.56], [-79.50, 9.00],
+    [-79.80, 7.50], [-80.00, 5.00], [-81.50, 2.50], [-84.00, 0.50], [-87.00, -0.30], [-90.30, -0.90],
+    [-95.00, -3.00], [-100.00, -4.50], [-105.00, -5.50], [-110.00, -6.50], [-115.00, -7.20], [-120.00, -7.80], [-125.00, -8.20], [-130.00, -8.50],
+    [-135.00, -8.70], [-139.50, -8.90],
+    [-141.00, -10.50], [-143.00, -12.50], [-145.50, -15.00], [-147.00, -16.00], [-149.40, -17.50], [-150.50, -17.00], [-151.75, -16.50],
+    [-153.50, -17.50], [-157.00, -18.50], [-163.00, -19.50], [-166.50, -19.20], [-169.92, -19.05],
+    [-172.00, -19.50], [-175.20, -21.17], [179.50, -18.50], [177.95, -17.77],
+    [177.00, -20.00], [176.50, -25.00], [175.50, -30.00], [174.10, -35.20],
+    [174.50, -34.00], [173.00, -29.00], [170.00, -26.00], [168.00, -23.00], [166.45, -22.27],
+    [167.00, -20.00], [168.32, -17.73], [164.00, -17.00], [159.00, -17.50], [154.00, -18.00], [150.00, -18.50], [147.50, -19.00], [146.80, -19.25],
+    [148.00, -18.00], [149.00, -16.00], [148.00, -13.50], [145.00, -11.50], [143.00, -10.80], [142.18, -10.59],
+    [140.00, -10.50], [137.50, -9.50], [135.00, -8.50], [133.00, -5.50], [131.50, -3.00], [130.50, -1.00], [129.50, -2.50], [128.00, -3.00], [125.50, -3.70],
+    [125.00, -5.50], [124.00, -7.00], [122.00, -8.00], [121.00, -8.50], [119.00, -9.00], [117.00, -8.80], [115.80, -8.80], [115.30, -8.70],
+    [113.50, -9.50], [111.00, -10.00], [108.00, -10.30], [105.63, -10.48], [103.00, -11.00], [100.00, -11.50], [96.83, -12.18],
+    [90.00, -13.50], [83.00, -15.00], [76.00, -17.00], [70.00, -18.50], [63.42, -19.67], [60.50, -19.90], [57.50, -20.16], [56.50, -20.50], [55.45, -21.11],
+    [50.00, -24.00], [46.00, -26.50], [43.00, -28.00], [39.00, -29.00], [36.00, -29.00], [34.00, -29.00], [32.04, -28.80],
+    [31.80, -29.50], [31.02, -29.86], [30.80, -30.80], [29.80, -31.80], [28.80, -32.50], [27.90, -33.01],
+    [26.80, -34.00], [25.90, -34.20], [24.00, -34.80], [21.50, -35.00], [19.50, -34.80], [18.42, -33.92],
+    [16.00, -32.00], [14.50, -28.00], [13.50, -25.00], [14.00, -23.00], [14.50, -22.94],
+    [11.00, -21.00], [7.00, -19.50], [2.00, -18.00], [-3.00, -16.50], [-5.72, -15.96],
+    [-12.00, -15.00], [-20.00, -14.00], [-28.00, -13.50], [-34.00, -13.00], [-38.51, -12.97],
+    [-37.50, -11.50], [-36.00, -9.50], [-34.50, -6.50], [-32.42, -3.85],
+    [-35.00, -1.00], [-40.00, 2.00], [-45.00, 5.00], [-50.00, 7.50], [-55.00, 9.00], [-59.00, 10.00], [-61.52, 10.45],
+    [-61.70, 11.50], [-61.50, 13.00], [-61.00, 14.60],
+    [-60.00, 17.00], [-57.00, 22.00], [-50.00, 28.00], [-43.00, 32.00], [-36.00, 35.50], [-28.63, 38.53],
+    [-25.00, 38.00], [-20.00, 37.50], [-15.00, 37.00], [-10.00, 36.50], [-5.35, 36.13],
+    [-4.00, 36.40], [-2.00, 36.50], [0.00, 37.00], [1.50, 38.50], [3.00, 40.50], [4.50, 42.00], [5.69, 43.17],
+  ];
+  const AROUND = PLANNED.slice(PLANNED.findIndex((p) => p[0] === 5.69 && p[1] === 43.17));
+  // Les escales nommées sur la carte (ProgrammeAnimation.jsx / plannedRoute.js) :
+  // [lon, lat, drapeau, fr, en, dx, dy, ancre (r = à droite, l = à gauche, c = centré), niveau]
+  const WSTOPS = [
+    [5.69, 43.17, '🇫🇷', 'Saint-Cyr', 'Saint-Cyr', 9, -9, 'r', 1],
+    [-5.35, 36.13, '🇬🇮', 'Gibraltar', 'Gibraltar', 8, 9, 'r', 2],
+    [-15.40, 28.10, '🇪🇸', 'Canaries', 'Canaries', 8, 3, 'r', 2],
+    [-23.50, 16.00, '🇨🇻', 'Cap-Vert', 'Cape Verde', 8, 6, 'r', 2],
+    [-61.00, 14.60, '🇲🇶', 'Martinique', 'Martinique', -8, -10, 'l', 1],
+    [-61.75, 12.05, '🇬🇩', 'Grenade', 'Grenada', 8, 9, 'r', 1],
+    [-79.50, 9.00, '🇵🇦', 'Panama', 'Panama', -8, -6, 'l', 1],
+    [-90.30, -0.90, '🇪🇨', 'Galápagos', 'Galápagos', -8, 10, 'l', 1],
+    [-139.50, -8.90, '🇵🇫', 'Marquises', 'Marquesas', 0, -13, 'c', 2],
+    [-149.40, -17.50, '🇵🇫', 'Tahiti', 'Tahiti', 0, 14, 'c', 1],
+    [-175.20, -21.17, '🇹🇴', '', '', 0, 0, 'c', 3],
+    [177.95, -17.77, '🇫🇯', 'Fidji', 'Fiji', 0, 14, 'c', 2],
+    [174.10, -35.20, '🇳🇿', 'Nouvelle-Zélande', 'New Zealand', 9, 6, 'r', 1],
+    [166.45, -22.27, '🇳🇨', 'Nouvelle-Calédonie', 'New Caledonia', -9, 9, 'l', 1],
+    [168.32, -17.73, '🇻🇺', 'Vanuatu', 'Vanuatu', 8, -9, 'r', 1],
+    [146.80, -19.25, '🇦🇺', 'Grande Barrière', 'Great Barrier Reef', -9, 1, 'l', 2],
+    [115.30, -8.70, '🇮🇩', 'Bali', 'Bali', 0, -13, 'c', 1],
+    [96.83, -12.18, '🇨🇨', 'Cocos', 'Cocos', 0, 14, 'c', 2],
+    [57.50, -20.16, '🇲🇺', 'Maurice · La Réunion', 'Mauritius · Réunion', -9, 11, 'l', 1],
+    [18.42, -33.92, '🇿🇦', 'Le Cap', 'Cape Town', 0, 14, 'c', 1],
+    [-5.72, -15.96, '🇸🇭', 'Sainte-Hélène', 'St Helena', 8, 0, 'r', 2],
+    [-38.51, -12.97, '🇧🇷', 'Brésil', 'Brazil', -8, 4, 'l', 1],
+    [-28.63, 38.53, '🇵🇹', 'Açores', 'Azores', 0, -13, 'c', 1],
+  ];
+
+  // ── En-tête ──
+  const themeSeg = () => `<div class="seg theme" role="group" aria-label="${t('Vue de jour ou de nuit', 'Day or night view')}">
+      <button type="button" data-set-theme="day" aria-pressed="${S.theme === 'day'}">${ic('sun')}${t('Jour', 'Day')}</button>
+      <button type="button" data-set-theme="night" aria-pressed="${S.theme === 'night'}">${ic('moon')}${t('Nuit', 'Night')}</button></div>`;
+  const langSeg = () => `<div class="seg lang" role="group" aria-label="${t('Langue', 'Language')}"><button type="button" data-lang="fr" aria-pressed="${WG.lang === 'fr'}">FR</button><button type="button" data-lang="en" aria-pressed="${WG.lang === 'en'}">EN</button></div>`;
+  const NAVBAR = ['carte', 'journal', 'galerie', 'escales', 'programme', 'equipage'];
+  const header = () => `
+  <div class="rvw" role="region" aria-label="${t('Revue du design', 'Design review')}"><div class="wrap rvw-in"><span>🎨 ${t('Revue du design · <b>La Synthèse v3</b>', 'Design review · <b>The Synthesis v3</b>')}</span><button type="button" data-avis>💬 ${t('Donner mon avis', 'Give my view')}</button></div></div>
+  <header class="top" id="top"><div class="wrap top-in">
+    <a class="brand" href="#accueil" aria-label="Wang'ap — ${t('accueil', 'home')}"><span class="lg"><img src="/images/logo.webp" alt="" width="46" height="46"></span><b>wang'ap</b><small>${t('Le tour du monde de Catherine &amp; Bertrand', 'Catherine &amp; Bertrand’s voyage around the world')}</small></a>
+    ${themeSeg()}${langSeg()}
+    <a class="login" href="#!" aria-label="${t('Connexion', 'Sign in')}">${ic('user')}<span>${t('Connexion', 'Sign in')}</span></a>
+  </div></header>
+  <nav class="navbar" aria-label="${t('Les sections', 'Sections')}"><div class="wrap nav-in">
+    ${NAVBAR.map((id, i) => `<a class="nv${i > 4 ? ' x2' : ''}" href="#${id}" data-t="${id}" style="--c:${SEC[id].c}"><span class="nv-i">${ic(SEC[id].icon)}</span>${esc(SEC[id].label())}</a>`).join('')}
+    <button type="button" class="som-btn" data-menu aria-haspopup="dialog">${ic('menu')}${t('Sommaire', 'Contents')}</button>
+  </div></nav>`;
+
+  // ── Accueil (d9) : la photo en grand et nette — et c'est Bertrand qui la choisit ──
+  // [récit, n° de photo, cadrage, légende] — des photos de Wang'ap tirées des récits publics.
+  const HERO = [
+    ['0484645a', 4, '50% 58%', 'Au mouillage, sous sa voile d’ombrage', 'At anchor, under her shade sail'],
+    ['0faac474', 5, '62% 62%', 'Entre pierre et mer, à La Valette', 'Between stone and sea, in Valletta'],
+    ['ece220a7', 6, '55% 62%', 'Un peu le roi de la fête', 'Quite the star of the show'],
+    ['c0a9511f', 2, '50% 42%', 'Sous spi, à la porte de l’Atlantique', 'Under spinnaker, at the gateway to the Atlantic'],
+    ['52c3b5fb', 10, '50% 34%', 'Grand-voile et génois, aux îles Ioniennes', 'Mainsail and genoa, in the Ionian Islands'],
+    ['97786827', 0, '50% 40%', 'Au premier souffle d’air', 'At the first breath of wind'],
+  ].map(([pre, i, pos, fr, en]) => ({ key: `${pre}/${i}`, x: photoOf(pre, i), pos, fr, en })).filter((h) => h.x);
+  const heroKey = () => { const k = WG.store.get('wg-d9-hero'); return HERO.some((h) => h.key === k) ? k : HERO[0].key; };
+  const heroImg = (h, cls = '') => `<img class="${cls}" src="${esc(WG.img(h.x.ph.url, 1600))}" srcset="${esc(WG.img(h.x.ph.url, 900))} 900w, ${esc(WG.img(h.x.ph.url, 1600))} 1600w, ${esc(WG.img(h.x.ph.url, 2200))} 2200w" sizes="100vw" alt="${esc(t(h.fr, h.en))}" decoding="async">`;
+  const hero = () => {
+    const h = HERO.find((x) => x.key === heroKey());
+    return `
+  <section class="band b-home hero" id="accueil" data-tab="accueil">
+    <div class="hero-ph" id="hero-ph" style="--hp:${h.pos}">
+      ${heroImg(h, RM ? '' : 'kb')}
+      <p class="hero-cap" id="hero-cap">${esc(t(h.fr, h.en))}</p>
+      <button type="button" class="hero-pick" data-pick aria-expanded="false" aria-controls="picks">${ic('camera')}${t('Choisir la photo', 'Choose the photo')}</button>
+    </div>
+    <div class="picks" id="picks" role="group" aria-label="${t('La photo de l’accueil', 'The opening photo')}">
+      <p class="picks-n">${t('Laquelle est la plus belle photo de Wang’ap ? Touchez-la : elle passe à l’accueil, et votre choix part avec votre avis.', 'Which is the most beautiful photo of Wang’ap? Tap it: it goes on the opening page, and your choice is sent with your view.')}</p>
+      ${HERO.map((x, i) => `<button type="button" class="pk" data-hero="${x.key}" aria-pressed="${x.key === h.key}">${im(x.x.ph.url, 260, '')}${i + 1}. ${esc(t(x.fr, x.en))}</button>`).join('')}
+    </div>
+    <div class="wrap hero-in">
+      <div class="hero-id"><span class="hero-logo"><img src="/images/logo.webp" alt="" width="136" height="136"></span><h1 class="wordmark">wang'ap</h1></div>
+      <div class="hero-l">
+        <p class="eyebrow"><span>Outremer 52 · ${t('Tour du monde', 'Round the world')} <span style="white-space:nowrap">2026–2029</span></span></p>
+        <p class="lead">${t('Catherine &amp; Bertrand larguent les amarres pour <em>3 ans</em> de navigation à la voile.', 'Catherine &amp; Bertrand cast off for <em>3 years</em> of sailing.')}</p>
+        <p class="sub">${t(`${nf(36000)} milles nautiques · 30+ pays · 3 océans`, `${nf(36000)} nautical miles · 30+ countries · 3 oceans`)}</p>
+        <div class="ctas"><a class="btn btn-p" href="#carte">${ic('map')}${t('Voir la carte', 'See the map')}</a><a class="btn btn-s" href="#journal">${ic('book')}${t('Lire le journal', 'Read the journal')}</a></div>
+      </div>
+      <div class="hero-r">
+        <blockquote class="q">${esc(WG.quote('rose'))}<cite>— Antoine de Saint-Exupéry, ${t('Le Petit Prince', 'The Little Prince')}</cite></blockquote>
+        <p class="chap">${t('Chapitre en cours', 'Current chapter')} : <b>${esc(WG.chapter(curChap.id))}</b></p>
+      </div>
+    </div>
+  </section>`;
+  };
+  // Le choix de la photo : à l'écran tout de suite, et dans l'avis du d9 (`heroPhoto`) dès que l'on sait qui regarde.
+  const noteHero = (quiet) => {
+    const W = window.WGS, k = heroKey(), n = HERO.findIndex((x) => x.key === k) + 1;
+    if (!W || !W.reviewer()) { if (!quiet) WG.toast(t(`Photo ${n} à l’accueil. Pour que votre choix nous parvienne, ouvrez « Mon avis » et dites qui vous êtes.`, `Photo ${n} on the opening page. To send us your choice, open “My view” and tell us who you are.`)); return; }
+    const rec = W.read('d9') || { answers: {} };
+    if (quiet && rec.answers?.heroPhoto === k) return;
+    W.write('d9', { answers: { ...rec.answers, heroPhoto: k }, savedAt: new Date().toISOString(), synced: null });
+    W.push('d9');
+    if (!quiet) WG.toast(t(`Photo ${n} choisie — c’est noté dans votre avis.`, `Photo ${n} chosen — it’s noted in your view.`));
+  };
+  const setHero = (key) => {
+    const h = HERO.find((x) => x.key === key);
+    if (!h) return;
+    WG.store.set('wg-d9-hero', key); WG.store.set('wg-d9-hero-chosen', '1');
+    const box = document.getElementById('hero-ph'), old = box.querySelector('img');
+    box.insertAdjacentHTML('afterbegin', heroImg(h));
+    const img = box.querySelector('img'); img.style.opacity = '0';
+    old.after(img);
+    const show = () => { box.style.setProperty('--hp', h.pos); img.style.opacity = '1'; setTimeout(() => old.remove(), 750); };
+    if (img.complete) requestAnimationFrame(show); else img.addEventListener('load', show, { once: true });
+    document.getElementById('hero-cap').textContent = t(h.fr, h.en);
+    document.querySelectorAll('[data-hero]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.hero === key)));
+    noteHero(false);
+  };
+  const syncHero = () => { if (WG.store.get('wg-d9-hero-chosen') === '1') noteHero(true); };
+  window.addEventListener('wg:reviewer', () => setTimeout(syncHero, 1500));
+  window.addEventListener('load', () => setTimeout(syncHero, 2500));
+
+  const numbers = () => {
+    const st = D.stats;
+    return `
+  <section class="band b-num" aria-label="${t('Le voyage en chiffres', 'The voyage in numbers')}"><div class="wrap">
+    ${epi('num')}
+    <ul class="nums">
+      <li><b data-count="${st.nm}">${nf(st.nm)}</b><span>${t('milles parcourus', 'miles sailed')}</span></li>
+      <li><b data-count="${st.days}">${st.days}</b><span>${t('jours de voyage', 'days under way')}</span></li>
+      <li><b data-count="${st.etapes}">${st.etapes}</b><span>${t('escales', 'stops')}</span></li>
+      <li><b data-count="${st.posts}">${st.posts}</b><span>${t('récits publiés', 'stories published')}</span></li>
+    </ul>
+    <p class="nums-n">${ic('clock')}<span>${t(`Au dernier point public. Notre position est publiée avec ${D.delayHours} h de retard.`, `At the latest public point. Our position is published ${D.delayHours} hours late.`)}</span></p>
+  </div></section>`;
+  };
+
+  // ── La carte ──
+  const carte = () => {
+    const lp = WG.lastPoint();
+    return `
+  <section class="band b-map" id="carte" data-tab="carte"><div class="wrap">
+    ${sh('carte', t('La carte', 'The map'), t('Le tour du monde prévu, et la route déjà parcourue depuis mai 2026.', 'The planned voyage around the world, and the route already sailed since May 2026.'))}
+    ${epi('carte')}
+    <figure class="wm-card" id="wm-card" style="margin:0">
+      <figcaption class="wm-h"><b>${t('Le tour du monde · 2026–2029', 'Around the world · 2026–2029')}</b>
+        <span class="legend"><span><i></i>${t('parcourue', 'sailed')}</span><span><i class="d"></i>${t('prévue', 'planned')}</span><span><i class="p"></i>${t('escale', 'stop')}</span></span></figcaption>
+      <div class="wm-scroll" id="wm-scroll" data-allow-overflow><div class="wm" id="wm" role="img" aria-label="${t('Carte du monde : la route prévue autour du monde, de Saint-Cyr à Saint-Cyr, et la route parcourue, de la Méditerranée à l’Atlantique', 'World map: the planned route around the world, Saint-Cyr to Saint-Cyr, and the route sailed, from the Mediterranean to the Atlantic')}"></div></div>
+      <div class="wm-f"><span class="hint">${ic('globe')}<span>${t('De Saint-Cyr à Saint-Cyr, vers l’ouest', 'Saint-Cyr to Saint-Cyr, heading west')}<span class="hint-sw"> · ${t('glissez pour suivre la route', 'swipe to follow the route')}</span></span></span>
+        <span class="arrows"><button type="button" data-pan="-1" aria-label="${t('Vers l’ouest', 'Westward')}">${ic('left')}</button><button type="button" data-pan="1" aria-label="${t('Vers l’est', 'Eastward')}">${ic('right')}</button></span></div>
+    </figure>
+    <div class="near-g">
+      <figure class="near-card"><div class="near" id="near"></div><figcaption>${t('La route parcourue depuis mai 2026 : la Méditerranée, Gibraltar, puis l’Atlantique', 'The route sailed since May 2026: the Mediterranean, Gibraltar, then the Atlantic')}</figcaption></figure>
+      <div class="pos-card">
+        <h3>${t('Dernière position publique', 'Latest public position')}</h3>
+        <p class="coord">${esc(WG.fmtPos(lp))}</p>
+        <p class="when">${esc(WG.date(D.lastPublicAt, { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }))}</p>
+        <p class="delay">${ic('clock')}<span>${t(`Publiée avec ${D.delayHours} h de retard, par sécurité.`, `Published ${D.delayHours} hours late, for safety.`)}<em>${t('« La patience fait partie de l’apprivoisement », dirait le renard.', '“Patience is part of taming,” the fox would say.')}</em></span></p>
+        <div class="ctas"><a class="btn btn-p" href="#!">${ic('map')}${t('Carte interactive', 'Interactive map')}</a><a class="btn btn-s" href="#!">${ic('play')}${t('Rejouer le voyage', 'Replay the voyage')}</a></div>
+        <a class="cockpit" href="#!">${ic('compass')}<span><b>${t('Demander l’accès au cockpit en direct', 'Request live cockpit access')}</b><small>${t('Pour les amis marins qui veulent suivre les instruments du bord.', 'For sailing friends who’d like to follow the boat’s instruments.')}</small></span>${ic('arrow')}</a>
+      </div>
+    </div>
+  </div></section>`;
+  };
+
+  // ── Le journal : des cartes nettement séparées, une seule photo par récit ──
+  const filtered = () => D.posts.filter((p) => (!S.chap || p.chapter_id === S.chap) && (!S.et || p.etape_id === S.et));
+  const artHTML = (p, feat) => {
+    const ph = p.photos[0], vd = (p.videos || [])[0];
+    const n = nPh(p), v = nVid(p);
+    const cnt = [n > 1 || (n && v) ? `${ic('camera')}${n} photo${n > 1 ? 's' : ''}` : '', v ? `${ic('video')}${v} ${t(`vidéo${v > 1 ? 's' : ''}`, `video${v > 1 ? 's' : ''}`)}` : ''].filter(Boolean).join('<span aria-hidden="true">·</span>');
+    const ci = chapIdx(p.chapter_id);
+    return `<article class="art${feat ? ' feat' : ''}" data-post="${esc(p.id)}" tabindex="0" role="button" aria-label="${esc(WG.title(p))}" style="--cc:${chapColor(p.chapter_id)}">
+      ${ph || vd ? `<div class="art-ph"><div class="pm mrect">${ph ? im(ph.url, feat ? 1100 : 700, WG.cap(ph)) : `<img src="${esc(poster(vd.url))}" alt="" loading="lazy" decoding="async">`}</div>${cnt ? `<span class="art-n">${cnt}</span>` : ''}</div>` : ''}
+      ${feat ? `<span class="lbl">${p === D.posts[0] ? t('Le dernier récit', 'The latest story') : t('En tête de la sélection', 'Top of the selection')}</span>` : ''}
+      <div class="art-b">
+        <p class="art-m">${ci >= 0 ? `<span class="ch">${t('Chapitre', 'Chapter')} ${ROMAN[ci]}</span>` : ''}<span>${esc(WG.date(p.date))} · ${esc(p.author)}</span></p>
+        <h3>${esc(WG.title(p))}</h3>
+        <p class="art-x">${esc(WG.excerpt(p, feat ? 300 : 150))}</p>
+        <p class="art-f">${p.etape_id ? `<span>${ic('pin')}${esc(cut(etName(p.etape_id), 34))}</span>` : '<span></span>'}<span class="more">${t('Lire', 'Read')}${ic('arrow')}</span></p>
+      </div>
+    </article>`;
+  };
+  const calendar = () => {
+    const ref = new Date(D.posts[0].date);
+    const y = ref.getUTCFullYear(), m = ref.getUTCMonth();
+    const byDay = {};
+    D.posts.forEach((p) => { const d = new Date(p.date); if (d.getUTCFullYear() === y && d.getUTCMonth() === m) (byDay[d.getUTCDate()] ||= []).push(p); });
+    const first = (new Date(Date.UTC(y, m, 1)).getUTCDay() + 6) % 7, nd = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+    const heads = [...Array(7)].map((_, i) => `<i>${esc(WG.date(Date.UTC(2026, 9, 5 + i), { weekday: 'narrow' }))}</i>`).join('');
+    let cells = '<span></span>'.repeat(first);
+    for (let d = 1; d <= nd; d++) {
+      const ps = byDay[d];
+      cells += ps ? `<button type="button" data-post="${esc(ps[0].id)}" aria-label="${esc(`${WG.date(Date.UTC(y, m, d), { day: 'numeric', month: 'long' })} — ${WG.title(ps[0])}`)}">${d}</button>` : `<span>${d}</span>`;
+    }
+    return `<div class="box" id="calendrier"><h3>${esc(cap1(WG.date(Date.UTC(y, m, 15), { month: 'long', year: 'numeric' })))}</h3><div class="cal">${heads}${cells}</div><p>${t('Les jours dorés sont des jours de récit.', 'Golden days are days with a story.')}</p></div>`;
+  };
+  const journal = () => {
+    const gal = [photoOf('3e280968', 4), photoOf('b7cb6768', 4), photoOf('892be0d3', 3)].filter(Boolean).map((x) => im(x.ph.url, 160)).join('');
+    return `
+  <section class="band b-jnl" id="journal" data-tab="journal"><div class="wrap">
+    ${sh('journal', t('Le journal', 'The journal'), t('Les récits de Catherine et Bertrand, du plus récent au plus ancien.', 'Stories by Catherine and Bertrand, newest first.'))}
+    ${epi('journal')}
+    <div class="filters">
+      <div class="chips" role="group" aria-label="${t('Choisir un chapitre', 'Choose a chapter')}" id="chips"></div>
+      <div class="fl-row"><label class="sel">${t('Étape', 'Stage')}<select id="f-et"></select></label><p class="fcount" id="fcount" aria-live="polite"></p></div>
+    </div>
+    <div class="jgrid">
+      <div class="jlist"><div id="feat"></div><div class="jcards" id="cards"></div>
+        <div class="ctas c"><a class="btn btn-p" href="#!">${ic('book')}${t(`Voir tout le journal · ${D.stats.posts} récits`, `See the whole journal · ${D.stats.posts} stories`)}</a></div></div>
+      <aside class="jside" aria-label="${t('Autour du journal', 'Around the journal')}">
+        ${calendar()}
+        <div class="box"><a class="gal-sc" href="#galerie"><span class="gal-st">${gal}</span><span><b>${t('La galerie', 'The gallery')}</b><small>${t(`${totalPhotos} photos du voyage`, `${totalPhotos} photos of the voyage`)}</small></span>${ic('arrow')}</a></div>
+      </aside>
+    </div>
+  </div></section>`;
+  };
+  const renderList = () => {
+    const ch = document.getElementById('chips');
+    if (!ch) return;
+    ch.innerHTML = `<button type="button" class="chip" data-chap="" aria-pressed="${!S.chap}" style="--cc:var(--fg)">${t('Tous les chapitres', 'All chapters')}</button>${chapters.map((c, i) => `<button type="button" class="chip" data-chap="${esc(c.id)}" aria-pressed="${S.chap === c.id}" style="--cc:${CHC[i % CHC.length]}"><i></i>${ROMAN[i]} · ${esc(WG.chapter(c.id))}</button>`).join('')}`;
+    const ets = etapes.filter((e) => !S.chap || e.chapter_id === S.chap);
+    if (S.et && !ets.some((e) => e.id === S.et)) S.et = '';
+    document.getElementById('f-et').innerHTML = `<option value="">${t('Toutes les étapes', 'All stages')}</option>${ets.map((e) => `<option value="${esc(e.id)}"${e.id === S.et ? ' selected' : ''}>${esc(etName(e.id))}</option>`).join('')}`;
+    const list = filtered();
+    document.getElementById('fcount').innerHTML = (S.chap || S.et) ? `${nStories(list.length)} ${t('dans cette sélection', 'in this selection')} <button type="button" data-reset>${t('Tout afficher', 'Show all')}</button>` : '';
+    document.getElementById('feat').innerHTML = list.length ? artHTML(list[0], true) : `<div class="box"><h3>${t('Aucun récit public pour cette sélection… pour l’instant.', 'No public story for this selection… yet.')}</h3><p>${t('Essayez un autre chapitre ou une autre étape.', 'Try another chapter or stage.')}</p></div>`;
+    document.getElementById('cards').innerHTML = list.slice(1, 7).map((p) => artHTML(p, false)).join('');
+    reveal(document.querySelector('.jlist'));
+  };
+
+  // ── La galerie ──
+  const GAL = [['5c6a66de', 0, 'big'], ['24320084', 0], ['2bea89b3', 0], ['7dc49c10', 0], ['9c218125', 0], ['3427f8c2', 2], ['52c3b5fb', 3, 'wide'], ['c0a9511f', 0], ['b42363d1', 3], ['4d97bc3c', 0], ['eb53f068', 1], ['3231880a', 2]];
+  const vidGrid = () => `<div class="vgrid">${VIDS.slice(0, 12).map(({ p, v }, i) => `<button type="button" class="vt" data-vid="${i}" aria-label="${esc(`${t('Vidéo', 'Video')} — ${WG.title(p)}`)}"><img src="${esc(poster(v.url))}" alt="" loading="lazy" decoding="async"><span class="pl">${ic('play')}</span><span class="vc"><span>${esc(cut(WG.cap(v) || WG.title(p), 90))}</span></span></button>`).join('')}</div>
+    <div class="gal-f"><span>${t(`${VIDS.length} vidéos, du départ à l’Atlantique — elles se regardent ici, sans quitter la page.`, `${VIDS.length} videos, from the start to the Atlantic — watch them right here.`)}</span><a class="btn btn-p" href="#!">${ic('video')}${t('Toutes les vidéos', 'All the videos')}</a></div>`;
+  const galerie = () => {
+    const tiles = GAL.map(([pre, i, cls]) => {
+      const x = photoOf(pre, i);
+      if (!x) return '';
+      const c = WG.cap(x.ph);
+      return `<button type="button" class="gt${cls ? ` ${cls}` : ''}" data-post="${esc(x.p.id)}" data-ph="${i}" aria-label="${esc(`${WG.title(x.p)} — ${t('voir la photo', 'see the photo')}`)}">${im(x.ph.url, cls ? 900 : 480, c)}<span>${esc(cut(c || WG.title(x.p), 80))}</span></button>`;
+    }).join('');
+    return `
+  <section class="band b-gal" id="galerie" data-tab="galerie"><div class="wrap">
+    ${sh('galerie', t('La galerie', 'The gallery'), t('Les photos et les vidéos du voyage. Touchez-en une pour l’ouvrir.', 'Photos and videos of the voyage. Tap one to open it.'))}
+    ${epi('galerie')}
+    <div class="gtabs" role="tablist" aria-label="${t('Photos ou vidéos', 'Photos or videos')}">
+      <button type="button" role="tab" id="gt-ph" aria-controls="g-ph" aria-selected="${S.gtab === 'ph'}" data-gtab="ph">${ic('camera')}${t('Photos', 'Photos')} <small>${totalPhotos}</small></button>
+      <button type="button" role="tab" id="gt-vd" aria-controls="g-vd" aria-selected="${S.gtab === 'vd'}" data-gtab="vd">${ic('video')}${t('Vidéos', 'Videos')} <small>${VIDS.length}</small></button>
+    </div>
+    <div id="g-ph" role="tabpanel" aria-labelledby="gt-ph"${S.gtab === 'ph' ? '' : ' hidden'}><div class="gal">${tiles}</div>
+      <div class="gal-f"><span>${t(`${totalPhotos} photos, classées par chapitre et par escale.`, `${totalPhotos} photos, sorted by chapter and stop.`)}</span><a class="btn btn-p" href="#!">${ic('images')}${t('Toutes les photos', 'All the photos')}</a></div></div>
+    <div id="g-vd" role="tabpanel" aria-labelledby="gt-vd"${S.gtab === 'vd' ? '' : ' hidden'}>${S.gtab === 'vd' ? vidGrid() : ''}</div>
+  </div></section>`;
+  };
+  const openVid = ({ p, v }) => {
+    const box = document.createElement('div');
+    box.className = 'vbox'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-label', WG.title(p));
+    box.innerHTML = `<div class="vbox-in"><video controls autoplay playsinline poster="${esc(poster(v.url))}" src="${esc(v.url)}"></video>
+      <div class="vbox-h"><b>${esc(WG.cap(v) || WG.title(p))}</b><span>${esc(WG.date(p.date))}</span>
+        <button type="button" class="btn btn-p" data-post="${esc(p.id)}">${ic('book')}${t('Lire le récit', 'Read the story')}</button>
+        <button type="button" class="x" data-vclose>${ic('close')}${t('Fermer', 'Close')}</button></div></div>`;
+    const close = () => { box.remove(); document.body.style.overflow = ''; document.removeEventListener('keydown', onKey); };
+    const onKey = (ev) => { if (ev.key === 'Escape') close(); };
+    box.addEventListener('click', (ev) => { if (ev.target === box || ev.target.closest('[data-vclose]') || ev.target.closest('[data-post]')) close(); });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(box); document.body.style.overflow = 'hidden';
+    box.querySelector('[data-vclose]').focus();
+  };
+
+  // ── Les escales : des cartes postales (d5), un mot au dos ──
+  const postmark = (txt) => `<svg viewBox="-34 -34 68 68" aria-hidden="true"><circle r="30" fill="none" stroke="currentColor" stroke-width="1.6"/><circle r="22" fill="none" stroke="currentColor" stroke-width=".9"/><text text-anchor="middle" y="4" font-family="-apple-system, Segoe UI, sans-serif" font-weight="700" font-size="8.5" letter-spacing=".6" fill="currentColor">${esc(txt)}</text><path d="M-72 -8q8-4 16 0t16 0t16 0M-72 0q8-4 16 0t16 0t16 0M-72 8q8-4 16 0t16 0t16 0" fill="none" stroke="currentColor" stroke-width="1.1"/></svg>`;
+  const pcArt = (k) => {
+    const sky = [['#F6E6C4', '#EFC67A'], ['#DCEBF1', '#A9CADB'], ['#F7DCCF', '#E9A98F']][k % 3];
+    return `<svg viewBox="0 0 340 230" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="pcg${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs>
+      <rect width="340" height="150" fill="url(#pcg${k})"/><circle cx="${240 - (k % 3) * 60}" cy="70" r="26" fill="#FFF6E2" opacity=".9"/>
+      <path d="M0 150q60-34 120-12t110 0 110-6V150z" fill="#7E9F6A" opacity=".75"/><rect y="148" width="340" height="82" fill="#2F6E8C"/><rect y="196" width="340" height="34" fill="#1F4F6B"/>
+      <g transform="translate(${120 + (k % 3) * 30} 98) scale(2.2)" fill="none" stroke="#14284B" stroke-width="1.6" stroke-linejoin="round"><path d="M22 18H2a4 4 0 0 0 4 4h12a4 4 0 0 0 4-4Z" fill="#FFF8EF"/><path d="M21 14 10 2 3 14h18Z" fill="#FFF8EF"/><path d="M10 2v16"/></g>
+      <path d="M30 172q8-4 16 0t16 0M210 186q8-4 16 0t16 0M120 210q8-4 16 0" fill="none" stroke="#FFF8EF" stroke-width="2" stroke-linecap="round" opacity=".7"/></svg>`;
+  };
+  const escales = () => {
+    const items = [...etapes].reverse().map((e) => {
+      const k = etapes.indexOf(e);
+      const ps = D.posts.filter((p) => p.etape_id === e.id);
+      const lp = ps[0];
+      const withPh = ps.find((p) => p.photos.length);
+      const fl = S.flip.has(e.id);
+      const pm = WG.date(e.date_start, { month: 'short', year: 'numeric' }).toUpperCase();
+      return `<div class="pc${fl ? ' is-flip' : ''}" data-flip="${esc(e.id)}" role="button" tabindex="0" aria-pressed="${fl}" aria-label="${esc(etName(e.id))} — ${t('retourner la carte postale', 'turn the postcard over')}">
+        <div class="pc-in">
+          <div class="pc-f"><div class="pc-ph">${withPh ? im(withPh.photos[0].url, 720, '') : pcArt(k)}</div>
+            <div class="pc-lab"><b>${esc(etName(e.id))}</b><span>${esc(range(e))} · ${nStories(ps.length)}</span></div>
+            <span class="pc-turn" aria-hidden="true">${ic('turn')}</span></div>
+          <div class="pc-b" aria-hidden="${!fl}">
+            <div class="pc-note">${lp ? `<p>${esc(WG.excerpt(lp, 170))}</p><span class="sig">— ${esc(lp.author)}, ${esc(dShort(lp.date))}</span>` : `<p class="pc-empty">${t('Pas encore de récit public pour cette escale.', 'No public story for this stop yet.')}</p><span class="sig">${esc(range(e))}</span>`}</div>
+            <div class="pc-addr"><span class="pc-stamp"><span>${ic('sail')}</span></span><span class="pc-pm">${postmark(pm)}</span>
+              <div class="pc-lines"><span>Wang’ap</span><span>${esc(WG.chapter(e.chapter_id))}</span></div>
+              ${lp ? `<button type="button" class="btn pc-read" data-post="${esc(lp.id)}"${fl ? '' : ' tabindex="-1"'}>${t('Lire le récit', 'Read the story')}</button>` : ''}</div>
+          </div>
+        </div></div>`;
+    }).join('');
+    return `
+  <section class="band b-esc" id="escales" data-tab="escales">
+    <div class="wrap">${sh('escales', t('Les escales', 'The stops'), t('Une carte postale de chaque escale. Touchez-la pour la retourner et lire le mot au dos.', 'A postcard from every stop. Tap it to turn it over and read the note on the back.'))}${epi('escales')}</div>
+    <div class="pcs" id="pcs" data-allow-overflow>${items}</div>
+    <div class="wrap pcs-f"><span class="hint">${ic('swipe')}${t('Glissez pour voir les autres escales', 'Swipe to see the other stops')}</span>
+      <span class="arrows"><button type="button" data-scroll="-1" aria-label="${t('Cartes précédentes', 'Previous cards')}">${ic('left')}</button><button type="button" data-scroll="1" aria-label="${t('Cartes suivantes', 'Next cards')}">${ic('right')}</button></span></div>
+  </section>`;
+  };
+
+  // ── Le programme (le vrai, avec ses drapeaux) ──
+  const programme = () => {
+    const groups = Object.entries(OCEANS).map(([k, [c, fr, en, yFr, yEn]]) => {
+      const ps = PROG.filter((p) => p[0] === k);
+      return `<div class="oc-g" style="--oc:${c}"><h3>${t(fr, en)}<small>${t(yFr, yEn)}</small></h3>${ps.map(([, flags, tFr, tEn, pFr, pEn, rFr, rEn, end]) => {
+        const done = end && new Date(`${end}T23:59:59Z`) < lastAt;
+        return `<div class="ph">${done ? `<span class="ok">✓ ${t('fait', 'done')}</span>` : ''}<span class="fl" aria-hidden="true">${flags}</span><b>${esc(t(tFr, tEn))}</b><span class="per">${esc(t(pFr, pEn))}</span><small>${esc(t(rFr, rEn))}</small></div>`;
+      }).join('')}</div>`;
+    }).join('');
+    return `
+  <section class="band b-prg" id="programme" data-tab="programme"><div class="wrap">
+    ${sh('programme', t('Le programme', 'The programme'), t(`La route prévue autour du monde : ~${nf(36000)} milles, 3 océans, de 2026 à 2029.`, `The planned route around the world: ~${nf(36000)} miles, 3 oceans, from 2026 to 2029.`))}
+    ${epi('programme')}
+    <div class="oc">${groups}</div>
+    <p class="prg-n">${t('Une trame indicative, volontairement souple : elle sera ajustée à la météo, à l’état du bateau, à la fatigue de l’équipage et aux envies de découverte.', 'A deliberately flexible outline: it will be adjusted to the weather, the state of the boat, the crew’s fatigue and the wish to explore.')}</p>
+    <div class="ctas"><a class="btn btn-p" href="#!">${ic('play')}${t('Voir l’animation', 'Watch the animation')}</a><a class="btn btn-s" href="#!">${t('Le programme complet', 'The full programme')}${ic('arrow')}</a></div>
+  </div></section>`;
+  };
+
+  // ── L'équipage, en grand ──
+  const equipage = () => {
+    const bp = photoOf('0faac474', 5);
+    return `
+  <section class="band b-crw" id="equipage" data-tab="equipage"><div class="wrap">
+    ${sh('equipage', t('L’équipage', 'The crew'), t('Deux marins et un catamaran.', 'Two sailors and a catamaran.'))}
+    ${epi('equipage')}
+    <div class="crew">
+      <figure class="duo"><div class="cp"><img src="/images/photo2.webp" alt="Catherine &amp; Bertrand" loading="lazy" decoding="async" width="1600" height="900" style="object-position:50% 30%"></div>
+        <figcaption class="who">
+          <div><h3>Catherine</h3><p class="role">${t('Co-skipper · navigatrice', 'Co-skipper · navigator')}</p><p class="alias">${t('la Rose', 'the Rose')}</p></div>
+          <div><h3>Bertrand</h3><p class="role">${t('Skipper · capitaine', 'Skipper · captain')}</p><p class="alias">${t('le Renard', 'the Fox')}</p></div>
+        </figcaption></figure>
+      <figure class="boat"><div class="cp">${bp ? im(bp.ph.url, 900, t('Wang’ap au mouillage à Malte', 'Wang’ap at anchor in Malta')) : '<img src="/images/boat.webp" alt="" loading="lazy">'}</div>
+        <div><h3>Wang’ap</h3><p class="role">Outremer 52 · ${t('catamaran', 'catamaran')}</p><p class="alias">${t('l’astéroïde', 'the asteroid')}</p></div></figure>
+    </div>
+  </div></section>`;
+  };
+
+  const genese = () => `
+  <section class="band b-gen" id="genese" data-tab="genese"><div class="wrap">
+    ${sh('genese', t('La genèse', 'Genesis'), t('Pourquoi « Wang’ap » ? Un mot coréen, un nouveau cycle.', 'Why “Wang’ap”? A Korean word, a new cycle.'))}
+    ${epi('genese')}
+    <div class="gen">
+      <div class="gen-ph"><img src="/images/photo1.webp" alt="Catherine &amp; Bertrand" loading="lazy" decoding="async" width="1600" height="900"></div>
+      <div>
+        <div class="gen-mark"><span class="kr" lang="ko">환갑</span><span>Hwangap<br>${t('les 60 ans', 'turning 60')}</span></div>
+        <h3 style="font-size:clamp(24px,4.4vw,32px);margin-top:6px">${t('Une décision, un bateau, quatre ans de préparation', 'One decision, one boat, four years of preparation')}</h3>
+        <p>${t('Wang’ap est né d’un mot coréen — 환갑 (Hwangap) — une tradition millénaire célébrant les 60 ans comme le début d’un nouveau cycle. Depuis 2022, Catherine et Bertrand préparent ce tour du monde : formations, construction du bateau, logistique.', 'Wang’ap was born from a Korean word — 환갑 (Hwangap) — an age-old tradition that celebrates turning 60 as the start of a new cycle. Since 2022, Catherine and Bertrand have been preparing this round-the-world voyage: training, building the boat, logistics.')}</p>
+        <a class="lnk" href="#!">${t('Lire la genèse complète', 'Read the full story')}${ic('arrow')}</a>
+      </div>
+    </div>
+  </div></section>`;
+
+  const contact = () => `
+  <section class="band b-ctc" id="contact" data-tab="contact"><div class="wrap">
+    ${sh('contact', t('Nous écrire', 'Write to us'), t('Un message pour le bord, ou les nouvelles par email.', 'A message for the boat, or the news by email.'))}
+    <div class="forms">
+      <div class="form-card"><h3>${t('Envoyer un message', 'Send a message')}</h3>
+        <form class="form">
+          <label class="fld"><span>${t('Prénom *', 'First name *')}</span><input name="prenom" required autocomplete="given-name"></label>
+          <label class="fld"><span>Email</span><input type="email" name="email" autocomplete="email"></label>
+          <label class="fld"><span>${t('Téléphone (WhatsApp)', 'Phone (WhatsApp)')}</span><input type="tel" name="tel" autocomplete="tel"></label>
+          <label class="fld"><span>Message</span><textarea name="message" rows="4"></textarea></label>
+          <p class="fhint">${t('Indiquez un email ou un téléphone pour que nous puissions vous répondre.', 'Leave an email or a phone number so we can reply.')}</p>
+          <div><button class="btn btn-p" type="submit">${ic('mail')}${t('Envoyer', 'Send')}</button></div>
+        </form></div>
+      <div class="form-card"><h3>${t('Suivre le voyage par email', 'Follow the voyage by email')}</h3>
+        <form class="form">
+          <fieldset class="opts">
+            <label class="opt"><input type="checkbox" checked> ${t('La lettre de la semaine', 'The weekly letter')}</label>
+            <label class="opt"><input type="checkbox" checked> ${t('Les nouveaux récits', 'New stories')}</label>
+            <label class="opt"><input type="checkbox"> ${t('Les nouvelles escales', 'New stops')}</label>
+          </fieldset>
+          <label class="fld"><span>Email</span><input type="email" name="nl-email" autocomplete="email"></label>
+          <div><button class="btn btn-p" type="submit">${t('S’inscrire', 'Subscribe')}</button></div>
+        </form></div>
+    </div>
+  </div></section>`;
+
+  const closing = () => {
+    let s = '';
+    [[6, 20, 1], [14, 62, 0.6], [24, 30, 0.8], [33, 78, 0.5], [46, 16, 0.6], [58, 70, 1], [68, 28, 0.5], [79, 58, 0.8], [88, 22, 0.6], [94, 74, 0.5], [40, 86, 0.4], [72, 88, 0.4]].forEach(([x, y, k]) => { s += star(x * 10, y * 4, k); });
+    return `
+  <section class="band b-end" id="fin">
+    <svg class="sky" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${s}</svg>
+    <div class="wrap"><blockquote>${esc(WG.quote('stars'))}<cite>— Antoine de Saint-Exupéry, ${t('Le Petit Prince', 'The Little Prince')}</cite></blockquote>
+      <a class="lnk" href="#!">${t('Espace skippers', 'Skippers’ area')}${ic('arrow')}</a>
+      <footer class="foot"><span class="fwm"><img src="/images/logo.webp" alt="" width="44" height="44" style="vertical-align:middle;border-radius:12px;background:#fff;margin-right:12px">wang'ap</span>Outremer 52 · 2026–2029<small>${t('Démo de design — contenus réels, liens inactifs', 'Design demo — real content, inactive links')}</small>
+        <div class="ctas"><button type="button" class="btn btn-p" data-avis>${ic('talk')}${t('Donner mon avis', 'Give my view')}</button><a class="btn btn-s" href="index.html">${ic('left')}${t('Revue du design', 'Design review')}</a></div></footer>
+    </div>
+  </section>`;
+  };
+
+  // ── Barre du bas (téléphone) + le sommaire ──
+  const TABS = ['carte', 'journal', 'galerie', 'programme'];
+  const chrome = () => `
+  <nav class="tabbar" aria-label="${t('Navigation', 'Navigation')}">
+    ${TABS.map((id) => `<a class="tab" href="#${id}" data-t="${id}" style="--c:${SEC[id].c}"><span class="ti">${ic(SEC[id].icon)}</span><span>${esc(SEC[id].label())}</span></a>`).join('')}
+    <button type="button" class="tab menu" data-menu aria-haspopup="dialog"><span class="ti">${ic('menu')}</span><span>Menu</span></button>
+  </nav>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="som-t"><div class="sheet-card">
+    <div class="sheet-h"><h2 id="som-t">${t('Sommaire', 'Contents')}</h2><button type="button" class="x" data-close>${ic('close')}${t('Fermer', 'Close')}</button></div>
+    <ul class="som">${SECS.map((s) => `<li><a href="#${s.id}" data-close style="--c:${s.c}"><span class="som-i">${ic(s.icon)}</span><span><b>${esc(s.label())}</b><small>${esc(s.desc())}</small></span><span class="arr">${ic('arrow')}</span></a></li>`).join('')}</ul>
+    <div class="sheet-f">${themeSeg()}${langSeg()}<a class="login" href="#!">${ic('user')}${t('Connexion', 'Sign in')}</a></div>
+  </div></div>`;
+
+  // ───────────────────── la carte du monde (tuiles Esri + encre) ─────────────────────
+  // d9 : la mappemonde (Esri World Physical : la mer en bleu, les reliefs) et, pour la route
+  // parcourue, une vraie carte de géographe (Esri NatGeo : côtes, pays, noms). Sans clé.
+  const PHYS = (z, x, y) => `https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/${z}/${y}/${x}`;
+  const NATGEO = (z, x, y) => `https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/${z}/${y}/${x}`;
+  // La route parcourue, en douceur : simplifiée (Douglas-Peucker, en pixels), puis lissée
+  // (Chaikin) ; un trou de données (> 0,6°, WG.segments) reste un fin pointillé.
+  const simplify = (pts, eps) => {
+    if (pts.length < 3) return pts;
+    const keep = new Uint8Array(pts.length); keep[0] = keep[pts.length - 1] = 1;
+    const st = [[0, pts.length - 1]];
+    while (st.length) {
+      const [a, b] = st.pop(); const [ax, ay] = pts[a], [bx, by] = pts[b];
+      const dx = bx - ax, dy = by - ay, L = Math.hypot(dx, dy);
+      let md = 0, mi = -1;
+      for (let i = a + 1; i < b; i++) {
+        const d = L ? Math.abs(dy * pts[i][0] - dx * pts[i][1] + bx * ay - by * ax) / L : Math.hypot(pts[i][0] - ax, pts[i][1] - ay);
+        if (d > md) { md = d; mi = i; }
+      }
+      if (md > eps) { keep[mi] = 1; st.push([a, mi], [mi, b]); }
+    }
+    return pts.filter((_, i) => keep[i]);
+  };
+  const chaikin = (pts, n = 2) => {
+    let p = pts;
+    for (let k = 0; k < n && p.length > 2; k++) {
+      const q = [p[0]];
+      for (let i = 0; i < p.length - 1; i++) { const [x0, y0] = p[i], [x1, y1] = p[i + 1]; q.push([x0 * 0.75 + x1 * 0.25, y0 * 0.75 + y1 * 0.25], [x0 * 0.25 + x1 * 0.75, y0 * 0.25 + y1 * 0.75]); }
+      q.push(p[p.length - 1]); p = q;
+    }
+    return p;
+  };
+  const smoothTrack = (proj, eps) => {
+    const segs = WG.segments(D.track).map((s) => chaikin(simplify(s.map(proj), eps), 2));
+    const gaps = segs.slice(1).map((s, i) => [segs[i][segs[i].length - 1], s[0]]);
+    return { segs, gaps };
+  };
+  const dPath = (pts) => pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join('');
+  const drawn = RM ? '' : ' class="trk-d" pathLength="1"';
+  const trackSvg = (proj, eps, TRK, GLOW, w) => {
+    const { segs, gaps } = smoothTrack(proj, eps);
+    const d = segs.map(dPath).join('');
+    return gaps.map(([a, b]) => `<path class="fadein" d="M${a[0].toFixed(1)},${a[1].toFixed(1)}L${b[0].toFixed(1)},${b[1].toFixed(1)}" stroke="${TRK}" stroke-width="2" stroke-dasharray="1 5" stroke-linecap="round" fill="none"/>`).join('')
+      + `<path d="${d}" fill="none" stroke="${GLOW}" stroke-width="${w + 4}" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".85"${drawn}/><path d="${d}" fill="none" stroke="${TRK}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"${drawn}/>`;
+  };
+  // Une rose des vents, à la manière des vieilles mappemondes.
+  const rose = (cx, cy, r, c, n) => `<g transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)})" class="fadein"><circle r="${r}" fill="none" stroke="${c}" stroke-width="1"/><circle r="${(r * 0.78).toFixed(1)}" fill="none" stroke="${c}" stroke-width=".7" stroke-dasharray="1 3"/>`
+    + [45, 135, 225, 315].map((a) => `<path transform="rotate(${a})" d="M0,${(-r * 0.72).toFixed(1)}L${(r * 0.1).toFixed(1)},0L0,${(r * 0.1).toFixed(1)}L${(-r * 0.1).toFixed(1)},0Z" fill="${c}" opacity=".55"/>`).join('')
+    + [0, 90, 180, 270].map((a) => `<path transform="rotate(${a})" d="M0,${(-r * 1.12).toFixed(1)}L${(r * 0.16).toFixed(1)},0L0,${(r * 0.16).toFixed(1)}L${(-r * 0.16).toFixed(1)},0Z" fill="${a ? c : n}"/>`).join('')
+    + `<text y="${(-r * 1.25).toFixed(1)}" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="${(r * 0.45).toFixed(1)}" fill="${c}">N</text></g>`;
+  const MERC = (lat) => Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360));
+  // Le monde « coupé » dans l'océan Indien (75° E) : chaque lieu n'y figure qu'une fois.
+  const WB = { w: 75, e: 435, n: 50, s: -44 };
+  const wrapLon = (lon) => (lon < WB.w ? lon + 360 : lon);
+  const seamSplit = (pts) => {
+    const out = []; let cur = [];
+    for (const q of pts) {
+      const p = [wrapLon(q[0]), q[1]];
+      const a = cur[cur.length - 1];
+      if (a && Math.abs(p[0] - a[0]) > 180) {
+        const bx = p[0] > a[0] ? p[0] - 360 : p[0] + 360;
+        const edge = bx < a[0] ? WB.w : WB.e;
+        const lat = a[1] + ((edge - a[0]) / (bx - a[0])) * (p[1] - a[1]);
+        cur.push([edge, lat]); out.push(cur);
+        cur = [[edge === WB.w ? WB.e : WB.w, lat]];
+      }
+      cur.push(p);
+    }
+    if (cur.length > 1) out.push(cur);
+    return out;
+  };
+  let wmW = 0;
+  const worldMap = (force) => {
+    const card = document.getElementById('wm-card'), sc = document.getElementById('wm-scroll'), host = document.getElementById('wm');
+    if (!card || !sc || !host) return;
+    const fitW = sc.clientWidth;
+    if (!fitW || (!force && fitW === wmW)) return;
+    wmW = fitW;
+    const aspect = (2 * Math.PI) / (MERC(WB.n) - MERC(WB.s));
+    let W = fitW, H = Math.round(W / aspect);
+    const fit = H >= 220;
+    if (!fit) { H = 290; W = Math.round(H * aspect); }
+    card.classList.toggle('fit', fit);
+    host.style.width = `${W}px`; host.style.height = `${H}px`;
+    const k = W / (2 * Math.PI);
+    const X = (lon) => ((lon - WB.w) / 360) * W;
+    const Y = (lat) => (MERC(WB.n) - MERC(lat)) * k;
+    const P = ([lon, lat]) => [X(wrapLon(lon)), Y(lat)];
+    // tuiles
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const z = Math.max(1, Math.min(3, Math.ceil(Math.log2((W * dpr) / 256))));
+    const n = 2 ** z, T = W / n;
+    const x0 = ((WB.w + 180) / 360) * n, y0 = (0.5 - MERC(WB.n) / (2 * Math.PI)) * n;
+    let tiles = '';
+    for (let ty = Math.floor(y0); ty < Math.min(n, y0 + H / T); ty++) {
+      for (let tx = Math.floor(x0); tx < x0 + W / T; tx++) {
+        tiles += `<img src="${PHYS(z, ((tx % n) + n) % n, ty)}" alt="" decoding="async" draggable="false" style="left:${((tx - x0) * T).toFixed(1)}px;top:${((ty - y0) * T).toFixed(1)}px;width:${(T + 0.5).toFixed(1)}px;height:${(T + 0.5).toFixed(1)}px">`;
+      }
+    }
+    const f = (v) => v.toFixed(1);
+    const path = (seg, wrap = true) => seg.map((p, i) => { const x = wrap ? X(p[0]) : X(p[0]), y = Y(p[1]); return `${i ? 'L' : 'M'}${f(x)},${f(y)}`; }).join('');
+    const night = S.theme === 'night';
+    const RTE = night ? '#F2C979' : '#173A6B', TRK = night ? '#FF8C6E' : '#C8402A', GLOW = night ? '#0B1730' : '#FFFFFF';
+    const GRAT = night ? 'rgba(243,235,218,.2)' : 'rgba(255,255,255,.6)', LINE = night ? 'rgba(242,201,121,.5)' : 'rgba(23,58,107,.45)';
+    let svg = `<svg width="${W}" height="${H}" aria-hidden="true">`;
+    // la mappemonde : les méridiens tous les 30°, l'équateur et les deux tropiques
+    for (let L = 90; L < WB.e; L += 30) svg += `<path d="M${f(X(L))},0V${H}" stroke="${GRAT}" stroke-width="1" fill="none"/>`;
+    [23.44, -23.44].forEach((lat) => { svg += `<path d="M0,${f(Y(lat))}H${W}" stroke="${LINE}" stroke-width="1" stroke-dasharray="2 5" fill="none"/>`; });
+    svg += `<path d="M0,${f(Y(0))}H${W}" stroke="${LINE}" stroke-width="1.3" stroke-dasharray="7 5" fill="none"/>`;
+    svg += rose(X(wrapLon(-122)), Y(-30), W >= 950 ? 30 : 22, RTE, TRK);
+    const around = seamSplit(AROUND);
+    around.forEach((seg) => { svg += `<path class="fadein" d="${path(seg)}" fill="none" stroke="${GLOW}" stroke-opacity="${night ? 0.55 : 0.65}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`; });
+    around.forEach((seg) => { svg += `<path class="fadein" d="${path(seg)}" fill="none" stroke="${RTE}" stroke-width="2.8" stroke-dasharray="0.1 6.5" stroke-linecap="round" stroke-linejoin="round"/>`; });
+    // la route parcourue (data-d9.js, au délai public) : lissée, et qui se dessine
+    svg += trackSvg(P, 1.2, TRK, GLOW, 3.2);
+    const tier = W >= 950 ? 2 : 1;
+    const lx = f(X(wrapLon(-150)));
+    let labels = `<span class="wl eq fadein" style="left:${lx}px;top:${f(Y(0) - 9)}px;transform:translate(-50%,-50%)">${t('Équateur', 'Equator')}</span>`
+      + `<span class="wl eq fadein" style="left:${lx}px;top:${f(Y(23.44) - 9)}px;transform:translate(-50%,-50%)">${t('Tropique du Cancer', 'Tropic of Cancer')}</span>`
+      + `<span class="wl eq fadein" style="left:${lx}px;top:${f(Y(-23.44) + 9)}px;transform:translate(-50%,-50%)">${t('Tropique du Capricorne', 'Tropic of Capricorn')}</span>`;
+    WSTOPS.forEach(([lon, lat, flag, fr, en, dx, dy, anc, lv], i) => {
+      const [x, y] = P([lon, lat]);
+      svg += `<circle class="pop" style="--d:${(0.9 + i * 0.07).toFixed(2)}s" cx="${f(x)}" cy="${f(y)}" r="${lv === 1 ? 4.6 : 3.6}" fill="${night ? '#0B1730' : '#FFFFFF'}" stroke="${RTE}" stroke-width="2.2"/>`;
+      if (lv > tier || !fr) return;
+      const tr = anc === 'r' ? 'translate(0,-50%)' : anc === 'l' ? 'translate(-100%,-50%)' : 'translate(-50%,-50%)';
+      labels += `<span class="wl fadein" style="left:${f(x + dx)}px;top:${f(y + dy)}px;transform:${tr}"><span class="f">${flag}</span>${esc(t(fr, en))}</span>`;
+    });
+    const [bx, by] = P(WG.lastPoint());
+    svg += '</svg>';
+    host.innerHTML = `<div class="wm-t">${tiles}</div>${svg}${labels}<span class="wl" style="left:${f(bx)}px;top:${f(by)}px;transform:translate(-50%,-50%)"><span class="boat-mk" style="--trk:${TRK}"></span></span>`;
+    if (!fit) {
+      // Au téléphone : on part de l'Atlantique, là où le tour du monde commence.
+      sc.scrollLeft = Math.max(0, X(wrapLon(-25)) - sc.clientWidth / 2);
+    }
+  };
+  // La route parcourue sur une carte de géographe (NatGeo), cadrée sur la trace publique.
+  // Les escales nommées : le passé seulement (règle 8) — jamais le lieu du dernier point.
+  const east = D.track.reduce((a, p) => (p[0] > a[0] ? p : a), D.track[0]);
+  const NSTOPS = [[4.08, 43.56, '🇫🇷', 'La Grande-Motte', 'La Grande-Motte', 'l'], [14.51, 35.9, '🇲🇹', 'Malte', 'Malta', 'r'], [east[0], east[1], '🇬🇷', 'Grèce', 'Greece', 'l'], [-5.35, 36.13, '🇬🇮', 'Gibraltar', 'Gibraltar', 'r']];
+  let nearW = 0, nearH = 0;
+  const mountNear = (force) => {
+    const el = document.getElementById('near');
+    if (!el) return;
+    const W = el.clientWidth, H = el.clientHeight;
+    if (!W || !H || (!force && W === nearW && H === nearH)) return;
+    nearW = W; nearH = H;
+    const TS = 256;
+    const wx = (lon) => ((lon + 180) / 360) * TS;
+    const wy = (lat) => { const s = Math.sin((lat * Math.PI) / 180); return (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * TS; };
+    const lons = D.track.map((p) => p[0]), lats = D.track.map((p) => p[1]);
+    const w0 = Math.min(...lons), e0 = Math.max(...lons), s0 = Math.min(...lats), n0 = Math.max(...lats);
+    const pad = 34;
+    const k = Math.min((W - 2 * pad) / (wx(e0) - wx(w0)), (H - 2 * pad) / (wy(s0) - wy(n0)));   // px par unité monde
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const zi = Math.max(1, Math.min(10, Math.ceil(Math.log2(k * dpr) - 0.25)));             // le niveau des tuiles
+    const ox = ((wx(w0) + wx(e0)) / 2) * k - W / 2, oy = ((wy(s0) + wy(n0)) / 2) * k - H / 2;
+    const P = ([lon, lat]) => [wx(lon) * k - ox, wy(lat) * k - oy];
+    const n = 2 ** zi, T = (TS * k) / n;
+    const f = (v) => v.toFixed(1);
+    let tiles = '';
+    for (let tx = Math.floor(ox / T); tx <= Math.floor((ox + W) / T); tx++) {
+      for (let ty = Math.max(0, Math.floor(oy / T)); ty <= Math.min(n - 1, Math.floor((oy + H) / T)); ty++) {
+        tiles += `<img src="${NATGEO(zi, ((tx % n) + n) % n, ty)}" alt="" decoding="async" draggable="false" style="left:${f(tx * T - ox)}px;top:${f(ty * T - oy)}px;width:${f(T + 0.5)}px;height:${f(T + 0.5)}px">`;
+      }
+    }
+    const night = S.theme === 'night';
+    const TRK = night ? '#FF8C6E' : '#C8402A', GLOW = night ? '#0B1730' : '#FFFFFF';
+    let svg = `<svg width="${W}" height="${H}" aria-hidden="true">${trackSvg(P, 1.6, TRK, GLOW, 3.4)}`;
+    let labels = '';
+    NSTOPS.forEach(([lon, lat, flag, fr, en, side], i) => {
+      const [x, y] = P([lon, lat]);
+      svg += `<circle class="pop" style="--d:${(0.8 + i * 0.6).toFixed(2)}s" cx="${f(x)}" cy="${f(y)}" r="5" fill="#FFFFFF" stroke="${TRK}" stroke-width="2.4"/>`;
+      labels += `<span class="pill fadein" style="left:${f(x)}px;top:${f(y)}px;transform:${side === 'l' ? 'translate(calc(-100% - 10px),-50%)' : 'translate(10px,-50%)'}">${flag} ${esc(t(fr, en))}</span>`;
+    });
+    const [bx, by] = P(WG.lastPoint());
+    el.innerHTML = `<div class="nm-t">${tiles}</div>${svg}</svg>${labels}<span class="wl" style="left:${f(bx)}px;top:${f(by)}px;transform:translate(-50%,-50%)"><span class="boat-mk" style="--trk:${TRK}"></span></span>`;
+  };
+
+  // ── Les apparitions, la route qui se dessine, la carte postale qui se retourne : quand on arrive dessus ──
+  let rvIO, goIO;
+  const reveal = (root = document) => {
+    if (!root || RM || !('IntersectionObserver' in window)) return;
+    if (!rvIO) rvIO = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('in'); rvIO.unobserve(en.target); } }), { rootMargin: '0px 0px -6% 0px', threshold: 0.06 });
+    root.querySelectorAll('.sh, .epi, .art, .gt, .pc, .oc-g, .duo, .boat, .gen-ph, .form-card, .wm-card, .near-card, .pos-card, .nums li, .jside .box').forEach((el) => {
+      if (el.classList.contains('rv')) return;
+      el.classList.add('rv');
+      el.style.setProperty('--rd', `${(Math.min([...el.parentElement.children].indexOf(el), 5) * 0.08).toFixed(2)}s`);
+      rvIO.observe(el);
+    });
+  };
+  const goWhenSeen = () => {
+    const els = [document.getElementById('wm-card'), document.querySelector('.near-card')].filter(Boolean);
+    if (RM || !('IntersectionObserver' in window)) { els.forEach((e) => e.classList.add('go')); return; }
+    if (goIO) goIO.disconnect();
+    goIO = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('go'); goIO.unobserve(en.target); } }), { threshold: 0.3 });
+    els.forEach((e) => goIO.observe(e));
+  };
+  let hinted = false;
+  const hintFlip = () => {
+    const pc = document.querySelector('#pcs .pc');
+    if (hinted || !pc || RM || !('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver((es) => {
+      if (!es[0].isIntersecting) return;
+      io.disconnect(); hinted = true;
+      setTimeout(() => { if (S.flip.has(pc.dataset.flip)) return; flip(pc); setTimeout(() => { if (S.flip.has(pc.dataset.flip)) flip(pc); }, 2000); }, 700);
+    }, { threshold: 0.7 });
+    io.observe(pc);
+  };
+
+  // ── Le lecteur (d9) : chaque photo entière, une à la fois, numérotée, avec des flèches ;
+  // les vidéos du récit à la suite ; ouvert sur la photo touchée dans la galerie ──
+  let lastPost = null, lastPh = 0;
+  document.addEventListener('click', (e) => { const el = e.target.closest('[data-post]'); if (el) { lastPost = D.posts.find((x) => x.id === el.dataset.post) || null; lastPh = Number(el.dataset.ph || 0); } }, true);
+  const enhanceReader = (ov) => {
+    const p = lastPost;
+    let sc = ov.querySelector('.wg-reader-photos');
+    if (p && nVid(p)) {
+      if (!sc) { sc = document.createElement('div'); sc.className = 'wg-reader-photos'; ov.querySelector('.wg-reader-body').before(sc); }
+      sc.insertAdjacentHTML('beforeend', p.videos.map((v) => `<figure><video controls playsinline preload="none" poster="${esc(poster(v.url))}" src="${esc(v.url)}"></video>${WG.cap(v) ? `<figcaption>${esc(WG.cap(v))}</figcaption>` : ''}</figure>`).join(''));
+    }
+    if (!sc) return;
+    const figs = [...sc.children], n = figs.length;
+    const wrap = document.createElement('div'); wrap.className = 'rd-wrap'; sc.before(wrap); wrap.appendChild(sc);
+    if (n < 2) return;
+    wrap.insertAdjacentHTML('beforeend', `<span class="rd-n" aria-live="polite"></span><button type="button" class="rd-a" data-d="-1" aria-label="${t('Précédente', 'Previous')}">${ic('left')}</button><button type="button" class="rd-a" data-d="1" aria-label="${t('Suivante', 'Next')}">${ic('right')}</button><div class="rd-dots" aria-hidden="true">${figs.map(() => '<i></i>').join('')}</div>`);
+    const cnt = wrap.querySelector('.rd-n'), dots = [...wrap.querySelectorAll('.rd-dots i')], prev = wrap.querySelector('[data-d="-1"]'), next = wrap.querySelector('[data-d="1"]');
+    const cur = () => Math.round(sc.scrollLeft / Math.max(1, sc.clientWidth));
+    const upd = () => {
+      const i = cur();
+      cnt.textContent = `${i + 1} / ${n}`;
+      dots.forEach((d, j) => d.classList.toggle('on', j === i));
+      prev.disabled = i === 0; next.disabled = i === n - 1;
+      sc.querySelectorAll('video').forEach((v) => { if (!v.paused && figs.indexOf(v.closest('figure')) !== i) v.pause(); });
+    };
+    const go = (i) => sc.scrollTo({ left: Math.max(0, Math.min(n - 1, i)) * sc.clientWidth, behavior: RM ? 'auto' : 'smooth' });
+    wrap.addEventListener('click', (e) => { const a = e.target.closest('.rd-a'); if (a) go(cur() + Number(a.dataset.d)); });
+    sc.addEventListener('scroll', () => requestAnimationFrame(upd), { passive: true });
+    ov.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); go(cur() + (e.key === 'ArrowRight' ? 1 : -1)); } });
+    if (lastPh > 0 && lastPh < n) sc.scrollLeft = lastPh * sc.clientWidth;
+    upd();
+  };
+  new MutationObserver((ms) => ms.forEach((m) => m.addedNodes.forEach((nd) => { if (nd.nodeType === 1 && nd.classList.contains('wg-reader')) enhanceReader(nd); }))).observe(document.body, { childList: true });
+
+  // ── Rendu ──
+  const applyTheme = () => {
+    root.setAttribute('data-theme', S.theme);
+    document.querySelector('meta[name="theme-color"]').content = S.theme === 'night' ? '#0D1830' : '#FBF6EA';
+    R.setProperty('--chev', chev(S.theme === 'night' ? '#EFE8D8' : '#1D2B44'));
+  };
+  const counters = () => {
+    const els = [...document.querySelectorAll('[data-count]')];
+    if (RM || !('IntersectionObserver' in window)) return;
+    const run = (el) => {
+      const to = +el.dataset.count, t0 = performance.now();
+      const tick = (now) => { const q = Math.min(1, (now - t0) / 1300); el.textContent = nf(Math.round(to * (1 - (1 - q) ** 3))); if (q < 1) requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+    };
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { io.unobserve(e.target); run(e.target); } }), { threshold: 0.6 });
+    els.forEach((el) => io.observe(el));
+  };
+  let spyIO;
+  const spy = () => {
+    if (spyIO) spyIO.disconnect();
+    if (!('IntersectionObserver' in window)) return;
+    spyIO = new IntersectionObserver((ents) => ents.forEach((en) => {
+      if (!en.isIntersecting) return;
+      const k = en.target.getAttribute('data-tab');
+      document.querySelectorAll('[data-t]').forEach((a) => { const on = a.dataset.t === k; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+    }), { rootMargin: '-40% 0px -55% 0px' });
+    document.querySelectorAll('[data-tab]').forEach((s) => spyIO.observe(s));
+  };
+  let wmRO;
+  const render = () => {
+    const y = window.scrollY;
+    applyTheme();
+    app.innerHTML = header() + '<main>' + hero() + numbers() + carte() + journal() + galerie() + escales() + programme() + equipage() + genese() + contact() + '</main>' + closing() + chrome();
+    renderList();
+    wmW = 0;
+    requestAnimationFrame(() => { worldMap(true); mountNear(true); });
+    if (wmRO) wmRO.disconnect();
+    if ('ResizeObserver' in window) {
+      let rt;
+      wmRO = new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => { worldMap(false); mountNear(false); }, 160); });
+      wmRO.observe(document.getElementById('wm-scroll')); wmRO.observe(document.getElementById('near'));
+    }
+    counters();
+    spy();
+    reveal();
+    goWhenSeen();
+    hintFlip();
+    window.scrollTo(0, y);
+  };
+
+  const sheet = (on) => { const s = document.getElementById('sheet'); s.classList.toggle('on', on); document.body.style.overflow = on ? 'hidden' : ''; if (on) s.querySelector('.x').focus(); };
+  const flip = (pc) => {
+    const id = pc.dataset.flip, on = !S.flip.has(id);
+    if (on) S.flip.add(id); else S.flip.delete(id);
+    pc.classList.toggle('is-flip', on); pc.setAttribute('aria-pressed', String(on));
+    pc.querySelector('.pc-b').setAttribute('aria-hidden', String(!on));
+    const b = pc.querySelector('.pc-read'); if (b) b.tabIndex = on ? 0 : -1;
+  };
+  document.addEventListener('click', (e) => {
+    const l = e.target.closest('[data-lang]'); if (l) { if (l.dataset.lang !== WG.lang) { sheet(false); WG.setLang(l.dataset.lang); } return; }
+    const th = e.target.closest('[data-set-theme]');
+    if (th) {
+      if (th.dataset.setTheme !== S.theme) {
+        S.theme = th.dataset.setTheme; WG.store.set('wg-d9-theme', S.theme); applyTheme();
+        document.querySelectorAll('[data-set-theme]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.setTheme === S.theme)));
+        worldMap(true); mountNear(true);
+      }
+      return;
+    }
+    if (e.target.closest('[data-menu]')) { sheet(true); return; }
+    const pick = e.target.closest('[data-pick]');
+    if (pick) { const pk = document.getElementById('picks'); const on = !pk.classList.contains('on'); pk.classList.toggle('on', on); pick.setAttribute('aria-expanded', String(on)); return; }
+    const hb = e.target.closest('[data-hero]'); if (hb) { setHero(hb.dataset.hero); return; }
+    const gt = e.target.closest('[data-gtab]');
+    if (gt) {
+      S.gtab = gt.dataset.gtab;
+      document.querySelectorAll('[data-gtab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.gtab === S.gtab)));
+      const gp = document.getElementById('g-ph'), gv = document.getElementById('g-vd');
+      gp.hidden = S.gtab !== 'ph'; gv.hidden = S.gtab !== 'vd';
+      if (S.gtab === 'vd' && !gv.innerHTML.trim()) gv.innerHTML = vidGrid();
+      return;
+    }
+    const vt = e.target.closest('[data-vid]'); if (vt) { openVid(VIDS[Number(vt.dataset.vid)]); return; }
+    const sh0 = document.getElementById('sheet');
+    if (sh0 && sh0.classList.contains('on') && (e.target === sh0 || e.target.closest('[data-close]'))) { sheet(false); return; }
+    const c = e.target.closest('[data-chap]');
+    if (c) { S.chap = c.dataset.chap; S.et = ''; renderList(); return; }
+    if (e.target.closest('[data-reset]')) { S.chap = ''; S.et = ''; renderList(); return; }
+    const pn = e.target.closest('[data-pan]'); if (pn) { const sc = document.getElementById('wm-scroll'); sc.scrollBy({ left: Number(pn.dataset.pan) * sc.clientWidth * 0.7, behavior: RM ? 'auto' : 'smooth' }); return; }
+    const sb = e.target.closest('[data-scroll]'); if (sb) { const r = document.getElementById('pcs'); r.scrollBy({ left: Number(sb.dataset.scroll) * Math.min(r.clientWidth * 0.8, 740), behavior: RM ? 'auto' : 'smooth' }); return; }
+    if (e.target.closest('[data-avis]')) { const tab = document.querySelector('.wg-tab'); if (tab) tab.click(); else location.reload(); return; }   // sans onglet (vieux wg.js) : recharger
+    const pc = e.target.closest('[data-flip]'); if (pc && !e.target.closest('[data-post]')) flip(pc);
+  });
+  document.addEventListener('change', (e) => { if (e.target.id === 'f-et') { S.et = e.target.value; renderList(); } });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { const s0 = document.getElementById('sheet'); if (s0?.classList.contains('on')) sheet(false); }
+    const pc = e.target.closest?.('[data-flip]');
+    if (pc && e.target === pc && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); flip(pc); return; }
+    const a = e.target.closest?.('article[data-post]');
+    if (a && e.target === a && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); const p = D.posts.find((x) => x.id === a.dataset.post); if (p) WG.openPost(p); }
+  });
+  window.addEventListener('wg:lang', render);
+  WG.inert();
+  render();
+})();
+</script>
+<script src="survey.js?v=20261113a"></script>
+</body>
+</html>

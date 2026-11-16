@@ -1,123 +1,1393 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-theme="day">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Wang'ap — La Synthèse (à venir)</title>
+<meta name="theme-color" content="#F4ECDB">
+<title>Wang'ap — La Synthèse (démo)</title>
 <link rel="icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..700,0..100,0..1;1,9..144,400..700,0..100,0..1&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&text=%ED%99%98%EA%B0%91&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="wg.css">
+<script>try { if (localStorage.getItem('wg-d7-theme') === 'night') document.documentElement.setAttribute('data-theme', 'night'); } catch (e) { /* navigation privée */ }</script>
 <style>
-  /* Design 7 — PLACEHOLDER (Flavien, 18 oct.) : la future « combinaison » des six
-     propositions, construite à partir des avis de Catherine et Bertrand. Pas de
-     questionnaire ici tant qu'il n'y a rien à juger (la 119 n'accepte que d1–d6). */
-  :root {
-    --bg: #FBF7EF; --card: #FFFFFF; --ink: #1D2B44; --muted: #5E6B7A; --line: #E7E1D4;
-    --teal: #1B9AAA; --teal-d: #157C89; --gold: #E8B059;
-    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  }
-  * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--sans); }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
-  header.top { position: sticky; top: 0; z-index: 50; background: rgba(251,247,239,.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
-  header.top .wrap { display: flex; align-items: center; gap: 10px; height: 58px; }
-  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
-  .brand img { width: 38px; height: 38px; border-radius: 10px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
-  .brand b { font-size: 19px; font-weight: 800; }
-  .brand span { font-size: 13px; color: var(--muted); display: block; line-height: 1; margin-top: 2px; }
-  .flags { margin-left: auto; display: flex; gap: 4px; }
-  .flags button { width: 40px; height: 34px; border-radius: 9px; border: 1.5px solid transparent; background: transparent; font-size: 20px; cursor: pointer; }
-  .flags button[aria-pressed="true"] { border-color: var(--teal); background: #fff; }
+/* Design 7 — « La Synthèse » (10 nov.). La base est d1 (La Petite Planète), revue
+   d'après les avis de Catherine (17 oct.) et de Bertrand (10 nov.) :
+   - le carnet de bord prend la mise en page de d3 (une colonne, une entrée après l'autre,
+     la plus récente en grand), en typographie d1, avec des pages numérotées ;
+   - la carte est neuve : une carte marine dépliée, fond clair (contours des terres
+     lisibles), la route parcourue à l'encre, la route prévue en pointillé ;
+   - les cartes postales de d5 (sans scotch ni polaroïd), son équipage, son
+     « glissez ou touchez » ;
+   - le marine et l'or de d2 et sa vue de nuit, mais le papier clair par défaut ;
+   - « Ce mois-ci dans le carnet » et le sommaire de d4 ;
+   - un tableau de bord discret, dans la palette (l'idée de d6).
+   L'univers du Petit Prince est évoqué (citations, petites planètes, un renard élancé),
+   dessiné à l'encre et au lavis, avec une touche de carnet de mer à la Corto Maltese. */
+:root{
+  --paper:#F4ECDB;--paper-2:#ECE1C8;--card:#FBF6EA;--card-2:#F6EEDD;
+  --ink:#1E2B47;--ink-2:#33415E;--muted:#5A6375;--hair:rgba(30,43,71,.13);--hair-2:rgba(30,43,71,.26);
+  --gold:#C9973B;--gold-ink:#83601B;--gold-soft:rgba(201,151,59,.2);
+  --sea:#4A74A3;--sea-ink:#33598A;--sea-soft:rgba(74,116,163,.15);--rose:#B4473D;--rose-ink:#9A382F;--sage:#6E8B57;
+  --btn:#1E2B47;--btn-ink:#F7F0E1;
+  --line-ink:#2A3349;--w-cream:#FBF4E4;--w-hull:#2C3D60;--w-sea-hi:#D7E4EE;--w-sea:#7FA3C7;--w-sea-lo:#3F6693;
+  --w-ochre:#D9A65A;--w-moon:#D9A65A;--w-sky:#A9C0D8;--w-sage:#8EA874;--w-rose:#C4584C;--w-land:#E3C98F;
+  --band:#1B2A4A;--band-ink:#F2EAD7;
+  --shadow:0 1px 0 rgba(30,43,71,.05),0 16px 36px -24px rgba(30,43,71,.42);
+  --ft:'Fraunces',Georgia,serif;--fb:'Literata',Georgia,serif;--fh:'Caveat','Segoe Print',cursive;
+  --rd-bg:#FBF6EA;--rd-ink:#1E2B47;--rd-muted:#5A6375;--rd-accent:#83601B;--rd-title:#1E2B47;
+  --rd-title-font:'Fraunces',Georgia,serif;--rd-body-font:'Literata',Georgia,serif;--rd-radius:18px;
+  --gut:16px;--tb:0px;
+}
+:root[data-theme="night"]{
+  --paper:#0F1A33;--paper-2:#14223F;--card:#152545;--card-2:#192B4E;
+  --ink:#EFE7D4;--ink-2:#D9D0BC;--muted:#AEB5C5;--hair:rgba(239,231,212,.13);--hair-2:rgba(239,231,212,.26);
+  --gold:#E2B55B;--gold-ink:#E8C47A;--gold-soft:rgba(226,181,91,.17);
+  --sea:#86A9D4;--sea-ink:#9DBBE0;--sea-soft:rgba(134,169,212,.14);--rose:#E08C7E;--rose-ink:#EFA597;--sage:#A3C08C;
+  --btn:#E2B55B;--btn-ink:#14203B;
+  --line-ink:#E6DCC5;--w-cream:#E9DFC9;--w-hull:#0B1428;--w-sea-hi:#6585B2;--w-sea:#36598A;--w-sea-lo:#1C3459;
+  --w-ochre:#C99549;--w-moon:#EDE3CC;--w-sky:#2B4673;--w-sage:#6E8B57;--w-rose:#C4584C;--w-land:#B99A62;
+  --band:#0A1328;--band-ink:#F2EAD7;
+  --shadow:0 1px 0 rgba(0,0,0,.2),0 20px 40px -24px rgba(0,0,0,.75);
+  --rd-bg:#152545;--rd-ink:#EFE7D4;--rd-muted:#AEB5C5;--rd-accent:#E8C47A;--rd-title:#EFE7D4;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:16px;background:var(--paper)}
+body{margin:0;background-color:var(--paper);background-image:var(--grain);color:var(--ink);font:400 17px/1.62 var(--fb);overflow-x:hidden;overflow-x:clip;padding-bottom:calc(var(--tb) + env(safe-area-inset-bottom,0px));transition:background-color .45s,color .45s}
+img{max-width:100%}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2.5px solid var(--sea);outline-offset:3px;border-radius:6px}
+h1,h2,h3,.ft{font-family:var(--ft);font-variation-settings:"SOFT" 40,"WONK" 0;font-weight:500;letter-spacing:-.01em;line-height:1.12;margin:0}
+p{margin:0}
+.hand{font-family:var(--fh);font-weight:600}
+.wrap{max-width:1180px;margin:0 auto;padding:0 var(--gut)}
+.sec{position:relative;padding:44px 0}
+.sh{margin:0 0 22px;max-width:680px}
+.kick{display:inline-flex;align-items:center;gap:8px;font:700 24px/1 var(--fh);color:var(--rose-ink);margin:0 0 8px}
+.kick svg{width:15px;height:15px;flex:none}
+.sh h2,.h2{font-size:clamp(29px,5.6vw,41px)}
+.sh .lead{margin:10px 0 0;color:var(--muted);font-size:17px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:24px 20px 24px 19px/20px 24px 19px 24px;font:500 16px/1.1 var(--fb);text-decoration:none;border:1.5px solid transparent;cursor:pointer;transition:transform .2s,background-color .3s,color .3s}
+.btn:active{transform:translateY(1px)}
+.btn-p{background:var(--btn);color:var(--btn-ink)}
+.btn-s{background:transparent;color:var(--ink);border-color:var(--hair-2)}
+.btn-s:hover{border-color:var(--ink)}
+.btn svg{width:19px;height:19px}
+.ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.lnk{display:inline-flex;align-items:center;gap:6px;min-height:44px;color:var(--gold-ink);font-weight:500;text-decoration:none;border-bottom:1px solid var(--gold-soft)}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.ic{width:22px;height:22px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+[data-reveal]{opacity:0;transform:translateY(14px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+[data-reveal].is-in{opacity:1;transform:none}
 
-  .hero { padding-top: 34px; padding-bottom: 10px; display: grid; gap: 26px; align-items: center; }
-  @media (min-width: 820px) { .hero { grid-template-columns: 1.2fr 1fr; padding-top: 52px; } }
-  .kick { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--teal-d); margin-bottom: 10px; }
-  .kick i { font-style: normal; background: var(--ink); color: #fff; border-radius: 99px; padding: 3px 9px; letter-spacing: 0; }
-  h1 { font: 700 clamp(30px, 6vw, 46px)/1.1 var(--serif); margin: 0 0 14px; }
-  .lead { font-size: 17px; color: #354357; margin: 0 0 12px; }
-  .soon { display: inline-flex; align-items: center; gap: 8px; background: #FDF1D8; color: #8A5A12; font-weight: 700; font-size: 14px; border-radius: 99px; padding: 6px 12px; }
+/* masques « aquarelle » (bords estompés) */
+.mr1{-webkit-mask:var(--m-r1) center/100% 100% no-repeat;mask:var(--m-r1) center/100% 100% no-repeat}
+.mr2{-webkit-mask:var(--m-r2) center/100% 100% no-repeat;mask:var(--m-r2) center/100% 100% no-repeat}
+.mrect{-webkit-mask:var(--m-rect) center/100% 100% no-repeat;mask:var(--m-rect) center/100% 100% no-repeat}
 
-  /* La maquette « en chantier » : un téléphone et un écran en pointillés. */
-  .mock { position: relative; height: 300px; }
-  .mock .desk, .mock .phone { position: absolute; border: 2px dashed #CBBFA6; background: repeating-linear-gradient(135deg, rgba(232,176,89,.07) 0 12px, transparent 12px 24px), #FFFDF8; display: grid; place-items: center; text-align: center; color: var(--muted); font-size: 14px; }
-  .mock .desk { left: 0; top: 18px; width: 78%; height: 230px; border-radius: 14px; }
-  .mock .phone { right: 0; top: 60px; width: 34%; max-width: 150px; height: 230px; border-radius: 22px; background-color: #fff; }
-  .mock .bars { width: 70%; display: grid; gap: 8px; }
-  .mock .bars span { display: block; height: 10px; border-radius: 6px; background: #EFE7D6; }
-  .mock .bars span:nth-child(1) { width: 60%; height: 14px; background: #E6DCC6; }
-  .mock .bars span:nth-child(3) { width: 80%; }
-  .mock .tag { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); white-space: nowrap; background: var(--ink); color: #fff; font-weight: 700; font-size: 13px; padding: 7px 14px; border-radius: 99px; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
-  .mock img { position: absolute; left: -6px; bottom: -8px; width: 120px; filter: drop-shadow(0 8px 16px rgba(0,0,0,.12)); }
+/* encre et lavis des dessins */
+.ink{fill:none;stroke:var(--line-ink);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.ink.thin{stroke-width:.8}
+.ink.bold{stroke-width:1.8}
+.f-cream{fill:var(--w-cream)}.f-hull{fill:var(--w-hull)}.f-ochre{fill:var(--w-ochre)}.f-sky{fill:var(--w-sky)}.f-sage{fill:var(--w-sage)}.f-rose{fill:var(--w-rose)}.f-land{fill:var(--w-land)}.f-sea{fill:var(--w-sea)}.f-sealo{fill:var(--w-sea-lo)}
+.f-gold{fill:var(--gold)}.f-moon{fill:var(--w-moon)}
+.st-gold{stroke:var(--gold-ink)}
 
-  h2 { font: 700 24px/1.2 var(--serif); margin: 38px 0 12px; }
-  .steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; counter-reset: s; }
-  @media (min-width: 760px) { .steps { grid-template-columns: repeat(3, 1fr); } }
-  .steps li { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px 14px 56px; position: relative; font-size: 15px; }
-  .steps li::before { counter-increment: s; content: counter(s); position: absolute; left: 14px; top: 14px; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: #fff; font-weight: 700; display: grid; place-items: center; }
-  .steps strong { display: block; margin-bottom: 2px; }
-  .note { margin: 22px 0 0; background: #fff; border: 1px dashed #D8CDB6; border-radius: 16px; padding: 14px 16px; font-size: 15px; }
-  .acts { display: flex; gap: 10px; flex-wrap: wrap; margin: 26px 0 0; }
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 46px; padding: 10px 18px; border-radius: 14px; font-weight: 700; font-size: 15px; text-decoration: none; }
-  .btn.primary { background: var(--ink); color: #fff; }
-  .btn.ghost { background: #fff; color: var(--ink); border: 1.5px solid #CFC7B6; }
-  footer { padding: 34px 0 calc(40px + env(safe-area-inset-bottom, 0px)); text-align: center; font-size: 13px; color: var(--muted); }
+/* ───────── en-tête ───────── */
+.top{position:relative;z-index:600;padding:calc(8px + env(safe-area-inset-top,0px)) 0 4px;transition:background-color .45s}
+.top-in{display:flex;align-items:center;gap:8px;min-height:56px}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;margin-right:auto;min-height:48px;flex:none}
+.brand img{width:42px;height:42px;border-radius:50%;background:#FBF6EA;box-shadow:0 0 0 1.5px var(--gold-soft)}
+.brand b{display:block;font:italic 500 25px/1 var(--ft);font-variation-settings:"SOFT" 40,"WONK" 0;letter-spacing:-.01em}
+.brand small{display:none;font:400 12.5px/1.2 var(--fb);color:var(--muted);margin-top:3px;white-space:nowrap}
+.nav{display:none;gap:2px;margin-right:6px}
+.nav a{text-decoration:none;font-size:15.5px;padding:12px 8px;border-radius:8px}
+.nav a:hover{color:var(--rose-ink)}
+.seg{display:inline-flex;border:1.4px solid var(--hair-2);border-radius:999px;padding:2px;background:color-mix(in srgb,var(--card) 70%,transparent)}
+.seg button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:40px;min-height:40px;padding:0 10px;border:0;background:none;border-radius:999px;font:500 14.5px/1 var(--fb);color:var(--ink);cursor:pointer;transition:background-color .3s,color .3s}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.seg svg{width:17px;height:17px}
+.theme .lbl{display:none}
+.som-btn{display:none;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;border:1.4px solid var(--ink);background:transparent;cursor:pointer;font:500 15.5px/1 var(--fb)}
+.som-btn svg{width:18px;height:18px}
+.login{display:none;min-height:44px;padding:0 14px;font-size:15px;flex:none}
+
+/* ───────── héros ───────── */
+.hero{padding:6px 0 8px}
+.spread{position:relative}
+.page{position:relative}
+.art-wrap{position:relative;width:min(100%,430px);margin:0 auto}
+.art{display:block;width:100%;height:auto;overflow:visible}
+.art-cap{text-align:center;font:600 21px/1.2 var(--fh);color:var(--sea-ink);margin:-6px 0 0;transform:rotate(-1.2deg)}
+.hero-txt{text-align:center;margin-top:10px}
+.chap-now{font:700 23px/1.2 var(--fh);color:var(--rose-ink);margin:0 0 12px}
+.badge{display:inline-block;font:500 12.5px/1.3 var(--fb);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);padding:7px 2px;border-top:1px solid var(--gold-soft);border-bottom:1px solid var(--gold-soft)}
+.hero h1{font-size:clamp(29px,7.4vw,46px);margin:16px 0 0;font-weight:480;text-wrap:balance}
+.hero h1 em{font-style:italic;color:var(--rose-ink)}
+.sub{margin:12px 0 0;font-size:17px;color:var(--muted)}
+.q{margin:22px auto 0;max-width:460px;font:italic 400 18.5px/1.5 var(--ft);font-variation-settings:"SOFT" 60,"WONK" 0;color:var(--ink-2)}
+.q cite{display:block;font:600 19px/1.2 var(--fh);color:var(--muted);margin-top:6px;font-style:normal}
+.q .qi{display:block;width:30px;height:34px;margin:0 auto 4px}
+.hero .ctas{justify-content:center}
+.spin{transform-box:view-box;transform-origin:270px 300px;animation:spin 200s linear infinite}
+.bob{transform-box:fill-box;transform-origin:50% 100%;animation:bob 7s ease-in-out infinite}
+.tw{transform-box:fill-box;transform-origin:center;animation:tw 4.5s ease-in-out infinite}
+.tw:nth-of-type(2n){animation-delay:-2s;animation-duration:6s}
+.tail{transform-box:fill-box;transform-origin:90% 80%;animation:tail 9s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(-360deg)}}
+@keyframes bob{0%,100%{transform:rotate(-1.6deg) translateY(0)}50%{transform:rotate(1.6deg) translateY(1.4px)}}
+@keyframes tw{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.78)}}
+@keyframes tail{0%,100%{transform:rotate(0)}50%{transform:rotate(-4deg)}}
+
+/* le tableau de bord */
+.board{margin:30px 0 0;padding:14px 0 12px;border-top:1px solid var(--gold-soft);border-bottom:1px solid var(--gold-soft)}
+.board-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 10px}
+.board-h b{font:700 22px/1 var(--fh);color:var(--gold-ink)}
+.board-h span{font-size:13.5px;color:var(--muted)}
+.gauges{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 0}
+.gauges li{padding:2px 10px;border-left:1px solid var(--hair);min-width:0}
+.gauges li:nth-child(3n+1){border-left:0;padding-left:0}
+.gauges .g-l{display:block;font:500 11.5px/1.25 var(--fb);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.gauges .g-v{display:flex;align-items:baseline;gap:5px;font:500 27px/1.15 var(--ft);font-variation-settings:"SOFT" 40,"WONK" 0;margin-top:4px;white-space:nowrap}
+.gauges .g-v small{font:400 13px/1 var(--fb);color:var(--muted)}
+.gauges .g-v svg{width:26px;height:26px;align-self:center;margin-right:2px}
+.gauges .na .g-v{color:var(--muted)}
+.board-f{display:flex;align-items:center;gap:8px;margin:12px 0 0;font-size:13.5px;color:var(--muted);line-height:1.4}
+.board-f svg{width:18px;height:18px;flex:none;color:var(--gold-ink)}
+.needle{transform-box:fill-box;transform-origin:50% 100%;animation:needle 6s ease-in-out infinite}
+@keyframes needle{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(9deg)}}
+
+/* ───────── la carte dépliée ───────── */
+.chart-tools{display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap;margin:0 0 12px}
+.chart-tools .seg button{padding:0 14px;font-size:14.5px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13.5px;color:var(--muted)}
+.legend i{display:inline-block;width:26px;height:0;vertical-align:middle;margin-right:6px;border-top:2.4px solid var(--ink)}
+.legend i.dot{border-top:3px dotted var(--rose)}
+.chart{position:relative;height:400px;border-radius:4px;background:var(--card);padding:9px;box-shadow:var(--shadow);perspective:1700px}
+.chart-frame{position:absolute;inset:9px;overflow:hidden;border-radius:2px;background:#C9D9E5}
+[data-theme="night"] .chart-frame{background:#2D3546}
+.chart-scroll{position:absolute;inset:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.chart-scroll::-webkit-scrollbar{display:none}
+.chart-map{position:relative;height:100%;overflow:hidden}
+.chart-map .ov{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.grat line{stroke:var(--ink);stroke-width:.6;opacity:.16}
+.grat text{font:italic 400 10.5px var(--fb);fill:var(--ink);opacity:.55;paint-order:stroke;stroke:var(--card);stroke-width:3px;stroke-opacity:.6}
+.route{fill:none;stroke:var(--rose);stroke-width:2.6;stroke-linecap:round;stroke-dasharray:.1 7.5;opacity:0;transition:opacity 1.2s ease 1.6s}
+.chart.open .route{opacity:.95}
+.ph-dot{fill:var(--card);stroke:var(--rose);stroke-width:1.6}
+.ph-lb{font:500 12px var(--fb);fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:3.5px;stroke-linejoin:round}
+.ph-fl{font-size:14px}
+.boat-mk{position:relative;display:block;width:16px;height:16px;border-radius:50%;background:var(--gold);border:2.5px solid var(--ink);box-shadow:0 0 0 5px rgba(201,151,59,.32)}
+.boat-mk em{position:absolute;left:20px;top:-8px;white-space:nowrap;font:600 17px/1 var(--fh);font-style:normal;color:var(--ink);background:color-mix(in srgb,var(--card) 88%,transparent);padding:4px 8px;border-radius:10px}
+.creases{position:absolute;inset:9px;pointer-events:none;z-index:3;border-radius:2px;
+  background:
+   linear-gradient(90deg,transparent calc(50% - 1px),rgba(40,30,10,.13) 50%,rgba(255,255,255,.28) calc(50% + 1px),transparent calc(50% + 4px)),
+   linear-gradient(90deg,transparent calc(25% - 1px),rgba(40,30,10,.07) 25%,rgba(255,255,255,.16) calc(25% + 1px),transparent calc(25% + 3px)),
+   linear-gradient(90deg,transparent calc(75% - 1px),rgba(40,30,10,.07) 75%,rgba(255,255,255,.16) calc(75% + 1px),transparent calc(75% + 3px)),
+   linear-gradient(180deg,transparent calc(50% - 1px),rgba(40,30,10,.08) 50%,rgba(255,255,255,.2) calc(50% + 1px),transparent calc(50% + 3px)),
+   radial-gradient(ellipse at 50% 50%,transparent 62%,rgba(90,60,20,.12) 100%)}
+[data-theme="night"] .creases{opacity:.45}
+[data-theme="night"] .wg-tab{background:#E2B55B;color:#14203B}
+.moon-n{display:none}[data-theme="night"] .moon-n{display:inline}[data-theme="night"] .f-moon{opacity:.1}
+.neat{position:absolute;inset:15px;border:1px solid rgba(30,43,71,.45);pointer-events:none;z-index:3;border-radius:1px;box-shadow:inset 0 0 0 3px rgba(251,246,234,.0)}
+[data-theme="night"] .neat{border-color:rgba(239,231,212,.35)}
+.c-rose{position:absolute;right:24px;top:24px;width:86px;height:86px;z-index:4;pointer-events:none;color:var(--gold-ink);opacity:.85}
+.cartouche{position:absolute;left:24px;bottom:24px;z-index:4;max-width:calc(100% - 48px);background:color-mix(in srgb,var(--card) 92%,transparent);padding:7px 12px 8px;border:1px solid var(--hair-2);outline:1px solid var(--hair);outline-offset:-5px;pointer-events:none}
+.cartouche b{display:block;font:500 15px/1.2 var(--ft);font-variation-settings:"SOFT" 40,"WONK" 0}
+.cartouche span{display:block;font:italic 400 12.5px/1.3 var(--fb);color:var(--muted)}
+.pan{position:absolute;right:24px;bottom:24px;z-index:4;display:none;gap:6px}
+@media (min-width:760px){.chart.world .pan{display:flex}}
+.pan button{width:44px;height:44px;border-radius:50%;border:1.4px solid var(--hair-2);background:color-mix(in srgb,var(--card) 92%,transparent);cursor:pointer;display:grid;place-items:center}
+.pan-hint{position:absolute;left:24px;top:22px;z-index:4;font:700 19px/1 var(--fh);color:var(--ink);background:color-mix(in srgb,var(--card) 90%,transparent);padding:6px 12px;border-radius:12px;pointer-events:none;display:none;white-space:nowrap}
+.chart.world .pan-hint{display:block}
+.flap{position:absolute;top:9px;bottom:9px;width:calc(50% - 9px);z-index:6;border:0;padding:0;cursor:pointer;overflow:hidden;background:var(--card);background-image:var(--grain);
+  transition:transform 1.25s cubic-bezier(.55,.06,.24,1),opacity .4s ease 1s;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.flap.l{left:9px;transform-origin:0 50%;box-shadow:inset -10px 0 18px -14px rgba(40,30,10,.5)}
+.flap.r{right:9px;transform-origin:100% 50%;box-shadow:inset 10px 0 18px -14px rgba(40,30,10,.5)}
+.flap .cover{position:absolute;top:0;bottom:0;width:200%;display:block}
+.flap.l .cover{left:0}.flap.r .cover{right:0}
+.chart.open .flap.l{transform:rotateY(-96deg);opacity:0;pointer-events:none}
+.chart.open .flap.r{transform:rotateY(96deg);opacity:0;pointer-events:none}
+.chart.closing .flap{transition:transform .55s cubic-bezier(.5,0,.6,1),opacity .1s}
+.cover-t{font:500 30px var(--ft);font-variation-settings:"SOFT" 40,"WONK" 0;fill:var(--ink)}
+.cover-s{font:italic 400 14px var(--fb);fill:var(--muted)}
+.cover-h{font:700 21px var(--fh);fill:var(--rose-ink)}
+.chart-foot{display:grid;gap:18px;margin-top:20px}
+.fox-note{display:grid;grid-template-columns:78px 1fr;gap:12px;align-items:center}
+.fox-note svg{width:78px;height:auto}
+.bubble{position:relative;margin:0;background:var(--card);border:1.2px solid var(--hair-2);border-radius:20px 22px 20px 16px;padding:11px 15px;font:600 19.5px/1.25 var(--fh);color:var(--ink)}
+.bubble::before{content:"";position:absolute;left:-8px;top:46%;width:14px;height:14px;background:var(--card);border-left:1.2px solid var(--hair-2);border-bottom:1.2px solid var(--hair-2);transform:rotate(45deg);border-radius:0 0 0 4px}
+.bubble b{color:var(--rose-ink)}
+.pos{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px}
+.pos dt{width:100%;font:500 11.5px/1.3 var(--fb);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pos dd{margin:0}
+.pos .coord{font:500 21px/1.3 var(--ft);font-variation-settings:"SOFT" 40,"WONK" 0;letter-spacing:.01em}
+.pos .when{font-size:15px;color:var(--muted)}
+.chart-btns{display:flex;flex-wrap:wrap;gap:8px}
+.chart-btns .btn{min-height:44px;padding:0 15px;font-size:15px}
+.cockpit{display:flex;align-items:center;gap:12px;padding:12px 14px;text-decoration:none;border-radius:16px;border:1.2px solid var(--gold-soft);background:var(--gold-soft)}
+.cockpit b{display:block;font-weight:500;font-size:15.5px;line-height:1.3}
+.cockpit small{display:block;font-size:14px;color:var(--muted);line-height:1.35;margin-top:2px}
+.cockpit .ic{color:var(--gold-ink);width:28px;height:28px}
+.cockpit>span:last-child{margin-left:auto;color:var(--gold-ink)}
+
+/* ───────── sommaire : ce mois-ci + table des matières ───────── */
+.month h2{text-transform:capitalize}
+.mlist{list-style:none;margin:16px 0 0;padding:0}
+.mlist li+li{border-top:1px solid var(--hair)}
+.mlist button{display:grid;grid-template-columns:44px minmax(0,1fr) 60px;gap:12px;align-items:center;width:100%;min-height:72px;padding:10px 0;border:0;background:none;text-align:left;cursor:pointer;color:inherit}
+.mlist .md{text-align:center;line-height:1}
+.mlist .md b{display:block;font:500 28px/1 var(--ft);color:var(--gold-ink)}
+.mlist .md small{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.mlist .mt b{display:block;font:500 18px/1.25 var(--ft);font-variation-settings:"SOFT" 40,"WONK" 0}
+.mlist .mt small{display:block;font-size:14px;color:var(--muted);margin-top:3px;line-height:1.3}
+.mlist .mp{width:60px;height:60px;overflow:hidden;background:var(--paper-2)}
+.mlist .mp img{width:100%;height:100%;object-fit:cover;display:block}
+.mlist button:hover .mt b{color:var(--rose-ink)}
+.toc{list-style:none;margin:16px 0 0;padding:0}
+.toc li+li{border-top:1px solid var(--hair)}
+.toc button{display:flex;align-items:center;gap:12px;width:100%;min-height:72px;padding:10px 0;background:none;border:0;text-align:left;cursor:pointer;color:inherit}
+.toc .pmini{width:44px;height:44px;flex:none}
+.toc-t{flex:0 1 auto;font:500 19px/1.2 var(--ft);font-variation-settings:"SOFT" 40,"WONK" 0}
+.toc-t i{display:block;font:700 18px/1 var(--fh);font-style:normal;color:var(--rose-ink);margin-bottom:3px}
+.toc-t small{display:block;font:400 14px/1.3 var(--fb);color:var(--muted);margin-top:4px}
+.toc-dots{flex:1 1 20px;min-width:16px;border-bottom:2px dotted var(--hair-2);align-self:flex-end;margin-bottom:9px}
+.toc-p{font:700 19px/1 var(--fh);white-space:nowrap;align-self:flex-end;padding-bottom:4px}
+.toc li.cur .toc-p{color:var(--rose-ink)}
+.toc button:hover .toc-t{color:var(--rose-ink)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;margin-top:10px;text-align:center;isolation:isolate}
+.cal i{font:500 12px/1 var(--fb);font-style:normal;color:var(--muted);padding:6px 0}
+.cal span,.cal button{display:grid;place-items:center;height:38px;font-size:14.5px;border-radius:50%;border:0;background:none;padding:0}
+.cal button{font-weight:600;cursor:pointer;position:relative;color:var(--ink)}
+.cal button::before{content:"";position:absolute;inset:2px;background:radial-gradient(closest-side,rgba(201,151,59,.75),rgba(201,151,59,.35) 75%,transparent);-webkit-mask:var(--m-r1) center/100% 100%;mask:var(--m-r1) center/100% 100%;z-index:-1}
+.cal-l{font:600 17px/1.2 var(--fh);color:var(--muted);margin:8px 0 0}
+.box-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.box-h h3{font-size:22px;text-transform:capitalize}
+
+/* livre ouvert (pages) */
+.spread>.page+.page{margin-top:40px}
+
+/* ───────── escales : cartes postales ───────── */
+.pcs{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:14px var(--gut) 24px;scroll-padding:0 var(--gut);overscroll-behavior-x:contain}
+.pcs::-webkit-scrollbar{display:none}
+.pc{flex:0 0 min(84vw,340px);height:236px;perspective:1200px;scroll-snap-align:start;cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:4px}
+.pc-in{position:relative;height:100%;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .7s cubic-bezier(.3,.9,.3,1)}
+.pc.is-flip .pc-in{transform:rotateY(180deg)}
+/* Safari : pas d'overflow:hidden sur les faces, sinon backface-visibility est ignoré. */
+.pc-f,.pc-b{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;background:var(--card);border-radius:4px;box-shadow:var(--shadow)}
+.pc-f{transform:rotateY(0deg)}
+/* …et, quoi qu'il arrive, on échange les faces à mi-course (la carte est alors de profil). */
+.pc-f,.pc-b{transition:visibility 0s .33s}
+.pc-b{visibility:hidden}
+.pc.is-flip .pc-b{visibility:visible}
+.pc.is-flip .pc-f{visibility:hidden}
+.pc-f{padding:7px}
+.pc-ph{position:relative;width:100%;height:100%;overflow:hidden;border-radius:2px;background:var(--paper-2)}
+.pc-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.pc-ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 48%,rgba(14,22,40,.68))}
+.pc-ph svg.pc-art{position:absolute;inset:0;width:100%;height:100%}
+.pc-lab{position:absolute;left:18px;right:60px;bottom:15px;z-index:2;color:#FBF6EA}
+.pc-lab b{display:block;font:500 20px/1.15 var(--ft);font-variation-settings:"SOFT" 40,"WONK" 0;text-wrap:balance}
+.pc-lab span{display:block;font:600 18px/1.1 var(--fh);opacity:.92;margin-top:2px}
+.pc-turn{position:absolute;right:15px;bottom:15px;z-index:2;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(251,246,234,.92);color:#1E2B47}
+.pc-turn svg{width:20px;height:20px}
+.pc-pl{position:absolute;right:16px;top:14px;z-index:2;width:46px;height:46px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
+.pc-b{transform:rotateY(180deg);display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);background-image:var(--grain)}
+.pc-note{padding:16px 12px 12px 18px;display:flex;flex-direction:column;border-right:1px solid var(--hair-2);margin:12px 0}
+.pc-note p{font:600 18px/1.28 var(--fh);color:var(--ink);display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.pc-note .sig{margin-top:auto;padding-top:6px;font:700 17px/1 var(--fh);color:var(--rose-ink)}
+.pc-addr{position:relative;padding:14px 14px 14px 12px;display:flex;flex-direction:column}
+.pc-stamp{align-self:flex-end;width:50px;height:60px;position:relative}
+.pc-pm{position:absolute;right:28px;top:20px;width:64px;height:64px;color:var(--sea-ink);opacity:.75}
+.pc-lines{margin-top:auto;display:grid;gap:4px}
+.pc-lines span{display:block;font:600 16px/1.25 var(--fh);border-bottom:1px solid var(--hair-2);padding-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink-2)}
+.pc-read{margin-top:10px;align-self:flex-start;min-height:40px;padding:0 13px;font-size:14px;border-radius:999px;white-space:nowrap}
+.pc-empty{font:600 18px/1.3 var(--fh);color:var(--muted)}
+.pcs-f{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:2px}
+.hint{display:inline-flex;align-items:center;gap:8px;font:600 20px/1 var(--fh);color:var(--muted)}
+.hint svg{width:22px;height:22px}
+.arrows{display:none;gap:8px}
+.arrows button{width:46px;height:46px;border-radius:50%;border:1.4px solid var(--hair-2);background:var(--card);cursor:pointer;display:grid;place-items:center}
+
+/* ───────── le carnet de bord ───────── */
+.cgrid{display:grid;gap:34px}
+.cmain{min-width:0}
+.filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;align-items:end;margin:0 0 6px}
+.fl span{display:block;font:500 11.5px/1.3 var(--fb);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 5px 2px}
+.fl select{width:100%;min-height:48px;-webkit-appearance:none;appearance:none;font:400 16px/1.2 var(--fb);color:var(--ink);background:var(--card) var(--chev) right 13px center/13px no-repeat;border:1.3px solid var(--hair-2);border-radius:14px 16px 13px 15px;padding:0 36px 0 13px;text-overflow:ellipsis}
+.fcount{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:14.5px;color:var(--muted);min-height:30px}
+.fcount button{background:none;border:0;color:var(--rose-ink);font:500 14.5px var(--fb);min-height:40px;cursor:pointer;text-decoration:underline;padding:0}
+.opener{display:grid;grid-template-columns:72px 1fr;gap:16px;align-items:center;margin:26px 0 22px;padding:18px 0 16px;position:relative}
+.opener::before,.opener::after{content:"";position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-soft) 12%,var(--gold-soft) 88%,transparent)}
+.opener::before{top:0}.opener::after{bottom:0}
+.opener .pmini{width:72px;height:72px}
+.opener i{display:block;font:700 20px/1 var(--fh);font-style:normal;color:var(--rose-ink)}
+.opener h3{font-size:clamp(24px,4.6vw,31px);margin:4px 0 0}
+.opener small{display:block;font-size:14.5px;color:var(--muted);margin-top:4px}
+.opener blockquote{grid-column:1/-1;margin:2px 0 0;font:italic 400 16.5px/1.45 var(--ft);font-variation-settings:"SOFT" 60,"WONK" 0;color:var(--ink-2)}
+.opener:first-child{margin-top:8px}
+.runhead{display:flex;align-items:center;gap:10px;margin:14px 0 18px;font:700 19px/1.2 var(--fh);color:var(--muted)}
+.runhead::after{content:"";flex:1;height:1px;background:var(--gold-soft)}
+.entry{position:relative;cursor:pointer;outline-offset:6px}
+.entry+.orn{margin:24px 0}
+.orn{display:flex;justify-content:center;color:var(--gold-ink);opacity:.7}
+.orn svg{width:84px;height:14px}
+.strip-w{position:relative;margin:0 0 12px}
+.strip{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;--h:178px}
+.strip::-webkit-scrollbar{display:none}
+.sp{flex:0 0 auto;height:var(--h);aspect-ratio:3/2;margin:0;scroll-snap-align:start;background:var(--paper-2);overflow:hidden;border-radius:3px}
+.sp img{width:100%;height:100%;object-fit:cover;display:block}
+.sp1{border-radius:0}
+.sp-more{display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:3/4;background:var(--card);border:1.2px dashed var(--hair-2);color:var(--muted);text-align:center;padding:10px}
+.sp-more b{font:500 26px/1 var(--ft);color:var(--gold-ink)}
+.sp-more span{font:600 16px/1.15 var(--fh);margin-top:4px}
+.sp-n{position:absolute;right:8px;bottom:8px;z-index:2;font:500 12px/1 var(--fb);color:#FBF6EA;background:rgba(14,22,40,.6);padding:5px 8px;border-radius:999px;pointer-events:none}
+.scap{font:600 19px/1.2 var(--fh);color:var(--sea-ink);margin:-4px 2px 10px;transform:rotate(-.6deg)}
+.emeta{display:flex;flex-wrap:wrap;gap:2px 10px;font:500 12px/1.4 var(--fb);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.emeta .by{color:var(--gold-ink)}
+.entry h3{font-size:22px;margin:6px 0 0;text-wrap:balance}
+.entry:hover h3{color:var(--rose-ink)}
+.eplace{display:inline-flex;align-items:center;gap:6px;font-size:14.5px;color:var(--sea-ink);margin-top:6px;line-height:1.3}
+.eplace svg{width:16px;height:16px}
+.eex{margin-top:8px;color:var(--ink-2);font-size:16.5px;line-height:1.6}
+.eacts{display:flex;align-items:center;gap:2px;margin-top:8px}
+.eacts .more{margin-right:auto;font-weight:500;color:var(--gold-ink);font-size:15.5px;min-height:44px;display:inline-flex;align-items:center}
+.eacts a{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;text-decoration:none;color:var(--muted)}
+.eacts a:hover{background:var(--gold-soft);color:var(--rose-ink)}
+.eacts svg{width:21px;height:21px}
+.entry.feat .strip{--h:214px}
+.entry.feat h3{font-size:clamp(26px,5.6vw,33px)}
+.entry.feat .eex{font-size:17px}
+.noquote{font:italic 400 15px/1.4 var(--ft);color:var(--muted)}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:30px 0 0;padding:14px 0 0;border-top:1px solid var(--gold-soft)}
+.pager>button{display:inline-flex;align-items:center;gap:6px;min-height:46px;padding:0 12px;border-radius:999px;border:1.3px solid var(--hair-2);background:transparent;cursor:pointer;font:500 15px/1 var(--fb);color:var(--ink)}
+.pager>button[disabled]{opacity:.35;cursor:default}
+.pager>button span{display:none}
+.pnums{display:flex;gap:4px}
+.pnums button{width:40px;height:40px;border-radius:50%;border:0;background:none;cursor:pointer;font:500 17px/1 var(--ft);color:var(--ink)}
+.pnums button[aria-current="page"]{background:var(--ink);color:var(--paper)}
+.pinfo{text-align:center;font:600 18px/1.2 var(--fh);color:var(--muted);margin:10px 0 0}
+.cside{display:grid;gap:18px;align-content:start}
+.box{background:var(--card);border-radius:18px 16px 20px 15px/16px 20px 15px 18px;padding:18px;box-shadow:var(--shadow)}
+.box h3{font-size:21px}
+.box p{font-size:15.5px;color:var(--muted);margin-top:6px}
+.sil-ph{position:relative;margin:12px 0 12px;aspect-ratio:16/10;overflow:hidden}
+.sil-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.sil-ph svg{position:absolute;inset:0;width:100%;height:100%}
+.gal{display:flex;align-items:center;gap:14px;text-decoration:none;min-height:60px}
+.gal-st{display:flex;flex:none}
+.gal-st img{width:54px;height:54px;object-fit:cover;margin-left:-14px;border:3px solid var(--card);border-radius:50%}
+.gal-st img:first-child{margin-left:0}
+.gal b{font:500 19px/1.2 var(--ft);display:block}
+.gal small{font-size:14px;color:var(--muted)}
+.side-q{font:italic 400 17px/1.45 var(--ft);font-variation-settings:"SOFT" 60,"WONK" 0;color:var(--ink-2);margin:0;padding:4px 4px 0}
+.side-q cite{display:block;font:600 17px/1.2 var(--fh);font-style:normal;color:var(--muted);margin-top:6px}
+.empty{display:grid;grid-template-columns:80px 1fr;gap:14px;align-items:center;max-width:560px;margin:20px 0}
+.empty svg{width:80px;height:auto}
+
+/* ───────── équipage ───────── */
+.crew{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:4px var(--gut) 10px;scroll-padding:0 var(--gut);overscroll-behavior-x:contain}
+.crew::-webkit-scrollbar{display:none}
+.crew-w{padding:0}
+.cm{flex:0 0 min(82vw,330px);margin:0;scroll-snap-align:start}
+.cm-ph{position:relative;aspect-ratio:4/5;overflow:hidden;background:var(--paper-2);border-radius:3px;box-shadow:var(--shadow)}
+.cm-ph img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.6s cubic-bezier(.2,.7,.2,1)}
+.cm:hover .cm-ph img{transform:scale(1.03)}
+.cm figcaption{padding:14px 2px 0}
+.cm .alias{display:inline-flex;align-items:center;gap:7px;font:700 21px/1 var(--fh);color:var(--rose-ink)}
+.cm .alias svg{width:22px;height:22px}
+.cm h3{font-size:27px;margin:6px 0 0}
+.cm p{font-size:15.5px;color:var(--muted);margin-top:3px}
+.tame{margin:28px auto 0;text-align:center;max-width:560px}
+
+/* ───────── genèse ───────── */
+.gen-mark{text-align:center;padding:4px 0 0}
+.gen-mark .kr{font:400 104px/1 'Nanum Brush Script',var(--ft);color:var(--rose-ink);display:block}
+.gen-mark .hw{font:700 24px/1 var(--fh);color:var(--sea-ink)}
+.gen-ph{width:min(100%,360px);aspect-ratio:16/10;margin:16px auto 0;overflow:hidden}
+.gen-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.gen p{margin:14px 0 0}
+
+/* ───────── programme ───────── */
+.hl{list-style:none;padding:0;margin:0 0 26px;display:flex;flex-wrap:wrap;gap:8px}
+.hl li{padding:7px 14px;border-radius:999px;font-size:14.5px;border:1.2px solid var(--hair-2)}
+.prog{list-style:none;margin:0;padding:0}
+.prow{display:block}
+.ph{position:relative;padding:0 0 14px 38px}
+.ph::after{content:"";position:absolute;left:9px;top:14px;bottom:-12px;border-left:2.4px dotted var(--hair-2)}
+.prow:last-child .ph:last-child::after{display:none}
+.ph::before{content:"";position:absolute;left:0;top:4px;width:20px;height:20px;border-radius:50%;background:var(--paper);border:2px solid rgb(var(--c));box-shadow:0 0 0 4px var(--paper);z-index:1}
+.ph.done::before{background:rgb(var(--c))}
+.ph b{display:flex;align-items:center;gap:8px;font:500 18px/1.25 var(--ft);font-variation-settings:"SOFT" 40,"WONK" 0}
+.ph .flag{font-size:19px;line-height:1}
+.ph .per{display:block;font:700 19px/1.15 var(--fh);color:var(--gold-ink);margin-top:2px}
+.ph small{display:block;font-size:14.5px;color:var(--muted);line-height:1.4;margin-top:2px}
+.ph .ok{font:600 16px/1 var(--fh);color:var(--sage);margin-left:4px;white-space:nowrap}
+
+/* ───────── lettres ───────── */
+.form{display:grid;gap:13px}
+.fld span{display:block;font:500 11.5px/1.3 var(--fb);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 5px 2px}
+.fld input,.fld textarea{width:100%;min-height:48px;font:400 16px/1.4 var(--fb);color:var(--ink);background:var(--card);border:1.3px solid var(--hair-2);border-radius:14px 16px 13px 15px;padding:11px 13px}
+.fld textarea{min-height:116px;resize:vertical;background:var(--card) repeating-linear-gradient(transparent 0 30px,var(--sea-soft) 30px 31px);background-position:0 10px}
+.fld input:focus,.fld textarea:focus{outline:none;border-color:var(--sea);box-shadow:0 0 0 3px var(--sea-soft)}
+.fhint{font-size:14.5px;color:var(--muted)}
+.opts{display:grid;gap:6px;margin:4px 0;padding:0;border:0}
+.opt{display:flex;align-items:center;gap:12px;min-height:46px;cursor:pointer;font-size:16px}
+.opt input{width:22px;height:22px;accent-color:var(--ink);flex:none}
+.letters h3{font-size:clamp(23px,4.6vw,29px);margin-bottom:8px}
+
+/* ───────── fin ───────── */
+.night{position:relative;overflow:hidden;background:radial-gradient(60% 90% at 18% 30%,rgba(110,149,190,.22),transparent 70%),radial-gradient(50% 80% at 86% 70%,rgba(201,151,59,.16),transparent 70%),var(--band);color:var(--band-ink);text-align:center;padding:72px 0 64px;margin-top:20px}
+.night svg.sky{position:absolute;inset:0;width:100%;height:100%}
+.night .hz{position:absolute;left:0;right:0;bottom:22px;height:24px;width:100%}
+.night blockquote{position:relative;margin:0 auto;max-width:700px;font:italic 400 clamp(22px,4.6vw,33px)/1.32 var(--ft);font-variation-settings:"SOFT" 60,"WONK" 0}
+.night cite{display:block;font:600 21px/1.2 var(--fh);font-style:normal;color:rgba(242,234,215,.8);margin-top:12px}
+.night .lnk{color:#E8C47A;border-color:rgba(232,196,122,.4);margin-top:22px;position:relative}
+.foot{text-align:center;padding:30px 0 26px;font-size:15px;color:var(--muted)}
+.foot b{font:italic 500 22px/1 var(--ft);color:var(--ink);display:block;margin-bottom:6px}
+.foot small{display:block;font-size:13px;margin-top:8px}
+.foot .ctas{justify-content:center;margin-top:18px}
+
+/* ───────── barre du bas (téléphone, tablette) ───────── */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:700;display:flex;background:color-mix(in srgb,var(--card) 96%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);padding:5px 6px calc(4px + env(safe-area-inset-bottom,0px));box-shadow:0 -1px 0 var(--hair),0 -12px 24px -20px rgba(30,43,71,.5)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;color:var(--muted);text-decoration:none;font:500 12px/1.1 var(--fb);background:none;border:0;cursor:pointer;padding:0;border-radius:14px}
+.tab svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tab.on{color:var(--ink)}
+.tab.on svg{color:var(--rose-ink)}
+.tab.menu{color:var(--ink)}
+
+/* ───────── le sommaire (menu) ───────── */
+.sheet{position:fixed;inset:0;z-index:860;background:rgba(14,22,40,.5);display:none;align-items:flex-end;justify-content:center}
+.sheet.on{display:flex;animation:wgFade .2s}
+.sheet-card{width:100%;max-width:520px;background:var(--card);background-image:var(--grain);border-radius:24px 24px 0 0;padding:18px 20px calc(18px + env(safe-area-inset-bottom,0px));animation:wgUp .26s cubic-bezier(.2,.8,.2,1);max-height:92dvh;overflow:auto;overscroll-behavior:contain}
+.sheet-h{display:flex;align-items:flex-end;gap:10px;margin-bottom:6px;padding-bottom:10px;border-bottom:1px solid var(--gold-soft)}
+.sheet-h div{margin-right:auto}
+.sheet-h .kick{margin:0 0 2px;font-size:21px}
+.sheet-h h2{font-size:34px}
+.x{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:999px;border:1.3px solid var(--hair-2);background:transparent;font:500 15px/1 var(--fb);cursor:pointer;color:var(--ink)}
+.som{list-style:none;margin:4px 0 12px;padding:0}
+.som>li>a{display:flex;align-items:center;gap:12px;min-height:54px;text-decoration:none;border-bottom:1px solid var(--hair)}
+.som>li>a svg{width:22px;height:22px;color:var(--gold-ink)}
+.som b{font:500 19px/1.2 var(--ft);font-variation-settings:"SOFT" 40,"WONK" 0}
+.som small{display:block;font-size:13.5px;color:var(--muted);font-weight:400;font-family:var(--fb)}
+.som-ch{list-style:none;margin:0 0 4px;padding:2px 0 6px 34px;border-bottom:1px solid var(--hair)}
+.som-ch button{display:flex;align-items:baseline;gap:8px;width:100%;min-height:42px;border:0;background:none;text-align:left;cursor:pointer;color:inherit;font:400 16px/1.25 var(--fb);padding:6px 0}
+.som-ch i{font:700 17px/1 var(--fh);font-style:normal;color:var(--rose-ink);min-width:28px}
+.som-ch em{font-style:normal;font-size:13px;color:var(--muted);margin-left:auto;white-space:nowrap}
+.som-app{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.som-app a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 13px;border-radius:999px;border:1.2px solid var(--hair-2);text-decoration:none;font-size:14.5px}
+.sheet-f{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sheet-f .theme .lbl{display:inline}
+
+/* ───────── tailles ───────── */
+@media (min-width:600px) and (max-width:1023px){
+  .prog{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 18px}
+  .prow:last-child .ph:last-child::after{display:block}
+  .prow .ph:last-child::after{display:none}
+  .cside{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .side-q{grid-column:1/-1}
+}
+@media (min-width:600px){
+  .brand small{display:block}
+  .theme .lbl{display:inline}
+  .gauges{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .gauges li:nth-child(3n+1){border-left:1px solid var(--hair);padding-left:10px}
+  .gauges li:first-child{border-left:0;padding-left:0}
+  .pc{flex-basis:360px;height:246px}
+  .pager>button span{display:inline}
+  .crew-w{padding:0 var(--gut)}
+  .crew{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible;padding:4px 0 0;gap:20px}
+  .cm-ph{aspect-ratio:5/6}
+  .cm{flex:none}
+  .chart{height:470px}
+  .strip{--h:190px}
+  .entry.feat .strip{--h:270px}
+  .chart-foot{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-items:start;gap:18px 32px}
+  .chart-foot .cockpit{grid-column:1/-1}
+}
+@media (min-width:760px){
+  :root{--gut:28px}
+  .sec{padding:56px 0}
+  .login{display:inline-flex}
+  .arrows{display:flex}
+  .fox-note{grid-template-columns:96px 1fr}
+  .fox-note svg{width:96px}
+}
+@media (min-width:900px){
+  .spread{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background-color:var(--card);background-image:var(--grain);border-radius:10px 10px 14px 14px;
+    box-shadow:0 2px 0 -1px var(--paper-2),0 3px 0 -1px var(--hair),0 6px 0 -3px var(--paper-2),0 7px 0 -3px var(--hair),0 30px 56px -34px rgba(30,43,71,.5)}
+  .spread::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:64px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,rgba(120,90,30,.06) 38%,rgba(30,43,71,.16) 50%,rgba(120,90,30,.06) 62%,transparent);pointer-events:none}
+  .spread>.page{padding:46px 50px 44px}
+  .spread>.page+.page{margin-top:0}
+  .hero .spread .page-l{display:flex;flex-direction:column;justify-content:center;padding:30px 26px 34px}
+  .hero .art-wrap{width:min(100%,500px)}
+  .hero-txt{text-align:left;margin-top:0}
+  .hero .ctas{justify-content:flex-start}
+  .hero .q{margin-left:0}.hero .q .qi{margin:0 0 4px}
+  .hero h1{font-size:clamp(34px,3.4vw,44px)}
+  .gen .page-l{display:flex;flex-direction:column;justify-content:center}
+  .chart{height:500px}
+  .chart-foot{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1.1fr);gap:24px 32px}
+  .chart-foot .cockpit{grid-column:auto}
+}
+@media (min-width:1024px){
+  .prow{display:flex;position:relative;padding:0 48px}
+  .prow::before{content:"";position:absolute;left:48px;right:48px;top:0;border-top:2.4px dotted var(--hair-2)}
+  .prow:first-child::before{left:0}
+  .prow:last-child::before{right:0}
+  .prow:nth-child(1)::after,.prow:nth-child(2)::after{content:"";position:absolute;top:0;bottom:-2px;width:48px;border:2.4px dotted var(--hair-2)}
+  .prow:nth-child(1)::after{right:0;border-left:0;border-radius:0 60px 60px 0}
+  .prow:nth-child(2)::after{left:0;border-right:0;border-radius:60px 0 0 60px}
+  .prow:nth-child(2){flex-direction:row-reverse}
+  .prow .ph{flex:1;padding:26px 10px 30px}
+  .prow .ph::after{display:none}
+  .prow .ph::before{left:10px;top:-11px}
+  .prow .ph{min-width:0}
+  :root{--tb:0px}
+  body{padding-bottom:0}
+  .tabbar{display:none}
+  .top{position:sticky;top:0;background:color-mix(in srgb,var(--paper) 94%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 1px 0 var(--hair)}
+  html{scroll-padding-top:76px}
+  .som-btn{display:inline-flex}
+  .sheet{align-items:flex-start;justify-content:flex-end;padding:74px 28px 28px}
+  .sheet-card{border-radius:22px;max-height:calc(100dvh - 100px)}
+  .cgrid{grid-template-columns:minmax(0,1fr) 300px;gap:48px;align-items:start}
+  .cside{position:sticky;top:90px}
+  .entry:not(.feat):not(.noph){display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+  .entry:not(.feat):not(.noph) .strip-w{order:2;margin:4px 0 0}
+  .entry:not(.feat):not(.noph) .strip{--h:200px}
+  .entry.feat .strip{--h:300px}
+  .pcs{padding-left:max(var(--gut),calc((100vw - 1180px) / 2 + var(--gut)));scroll-padding-left:max(var(--gut),calc((100vw - 1180px) / 2 + var(--gut)))}
+}
+@media (min-width:1340px){
+  .nav{display:flex}
+  .brand small{display:none}
+}
+@media (max-width:1023px){
+  :root{--tb:64px}
+}
+@media (max-width:420px){
+  .chart{height:420px}
+  .c-rose{width:62px;height:62px;right:20px;top:20px}
+  .cartouche{left:20px;bottom:20px}
+  .filters{grid-template-columns:1fr}
+  .badge{letter-spacing:.08em;font-size:12px}
+  .seg button{min-width:38px;padding:0 9px}
+  .brand b{font-size:23px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+  [data-reveal]{opacity:1;transform:none}
+}
+#app{overflow-x:clip}
 </style>
 </head>
-<body>
-<header class="top"><div class="wrap">
-  <a class="brand" href="index.html"><img src="/images/logo.webp" alt=""><div><b>wang'ap</b><span id="sub"></span></div></a>
-  <div class="flags" role="group" aria-label="Langue / Language">
-    <button type="button" data-lang="fr" aria-label="Français">🇫🇷</button>
-    <button type="button" data-lang="en" aria-label="English">🇬🇧</button>
-  </div>
-</div></header>
-<main id="app"></main>
+<body data-design="d7">
+<div id="app"></div>
 <script src="data.js"></script>
 <script src="wg.js"></script>
 <script>
 (function () {
-  const { t } = WG;
+  const { D, t, esc } = WG;
   const app = document.getElementById('app');
-  function render() {
-    document.getElementById('sub').textContent = t('Revue du design · page publique', 'Design review · public page');
-    document.querySelectorAll('[data-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === WG.lang)));
-    app.innerHTML = `
-    <section class="wrap hero">
-      <div>
-        <div class="kick"><i>7</i> ${t('La Synthèse', 'The Synthesis')}</div>
-        <h1>${t('La combinaison finale', 'The final combination')}</h1>
-        <p class="lead">${t('Ici prendra place la maquette qui réunit le meilleur des six propositions — les éléments que vous aurez choisis, ensemble.', 'This is where the mock-up bringing together the best of the six proposals will appear — the elements you will have chosen, together.')}</p>
-        <p class="lead">${t('Prenez tout votre temps pour en discuter : vos avis restent enregistrés, et vous pouvez les compléter ou les modifier à tout moment.', 'Take all the time you need to talk it over: your views stay saved, and you can add to them or change them at any time.')}</p>
-        <span class="soon">⏳ ${t('En préparation', 'In preparation')}</span>
+  const root = document.documentElement;
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const S = { chap: '', et: '', page: 0, world: false, theme: root.getAttribute('data-theme') === 'night' ? 'night' : 'day', flip: new Set() };
+
+  // ── Textures et masques « aquarelle », peints une fois en SVG (comme d1) ──
+  const url = (s) => `url("data:image/svg+xml,${encodeURIComponent(s)}")`;
+  const disp = (seed, freq, scale, shape, vb = '0 0 200 200', blur = 0.7) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${vb}' preserveAspectRatio='none'><filter id='f' x='-20%' y='-20%' width='140%' height='140%'><feTurbulence type='fractalNoise' baseFrequency='${freq}' numOctaves='3' seed='${seed}'/><feDisplacementMap in='SourceGraphic' scale='${scale}' xChannelSelector='R' yChannelSelector='G'/><feGaussianBlur stdDeviation='${blur}'/></filter><g filter='url(#f)'>${shape}</g></svg>`;
+  const R = root.style;
+  R.setProperty('--m-r1', url(disp(3, 0.03, 14, "<circle cx='100' cy='100' r='88'/>")));
+  R.setProperty('--m-r2', url(disp(11, 0.035, 16, "<circle cx='100' cy='100' r='86'/>")));
+  R.setProperty('--m-rect', url(disp(5, 0.022, 12, "<rect x='7' y='7' width='286' height='186' rx='4'/>", '0 0 300 200', 0.6)));
+  R.setProperty('--grain', url("<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .42 0 0 0 0 .33 0 0 0 0 .2 0 0 0 .06 0'/></filter><rect width='100%' height='100%' filter='url(#n)'/></svg>"));
+  const chev = (c) => url(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 9'><path d='M1.5 1.8c2 1.6 3.6 3.4 5.6 5.4 1.8-2.2 3.3-3.8 5.4-5.6' fill='none' stroke='${c}' stroke-width='1.8' stroke-linecap='round'/></svg>`);
+
+  // ── Icônes au trait ──
+  const ICON = {
+    map: 'M3.4 6.9l5.3-2.4 6.4 2.5 5.4-2.3v12.6l-5.4 2.3-6.4-2.5-5.3 2.4z M8.7 4.6l.1 12.6 M15.1 7l-.1 12.5',
+    journal: 'M5.6 3.7h10.7c1 0 1.7.7 1.7 1.6l-.1 14.3c0 .5-.4.9-.9.9H5.6z M5.6 3.7v16.8 M8.9 8.4c2-.1 4-.1 6 .1 M8.9 11.7c1.7 0 3.3-.1 5 0 M8.9 15c1.2 0 2.3 0 3.5.1',
+    card: 'M3.5 6.5h17v11h-17z M12 9v6 M14.5 9.5h3.5v3h-3.5z M5.5 10h4 M5.5 12.5h4 M5.5 15h3',
+    route: 'M5 18.5c3.5 0 3-4.5 6.5-4.5s3.5 3 6.5 1.5 M5 18.5a1.6 1.6 0 1 0 .1 0 M18 5.5l.1 6 M18 5.5l3 1.6-3 1.6',
+    menu: 'M4 7h16 M4 12h16 M4 17h11',
+    user: 'M12 12.3a3.9 3.9 0 1 0 0-7.8 3.9 3.9 0 0 0 0 7.8z M4.6 20.2c.8-3.8 3.7-5.9 7.4-5.9s6.6 2.1 7.4 5.9',
+    crew: 'M8.5 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M3 19.5c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5 M16 11.2a2.6 2.6 0 1 0 0-5.2 M17.5 14.6c1.9.6 3.1 2.2 3.5 4.6',
+    compass: 'M12 3.2a8.8 8.8 0 1 0 .1 0z M12 6.2l2.1 5.6L12 17.8l-2.1-6z M12 2v1.4 M12 20.6V22 M2 12h1.4 M20.6 12H22',
+    sun: 'M12 16.2a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4z M12 2.8v2 M12 19.2v2 M2.8 12h2 M19.2 12h2 M5.5 5.5l1.4 1.4 M17.1 17.1l1.4 1.4 M5.5 18.5l1.4-1.4 M17.1 6.9l1.4-1.4',
+    moon: 'M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z',
+    heart: 'M12 19.6s-7.4-4.4-7.4-9.7A4.1 4.1 0 0 1 12 7.6a4.1 4.1 0 0 1 7.4 2.3c0 5.3-7.4 9.7-7.4 9.7z',
+    talk: 'M4.5 6.2c0-1 .8-1.8 1.8-1.8h11.4c1 0 1.8.8 1.8 1.8v7.6c0 1-.8 1.8-1.8 1.8H11l-4.2 3.4v-3.4h-.5c-1 0-1.8-.8-1.8-1.8z',
+    pin: 'M12 20.5s-5.8-5.6-5.8-10a5.8 5.8 0 0 1 11.6 0c0 4.4-5.8 10-5.8 10z M12 12.3a1.9 1.9 0 1 0 0-3.8 1.9 1.9 0 0 0 0 3.8z',
+    turn: 'M5 12a7 7 0 0 1 12-4.9 M17.6 3.6v3.8h-3.8 M19 12a7 7 0 0 1-12 4.9 M6.4 20.4v-3.8h3.8',
+    full: 'M4 9V4.6h4.6 M15.4 4.6H20V9 M20 15v4.4h-4.6 M8.6 19.4H4V15',
+    play: 'M8 5.5v13l10.5-6.5z',
+    photo: 'M3.5 7.5h4l1.6-2.2h5.8l1.6 2.2h4v11h-17z M12 16.3a3.4 3.4 0 1 0 0-6.8 3.4 3.4 0 0 0 0 6.8z',
+    left: 'M14.5 5.5L8 12l6.5 6.5', right: 'M9.5 5.5L16 12l-6.5 6.5',
+    close: 'M6 6l12 12 M18 6L6 18',
+    mail: 'M3.5 6.5h17v11h-17z M3.8 7l8.2 6.2L20.2 7',
+    book: 'M3 6.6c3-1.4 6-1.1 9 1 3-2.1 6-2.4 9-1v12.1c-3-1.3-6-1-9 1.1-3-2.1-6-2.3-9-1z M12 7.6v12.2',
+    star: 'M12 3.5l1.6 6.9 6.9 1.6-6.9 1.6L12 20.5l-1.6-6.9L3.5 12l6.9-1.6z',
+    clock: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17z M12 7.5V12l3 2',
+    seed: 'M12 20c-4-3-6-6.5-4-10.5S14 4 16.5 4c.5 4-1 7.5-4.5 9.5 M12 20v-6',
+  };
+  const ic = (k, cls = 'ic') => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICON[k]}"/></svg>`;
+  const STARP = 'M0-10C1.2-3 3-1.2 10 0 3 1.2 1.2 3 0 10-1.2 3-3 1.2-10 0-3-1.2-1.2-3 0-10z';
+  const star = (x, y, s, tw = true) => `<g transform="translate(${x} ${y}) scale(${s})"><path class="f-gold${tw ? ' tw' : ''}" d="${STARP}"/></g>`;
+  const f1 = (n) => n.toFixed(1);
+  const nf = (n) => WG.fmtNm(n).replace(/\u202f/g, '\u00a0');
+
+  // ── Les dessins (originaux) : encre + lavis ──
+  // Filtres partagés : bords d'aquarelle (lavis), trait d'encre un peu tremblé, grandes taches.
+  const FILTERS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+    <filter id="f-wash" x="-15%" y="-15%" width="130%" height="130%">
+      <feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="3" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feMorphology in="d" operator="erode" radius="1.4" result="e"/>
+      <feComposite in="d" in2="e" operator="out" result="rim"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="2" result="g"/>
+      <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .45 .66" result="ga"/>
+      <feComposite in="d" in2="ga" operator="in" result="dg"/>
+      <feMerge><feMergeNode in="dg"/><feMergeNode in="rim"/></feMerge>
+    </filter>
+    <filter id="f-ink" filterUnits="userSpaceOnUse" x="-2000" y="-2000" width="5000" height="5000">
+      <feTurbulence type="fractalNoise" baseFrequency=".07" numOctaves="2" seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="1.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="f-bleed" x="-30%" y="-30%" width="160%" height="160%">
+      <feTurbulence type="fractalNoise" baseFrequency=".014" numOctaves="2" seed="9" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"/>
+      <feGaussianBlur stdDeviation="2.4"/>
+    </filter>
+  </defs></svg>`;
+
+  // La rose des vents (gravure, encre or).
+  const compassG = (r) => {
+    let s = `<circle r="${r}" fill="none" stroke="currentColor" stroke-width=".9"/><circle r="${r - 6}" fill="none" stroke="currentColor" stroke-width=".6"/>`;
+    for (let i = 0; i < 64; i++) {
+      const a = (i * Math.PI) / 32, r2 = i % 8 === 0 ? r : i % 4 === 0 ? r - 2.4 : r - 4;
+      s += `<line x1="${f1(Math.sin(a) * (r - 6))}" y1="${f1(-Math.cos(a) * (r - 6))}" x2="${f1(Math.sin(a) * r2)}" y2="${f1(-Math.cos(a) * r2)}" stroke="currentColor" stroke-width=".6"/>`;
+    }
+    const pt = (deg, len, w) => `<g transform="rotate(${deg})"><path d="M0 ${-len}L${-w} ${-w * 0.9}L0 0z" fill="currentColor"/><path d="M0 ${-len}L${w} ${-w * 0.9}L0 0z" fill="var(--card)" stroke="currentColor" stroke-width=".7"/></g>`;
+    for (let i = 0; i < 4; i++) s += pt(45 + i * 90, r * 0.56, r * 0.09);
+    for (let i = 0; i < 4; i++) s += pt(i * 90, r - 9, r * 0.12);
+    s += `<circle r="${f1(r * 0.05 + 1)}" fill="currentColor"/><text y="${-r - 6}" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-style="italic" font-size="${f1(r * 0.24)}" fill="currentColor">N</text>`;
+    return s;
+  };
+  const compassSVG = (cls = '') => `<svg class="${cls}" viewBox="-70 -78 140 148" aria-hidden="true">${compassG(56)}</svg>`;
+
+  // Le renard — élancé, de grandes oreilles, assis de profil (un hommage, pas une copie).
+  const FOX_BODY = 'M89 31.5Q84 34.5 76 35.5Q71 37 68.5 40Q65.5 44 65 50Q64.8 56 66 61L66.6 97.5Q68.6 99.6 72 100L61.2 100L61 73Q57 79 53 80Q49.5 86 52.5 96Q55.5 99 58 100L39 100Q30.5 98 29.5 88Q28.6 71 36 57Q42 45 50 37Q53 31 54.5 26Q49 15 47.5 2.5Q54 11 58 19Q59.2 10 63.5 0Q65.8 11 65.6 20Q69 20 72 22.5Q80 26 89 31.5Z';
+  const foxG = () => `
+    <g class="tail"><path class="f-ochre" filter="url(#f-wash)" opacity=".9" d="M33 88Q19 85 9 80Q2 77 0 70Q-2 83 4 90Q13 99 33 99Z"/>
+      <path class="f-cream" opacity=".8" d="M4 77Q1 80 1.5 84Q4 82 6 79Z"/>
+      <path class="ink" filter="url(#f-ink)" d="M33 88Q19 85 9 80Q2 77 0 70Q-2 83 4 90Q13 99 33 99"/>
+      <path class="ink thin" d="M7 86q6 4 13 5M13 93q6 2 14 2"/></g>
+    <path class="f-ochre" filter="url(#f-wash)" opacity=".9" d="${FOX_BODY}"/>
+    <path class="f-cream" opacity=".85" d="M76 35.5Q70 37.5 67.5 42Q65.5 47 66 54Q67.5 49 70 45Q72 40 76 35.5Z"/>
+    <path class="f-rose" opacity=".35" d="M50.5 8Q54 14 56.5 21L53.6 24Q51 16 50.5 8ZM62.6 6Q64.3 13 64.2 19.5L61.4 19.5Q61.5 12 62.6 6Z"/>
+    <path class="ink" filter="url(#f-ink)" d="${FOX_BODY}"/>
+    <path class="ink thin" d="M63.6 61L63.6 97.6M61.8 100h3.6M44 64q-3.5 6-2.4 13M36 60q5-8 12-14"/>
+    <path class="ink" stroke-width="1.5" d="M72.6 26.2q2-1.3 4 .2"/><circle cx="88.6" cy="31.6" r="1.4" fill="var(--line-ink)"/>`;
+  const foxSVG = (cls = '') => `<svg class="${cls}" viewBox="-4 -2 96 106" aria-hidden="true">${foxG()}</svg>`;
+
+  // La rose sous son globe.
+  const roseG = () => `
+    <path class="f-sky" opacity=".22" d="M-11 0L-11-19A11 11 0 0 1 11-19L11 0Z"/>
+    <path class="ink thin" filter="url(#f-ink)" d="M-11 0L-11-19A11 11 0 0 1 11-19L11 0M-13 0h26M0-30.5v-2.4"/>
+    <path class="ink thin" d="M-6.5-21a7 7 0 0 1 4-4.5" opacity=".6"/>
+    <path d="M0 0Q1.2-7 0-12.5" fill="none" stroke="var(--w-sage)" stroke-width="1.3" stroke-linecap="round"/>
+    <path class="f-sage" d="M.2-6.2q-4.6-.6-5.6-4.4 4 .2 5.6 4.4z"/>
+    <path class="f-rose" filter="url(#f-wash)" d="M0-21.5c3.2 0 4.6 2.2 4.2 4.4-.4 2.3-2.2 3.6-4.2 3.6s-3.9-1.3-4.2-3.6c-.4-2.2 1-4.4 4.2-4.4z"/>
+    <path class="ink thin" d="M-1.6-18.6c1-1.4 3.2-1 3.2.6 0 1.2-1.6 1.8-2.4.9"/>`;
+  const roseIcon = () => `<svg viewBox="-16 -36 32 38" aria-hidden="true">${roseG()}</svg>`;
+
+  // Wang'ap, l'Outremer 52 — de profil, au trait.
+  const boatG = () => `
+    <path class="ink thin" d="M-1-12V-122"/>
+    <path class="f-cream" filter="url(#f-wash)" d="M-2-118Q-32-66-45-16L-2-16Z"/>
+    <path class="ink" filter="url(#f-ink)" d="M-2-118Q-32-66-45-16L-2-16Z"/>
+    <path class="ink thin" opacity=".55" d="M-13-92h11M-24-66h22M-35-40h33"/>
+    <path class="f-ochre" filter="url(#f-wash)" opacity=".55" d="M2-112L46-7L6-9Q12-60 2-112Z"/>
+    <path class="ink" filter="url(#f-ink)" d="M2-112L46-7L6-9Q12-60 2-112Z"/>
+    <path class="f-rose" d="M-1-122l13 3.6-13 3.6z"/>
+    <path class="f-hull" d="M-57-4L50-4L52 1Q50 8 44 9L-51 9Q-57 6-57-4Z"/>
+    <path class="ink" filter="url(#f-ink)" d="M-57-4L50-4L52 1Q50 8 44 9L-51 9Q-57 6-57-4Z"/>
+    <path class="f-cream" d="M-30-4L-24-13L18-13L28-4Z"/><path class="ink thin" d="M-30-4L-24-13L18-13L28-4"/>
+    <path d="M-19-8.5h7M-8-8.5h9M5-8.5h7" stroke="var(--line-ink)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M-46 4.5c28 1 58 1 90-.5" stroke="var(--w-sea-hi)" stroke-width="1.2" fill="none" opacity=".8"/>
+    <path d="M-80 11q7-4 14 0t14 0M56 11q7-4 14 0t14 0" fill="none" stroke="var(--w-cream)" stroke-width="2" stroke-linecap="round"/>`;
+
+  // La petite planète Wang'ap — l'astéroïde, la rose, le renard, le bateau.
+  const heroArt = () => {
+    let hatch = '';
+    for (let k = -6; k < 14; k++) hatch += `M${150 + k * 11} 440L${330 + k * 11} 260`;
+    return `
+  <svg class="art" viewBox="0 0 520 492" role="img" aria-label="${esc(t('Wang’ap dessiné sur sa petite planète : un catamaran à l’encre, un renard assis, une rose sous son globe, une rose des vents et des étoiles', 'Wang’ap drawn on its little planet: an ink catamaran, a sitting fox, a rose under its glass, a compass rose and stars'))}">
+    <defs>
+      <radialGradient id="g-sea" cx="34%" cy="27%" r="80%"><stop offset="0" style="stop-color:var(--w-sea-hi)"/><stop offset=".45" style="stop-color:var(--w-sea)"/><stop offset="1" style="stop-color:var(--w-sea-lo)"/></radialGradient>
+      <clipPath id="c-pl"><circle cx="270" cy="300" r="117"/></clipPath>
+      <clipPath id="c-sh"><circle cx="330" cy="362" r="128"/></clipPath>
+      <mask id="m-moon"><circle cx="420" cy="102" r="22" fill="#fff"/><circle cx="430" cy="95" r="19" fill="#000"/></mask>
+    </defs>
+    <g filter="url(#f-bleed)"><ellipse cx="300" cy="300" rx="200" ry="150" class="f-sky" opacity=".3"/><ellipse cx="190" cy="214" rx="120" ry="90" class="f-sky" opacity=".22"/><circle cx="420" cy="102" r="46" class="f-moon" opacity=".3"/><ellipse cx="380" cy="478" rx="170" ry="14" class="f-sea" opacity=".2"/></g>
+    <g class="moon-n"><circle cx="420" cy="102" r="40" fill="var(--w-cream)" opacity=".08"/><circle cx="420" cy="102" r="22" fill="var(--w-cream)" opacity=".9" mask="url(#m-moon)"/></g>
+    <g transform="translate(108 118)" style="color:var(--gold-ink)" opacity=".62">${compassG(58)}</g>
+    <g>${star(214, 52, 0.9)}${star(452, 196, 0.62)}${star(40, 250, 0.55)}${star(330, 40, 0.5)}${star(476, 330, 0.7)}${star(52, 410, 0.45)}${star(170, 172, 0.38)}
+      <circle cx="372" cy="160" r="1.8" class="f-gold"/><circle cx="244" cy="22" r="1.4" class="f-gold"/><circle cx="22" cy="150" r="1.4" class="f-gold"/><circle cx="500" cy="98" r="1.4" class="f-gold"/></g>
+    <g class="ink thin" filter="url(#f-ink)"><path d="M356 66q6-6.5 12 0q6-6.5 12 0"/><path d="M392 92q4-4.4 8 0q4-4.4 8 0"/></g>
+    <g transform="rotate(-14 270 300)"><path d="M62 300A208 50 0 0 1 478 300" fill="none" stroke="var(--gold-ink)" stroke-width="1.4" stroke-dasharray="1 7" stroke-linecap="round" opacity=".75"/></g>
+    <circle cx="270" cy="300" r="118" fill="url(#g-sea)" filter="url(#f-wash)"/>
+    <g clip-path="url(#c-pl)">
+      <g class="spin">
+        <ellipse cx="160" cy="250" rx="52" ry="24" class="f-cream" opacity=".16"/>
+        <path d="M190 284c10-15 35-17 50-6 12 9 7 24-8 28-15 5-38 2-44-7-3-6-1-11 2-15z" fill="none" stroke="var(--w-cream)" stroke-width="1" stroke-dasharray="1 3.5" opacity=".8"/>
+        <path class="f-land" filter="url(#f-wash)" d="M198 287c8-10 28-12 39-4 9 7 5 18-7 21-12 3-29 1-34-6-2-4 0-8 2-11z"/>
+        <path class="ink thin" d="M198 287c8-10 28-12 39-4 9 7 5 18-7 21-12 3-29 1-34-6-2-4 0-8 2-11z" opacity=".7"/>
+        <path class="f-sage" opacity=".55" d="M207 289c6-5 17-6 23-1 4 4 1 9-5 10-7 1-16 0-19-4-1-2-1-4 1-5z"/>
+        <path d="M286 336c12-11 36-9 44 3 6 9-3 18-18 18-14 0-30-4-31-13 0-3 2-6 5-8z" fill="none" stroke="var(--w-cream)" stroke-width="1" stroke-dasharray="1 3.5" opacity=".8"/>
+        <path class="f-land" filter="url(#f-wash)" d="M294 339c10-8 29-6 35 3 4 7-3 13-14 13-10 0-23-3-24-9 0-3 1-5 3-7z"/>
+        <path class="ink thin" d="M294 339c10-8 29-6 35 3 4 7-3 13-14 13-10 0-23-3-24-9 0-3 1-5 3-7z" opacity=".7"/>
+        <path class="f-land" opacity=".85" d="M318 248c6-6 17-6 21 0 3 5-2 9-10 9s-14-4-11-9z"/><path class="ink thin" opacity=".6" d="M318 248c6-6 17-6 21 0 3 5-2 9-10 9s-14-4-11-9z"/>
+        <path d="M232 372q7-4 14 0t14 0M262 236q6-3.5 12 0t12 0M178 330q5-3.5 10 0t10 0M352 296q6-3.5 12 0" fill="none" stroke="var(--w-cream)" stroke-width="1.4" stroke-linecap="round" opacity=".6"/>
+      </g>
+      <g clip-path="url(#c-sh)"><path d="${hatch}" stroke="var(--line-ink)" stroke-width=".6" opacity=".15" filter="url(#f-ink)"/></g>
+    </g>
+    <circle cx="270" cy="300" r="118" class="ink" filter="url(#f-ink)" opacity=".85"/>
+    <path d="M214 196A118 118 0 0 1 326 196" fill="none" stroke="var(--w-cream)" stroke-width="2.4" stroke-dasharray="10 7" stroke-linecap="round" opacity=".7"/>
+    <g transform="rotate(-14 270 300)"><path d="M62 300A208 50 0 0 0 478 300" fill="none" stroke="var(--gold-ink)" stroke-width="1.4" stroke-dasharray="1 7" stroke-linecap="round"/><circle cx="378" cy="343" r="6" class="f-gold" filter="url(#f-wash)"/><circle cx="378" cy="343" r="6" class="ink thin"/></g>
+    <g transform="translate(270 187)"><g class="bob">${boatG()}</g></g>
+    <g aria-hidden="true">
+      <path d="M0 474C40 466 96 462 150 468S236 476 262 474" class="f-land" opacity=".35" filter="url(#f-wash)"/>
+      <path class="ink" filter="url(#f-ink)" d="M0 471C46 463 98 461 150 466S230 474 262 472"/>
+      <path class="ink thin" filter="url(#f-ink)" d="M262 472C330 470 420 470 520 471" opacity=".75"/>
+      <path d="M300 482q8-3.6 16 0t16 0M420 480q8-3.6 16 0t16 0M372 488q6-3 12 0" fill="none" stroke="var(--line-ink)" stroke-width=".8" stroke-linecap="round" opacity=".45"/>
+      <path class="ink thin" d="M20 478q10 4 26 3M96 474q14 4 30 2" opacity=".45"/>
+    </g>
+    <g transform="translate(78 468) scale(1.02) translate(-52 -100)">${foxG()}</g>
+    <g transform="translate(362 228) rotate(51) scale(1.4)">${roseG()}</g>
+  </svg>`;
+  };
+
+  // Les petites planètes des chapitres (et des escales).
+  const PL = [['f-sage', 'f-land'], ['f-sea', 'f-land'], ['f-sealo', 'f-ochre'], ['f-ochre', 'f-sage'], ['f-rose', 'f-land']];
+  const planetMini = (i, cls = '') => {
+    const [a, b] = PL[i % PL.length];
+    const emb = [
+      '<path class="f-cream" d="M-8-3L9-3L10 0Q9 3 6 3.4L-7 3.4Q-9 2-8-3Z"/><path class="ink thin" d="M0-3V-20M0-19Q-6-11-8-4H0Z"/>',
+      `<path class="${b}" d="M-12 2c3-5 10-5 13-1 2 3-2 6-6 6-5 0-9-2-7-5zM5-10c2-3 7-3 8 0 1 2-2 4-4 4-3 0-5-2-4-4z"/>`,
+      '<path class="f-gold" transform="translate(9 -9) scale(.5)" d="M0-10C1.2-3 3-1.2 10 0 3 1.2 1.2 3 0 10-1.2 3-3 1.2-10 0-3-1.2-1.2-3 0-10z"/><path d="M-30 6c-3-5 14-14 30-17s30-2 30 3" fill="none" stroke="var(--gold-ink)" stroke-width="1.2" stroke-linecap="round"/>',
+      `<path class="${b}" d="M-10-6c4-3 11-2 12 2 1 4-4 6-8 5-5-1-7-4-4-7z"/>`,
+      '<path class="f-cream" d="M-9 3q4.5-3 9 0t9 0" opacity=".8"/>',
+    ][i % 5];
+    return `<svg class="pmini ${cls}" viewBox="-31 -31 62 62" aria-hidden="true"><circle r="22" class="${a}" filter="url(#f-wash)"/><circle r="22" class="f-cream" opacity=".1"/><g>${emb}</g><circle r="22" class="ink thin" filter="url(#f-ink)"/></svg>`;
+  };
+
+  // Le tampon d'une carte postale : un timbre dentelé avec sa petite planète.
+  const stampSVG = (i) => `<svg viewBox="0 0 50 60" aria-hidden="true"><path fill="var(--card)" stroke="var(--hair-2)" stroke-width="1" stroke-dasharray="2 2" d="M2 2h46v56H2z"/><rect x="6" y="6" width="38" height="48" class="${PL[i % PL.length][0]}" opacity=".22"/><g transform="translate(25 27) scale(.62)">${planetMini(i).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</g><path class="ink thin" d="M9 50h32"/></svg>`;
+  const postmark = (txt) => `<svg viewBox="-34 -34 68 68" aria-hidden="true"><circle r="30" fill="none" stroke="currentColor" stroke-width="1.4"/><circle r="22" fill="none" stroke="currentColor" stroke-width=".8"/><text text-anchor="middle" y="4" font-family="Literata, Georgia, serif" font-size="9" letter-spacing=".5" fill="currentColor">${esc(txt)}</text><path d="M-70 -8q8-4 16 0t16 0t16 0M-70 0q8-4 16 0t16 0t16 0M-70 8q8-4 16 0t16 0t16 0" fill="none" stroke="currentColor" stroke-width="1"/></svg>`;
+  const ornament = () => `<div class="orn" aria-hidden="true"><svg viewBox="0 0 84 14"><path d="M2 7q5-5 10 0t10 0t10 0M52 7q5-5 10 0t10 0t10 0" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path transform="translate(42 7) scale(.55)" fill="currentColor" d="${STARP}"/></svg></div>`;
+  const kick = (txt) => `<span class="kick"><svg viewBox="-11 -11 22 22" aria-hidden="true"><path fill="var(--gold)" d="${STARP}"/></svg>${txt}</span>`;
+
+  // ── Données ──
+  const byDate = (a, b) => a.date_start.localeCompare(b.date_start);
+  const chapters = [...D.chapters].sort(byDate);
+  const etapes = [...D.etapes].sort(byDate);
+  const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+  const curChap = chapters[chapters.length - 1];
+  const chapIdx = (id) => chapters.findIndex((c) => c.id === id);
+  const EPI = ['heart', 'desert', 'flower'];
+  const cap1 = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+  const etName = (id) => cap1(WG.etape(id)).replace(/\s*->\s*/g, ' → ');
+  const nStories = (n) => (n ? t(`${n} récit${n > 1 ? 's' : ''}`, `${n} stor${n > 1 ? 'ies' : 'y'}`) : t('pas encore de récit', 'no story yet'));
+  const cut = (s, n) => (s && s.length > n ? `${s.slice(0, s.lastIndexOf(' ', n))}…` : s || '');
+  const im = (u, w, alt = '', lazy = true) => `<img src="${esc(WG.img(u, w))}" alt="${esc(alt)}" ${lazy ? 'loading="lazy" ' : ''}decoding="async">`;
+  const dShort = (iso) => WG.date(iso, { day: 'numeric', month: 'short' });
+  const period = (a, b) => `${WG.date(a, { month: 'short' })} – ${WG.date(b, { month: 'short', year: 'numeric' })}`;
+  const RGB = ['110,139,87', '74,116,163', '201,151,59', '180,71,61'];
+  const lastAt = new Date(D.lastPublicAt);
+  const whenTxt = () => WG.date(D.lastPublicAt, { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+  const boatPost = D.posts.find((p) => p.id.startsWith('0484645a'));
+  const boatPhoto = boatPost && boatPost.photos[4] ? boatPost.photos[4].url : null;
+
+  // ── En-tête ──
+  const themeSeg = () => `<div class="seg theme" role="group" aria-label="${t('Vue de jour ou de nuit', 'Day or night view')}">
+      <button type="button" data-set-theme="day" aria-pressed="${S.theme === 'day'}" aria-label="${t('Vue de jour', 'Day view')}">${ic('sun', '')}<span class="lbl">${t('Jour', 'Day')}</span></button>
+      <button type="button" data-set-theme="night" aria-pressed="${S.theme === 'night'}" aria-label="${t('Vue de nuit', 'Night view')}">${ic('moon', '')}<span class="lbl">${t('Nuit', 'Night')}</span></button></div>`;
+  const langSeg = () => `<div class="seg lang" role="group" aria-label="${t('Langue', 'Language')}"><button type="button" data-lang="fr" aria-pressed="${WG.lang === 'fr'}">FR</button><button type="button" data-lang="en" aria-pressed="${WG.lang === 'en'}">EN</button></div>`;
+  const NAVL = () => [['carte', t('Carte', 'Map')], ['carnet', t('Carnet', 'Log')], ['escales', t('Escales', 'Stops')], ['equipage', t('Équipage', 'Crew')], ['programme', 'Programme']];
+  const header = () => `
+  <header class="top" id="top"><div class="wrap top-in">
+    <a class="brand" href="#top" aria-label="Wang'ap"><img src="/images/logo.webp" alt="" width="42" height="42"><span><b>wang'ap</b><small>${t('Carnet de voyage · Outremer 52', 'Travel journal · Outremer 52')}</small></span></a>
+    <nav class="nav" aria-label="${t('Menu principal', 'Main menu')}">${NAVL().map(([id, l]) => `<a href="#${id}">${esc(l)}</a>`).join('')}</nav>
+    <button type="button" class="som-btn" data-menu aria-haspopup="dialog">${ic('book', '')}${t('Sommaire', 'Contents')}</button>
+    ${themeSeg()}${langSeg()}
+    <a class="btn btn-s login" href="#!">${ic('user')}${t('Connexion', 'Sign in')}</a>
+  </div></header>`;
+
+  // ── Héros + tableau de bord ──
+  const hero = () => {
+    const ci = chapters.indexOf(curChap);
+    const st = D.stats;
+    const dial = (needle) => `<svg viewBox="0 0 26 26" aria-hidden="true"><path d="M3.5 18a9.5 9.5 0 0 1 19 0" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M5.6 12.4l1.4.9M13 7.4v1.6M20.4 12.4l-1.4.9" stroke="currentColor" stroke-width="1"/>${needle ? '<path class="needle" d="M13 18L13 10" stroke="var(--rose)" stroke-width="1.6" stroke-linecap="round"/>' : '<path d="M8 15.5l9-3.5" stroke="var(--rose)" stroke-width="1.4" stroke-linecap="round"/><path d="M17 12l-2.6-.2 1.3 2.3z" fill="var(--rose)"/>'}<circle cx="13" cy="18" r="1.6" fill="currentColor"/></svg>`;
+    return `
+  <section class="hero" id="histoire" data-tab="histoire">
+    <div class="wrap">
+      <div class="spread">
+        <div class="page page-l">
+          <div class="art-wrap">${heroArt()}</div>
+          <p class="art-cap">${t('Wang’ap, notre petite planète', 'Wang’ap, our little planet')}</p>
+        </div>
+        <div class="page page-r hero-txt">
+          <p class="chap-now">${t('Chapitre', 'Chapter')} ${ROMAN[ci]} — ${esc(WG.chapter(curChap.id))}</p>
+          <span class="badge">Outremer 52 · ${t('Tour du monde', 'Round the world')} 2026–2029</span>
+          <h1>${t('Catherine &amp; Bertrand larguent les amarres pour <em>3\u00a0ans</em> de navigation à la voile.', 'Catherine &amp; Bertrand cast off for <em>3\u00a0years</em> of sailing.')}</h1>
+          <p class="sub">${t(`${nf(36000)} milles nautiques · 30+ pays · 3 océans`, `${nf(36000)} nautical miles · 30+ countries · 3 oceans`)}</p>
+          <blockquote class="q"><svg class="qi" viewBox="-16 -36 32 38" aria-hidden="true">${roseG()}</svg>${esc(WG.quote('rose'))}<cite>— ${t('Le Petit Prince', 'The Little Prince')}</cite></blockquote>
+          <div class="ctas"><a class="btn btn-p" href="#carte">${ic('map')}${t('Où sommes-nous ?', 'Where are we?')}</a><a class="btn btn-s" href="#carnet">${ic('journal')}${t('Lire le carnet', 'Read the log')}</a></div>
+        </div>
       </div>
-      <div class="mock" aria-hidden="true">
-        <div class="desk"><div class="bars"><span></span><span></span><span></span><span></span></div></div>
-        <div class="phone"><div class="bars"><span></span><span></span><span></span></div></div>
-        <img src="art/prince.webp" alt="">
-        <span class="tag">${t('Maquette à venir', 'Mock-up coming soon')}</span>
+      <div class="board" aria-label="${t('Le tableau de bord', 'The dashboard')}">
+        <div class="board-h"><b>${t('Le tableau de bord', 'The dashboard')}</b><span>${t(`au dernier point public · ${D.delayHours}\u00a0h de retard`, `at the latest public point · ${D.delayHours}-hour delay`)}</span></div>
+        <ul class="gauges">
+          <li><span class="g-l">${t('Milles parcourus', 'Miles sailed')}</span><span class="g-v"><b data-count="${st.nm}">${nf(st.nm)}</b><small>nm</small></span></li>
+          <li><span class="g-l">${t('Jours de voyage', 'Days under way')}</span><span class="g-v"><b data-count="${st.days}">${st.days}</b></span></li>
+          <li><span class="g-l">${t('Escales', 'Stops')}</span><span class="g-v"><b data-count="${st.etapes}">${st.etapes}</b></span></li>
+          <li><span class="g-l">${t('Récits', 'Stories')}</span><span class="g-v"><b data-count="${st.posts}">${st.posts}</b></span></li>
+          <li class="na"><span class="g-l">${t('Vitesse', 'Speed')}</span><span class="g-v" title="${t('Démo : non incluse dans l’instantané', 'Demo: not in the snapshot')}">${dial(true)}—<small>${t('nd', 'kn')}</small></span></li>
+          <li class="na"><span class="g-l">${t('Vent', 'Wind')}</span><span class="g-v" title="${t('Démo : non inclus dans l’instantané', 'Demo: not in the snapshot')}">${dial(false)}—<small>${t('nd', 'kn')}</small></span></li>
+        </ul>
+        <p class="board-f">${ic('clock')}<span>${t(`Dernière position publique : ${esc(whenTxt())}. Vitesse et vent sont relevés à ce même point sur le vrai site — cette démo ne les contient pas.`, `Latest public position: ${esc(whenTxt())}. Speed and wind are read at that same point on the real site — this demo doesn’t include them.`)}</span></p>
       </div>
-    </section>
-    <section class="wrap">
-      <h2>${t('Comment elle sera construite', 'How it will be built')}</h2>
-      <ol class="steps">
-        <li><strong>${t('Vos avis', 'Your views')}</strong>${t('Ce que vous aimez, n’aimez pas et changeriez, design par design.', 'What you like, dislike and would change, design by design.')}</li>
-        <li><strong>${t('Votre discussion', 'Your discussion')}</strong>${t('Votre bilan : classement, mélange idéal, idées en plus.', 'Your wrap-up: ranking, ideal mix, extra ideas.')}</li>
-        <li><strong>${t('Une maquette', 'A mock-up')}</strong>${t('Les éléments retenus réunis sur une seule page — que vous pourrez à nouveau commenter.', 'The chosen elements brought together on one page — which you will be able to comment on again.')}</li>
-      </ol>
-      <p class="note">${t('Comme les six autres, ce sera une maquette : les vrais textes et les vraies photos, toutes les fonctions conservées, et aucun changement sur wangap.fr tant que vous ne l’aurez pas validée.', 'Like the other six, it will be a mock-up: the real texts and photos, every feature kept, and no change to wangap.fr until you have approved it.')}</p>
-      <div class="acts">
-        <a class="btn primary" href="index.html">← ${t('Revenir aux six designs', 'Back to the six designs')}</a>
-        <a class="btn ghost" href="index.html#bilan">✍️ ${t('Compléter mon bilan', 'Add to my wrap-up')}</a>
+    </div>
+  </section>`;
+  };
+
+  // ── La carte dépliée ──
+  const chartSec = () => {
+    const lp = WG.lastPoint();
+    const cover = `<svg class="cover" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect x="22" y="22" width="756" height="476" fill="none" stroke="var(--ink)" stroke-width="1.4" opacity=".55"/><rect x="30" y="30" width="740" height="460" fill="none" stroke="var(--ink)" stroke-width=".7" opacity=".4"/>
+      <g transform="translate(400 250)" style="color:var(--gold-ink)">${compassG(92)}</g>
+      <text class="cover-t" x="400" y="104" text-anchor="middle">${t('Carte de la route', 'Chart of the route')}</text>
+      <text class="cover-s" x="400" y="130" text-anchor="middle">Wang’ap · Outremer 52 · 2026–2029</text>
+      <text class="cover-h" x="400" y="440" text-anchor="middle">${t('touchez pour déplier', 'tap to unfold')}</text></svg>`;
+    return `
+  <section class="sec" id="carte" data-tab="carte">
+    <div class="wrap">
+      <header class="sh" data-reveal>${kick(t('Où sommes-nous ?', 'Where are we?'))}<h2 class="h2">${t('La carte dépliée', 'The unfolded chart')}</h2>
+        <p class="lead">${t('La route parcourue depuis mai 2026, tracée à l’encre ; la route prévue autour du monde, en pointillé.', 'The route sailed since May 2026, drawn in ink; the planned route around the world, dotted.')}</p></header>
+      <div class="chart-tools">
+        <div class="seg view" role="group" aria-label="${t('Échelle de la carte', 'Map scale')}"><button type="button" data-view="near" aria-pressed="${!S.world}">${t('La route parcourue', 'The route sailed')}</button><button type="button" data-view="world" aria-pressed="${S.world}">${t('Le tour du monde', 'Around the world')}</button></div>
+        <p class="legend"><span><i></i>${t('parcourue', 'sailed')}</span><span><i class="dot"></i>${t('prévue', 'planned')}</span></p>
       </div>
-    </section>
-    <footer class="wrap">${t('Page de travail, non référencée.', 'A working page, not indexed.')}</footer>`;
-  }
-  document.querySelectorAll('[data-lang]').forEach((b) => b.addEventListener('click', () => WG.setLang(b.dataset.lang)));
+      <div class="chart${S.world ? ' world' : ''}" id="chart">
+        <div class="chart-frame" role="img" aria-label="${t('Carte de la route parcourue et de la route prévue', 'Map of the route sailed and the planned route')}"><div class="chart-scroll" id="chart-scroll" data-allow-overflow><div class="chart-map" id="chart-map"></div></div></div>
+        <div class="creases" aria-hidden="true"></div><div class="neat" aria-hidden="true"></div>
+        <svg class="c-rose" viewBox="-70 -78 140 148" aria-hidden="true">${compassG(56)}</svg>
+        <div class="cartouche" id="cartouche"></div>
+        <span class="pan-hint" aria-hidden="true">← ${t('glissez pour suivre la route', 'swipe to follow the route')}</span>
+        <div class="pan"><button type="button" data-pan="-1" aria-label="${t('Vers l’ouest', 'Westward')}">${ic('left')}</button><button type="button" data-pan="1" aria-label="${t('Vers l’est', 'Eastward')}">${ic('right')}</button></div>
+        <button type="button" class="flap l" data-unfold aria-label="${t('Déplier la carte', 'Unfold the chart')}">${cover}</button>
+        <button type="button" class="flap r" data-unfold aria-label="${t('Déplier la carte', 'Unfold the chart')}">${cover}</button>
+      </div>
+      <div class="chart-foot">
+        <div class="fox-note">${foxSVG()}<p class="bubble">${t(`Le renard veille : notre position est publiée avec <b>${D.delayHours}\u00a0h de retard</b>. La patience fait partie de l’apprivoisement.`, `The fox keeps watch: our position goes up <b>${D.delayHours} hours late</b>. Patience is part of taming.`)}</p></div>
+        <dl class="pos"><dt>${t('Dernière position publique', 'Latest public position')}</dt><dd class="coord">${esc(WG.fmtPos(lp))}</dd><dd class="when">${esc(whenTxt())}</dd>
+          <dd class="chart-btns" style="width:100%;margin-top:10px"><a class="btn btn-s" href="#!">${ic('full')}${t('Plein écran', 'Full screen')}</a><a class="btn btn-p" href="#!">${t('Carte interactive', 'Interactive map')}</a></dd></dl>
+        <a class="cockpit" href="#!">${ic('compass')}<span><b>${t('Demander l’accès au cockpit en direct', 'Request live cockpit access')}</b><small>${t('Pour les amis marins qui veulent suivre les instruments du bord.', 'For sailing friends who’d like to follow the boat’s instruments.')}</small></span><span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>`;
+  };
+
+  // ── Le sommaire : « Ce mois-ci dans le carnet » + la table des matières ──
+  const sommaire = () => {
+    const ym = D.posts[0].date.slice(0, 7);
+    const ps = D.posts.filter((p) => p.date.startsWith(ym));
+    const y = +ym.slice(0, 4), m = +ym.slice(5, 7) - 1;
+    const monthName = WG.date(Date.UTC(y, m, 15), { month: 'long', year: 'numeric' });
+    const byDay = {};
+    ps.forEach((p) => { const d = new Date(p.date).getUTCDate(); (byDay[d] ||= []).push(p); });
+    const first = (new Date(Date.UTC(y, m, 1)).getUTCDay() + 6) % 7, nd = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+    const heads = [...Array(7)].map((_, i) => `<i>${esc(WG.date(Date.UTC(2026, 9, 5 + i), { weekday: 'narrow' }))}</i>`).join('');
+    let cells = '<span></span>'.repeat(first);
+    for (let d = 1; d <= nd; d++) {
+      const dp = byDay[d];
+      cells += dp ? `<button type="button" data-post="${esc(dp[0].id)}" aria-label="${esc(`${WG.date(Date.UTC(y, m, d), { day: 'numeric', month: 'long' })} — ${WG.title(dp[0])}`)}">${d}</button>` : `<span>${d}</span>`;
+    }
+    return `
+  <section class="sec" id="ce-mois" data-tab="carnet">
+    <div class="wrap"><div class="spread">
+      <div class="page page-l month">
+        ${kick(t('Ce mois-ci dans le carnet', 'This month in the log'))}<h2 class="h2">${esc(monthName)}</h2>
+        <ul class="mlist">${ps.map((p, i) => {
+          const ph = p.photos[0];
+          return `<li><button type="button" data-post="${esc(p.id)}"><span class="md"><b>${new Date(p.date).getUTCDate()}</b><small>${esc(WG.date(p.date, { month: 'short' }))}</small></span>
+            <span class="mt"><b>${esc(WG.title(p))}</b><small>${esc(p.author)}${p.etape_id ? ` · ${esc(etName(p.etape_id))}` : ''}</small></span>
+            <span class="mp ${i % 2 ? 'mr2' : 'mr1'}">${ph ? im(ph.url, 160) : ''}</span></button></li>`;
+        }).join('')}</ul>
+      </div>
+      <div class="page page-r">
+        ${kick(t('Table des matières', 'Contents'))}<h2 class="h2">${t('Les chapitres du voyage', 'The chapters of the voyage')}</h2>
+        <ol class="toc">${chapters.map((c, i) => {
+          const n = D.posts.filter((p) => p.chapter_id === c.id).length;
+          return `<li class="${c === curChap ? 'cur' : ''}"><button type="button" data-chap="${esc(c.id)}">${planetMini(i)}<span class="toc-t"><i>${t('Chapitre', 'Chapter')} ${ROMAN[i]}</i>${esc(WG.chapter(c.id))}<small>${esc(period(c.date_start, c.date_end))}${c === curChap ? ` · ${t('en cours', 'under way')}` : ''}</small></span><span class="toc-dots"></span><span class="toc-p">${nStories(n)}</span></button></li>`;
+        }).join('')}</ol>
+        <div style="margin-top:26px"><div class="box-h"><h3>${esc(monthName)}</h3></div>
+          <div class="cal" id="calendrier">${heads}${cells}</div><p class="cal-l">${t('Les jours dorés sont des jours de récit.', 'Golden days are days with a story.')}</p></div>
+      </div>
+    </div></div>
+  </section>`;
+  };
+
+  // ── Les escales : des cartes postales ──
+  const postcards = () => {
+    const items = [...etapes].reverse().map((e, k0) => {
+      const k = etapes.indexOf(e);
+      const ps = D.posts.filter((p) => p.etape_id === e.id);
+      const lp = ps[0];
+      const withPh = ps.find((p) => p.photos.length);
+      const fl = S.flip.has(e.id);
+      const range = `${dShort(e.date_start)} – ${dShort(e.date_end)}`;
+      const SK = [['#E9C98F', '#F6EBD3'], ['#A9C3DB', '#EEF1EC'], ['#D9A39A', '#F3E2D2']][k % 3];
+      const art = `<svg class="pc-art" viewBox="0 0 340 230" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><linearGradient id="pcg${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${SK[1]}"/><stop offset="1" stop-color="${SK[0]}"/></linearGradient></defs>
+        <rect width="340" height="140" fill="url(#pcg${k})"/>
+        <circle cx="${232 - (k % 3) * 52}" cy="${66 + (k % 2) * 16}" r="${20 + (k % 3) * 4}" fill="#F7EFD9" opacity=".85" filter="url(#f-wash)"/>
+        <path d="M${k % 2 ? 0 : 200} 136q30-${26 + (k % 3) * 8} 70-18t70 4v20H${k % 2 ? 0 : 200}z" fill="#8EA874" opacity=".75" filter="url(#f-wash)"/>
+        <rect y="134" width="340" height="96" fill="#4A74A3" opacity=".72" filter="url(#f-wash)"/>
+        <rect y="186" width="340" height="44" fill="#2C4A74" opacity=".35"/>
+        <path d="M0 134.5h340" stroke="#2A3349" stroke-width="1" filter="url(#f-ink)"/>
+        <g transform="translate(${96 + (k % 4) * 34} 136) scale(.36)">${boatG()}</g>
+        <path d="M24 162q8-4 16 0t16 0M220 176q8-4 16 0t16 0M120 198q8-4 16 0" fill="none" stroke="#F7EFD9" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>
+        <path d="M60 40q5-5 10 0q5-5 10 0" fill="none" stroke="#2A3349" stroke-width=".9" opacity=".6"/></svg>`;
+      const pm = WG.date(e.date_end, { month: 'short', year: 'numeric' }).toUpperCase();
+      return `<div class="pc${fl ? ' is-flip' : ''}" data-flip="${esc(e.id)}" role="button" tabindex="0" aria-pressed="${fl}" aria-label="${esc(etName(e.id))} — ${t('retourner la carte postale', 'turn the postcard over')}">
+        <div class="pc-in">
+          <div class="pc-f"><div class="pc-ph">${withPh ? im(withPh.photos[0].url, 720, '') : art}</div>
+            <svg class="pc-pl" viewBox="-31 -31 62 62" aria-hidden="true">${planetMini(k).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg>
+            <div class="pc-lab"><b>${esc(etName(e.id))}</b><span>${esc(range)}</span></div>
+            <span class="pc-turn" aria-hidden="true">${ic('turn', '')}</span></div>
+          <div class="pc-b" aria-hidden="${!fl}">
+            <div class="pc-note">${lp ? `<p>${esc(WG.excerpt(lp, 150))}</p><span class="sig">— ${esc(lp.author)}, ${esc(dShort(lp.date))}</span>` : `<p class="pc-empty">${t('Pas encore de récit public pour cette escale.', 'No public story for this stop yet.')}</p><span class="sig">${esc(range)}</span>`}</div>
+            <div class="pc-addr"><span class="pc-stamp">${stampSVG(k)}</span><span class="pc-pm">${postmark(pm)}</span>
+              <div class="pc-lines"><span>Wang’ap</span><span>${esc(WG.chapter(e.chapter_id))}</span></div>
+              ${lp ? `<button type="button" class="btn btn-p pc-read" data-post="${esc(lp.id)}"${fl ? '' : ' tabindex="-1"'}>${t('Lire le récit', 'Read the story')} →</button>` : ''}</div>
+          </div>
+        </div></div>`;
+    }).join('');
+    return `
+  <section class="sec" id="escales" data-tab="escales">
+    <div class="wrap"><header class="sh" data-reveal>${kick(t('Les escales', 'The stops'))}<h2 class="h2">${t('Une carte postale de chaque escale', 'A postcard from every stop')}</h2>
+      <p class="lead">${t('Au dos, quelques mots du dernier récit écrit là-bas.', 'On the back, a few words from the latest story written there.')}</p></header></div>
+    <div class="pcs" id="pcs" data-allow-overflow>${items}</div>
+    <div class="wrap pcs-f"><span class="hint">${ic('turn', '')}${t('glissez ou touchez', 'swipe or tap')}</span>
+      <span class="arrows"><button type="button" data-scroll="-1" aria-label="${t('Cartes précédentes', 'Previous cards')}">${ic('left')}</button><button type="button" data-scroll="1" aria-label="${t('Cartes suivantes', 'Next cards')}">${ic('right')}</button></span></div>
+  </section>`;
+  };
+
+  // ── Le carnet de bord (la mise en page de d3, la typographie de d1) ──
+  const PER = 5;
+  const flow = () => {
+    const out = [];
+    for (const c of [...chapters].reverse()) {
+      if (S.chap && S.chap !== c.id) continue;
+      const ps = D.posts.filter((p) => p.chapter_id === c.id && (!S.et || p.etape_id === S.et)).sort((a, b) => b.date.localeCompare(a.date));
+      ps.forEach((p, i) => out.push({ p, c, first: i === 0, n: ps.length }));
+    }
+    return out;
+  };
+  const opener = (c, n) => {
+    const i = chapIdx(c.id);
+    return `<header class="opener">${planetMini(i)}<div><i>${t('Chapitre', 'Chapter')} ${ROMAN[i]}${c === curChap ? ` · ${t('en cours', 'under way')}` : ''}</i><h3>${esc(WG.chapter(c.id))}</h3><small>${esc(period(c.date_start, c.date_end))} · ${nStories(n)}</small></div>
+      <blockquote>${esc(WG.quote(EPI[i] || 'heart'))}</blockquote></header>`;
+  };
+  const entry = (p, feat) => {
+    const n = p.photos.length;
+    const ph0 = p.photos[0];
+    const capx = ph0 ? WG.cap(ph0) : '';
+    const more = Math.max(0, (p.nPhotos || n) - n);
+    const strip = n ? `<div class="strip-w"><div class="strip" data-strip data-allow-overflow>${p.photos.map((x, i) => `<figure class="sp${i === 0 ? ' sp1 mrect' : ''}">${im(x.url, i === 0 ? (feat ? 1000 : 640) : 520, WG.cap(x))}</figure>`).join('')}${more ? `<span class="sp sp-more"><b>+${more}</b><span>${t('photos dans le récit', 'photos in the story')}</span></span>` : ''}</div>${n > 1 ? `<span class="sp-n">1 / ${n}</span>` : ''}</div>${feat && capx ? `<p class="scap">${esc(cut(capx, 90))}</p>` : ''}` : '';
+    return `<article class="entry${feat ? ' feat' : ''}${n ? '' : ' noph'}" data-post="${esc(p.id)}" tabindex="0" aria-label="${esc(WG.title(p))}">
+      ${strip}
+      <div class="etx">
+        <p class="emeta"><time datetime="${esc(p.date)}">${esc(WG.date(p.date, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }))}</time><span class="by">${t('par', 'by')} ${esc(p.author)}</span></p>
+        <h3>${esc(WG.title(p))}</h3>
+        ${p.etape_id ? `<p class="eplace">${ic('pin', '')}${esc(etName(p.etape_id))}</p>` : ''}
+        <p class="eex">${esc(WG.excerpt(p, feat ? 340 : 190))}</p>
+        <div class="eacts"><span class="more">${t('Lire la suite', 'Read more')} →</span><a href="#!" aria-label="${t('J’aime', 'Like')}">${ic('heart', '')}</a><a href="#!" aria-label="${t('Laisser un mot', 'Leave a note')}">${ic('talk', '')}</a></div>
+      </div>
+    </article>`;
+  };
+  const carnet = () => {
+    const silPost = D.posts.find((p) => p.id.startsWith('0faac474')) || D.posts[0];
+    const sil = silPost.photos[0];
+    const gal = D.posts.filter((p) => p.photos.length).slice(1, 4).map((p) => im(p.photos[p.photos.length - 1].url, 200)).join('');
+    return `
+  <section class="sec" id="carnet" data-tab="carnet">
+    <div class="wrap">
+      <header class="sh" data-reveal>${kick(t('Les récits du bord', 'Stories from aboard'))}<h2 class="h2">${t('Le carnet de bord', 'The ship’s log')}</h2>
+        <p class="lead">${t('Les nouvelles écrites par Catherine et Bertrand, chapitre après chapitre, la plus récente en premier.', 'News written by Catherine and Bertrand, chapter by chapter, newest first.')}</p></header>
+      <div class="cgrid">
+        <div class="cmain">
+          <div class="filters">
+            <label class="fl"><span>${t('Chapitre', 'Chapter')}</span><select id="f-chap"></select></label>
+            <label class="fl"><span>${t('Escale', 'Stop')}</span><select id="f-et"></select></label>
+            <p class="fcount" id="fcount" aria-live="polite"></p>
+          </div>
+          <div id="log"></div>
+          <div id="pager"></div>
+        </div>
+        <aside class="cside" aria-label="${t('Autour du carnet', 'Around the log')}">
+          <div class="box"><h3>${t('Le voyage rejoué', 'The voyage replayed')}</h3><p>${t('Le sillage : la route telle qu’elle a été naviguée, mille après mille.', 'The wake: the route exactly as it was sailed, mile after mile.')}</p>
+            <figure class="sil-ph mrect" style="margin:12px 0">${sil ? im(sil.url, 700, WG.cap(sil)) : ''}<svg viewBox="0 0 400 250" preserveAspectRatio="none" aria-hidden="true"><path d="M30 210c60-10 70-60 130-70s80 34 140-8 50-80 70-108" fill="none" stroke="#FBF6EA" stroke-width="3" stroke-dasharray=".1 9" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg></figure>
+            <a class="btn btn-p" href="#!" style="width:100%">${ic('play')}${t('Rejouer le voyage', 'Replay the voyage')}</a></div>
+          <div class="box"><a class="gal" href="#!"><span class="gal-st">${gal}</span><span><b>${t('La galerie', 'The gallery')}</b><small>${t('Toutes les photos du voyage', 'Every photo of the voyage')}</small></span></a>
+            <a class="btn btn-s" href="#!" style="width:100%;margin-top:12px">${ic('journal')}${t('Tout le journal', 'The whole journal')}</a></div>
+          <blockquote class="side-q">${esc(WG.quote('heart'))}<cite>— ${t('Le Petit Prince', 'The Little Prince')}</cite></blockquote>
+        </aside>
+      </div>
+    </div>
+  </section>`;
+  };
+  const renderLog = (scroll) => {
+    const fc = document.getElementById('f-chap'), fe = document.getElementById('f-et');
+    if (!fc) return;
+    fc.innerHTML = `<option value="">${t('Tous les chapitres', 'All chapters')}</option>${chapters.map((c, i) => `<option value="${esc(c.id)}"${c.id === S.chap ? ' selected' : ''}>${ROMAN[i]} · ${esc(WG.chapter(c.id))}</option>`).join('')}`;
+    const ets = etapes.filter((e) => !S.chap || e.chapter_id === S.chap);
+    if (S.et && !ets.some((e) => e.id === S.et)) S.et = '';
+    fe.innerHTML = `<option value="">${t('Toutes les escales', 'All stops')}</option>${ets.map((e) => `<option value="${esc(e.id)}"${e.id === S.et ? ' selected' : ''}>${esc(etName(e.id))}</option>`).join('')}`;
+    const L = flow();
+    const pages = Math.max(1, Math.ceil(L.length / PER));
+    S.page = Math.max(0, Math.min(S.page, pages - 1));
+    const a = S.page * PER, slice = L.slice(a, a + PER);
+    const on = S.chap || S.et;
+    document.getElementById('fcount').innerHTML = `<span>${L.length ? t(`Page ${S.page + 1} sur ${pages} · récits ${a + 1} à ${a + slice.length} sur ${L.length}`, `Page ${S.page + 1} of ${pages} · stories ${a + 1}–${a + slice.length} of ${L.length}`) : ''}</span>${on ? `<button type="button" data-reset>${t('Tout afficher', 'Show all')}</button>` : ''}`;
+    let html = '';
+    slice.forEach((it, k) => {
+      if (it.first) html += opener(it.c, it.n);
+      else if (k === 0) html += `<p class="runhead">${t('Chapitre', 'Chapter')} ${ROMAN[chapIdx(it.c.id)]} — ${esc(WG.chapter(it.c.id))} (${t('suite', 'continued')})</p>`;
+      else html += ornament();
+      html += entry(it.p, k === 0 || it.first);
+    });
+    document.getElementById('log').innerHTML = L.length ? html : `<div class="empty">${foxSVG()}<p class="bubble">${t('Le renard a cherché partout : aucun récit public pour cette sélection… pour l’instant.', 'The fox looked everywhere: no public story for this selection… yet.')}</p></div>`;
+    document.getElementById('pager').innerHTML = pages > 1 ? `<nav class="pager" aria-label="${t('Pages du carnet', 'Log pages')}">
+        <button type="button" data-page="prev"${S.page === 0 ? ' disabled' : ''}>${ic('left')}<span>${t('Plus récents', 'Newer')}</span></button>
+        <span class="pnums">${[...Array(pages)].map((_, i) => `<button type="button" data-page="${i}"${i === S.page ? ' aria-current="page"' : ''} aria-label="${t('Page', 'Page')} ${i + 1}">${i + 1}</button>`).join('')}</span>
+        <button type="button" data-page="next"${S.page === pages - 1 ? ' disabled' : ''}><span>${t('Plus anciens', 'Older')}</span>${ic('right')}</button></nav>
+      <p class="pinfo">${t(`page ${S.page + 1} sur ${pages}`, `page ${S.page + 1} of ${pages}`)}</p>` : '';
+    document.querySelectorAll('#log [data-strip]').forEach((s) => {
+      const n = s.parentNode.querySelector('.sp-n'); if (!n) return;
+      const tot = s.querySelectorAll('figure').length;
+      s.addEventListener('scroll', () => { const w = s.firstElementChild.getBoundingClientRect().width + 8; n.textContent = `${Math.min(tot, Math.round(s.scrollLeft / w) + 1)} / ${tot}`; }, { passive: true });
+    });
+    if (scroll) {
+      const top = document.getElementById('carnet').querySelector('.cmain').getBoundingClientRect().top;
+      if (top < 0 || top > innerHeight * 0.6) window.scrollTo({ top: window.scrollY + top - (innerWidth >= 1024 ? 84 : 12), behavior: RM ? 'auto' : 'smooth' });
+    }
+  };
+
+  // ── L'équipage : de grandes photos ──
+  const crew = () => {
+    const C = [
+      ['/images/photo2.webp', '38% 50%', 'Catherine', roseIcon(), t('La Rose', 'The Rose'), t('Co-skipper · Navigatrice', 'Co-skipper · Navigator')],
+      ['/images/photo3.webp', '44% 40%', 'Bertrand', foxSVG(), t('Le Renard', 'The Fox'), t('Skipper · Capitaine', 'Skipper · Captain')],
+      [boatPhoto ? WG.img(boatPhoto, 900) : '/images/boat.webp', '50% 60%', 'Wang’ap', `<svg viewBox="-12 -12 24 24" aria-hidden="true"><path class="f-gold" d="${STARP}"/></svg>`, t('L’Astéroïde', 'The Asteroid'), 'Outremer 52 · Catamaran'],
+    ];
+    return `
+  <section class="sec" id="equipage" data-tab="equipage">
+    <div class="wrap"><header class="sh" data-reveal>${kick(t('Les personnages', 'The characters'))}<h2 class="h2">${t('L’équipage', 'The crew')}</h2>
+      <p class="lead">${t('La Rose, le Renard et l’Astéroïde.', 'The Rose, the Fox and the Asteroid.')}</p></header></div>
+    <div class="wrap crew-w"><div class="crew" data-allow-overflow>${C.map(([src, pos, name, icon, alias, role]) => `
+      <figure class="cm" data-reveal><div class="cm-ph"><img src="${esc(src)}" alt="${esc(name)}" loading="lazy" decoding="async" style="object-position:${pos}"></div>
+        <figcaption><span class="alias">${icon}${esc(alias)}</span><h3>${esc(name)}</h3><p>${esc(role)}</p></figcaption></figure>`).join('')}</div></div>
+    <div class="wrap"><blockquote class="q tame">${esc(WG.quote('tame'))}<cite>— ${t('le renard, dans Le Petit Prince', 'the fox, in The Little Prince')}</cite></blockquote></div>
+  </section>`;
+  };
+
+  // ── La Genèse ──
+  const genese = () => `
+  <section class="sec gen" id="genese">
+    <div class="wrap"><div class="spread">
+      <div class="page page-l"><div class="gen-mark"><span class="kr" lang="ko">환갑</span><span class="hw">Hwangap</span></div>
+        <div class="gen-ph mrect"><img src="/images/photo1.webp" alt="Catherine &amp; Bertrand" loading="lazy" width="800" height="450"></div></div>
+      <div class="page page-r">${kick(t('La Genèse', 'Genesis'))}<h2 class="h2">${t('Une décision, un bateau, quatre ans de préparation', 'One decision, one boat, four years of preparation')}</h2>
+        <p>${t('Wang’ap est né d’un mot coréen — 환갑 (Hwangap) — une tradition millénaire célébrant les 60 ans comme le début d’un nouveau cycle. Depuis 2022, Catherine et Bertrand préparent ce tour du monde : formations, construction du bateau, logistique.', 'Wang’ap was born from a Korean word — 환갑 (Hwangap) — an age-old tradition that celebrates turning 60 as the start of a new cycle. Since 2022, Catherine and Bertrand have been preparing this round-the-world voyage: training, building the boat, logistics.')}</p>
+        <a class="lnk" href="#!" style="margin-top:10px">${t('Lire la genèse complète', 'Read the full story')} →</a></div>
+    </div></div>
+  </section>`;
+
+  // ── Le programme (le visuel de d1, avec les drapeaux) ──
+  const programme = () => {
+    const OC = [2, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0, 3, 3, 1, 1];
+    const snap = new Date(D.snapshotAt);
+    const ENDS = ['2026-05-31', '2026-09-30', '2026-09-27'];
+    const done = (i) => ENDS[i] && new Date(`${ENDS[i]}T23:59:59Z`) < snap;
+    const rows = [0, 5, 10].map((s) => `<li class="prow">${WG.PHASES.slice(s, s + 5).map((ph, j) => `<div class="ph${done(s + j) ? ' done' : ''}" style="--c:${RGB[OC[s + j]]}"><b><span class="flag" aria-hidden="true">${ph.flag}</span>${esc(ph.place)}${done(s + j) ? `<span class="ok">✓ ${t('fait', 'done')}</span>` : ''}</b><span class="per">${esc(ph.period())}</span><small>${esc(ph.desc())}</small></div>`).join('')}</li>`).join('');
+    return `
+  <section class="sec" id="programme" data-tab="programme">
+    <div class="wrap">
+      <header class="sh" data-reveal>${kick(t('La route prévue', 'The planned route'))}<h2 class="h2">${t('Le programme', 'The programme')}</h2><p class="lead">${t(`~${nf(36000)} milles · 3 océans · 2026–2029`, `~${nf(36000)} miles · 3 oceans · 2026–2029`)}</p></header>
+      <ul class="hl"><li>${t('Départ de Saint-Cyr · sept. 2026', 'Departure from Saint-Cyr · Sept 2026')}</li><li>${t('3 océans', '3 oceans')}</li><li>${t('Retour à Saint-Cyr · été 2029', 'Home to Saint-Cyr · summer 2029')}</li></ul>
+      <ol class="prog">${rows}</ol>
+      <div class="ctas"><button type="button" class="btn btn-p" data-goworld>${ic('map')}${t('Voir la route sur la carte', 'See the route on the map')}</button><a class="btn btn-s" href="#!">${ic('play')}${t('Voir l’animation', 'Watch the animation')}</a></div>
+    </div>
+  </section>`;
+  };
+
+  // ── Écrire à l'équipage ──
+  const letters = () => `
+  <section class="sec letters" id="contact" data-tab="contact">
+    <div class="wrap">
+      <header class="sh" data-reveal>${kick(t('Un petit mot pour le bord', 'A note for the boat'))}<h2 class="h2">${t('Écrire à l’équipage', 'Write to the crew')}</h2></header>
+      <div class="spread">
+        <div class="page page-l"><h3>${t('Nous envoyer un message', 'Send us a message')}</h3>
+          <form class="form">
+            <label class="fld"><span>${t('Prénom *', 'First name *')}</span><input name="prenom" required autocomplete="given-name"></label>
+            <label class="fld"><span>Email</span><input type="email" name="email" autocomplete="email"></label>
+            <label class="fld"><span>${t('Téléphone (WhatsApp)', 'Phone (WhatsApp)')}</span><input type="tel" name="tel" autocomplete="tel"></label>
+            <label class="fld"><span>Message</span><textarea name="message" rows="4"></textarea></label>
+            <p class="fhint">${t('Indiquez un email ou un téléphone pour que nous puissions vous répondre.', 'Leave an email or a phone number so we can reply.')}</p>
+            <div><button class="btn btn-p" type="submit">${ic('mail')}${t('Envoyer', 'Send')}</button></div>
+          </form></div>
+        <div class="page page-r"><h3>${t('Suivre le voyage par email', 'Follow the voyage by email')}</h3>
+          <form class="form">
+            <fieldset class="opts">
+              <label class="opt"><input type="checkbox" checked> ${t('La newsletter', 'The newsletter')}</label>
+              <label class="opt"><input type="checkbox" checked> ${t('Les nouvelles publications', 'New posts')}</label>
+              <label class="opt"><input type="checkbox"> ${t('Les nouvelles étapes', 'New stages')}</label>
+            </fieldset>
+            <label class="fld"><span>Email</span><input type="email" name="nl-email" autocomplete="email"></label>
+            <div><button class="btn btn-p" type="submit">${t('S’inscrire', 'Subscribe')}</button></div>
+          </form></div>
+      </div>
+    </div>
+  </section>`;
+
+  const closing = () => {
+    let s = '';
+    [[6, 20, 1], [14, 62, 0.6], [24, 30, 0.8], [33, 78, 0.5], [46, 16, 0.6], [58, 70, 1], [68, 28, 0.5], [79, 58, 0.8], [88, 22, 0.6], [94, 74, 0.5], [40, 86, 0.4], [72, 88, 0.4]].forEach(([x, y, k]) => { s += star(x * 10, y * 4, k); });
+    return `
+  <section class="night" id="fin">
+    <svg class="sky" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${s}</svg>
+    <svg class="hz" viewBox="0 0 1000 24" preserveAspectRatio="none" aria-hidden="true"><path d="M0 12h1000" stroke="rgba(242,234,215,.35)" stroke-width="1"/><path d="M120 18q8-4 16 0t16 0M520 20q8-4 16 0t16 0M820 17q8-4 16 0" fill="none" stroke="rgba(242,234,215,.3)" stroke-width="1"/></svg>
+    <div class="wrap"><blockquote>${esc(WG.quote('stars'))}<cite>— ${t('Le Petit Prince', 'The Little Prince')}</cite></blockquote>
+    <a class="lnk" href="#!">${t('Espace skippers', 'Skippers’ area')} →</a></div>
+  </section>
+  <footer class="foot"><div class="wrap"><b>wang'ap</b>Wang'ap · Outremer 52 · 2026–2029<small>${t('Démo de design — contenus réels, liens inactifs', 'Design demo — real content, inactive links')}</small>
+    <div class="ctas"><button type="button" class="btn btn-p" data-avis>${ic('talk')}${t('Donner mon avis sur la synthèse', 'Give my view on the synthesis')}</button><a class="btn btn-s" href="index.html">${ic('left')}${t('Revue du design', 'Design review')}</a></div></div></footer>`;
+  };
+
+  // ── Barre du bas + sommaire ──
+  const chrome = () => `
+  <nav class="tabbar" aria-label="${t('Navigation', 'Navigation')}">
+    <a class="tab" href="#carte" data-t="carte">${ic('map', '')}<span>${t('Carte', 'Map')}</span></a>
+    <a class="tab" href="#carnet" data-t="carnet">${ic('journal', '')}<span>${t('Carnet', 'Log')}</span></a>
+    <a class="tab" href="#escales" data-t="escales">${ic('card', '')}<span>${t('Escales', 'Stops')}</span></a>
+    <a class="tab" href="#programme" data-t="programme">${ic('route', '')}<span>Programme</span></a>
+    <button type="button" class="tab menu" data-menu aria-haspopup="dialog">${ic('menu', '')}<span>Menu</span></button>
+  </nav>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="som-t"><div class="sheet-card">
+    <div class="sheet-h"><div><span class="kick">${t('Dans ce carnet', 'In this journal')}</span><h2 id="som-t">${t('Sommaire', 'Contents')}</h2></div><button type="button" class="x" data-close>${ic('close', '')}${t('Fermer', 'Close')}</button></div>
+    <ul class="som">
+      <li><a href="#carte" data-close>${ic('map', '')}<span><b>${t('Où sommes-nous ?', 'Where are we?')}</b><small>${t('La carte dépliée, la route prévue', 'The unfolded chart, the planned route')}</small></span></a></li>
+      <li><a href="#ce-mois" data-close>${ic('star', '')}<span><b>${t('Ce mois-ci dans le carnet', 'This month in the log')}</b><small>${t('Les derniers récits, le calendrier', 'The latest stories, the calendar')}</small></span></a></li>
+      <li><a href="#escales" data-close>${ic('card', '')}<span><b>${t('Les escales', 'The stops')}</b><small>${t('Une carte postale de chaque escale', 'A postcard from every stop')}</small></span></a></li>
+      <li><a href="#carnet" data-close>${ic('journal', '')}<span><b>${t('Le carnet de bord', 'The ship’s log')}</b><small>${t('Tous les récits, chapitre par chapitre', 'Every story, chapter by chapter')}</small></span></a>
+        <ul class="som-ch">${[...chapters].reverse().map((c) => { const i = chapIdx(c.id); return `<li><button type="button" data-chap="${esc(c.id)}" data-close><i>${ROMAN[i]}</i>${esc(WG.chapter(c.id))}<em>${c === curChap ? t('en cours', 'under way') : esc(period(c.date_start, c.date_end))}</em></button></li>`; }).join('')}</ul></li>
+      <li><a href="#equipage" data-close>${ic('crew', '')}<span><b>${t('L’équipage', 'The crew')}</b><small>${t('La Rose, le Renard et l’Astéroïde', 'The Rose, the Fox and the Asteroid')}</small></span></a></li>
+      <li><a href="#genese" data-close>${ic('seed', '')}<span><b>${t('La Genèse', 'Genesis')}</b><small>Hwangap</small></span></a></li>
+      <li><a href="#programme" data-close>${ic('route', '')}<span><b>${t('Le programme', 'The programme')}</b><small>${t('La route prévue, 2026–2029', 'The planned route, 2026–2029')}</small></span></a></li>
+      <li><a href="#contact" data-close>${ic('mail', '')}<span><b>${t('Écrire à l’équipage', 'Write to the crew')}</b><small>${t('Un message, la newsletter', 'A message, the newsletter')}</small></span></a></li>
+    </ul>
+    <div class="som-app"><a href="#!">${ic('book', '')}${t('Le journal complet', 'The full journal')}</a><a href="#!">${ic('photo', '')}${t('La galerie', 'The gallery')}</a><a href="#!">${ic('play', '')}${t('Le sillage', 'The wake')}</a><a href="#!">${ic('user', '')}${t('Connexion', 'Sign in')}</a></div>
+    <div class="sheet-f">${themeSeg()}${langSeg()}</div>
+  </div></div>`;
+
+  // ───────────────────────── la carte (tuiles + encre) ─────────────────────────
+  const TILE = { day: ['relief', 'grayscale(.15) sepia(.18) saturate(1.5) brightness(1.03) contrast(1.05)'], night: ['relief', 'grayscale(1) invert(.88) sepia(.45) hue-rotate(186deg) saturate(3) brightness(.78) contrast(1.15)'] };
+  const NEAR = [[-6.2, 34.6], [22.4, 44.6]];
+  const NEAR_S = [[-5.7, 35.2], [21.4, 44]];
+  const AHEAD = WG.ROUTE.slice(2); // depuis Saint-Cyr (le Grand Départ) : la route prévue, publique.
+  let chartRO;
+  const drawOverlay = (host, m) => {
+    host.querySelector(':scope > svg.ov')?.remove();
+    const W = host.clientWidth, H = host.clientHeight;
+    if (!W || !m.project([0, 0])) return;
+    const P = (ll) => m.project(ll);
+    let s = `<svg class="ov" width="${W}" height="${H}" aria-hidden="true"><g class="grat">`;
+    const x0 = P([0, 0])[0], x1 = P([1, 0])[0], a = x1 - x0;
+    const lonL = -x0 / a, lonR = (W - x0) / a, span = lonR - lonL;
+    const step = [2, 5, 10, 15, 30, 45, 60].find((v) => span / v <= 9) || 90;
+    const lab = (L) => { const v = ((Math.round(L) + 540) % 360) - 180; return `${Math.abs(v)}°${v < 0 ? 'W' : v > 0 ? 'E' : ''}`; };
+    for (let L = Math.ceil(lonL / step) * step; L <= lonR; L += step) { const x = a * L + x0; if (x < 26 || x > W - 26) continue; s += `<line x1="${f1(x)}" x2="${f1(x)}" y1="0" y2="${H}"/><text x="${f1(x + 4)}" y="${H - 30}">${lab(L)}</text>`; }
+    for (let la = -75; la <= 75; la += step) { const y = P([0, la])[1]; if (y < 30 || y > H - 40) continue; s += `<line x1="0" x2="${W}" y1="${f1(y)}" y2="${f1(y)}"/><text x="30" y="${f1(y - 4)}">${Math.abs(la)}°${la < 0 ? 'S' : la > 0 ? 'N' : ''}</text>`; }
+    s += '</g>';
+    const d = AHEAD.map((p, i) => { const [x, y] = P(p); return `${i ? 'L' : 'M'}${f1(x)},${f1(y)}`; }).join('');
+    s += `<path class="route" d="${d}"/>`;
+    if (S.world) {
+      // Des étiquettes courtes, placées à la main (les noms longs sont dans le programme).
+      const LB = { 0: ['La Grande-Motte', -12, -12, 'end'], 3: ['Canaries', 10, 16], 4: ['Martinique', 8, -12], 5: ['Panama', -10, -12, 'end'], 6: ['Galápagos', -10, 18, 'end'],
+        7: ['Polynésie', 0, -14, 'middle'], 8: ['Nouvelle-Zélande', 0, 24, 'middle'], 9: ['Australie', 0, -14, 'middle'], 10: ['Indonésie', 0, -14, 'middle'],
+        11: ['Maurice · Réunion', 0, -14, 'middle'], 12: ['Le Cap', 0, 24, 'middle'], 13: ['Salvador', -10, 18, 'end'], 14: ['Açores', 10, -10] };
+      WG.PHASES.forEach((ph, i) => {
+        if (!LB[i]) return;
+        const [x, y] = P(ph.lonlat);
+        const [name, dx, dy, anc = 'start'] = LB[i];
+        const nm = WG.lang === 'fr' ? name : name.replace('Polynésie', 'Polynesia').replace('Nouvelle-Zélande', 'New Zealand').replace('Australie', 'Australia').replace('Indonésie', 'Indonesia').replace('Le Cap', 'Cape Town').replace('Açores', 'Azores').replace('Maurice · Réunion', 'Mauritius · Réunion');
+        s += `<circle class="ph-dot" cx="${f1(x)}" cy="${f1(y)}" r="4.5"/><text class="ph-lb" x="${f1(x + dx)}" y="${f1(y + dy)}" text-anchor="${anc}"><tspan class="ph-fl">${ph.flag}</tspan> ${esc(nm)}</text>`;
+      });
+    }
+    s += '</svg>';
+    host.insertAdjacentHTML('beforeend', s);
+  };
+  const mountMap = () => {
+    const old = document.getElementById('chart-map');
+    const scroller = document.getElementById('chart-scroll');
+    if (!old || !scroller) return;
+    const host = old.cloneNode(false); old.replaceWith(host);
+    const [tiles, filter] = TILE[S.theme];
+    const night = S.theme === 'night';
+    const frameW = scroller.clientWidth, frameH = scroller.clientHeight;
+    const lab = `<span class="boat-mk">${S.world ? '' : `<em>${t(`position publiée (−${D.delayHours}\u00a0h)`, `published position (−${D.delayHours}\u00a0h)`)}</em>`}</span>`;
+    let opts;
+    if (S.world) {
+      // Le tour du monde : la carte déroulée vers l'ouest, à faire glisser.
+      const z = frameH >= 330 ? 2 : 1;
+      const pad = frameH < 450 ? 34 : 64;
+      const lons = WG.ROUTE.map((p) => p[0]).concat(D.track.map((p) => p[0]));
+      const span = Math.max(...lons) - Math.min(...lons);
+      host.style.width = `${Math.max(frameW, Math.round(((span + 8) / 360) * 256 * 2 ** z) + 2 * pad + 60)}px`;
+      opts = { tiles, filter, maxZoom: z, pad, bounds: [[Math.min(...lons) - 4, -40], [Math.max(...lons) + 4, 46]], line: { color: night ? '#F0CF86' : '#1E2B47', width: 2.4, glow: night ? '#14223F' : '#FBF6EA' }, boat: { html: lab } };
+    } else {
+      host.style.width = '100%';
+      opts = { tiles, filter, maxZoom: 7, pad: frameW < 500 ? 8 : 30, bounds: frameW < 500 ? NEAR_S : NEAR, line: { color: night ? '#F0CF86' : '#1E2B47', width: 2.6, glow: night ? '#14223F' : '#FBF6EA', draw: true }, boat: { html: lab } };
+    }
+    const m = WG.staticMap(host, opts);
+    drawOverlay(host, m);
+    if (chartRO) chartRO.disconnect();
+    if ('ResizeObserver' in window) { let rt; chartRO = new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => drawOverlay(host, m), 220); }); chartRO.observe(host); }
+    if (S.world) requestAnimationFrame(() => { scroller.scrollLeft = scroller.scrollWidth; });
+    else scroller.scrollLeft = 0;
+    const c = document.getElementById('cartouche');
+    if (c) c.innerHTML = S.world ? `<b>${t('Le tour du monde prévu', 'The planned voyage')}</b><span>2026–2029 · ${t('de Saint-Cyr à Saint-Cyr', 'Saint-Cyr to Saint-Cyr')}</span>` : `<b>${t('Méditerranée', 'Mediterranean')}</b><span>${t('la route parcourue, mai – oct. 2026', 'the route sailed, May – Oct 2026')}</span>`;
+    document.getElementById('chart')?.classList.toggle('world', S.world);
+  };
+  const replayDraw = () => document.querySelectorAll('#chart-map .wg-draw').forEach((p) => { p.style.animation = 'none'; void p.getBoundingClientRect(); p.style.animation = ''; });
+  const openChart = () => { const ch = document.getElementById('chart'); if (!ch || ch.classList.contains('open')) return; ch.classList.remove('closing'); ch.classList.add('open'); replayDraw(); };
+  const setView = (world) => {
+    if (S.world === world) return;
+    S.world = world;
+    document.querySelectorAll('[data-view]').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.view === 'world') === world)));
+    const ch = document.getElementById('chart');
+    if (RM || !ch.classList.contains('open')) { mountMap(); openChart(); return; }
+    ch.classList.add('closing'); ch.classList.remove('open');
+    setTimeout(() => { mountMap(); setTimeout(openChart, 60); }, 600);
+  };
+  let chartIO;
+  const watchChart = () => {
+    const ch = document.getElementById('chart');
+    if (chartIO) chartIO.disconnect();
+    if (RM || !('IntersectionObserver' in window)) { openChart(); return; }
+    chartIO = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { setTimeout(openChart, 250); chartIO.disconnect(); } }), { threshold: 0.35 });
+    chartIO.observe(ch);
+  };
+
+  // Les compteurs du tableau de bord.
+  const counters = () => {
+    const els = [...document.querySelectorAll('[data-count]')];
+    const fmt = (v) => nf(Math.round(v));
+    if (RM || !('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver((es) => es.forEach((e) => {
+      if (!e.isIntersecting) return; io.unobserve(e.target);
+      const el = e.target, to = +el.dataset.count, t0 = performance.now();
+      const tick = (now) => { const k = Math.min(1, (now - t0) / 1400); el.textContent = fmt(to * (1 - (1 - k) ** 3)); if (k < 1) requestAnimationFrame(tick); };
+      el.textContent = fmt(0); requestAnimationFrame(tick);
+    }), { threshold: 0.6 });
+    els.forEach((e) => io.observe(e));
+  };
+
+  // L'onglet actif suit la section à l'écran.
+  let spyIO;
+  const spy = () => {
+    if (spyIO) spyIO.disconnect();
+    if (!('IntersectionObserver' in window)) return;
+    spyIO = new IntersectionObserver((es) => es.forEach((en) => {
+      if (!en.isIntersecting) return;
+      const k = en.target.getAttribute('data-tab');
+      document.querySelectorAll('.tab[data-t]').forEach((a) => { a.classList.toggle('on', a.dataset.t === k); if (a.dataset.t === k) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+    }), { rootMargin: '-45% 0px -50% 0px' });
+    document.querySelectorAll('[data-tab]').forEach((s) => spyIO.observe(s));
+  };
+
+  // ── Rendu ──
+  const applyTheme = () => {
+    root.setAttribute('data-theme', S.theme);
+    document.querySelector('meta[name="theme-color"]').content = S.theme === 'night' ? '#0F1A33' : '#F4ECDB';
+    R.setProperty('--chev', chev(S.theme === 'night' ? '#EFE7D4' : '#1E2B47'));
+  };
+  const render = () => {
+    const y = window.scrollY;
+    applyTheme();
+    app.innerHTML = FILTERS + header() + '<main>' + hero() + chartSec() + sommaire() + postcards() + carnet() + crew() + genese() + programme() + letters() + '</main>' + closing() + chrome();
+    renderLog(false);
+    WG.reveal();
+    requestAnimationFrame(() => { mountMap(); watchChart(); });
+    counters();
+    spy();
+    window.scrollTo(0, y);
+  };
+
+  const sheet = (on) => { const s = document.getElementById('sheet'); s.classList.toggle('on', on); document.body.style.overflow = on ? 'hidden' : ''; if (on) s.querySelector('.x').focus(); };
+  const flip = (pc) => {
+    const id = pc.dataset.flip, on = !S.flip.has(id);
+    if (on) S.flip.add(id); else S.flip.delete(id);
+    pc.classList.toggle('is-flip', on); pc.setAttribute('aria-pressed', String(on));
+    pc.querySelector('.pc-b').setAttribute('aria-hidden', String(!on));
+    const b = pc.querySelector('.pc-read'); if (b) b.tabIndex = on ? 0 : -1;
+  };
+  document.addEventListener('click', (e) => {
+    const l = e.target.closest('[data-lang]'); if (l) { if (l.dataset.lang !== WG.lang) { sheet(false); WG.setLang(l.dataset.lang); } return; }
+    const th = e.target.closest('[data-set-theme]');
+    if (th) { if (th.dataset.setTheme !== S.theme) { S.theme = th.dataset.setTheme; WG.store.set('wg-d7-theme', S.theme); applyTheme(); document.querySelectorAll('[data-set-theme]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.setTheme === S.theme))); mountMap(); } return; }
+    if (e.target.closest('[data-menu]')) { sheet(true); return; }
+    const sh = document.getElementById('sheet');
+    const c = e.target.closest('[data-chap]');
+    if (c) { if (sh?.classList.contains('on')) sheet(false); S.chap = c.dataset.chap; S.et = ''; S.page = 0; renderLog(false); document.getElementById('carnet').scrollIntoView({ behavior: RM ? 'auto' : 'smooth' }); return; }
+    if (sh && sh.classList.contains('on') && (e.target === sh || e.target.closest('[data-close]'))) { sheet(false); return; }
+    if (e.target.closest('[data-reset]')) { S.chap = ''; S.et = ''; S.page = 0; renderLog(true); return; }
+    const pg = e.target.closest('[data-page]');
+    if (pg) { const v = pg.dataset.page; S.page = v === 'prev' ? S.page - 1 : v === 'next' ? S.page + 1 : +v; renderLog(true); return; }
+    const vw = e.target.closest('[data-view]'); if (vw) { setView(vw.dataset.view === 'world'); return; }
+    if (e.target.closest('[data-unfold]')) { openChart(); return; }
+    if (e.target.closest('[data-goworld]')) { document.getElementById('carte').scrollIntoView({ behavior: RM ? 'auto' : 'smooth' }); setTimeout(() => setView(true), RM ? 0 : 500); return; }
+    const pn = e.target.closest('[data-pan]'); if (pn) { const sc = document.getElementById('chart-scroll'); sc.scrollBy({ left: Number(pn.dataset.pan) * sc.clientWidth * 0.7, behavior: RM ? 'auto' : 'smooth' }); return; }
+    const sb = e.target.closest('[data-scroll]'); if (sb) { const r = document.getElementById('pcs'); r.scrollBy({ left: Number(sb.dataset.scroll) * Math.min(r.clientWidth * 0.8, 760), behavior: RM ? 'auto' : 'smooth' }); return; }
+    if (e.target.closest('[data-avis]')) { const tab = document.querySelector('.wg-tab'); if (tab) tab.click(); return; }
+    const pc = e.target.closest('[data-flip]'); if (pc && !e.target.closest('[data-post]')) { flip(pc); }
+  });
+  document.addEventListener('change', (e) => {
+    if (e.target.id === 'f-chap') { S.chap = e.target.value; S.page = 0; renderLog(true); }
+    if (e.target.id === 'f-et') { S.et = e.target.value; S.page = 0; renderLog(true); }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { const sh = document.getElementById('sheet'); if (sh?.classList.contains('on')) sheet(false); }
+    const pc = e.target.closest?.('[data-flip]');
+    if (pc && e.target === pc && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); flip(pc); return; }
+    const a = e.target.closest?.('article[data-post]');
+    if (a && e.target === a && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); const p = D.posts.find((x) => x.id === a.dataset.post); if (p) WG.openPost(p); }
+  });
   window.addEventListener('wg:lang', render);
+  WG.inert();
   render();
 })();
 </script>
+<script src="survey.js"></script>
 </body>
 </html>

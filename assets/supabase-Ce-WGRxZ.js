@@ -1,0 +1,1 @@
+import{n as e}from"./chunk-DseTPa7n.js";import{t}from"./supabaseArchive-DbTF1Ohp.js";import"./poll-BK4sfiB2.js";var n=e({ARCHIVE_MODE:()=>!0,isSupabaseConfigured:()=>i,supabase:()=>r}),r=t,i=!!r;export{r as n,n as r,i as t};

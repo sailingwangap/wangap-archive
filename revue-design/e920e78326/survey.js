@@ -97,7 +97,7 @@
       const prev = DESIGNS[idx - 1], next = DESIGNS[idx + 1];
       panel.innerHTML = `
         <div class="wg-panel-head">
-          <div><div class="wg-kicker">${t('Design', 'Design')} ${idx + 1}/6</div><div class="wg-panel-title">${esc(t(meta.fr, meta.en))}</div></div>
+          <div><div class="wg-kicker">${t('Design', 'Design')} ${idx + 1}/${DESIGNS.length}</div><div class="wg-panel-title">${esc(t(meta.fr, meta.en))}</div></div>
           <button class="wg-x" type="button" aria-label="${t('Fermer', 'Close')}">✕</button>
         </div>
         <div class="wg-panel-body">

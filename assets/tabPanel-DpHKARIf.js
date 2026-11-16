@@ -1,0 +1,1 @@
+function e(e,t,n){return{id:`${e}-p-${t}`,role:`tabpanel`,"aria-labelledby":`${e}-t-${t}`,hidden:t!==n,tabIndex:0}}export{e as t};

@@ -184,7 +184,7 @@
 // away the journal it exists to protect.
 //
 // So: bump CACHE_NAME on a release again, as the repo always said.
-const CACHE_NAME = 'wangap-v363';
+const CACHE_NAME = 'wangap-v371';
 const IMAGE_CACHE = 'wangap-images-v1';
 const TILE_CACHE = 'wangap-tiles-v1';
 // V3.4 item 2 — Supabase REST responses: the offline journal. Unversioned on
@@ -199,7 +199,11 @@ const ROUTING_CACHE = 'wangap-routing-v1';
 // V3.44.1 — les pages d'aide de B&C (/aide/routage.html, /aide/polaires.html, leurs images) : réseau
 // d'abord, gardées pour relire hors ligne en mer. Hors CACHE_NAME, sinon chaque version les effacerait.
 const AIDE_CACHE = 'wangap-aide-v1';
-const EXPECTED_CACHES = new Set([CACHE_NAME, IMAGE_CACHE, TILE_CACHE, API_CACHE, ROUTING_CACHE, AIDE_CACHE]);
+// ADR-0043 phase 6 — la marque « appareil d'un compte » (le pré-cache en deux parts, plus bas). Non
+// versionné : une mise à jour doit la retrouver. Hors du préfixe `wangap-v` (jamais pris pour une
+// vieille coquille par `activate`).
+const META_CACHE = 'wangap-meta-v1';
+const EXPECTED_CACHES = new Set([CACHE_NAME, IMAGE_CACHE, TILE_CACHE, API_CACHE, ROUTING_CACHE, AIDE_CACHE, META_CACHE]);
 // Approx upper-bounds per cache. Tile entries are small (10-40 KB raster,
 // ~5-20 KB glyph PBF) so 2000 ≈ 50-100 MB. Image entries vary (sm 15 KB,
 // md 80 KB, lg 300 KB); 500 covers thousands of variants at most-used
@@ -276,26 +280,137 @@ const PRECACHE_SHELL = [
 // an empty array so the SW still installs.
 const PRECACHE_ASSETS = /* @PRECACHE_ASSETS@ */ [];
 
-const PRECACHE_URLS = [...PRECACHE_SHELL, ...PRECACHE_ASSETS];
+// ADR-0043 phase 6 — LE PRÉ-CACHE EN DEUX PARTS.
+// Jusqu'ici, TOUT le build (≈ 340 fichiers, ≈ 10 Mo) pour tout le monde, à chaque version : un
+// visiteur de passage téléchargeait heic2any (1,35 Mo), le worker PDF (1,1 Mo), le routage, le
+// compositeur de lettre… Maintenant :
+//   · la part PUBLIQUE (`PRECACHE_PUBLIC`, calculée au build depuis le graphe des morceaux :
+//     l'entrée et les pages de l'arbre public, src/PublicApp.jsx) pour un visiteur ;
+//   · TOUT (`PRECACHE_ASSETS`, comme avant) pour l'appareil d'un compte — sans rien faire :
+//       1. la marque `CREW_MARK` (META_CACHE), posée dès que l'application connectée a tourné ici
+//          avec une session ou un dernier rôle connu (son message, lib/appPrecache.js) ;
+//       2. sinon, un profil gardé dans IndexedDB (`WangapJDB.profiles`, F8.3 : useAuth y range le
+//          profil du compte à chaque lecture en ligne, depuis mai 2026) — l'appareil d'un compte
+//          d'AVANT cette version, qui n'a jamais envoyé le message ;
+//       3. sinon, une ancienne coquille d'avant la coupe (sans `SCOPE_KEY`) : on ne sait pas, donc
+//          tout, comme avant — une seule fois (la version suivante a sa marque de portée).
+//     Dans le doute (une erreur), tout.
+// Le message de l'application (même service worker, en cours de séance) va chercher ce qui manque,
+// une fois : idempotent. Une page visitée garde toujours ses fichiers (le « stale while
+// revalidate » plus bas) : hors ligne, les pages publiques déjà vues s'ouvrent.
+const PRECACHE_PUBLIC = /* @PRECACHE_PUBLIC@ */ [];
+const CREW_MARK = '/__wangap/crew-device';
+const SCOPE_KEY = '/__wangap/precache-scope';
+const PRECACHE_APP_MESSAGE = 'wangap-precache-app';
+
+function crewMarked() {
+  return caches.open(META_CACHE).then((c) => c.match(CREW_MARK)).then((r) => !!r).catch(() => false);
+}
+function markCrew() {
+  return caches.open(META_CACHE)
+    .then((c) => c.put(CREW_MARK, new Response('1', { headers: { 'Content-Type': 'text/plain' } })))
+    .catch(() => undefined);
+}
+
+// Un profil gardé par l'application (Dexie, `WangapJDB.profiles`) — lu sans Dexie, sans RIEN créer :
+// une base absente (`onupgradeneeded`) est abandonnée, donc pas créée ; au plus 2 s.
+function crewProfileInDb() {
+  return new Promise((resolve) => {
+    let done = false;
+    const end = (v) => { if (!done) { done = true; resolve(v); } };
+    setTimeout(() => end(false), 2000);
+    try {
+      const req = indexedDB.open('WangapJDB');
+      req.onupgradeneeded = () => { try { req.transaction.abort(); } catch (_) { /* déjà fini */ } end(false); };
+      req.onerror = () => end(false);
+      req.onblocked = () => end(false);
+      req.onsuccess = () => {
+        const db = req.result;
+        try {
+          db.onversionchange = () => db.close();
+          if (!db.objectStoreNames.contains('profiles')) { db.close(); end(false); return; }
+          const count = db.transaction('profiles', 'readonly').objectStore('profiles').count();
+          count.onsuccess = () => { db.close(); end(count.result > 0); };
+          count.onerror = () => { db.close(); end(false); };
+        } catch (_) { try { db.close(); } catch (__) { /* fermée */ } end(false); }
+      };
+    } catch (_) { end(false); }
+  });
+}
+
+// Une coquille `wangap-v*` remplie par un service worker d'avant la coupe (aucune marque de portée).
+function preSplitShell() {
+  return caches.keys().then((names) => Promise.all(
+    names.filter((n) => n.startsWith('wangap-v')).map((n) => caches.open(n).then((c) =>
+      c.match(SCOPE_KEY).then((scope) => (scope ? false : c.keys().then((ks) => ks.length > 0))))),
+  )).then((l) => l.some(Boolean));
+}
+
+/** 'app' (tout) ou 'public' (la part publique). */
+function precacheScope() {
+  return crewMarked()
+    .then((m) => m || crewProfileInDb())
+    .then((crew) => (crew ? markCrew().then(() => 'app') : preSplitShell().then((old) => (old ? 'app' : 'public'))))
+    .catch(() => 'app');
+}
+
+function fetchInto(cache, urls, init) {
+  return Promise.allSettled(
+    urls.map((url) =>
+      fetch(url, init)
+        .then((response) => {
+          if (response && response.ok) return cache.put(url, response);
+        })
+        .catch(() => undefined)
+    )
+  );
+}
 
 // Install — precache app shell + build assets. Uses Promise.allSettled +
 // per-URL fetch/put so a single missing asset (deploy race, 404) doesn't
 // abort the entire precache and leave the user without an offline shell.
+// ADR-0043 phase 6 — la part publique ou tout, selon `precacheScope()` ; la portée est notée.
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) =>
-      Promise.allSettled(
-        PRECACHE_URLS.map((url) =>
-          fetch(url, { cache: 'reload' })
-            .then((response) => {
-              if (response && response.ok) return cache.put(url, response);
-            })
-            .catch(() => undefined)
-        )
+    precacheScope().then((scope) =>
+      caches.open(CACHE_NAME).then((cache) =>
+        fetchInto(cache, [...PRECACHE_SHELL, ...(scope === 'app' ? PRECACHE_ASSETS : PRECACHE_PUBLIC)], { cache: 'reload' })
+          .then(() => cache.put(SCOPE_KEY, new Response(scope, { headers: { 'Content-Type': 'text/plain' } })))
       )
     )
   );
   self.skipWaiting();
+});
+
+// ADR-0043 phase 6 — l'application connectée tourne ici (session ou dernier rôle connu) : noter
+// l'appareil, puis aller chercher ce qui manque de TOUT le pré-cache (6 à la fois). Idempotent : ce
+// qui est déjà là n'est pas retéléchargé ; deux messages ne font qu'un remplissage.
+let filling = null;
+function fillAppPrecache() {
+  if (filling) return filling;
+  // Déjà tout (installé « app », ou un remplissage fini) : une seule lecture, rien d'autre — le message
+  // revient à chaque démarrage, il ne doit pas occuper le service worker pendant que la page charge.
+  filling = caches.open(CACHE_NAME).then((cache) => cache.match(SCOPE_KEY).then((r) => (r ? r.text() : null)).then((scope) => {
+    if (scope === 'app') return undefined;
+    let i = 0;
+    let missed = 0; // un fichier pas rangé (réseau coupé en route, 404) : la portée reste « public »,
+    // et le prochain message de l'application reprend là où il manque — jamais « tout » à moitié.
+    const next = () => {
+      if (i >= PRECACHE_ASSETS.length) return Promise.resolve();
+      const url = PRECACHE_ASSETS[i++];
+      return cache.match(url)
+        .then((hit) => (hit ? undefined : fetch(url).then((r) => { if (r && r.ok) return cache.put(url, r); missed += 1; return undefined; })))
+        .catch(() => { missed += 1; })
+        .then(next);
+    };
+    return Promise.all([next(), next(), next(), next(), next(), next()])
+      .then(() => (missed === 0 ? cache.put(SCOPE_KEY, new Response('app', { headers: { 'Content-Type': 'text/plain' } })) : undefined));
+  })).catch(() => undefined).finally(() => { filling = null; });
+  return filling;
+}
+self.addEventListener('message', (event) => {
+  if (!event.data || event.data.type !== PRECACHE_APP_MESSAGE) return;
+  event.waitUntil(markCrew().then(fillAppPrecache));
 });
 
 // Activate — purge anything that isn't one of the three expected caches
@@ -349,6 +464,58 @@ self.addEventListener('activate', (event) => {
 });
 
 // Fetch handler
+// ADR-0043 phase 5 — la page de secours « Pas de réseau » (une navigation sans coquille gardée, ou
+// le gestionnaire en échec). Au design de d11 quand CET appareil voit la nouvelle page publique —
+// l'aperçu de l'onglet ou le dernier réglage du bord lu ici (`wangap-public-design-preview` /
+// `wangap-public-design`, lib/publicDesign.js), dans le même ordre que `resolvePublicDesign` ; sinon
+// celle d'aujourd'hui, mot pour mot. d11 : le logo, le message, « Réessayer » ; FR / EN (`?lang=`,
+// puis `lang`), jour / nuit (`wangap-public-theme`) ; le retour du réseau recharge seul. Le serveur
+// momentanément indisponible se réessaie seul, 3 fois (V2.2), dans les deux.
+const OFFLINE_HTML = [
+  '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Wang&#39;ap — Offline</title><style>',
+  'body{background:#0B1026;color:#FBF7EF;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}',
+  '.v1{text-align:center;max-width:320px;padding:0 20px}',
+  '#d11,html.d11 .v1{display:none}html.d11 #d11{display:block}',
+  'html.d11 body{height:auto;min-height:100vh;background:#FBF6EA;color:#14284B;font:400 1.0625rem/1.55 Georgia,"Times New Roman",serif}',
+  'html.d11.night body{background:#0D1830;color:#EFE8D8}',
+  '#d11 .c{box-sizing:border-box;width:min(440px,calc(100vw - 32px));margin:24px auto;padding:30px 24px 28px;border-radius:22px;background:#FFFFFF;text-align:center;box-shadow:0 1px 2px rgba(20,40,75,.07),0 16px 32px -18px rgba(20,40,75,.42)}',
+  'html.night #d11 .c{background:#18233A;box-shadow:0 1px 2px rgba(0,0,0,.3),0 18px 34px -18px rgba(0,0,0,.75)}',
+  '#d11 .lg{display:block;width:72px;height:72px;margin:0 auto 14px;border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2)}',
+  '#d11 .lg img{display:block;width:100%;height:100%;object-fit:cover}',
+  '#d11 .wm{margin:0 0 18px;font:800 1.5625rem/1 Georgia,"Times New Roman",serif;letter-spacing:.05em}',
+  '#d11 h1{margin:0 0 10px;font:700 1.625rem/1.15 Georgia,"Times New Roman",serif;letter-spacing:.02em}',
+  '#d11 .m{margin:0 0 22px;font:400 1rem/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#525D6F}',
+  'html.night #d11 .m{color:#A9B2C2}',
+  '#d11 button{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:50px;padding:0 24px;border:0;border-radius:999px;background:#14284B;color:#FBF6EA;font:700 1rem/1.15 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;cursor:pointer}',
+  'html.night #d11 button{background:#E8B059;color:#14284B}',
+  '#d11 button:focus-visible{outline:3px solid #1F6F8B;outline-offset:3px}html.night #d11 button:focus-visible{outline-color:#E8B059}',
+  '</style></head><body>',
+  '<div class="v1"><h1>⛵ Wang&#39;ap</h1><p id="msg">Chargement…</p></div>',
+  '<main id="d11"><div class="c"><span class="lg"><img src="/images/logo.webp" alt="" width="72" height="72" onerror="this.parentNode.remove()"></span>',
+  '<p class="wm">wang&#39;ap</p><h1 id="t"></h1><p class="m" id="m" role="status"></p>',
+  '<button type="button" id="r"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg><span id="rl"></span></button></div></main>',
+  '<script>(function(){',
+  'var on=navigator.onLine;',
+  'function g(s,k){try{return s.getItem(k)}catch(e){return null}}',
+  'var q=null;try{q=new URLSearchParams(location.search)}catch(e){}',
+  'var ok=function(v){return v==="v1"||v==="synthese"};',
+  'var qd=q&&q.get("design"),pv=g(sessionStorage,"wangap-public-design-preview"),cd=g(localStorage,"wangap-public-design");',
+  'var d=ok(qd)?qd:(qd!=="auto"&&ok(pv))?pv:ok(cd)?cd:"v1";',
+  'var k="wangap:swReloadCount",n=parseInt(g(sessionStorage,k)||"0",10);',
+  'if(d!=="synthese"){var t=document.getElementById("msg");if(!on){t.textContent="Hors-ligne — reconnectez-vous";return;}if(n>=3){t.textContent="Service indisponible — réessayez dans quelques minutes";sessionStorage.removeItem(k);return;}sessionStorage.setItem(k,String(n+1));t.textContent="Service momentanément indisponible — nouvelle tentative…";setTimeout(function(){location.reload();},2000);return;}',
+  'var ql=q&&q.get("lang"),L=(ql==="en"||ql==="fr")?ql:(g(localStorage,"lang")==="en"?"en":"fr");',
+  'var S={fr:{off:"Pas de réseau",offm:"Cet appareil n’est pas connecté à Internet. Dès que le réseau revient, la page s’ouvre.",busy:"Le site ne répond pas",busym:"Nouvelle tentative dans un instant…",downm:"Réessayez dans quelques minutes.",r:"Réessayer"},',
+  'en:{off:"No network",offm:"This device is not connected to the Internet. As soon as the network is back, the page opens.",busy:"The site is not answering",busym:"Trying again in a moment…",downm:"Please try again in a few minutes.",r:"Try again"}}[L];',
+  'var h=document.documentElement;h.className="d11"+(g(localStorage,"wangap-public-theme")==="night"?" night":"");h.lang=L;',
+  'var T=document.getElementById("t"),M=document.getElementById("m");document.getElementById("rl").textContent=S.r;',
+  'document.getElementById("r").onclick=function(){try{sessionStorage.removeItem(k)}catch(e){}location.reload();};',
+  'function say(a,b){T.textContent=a;M.textContent=b;document.title="Wang’ap — "+a;}',
+  'if(!on){say(S.off,S.offm);window.addEventListener("online",function(){location.reload();});return;}',
+  'if(n>=3){say(S.busy,S.downm);try{sessionStorage.removeItem(k)}catch(e){}return;}',
+  'try{sessionStorage.setItem(k,String(n+1))}catch(e){}say(S.busy,S.busym);setTimeout(function(){location.reload();},2000);',
+  '})();</script></body></html>',
+].join('');
+
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -367,6 +534,27 @@ self.addEventListener('fetch', (event) => {
   // Supabase's native range support reaches the player untouched. This covers
   // any-origin video by extension AND any request carrying a Range header.
   if (/\.(mp4|mov|m4v|webm)(\?|$)/i.test(url.pathname) || event.request.headers.has('range')) {
+    return;
+  }
+
+  // ADR-0043 P0-7 (13 nov. 2026) — la revue du design (`/revue-design/…`) va ENTIÈREMENT au réseau :
+  // ses pages l'étaient déjà (V3.51.1), pas leurs fichiers. Le 12 nov., le « stale-while-revalidate »
+  // plus bas a servi chez Catherine et Bertrand un vieux `wg.js` (d'avant d10) : pas d'onglet
+  // « Mon avis », le bouton doré ne faisait rien (contourné ce jour-là par `?v=`). Rien de la revue
+  // n'a sa place dans le cache de l'application.
+  if (url.origin === self.location.origin && url.pathname.startsWith('/revue-design/')) {
+    return;
+  }
+
+  // VIDEO-005 — a video's subtitles (`<base>.en.vtt`, next to it in the
+  // `photos` bucket) go straight to the network too. The image handler below is
+  // cache-first FOR EVER: a subtitle file made again (a better translation)
+  // would never reach a device that had read the first one, and each file would
+  // take a slot of the 500-entry image cache. They are useless offline anyway —
+  // the video they belong to bypasses this worker. The player fetches them
+  // itself and treats any failure (a clip with no speech has no file) as « no
+  // subtitles ».
+  if (/\.vtt$/i.test(url.pathname)) {
     return;
   }
 
@@ -526,7 +714,7 @@ self.addEventListener('fetch', (event) => {
     // The body auto-detects via navigator.onLine + retries the
     // navigation once after 2 s so a Vercel cold-start usually
     // self-recovers without the user noticing.
-    const offlinePage = new Response('<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Wang\'ap — Offline</title></head><body style="background:#0B1026;color:#FBF7EF;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0"><div style="text-align:center;max-width:320px;padding:0 20px"><h1>⛵ Wang\'ap</h1><p id="msg">Chargement…</p><script>(function(){var on=navigator.onLine;var t=document.getElementById("msg");if(!on){t.textContent="Hors-ligne — reconnectez-vous";return;}var k="wangap:swReloadCount",n=parseInt(sessionStorage.getItem(k)||"0",10);if(n>=3){t.textContent="Service indisponible — réessayez dans quelques minutes";sessionStorage.removeItem(k);return;}sessionStorage.setItem(k,String(n+1));t.textContent="Service momentanément indisponible — nouvelle tentative…";setTimeout(function(){location.reload();},2000);})();</script></div></body></html>', {
+    const offlinePage = new Response(OFFLINE_HTML, {
       // V1.9.3-fix: explicit charset=utf-8 in the Content-Type header AND a
       // <meta charset="utf-8"> in the HTML so the ⛵ + em-dash UTF-8 bytes
       // don't render as Latin-1 mojibake (â›µ / â€" — what users were seeing
@@ -548,9 +736,12 @@ self.addEventListener('fetch', (event) => {
     // depuis une notification en mer, montrait « Hors-ligne — reconnectez-vous »
     // (et sur un réseau muet, iOS, attendait sans fin). Un FICHIER (une
     // extension : uat-guide.html…) ou un dossier statique garde le réseau d'abord.
+    // ⚠️ V3.51.1 (10 nov.) — `revue-design` : la revue du design (`/revue-design/<jeton>/`)
+    // est un dossier STATIQUE ; sans lui ici, son adresse « dossier » (sans .html) recevait
+    // la coquille de l'app et retombait sur la page connectée ou publique.
     const isAppRoute = isShell || (
       !/\.[a-z0-9]+$/i.test(url.pathname) &&
-      !/^\/(api|assets|aide|screenshots|help-shots|images|icons|routing)(\/|$)/.test(url.pathname)
+      !/^\/(api|assets|aide|screenshots|help-shots|images|icons|routing|revue-design)(\/|$)/.test(url.pathname)
     );
     safeRespond(event, () =>
       caches.match('/').then((cached) => {

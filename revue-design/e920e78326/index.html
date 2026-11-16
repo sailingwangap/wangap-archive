@@ -6,7 +6,8 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Wang'ap — Revue du design</title>
 <link rel="icon" href="/favicon.svg">
-<link rel="stylesheet" href="wg.css">
+<!-- ?v= : le service worker de l'application (déjà installé chez Catherine et Bertrand) sert d'abord SA copie des fichiers de même origine ; une adresse nouvelle n'est jamais dans son cache. ⚠️ Après toute modification de wg.js / survey.js / wg.css / data-*.js : changer ce ?v= (verify-design-survey vérifie qu'il est le même partout). -->
+<link rel="stylesheet" href="wg.css?v=20261113a">
 <style>
   :root {
     --bg: #FBF7EF; --card: #FFFFFF; --ink: #1D2B44; --muted: #5E6B7A; --line: #E7E1D4;
@@ -85,6 +86,21 @@
   .btn.primary { background: var(--ink); color: #fff; }
   .btn.ghost { background: #fff; color: var(--ink); border: 1.5px solid #CFC7B6; }
 
+  .d7, .d8, .d9, .d10, .d11 { margin: 22px 0 0; border: 1.5px solid #D9C79F; box-shadow: 0 8px 30px rgba(29,43,68,.10); }
+  .d7 .shots { background: #E9DEC4; }
+  .d8 { border-color: #E8B059; }
+  .d8 .shots { background: #14284B; }
+  .d9 { border-color: #1B4572; }
+  .d9 .shots { background: #1B4572; }
+  .d10 { border-color: #E8B059; }
+  .d10 .shots { background: #0B1730; }
+  .d11 { border-color: #E8B059; }
+  .d11 .shots { background: #0B1730; }
+  .d7-k { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .chip.new { background: #1D2B44; color: #F4ECDB; }
+  .chip.was { background: #EFE6D2; color: #5E6B7A; }
+  .d7 .from, .d8 .from, .d9 .from, .d10 .from, .d11 .from { margin: 0; font-size: 14px; color: var(--muted); }
+  @media (min-width: 760px) { .d7, .d8, .d9, .d10, .d11 { display: grid; grid-template-columns: 1.15fr 1fr; } .d7 .shots, .d8 .shots, .d9 .shots, .d10 .shots, .d11 .shots { aspect-ratio: auto; min-height: 340px; } }
   .next { margin: 18px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 16px 18px; border: 2px dashed #CBBFA6; border-radius: 20px; background: repeating-linear-gradient(135deg, rgba(232,176,89,.06) 0 12px, transparent 12px 24px), #FFFDF8; color: var(--ink); text-decoration: none; }
   .next-n { width: 44px; height: 44px; flex: none; border-radius: 50%; background: var(--ink); color: #fff; font: 700 20px/44px var(--serif); text-align: center; }
   .next-b { flex: 1 1 260px; display: flex; flex-direction: column; gap: 2px; }
@@ -120,23 +136,58 @@
   </div>
 </div></header>
 <main id="app"></main>
-<script src="data.js"></script>
-<script src="wg.js"></script>
-<script src="survey.js"></script>
+<script src="data.js?v=20261113a"></script>
+<script src="wg.js?v=20261113a"></script>
+<script src="survey.js?v=20261113a"></script>
 <script>
 (function () {
   const { t, esc, DESIGNS } = WG;
+  // Les six propositions du 17 oct., puis d7 — la synthèse (10 nov.) —, d8, sa v2
+  // (11 nov.), d9, sa v3, et d10, sa v4 (12 nov.), présentées à part.
+  const SIX = DESIGNS.filter((d) => !['d7', 'd8', 'd9', 'd10', 'd11'].includes(d.id));
+  const D7 = DESIGNS.find((d) => d.id === 'd7');
+  const D8 = DESIGNS.find((d) => d.id === 'd8');
+  const D9 = DESIGNS.find((d) => d.id === 'd9');
+  const D10 = DESIGNS.find((d) => d.id === 'd10');
+  const D11 = DESIGNS.find((d) => d.id === 'd11');
+  // Une synthèse, en grand sous les six.
+  const special = (D, num, chip, from) => {
+    const st = WGS.status(D.id);
+    return `
+      <article class="card ${D.id}">
+        <a class="shots" href="${D.file}" aria-label="${esc(t('Ouvrir la démo', 'Open the demo'))} ${esc(t(D.fr, D.en))}">
+          <span class="ph">${t('Aperçu…', 'Preview…')}</span>
+          <img class="desk" src="snaps/${D.id}-desktop.jpg" alt="" loading="lazy" onerror="this.remove()">
+          <img class="phone" src="snaps/${D.id}-phone.jpg" alt="" loading="lazy" onerror="this.remove()">
+          <span class="num">${num}</span>
+        </a>
+        <div class="body">
+          <div class="d7-k">${chip}</div>
+          <div class="title"><h3>${esc(WG.lang === 'fr' ? D.fr : D.en)}</h3><small>${esc(WG.lang === 'fr' ? D.en : D.fr)}</small></div>
+          <p class="mood">${esc(t(D.moodFr, D.moodEn))}</p>
+          <p class="xp">${esc(t(D.xpFr, D.xpEn))}</p>
+          <p class="from">${from}</p>
+          <div class="meta"><span class="sw">${D.palette.map((c) => `<i style="background:${c}"></i>`).join('')}</span><span>${esc(D.fonts)}</span></div>
+          <div class="meta">${t('Petit Prince', 'Little Prince')} <span class="pp" aria-label="${D.pp}/5">${'★'.repeat(D.pp)}${'☆'.repeat(5 - D.pp)}</span></div>
+          <span class="chip ${st}">${STATUS()[st]}</span>
+          <div class="acts">
+            <a class="btn primary" href="${D.file}">${t('Ouvrir', 'Open')} →</a>
+            <a class="btn ghost" href="${D.file}#avis">💬 ${t('Mon avis', 'My view')}</a>
+          </div>
+        </div>
+      </article>`;
+  };
   const app = document.getElementById('app');
   const STATUS = () => ({ todo: t('À découvrir', 'To discover'), started: t('Avis commencé', 'View started'), done: t('✓ Avis donné', '✓ View given') });
 
   const general = () => (WGS.read('general') || { answers: {} });
-  const opts = (sel) => `<option value="">—</option>${DESIGNS.map((d, i) => `<option value="${d.id}" ${sel === d.id ? 'selected' : ''}>${i + 1}. ${esc(t(d.fr, d.en))}</option>`).join('')}`;
+  const opts = (sel) => `<option value="">—</option>${SIX.map((d, i) => `<option value="${d.id}" ${sel === d.id ? 'selected' : ''}>${i + 1}. ${esc(t(d.fr, d.en))}</option>`).join('')}`;
 
   function render() {
     document.getElementById('sub').textContent = t('Revue du design · page publique', 'Design review · public page');
     document.querySelectorAll('[data-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === WG.lang)));
     const rev = WGS.reviewer();
-    const st = DESIGNS.map((d) => WGS.status(d.id));
+    const st = SIX.map((d) => WGS.status(d.id));
     const done = st.filter((s) => s === 'done').length;
     const g = general().answers || {};
     const first = rev ? rev.split(' ')[0] : '';
@@ -173,7 +224,7 @@
 
     <section class="wrap">
       <div class="progress"><h2>${t('Les six designs', 'The six designs')}</h2><div class="bar"><i style="width:${(done / 6) * 100}%"></i></div><span class="count">${done}/6 ${t('avis donnés', 'views given')}</span></div>
-      <div class="grid">${DESIGNS.map((d, i) => `
+      <div class="grid">${SIX.map((d, i) => `
         <article class="card">
           <a class="shots" href="${d.file}" aria-label="${esc(t('Ouvrir la démo', 'Open the demo'))} ${esc(t(d.fr, d.en))}">
             <span class="ph">${t('Aperçu…', 'Preview…')}</span>
@@ -195,12 +246,16 @@
           </div>
         </article>`).join('')}
       </div>
-      <a class="next" href="d7-la-synthese.html">
-        <span class="next-n">7</span>
-        <span class="next-b"><b>${t('La Synthèse — la combinaison finale', 'The Synthesis — the final combination')}</b>
-          <span>${t('La maquette qui réunira le meilleur des six, à partir de vos avis et de votre discussion. Prenez votre temps.', 'The mock-up that will bring together the best of the six, from your views and your discussion. Take your time.')}</span></span>
-        <span class="chip started">⏳ ${t('En préparation', 'In preparation')}</span>
-      </a>
+      ${special(D11, 11, `<span class="chip new">✨ ${t('Nouveau · d’après vos avis sur la v4', 'New · built from your views on v4')}</span>`,
+        t('La v4 reste la base. Ce qui change : votre photo à la barre (votre choix à tous les deux) fixée à l’accueil ; le grand titre une à deux tailles plus petit ; le menu vérifié sur iPhone, iPad et ordinateur, en portrait et en paysage, plus compact quand le téléphone est tenu en largeur.', 'v4 stays the base. What changed: your photo at the helm (you both chose it) fixed on the opening page; the big title one or two sizes smaller; the menu checked on iPhone, iPad and computer, portrait and landscape, more compact when the phone is held sideways.'))}
+      ${special(D10, 10, `<span class="chip was">${t('D’après vos avis du 12 nov.', 'Built from your views of 12 Nov.')}</span>`,
+        t('La v3 reste la base. Ce qui change après vos avis du 12 nov. : la première page de la v2 revient (les étoiles, l’orbite, la grande phrase), avec un cadre bien plus grand, à la forme de la photo, pour la voir presque entière — à choisir parmi vos quatre photos ; les deux cartes harmonisées : la même mappemonde, le même trait, les mêmes escales.', 'v3 stays the base. What changed after your views of 12 Nov.: v2’s opening page is back (the stars, the orbit, the big sentence), with a much larger frame shaped like the photo so you see almost all of it — pick one of your four photos; both maps harmonised: the same world map, the same line, the same stops.'))}
+      ${special(D9, 9, `<span class="chip was">${t('D’après vos avis du 11–12 nov.', 'Built from your views of 11–12 Nov.')}</span>`,
+        t('La v2 (5/5 pour vous deux) reste la base. Ce qui change après vos avis du 11 et du 12 nov. : la photo de Wang’ap en grand et nette, à choisir parmi six ; le logo en grand et « wang’ap » dans sa police ; des caractères plus petits à l’accueil ; une mappemonde avec la mer en bleu et une carte de géographe pour la route parcourue, lissée ; la galerie en photos et vidéos ; chaque photo entière dans le lecteur ; le Petit Prince en exergue ; de nouvelles couleurs pour l’équipage, la genèse et le contact ; des animations qui se voient.', 'v2 (5/5 from you both) stays the base. What changed after your views of 11 and 12 Nov.: Wang’ap’s photo full-size and sharp, pick one of six; the logo full-size and “wang’ap” in her own font; smaller type on the opening page; a world map with a blue sea and a geographer’s map for the route sailed, smoothed; the gallery in photos and videos; every photo whole in the reader; the Little Prince as epigraphs; new colours for the crew, genesis and contact; animations you can actually see.'))}
+      ${special(D8, 8, `<span class="chip was">${t('D’après vos avis du 10 nov.', 'Built from your views of 10 Nov.')}</span>`,
+        t('La Petite Planète (1) reste la base. Ce qui change après vos avis du 10 nov. : une couleur par section et des séparations nettes ; la police de Wang’ap partout ; des titres simples ; le journal en cartes bien séparées, une photo par récit ; un menu en couleurs avec la galerie ; la carte du tour du monde sur le vrai programme (Nouvelle-Calédonie, Vanuatu, les Antilles après le Brésil) ; un accueil moins enfantin.', 'The Little Planet (1) stays the base. What changed after your views of 10 Nov.: one colour per section with clear separations; Wang’ap’s own font throughout; simple titles; the journal as clearly separated cards, one photo per story; a colourful menu with the gallery; the world map drawn on the real programme (New Caledonia, Vanuatu, the Antilles after Brazil); a less childish opening.'))}
+      ${special(D7, 7, `<span class="chip was">${t('D’après vos avis du 17 oct.', 'Built from your views of 17 Oct.')}</span>`,
+        t('La base de la Petite Planète (1) ; le carnet du Journal de bord (3) ; « Ce mois-ci » de la Revue (4) ; les cartes postales et l’équipage de l’Album (5) ; le marine, l’or et la vue de nuit de Nuit de quart (2) ; le tableau de bord de la Carte vivante (6).', 'The Little Planet’s base (1); the Ship’s Logbook’s log (3); The Review’s “This month” (4); the Scrapbook’s postcards and crew (5); Night Watch’s navy, gold and night view (2); the Living Map’s dashboard (6).'))}
       <div class="tips"><b>${t('Quelques conseils', 'A few tips')}</b><ul>
         <li>${t('Regardez si possible sur <b>téléphone et sur iPad ou ordinateur</b> : chaque design s’adapte différemment.', 'If you can, look on <b>phone and on iPad or computer</b>: each design adapts differently.')}</li>
         <li>${t('Fiez-vous à la première impression, puis prenez le temps de lire un récit.', 'Trust your first impression, then take time to read a story.')}</li>
